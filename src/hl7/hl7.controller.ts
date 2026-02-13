@@ -1,0 +1,125 @@
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+  BadRequestException,
+} from '@nestjs/common';
+import { Hl7Service } from './hl7.service';
+import { TcpListenerService } from './tcp-listener.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
+import { UserRoleEnum } from '../database/schemas/user-role.schema';
+
+@Controller('hl7')
+export class Hl7Controller {
+  constructor(
+    private readonly hl7Service: Hl7Service,
+    private readonly tcpListenerService: TcpListenerService,
+  ) {}
+
+  @Post('receive')
+  async receiveMessage(
+    @Body() body: { message: string; machineId: string; protocol?: string },
+  ) {
+    const { message, machineId, protocol = 'HL7' } = body;
+
+    if (!message || !machineId) {
+      throw new BadRequestException('Message and machineId are required');
+    }
+
+    let result;
+    if (protocol === 'HL7') {
+      result = await this.hl7Service.processHL7Message(message, machineId);
+    } else if (protocol === 'ASTM') {
+      result = await this.hl7Service.processASTMMessage(message, machineId);
+    } else if (protocol === 'LIS2-A2') {
+      result = await this.hl7Service.processLIS2A2Message(message, machineId);
+    } else {
+      throw new BadRequestException('Unsupported protocol');
+    }
+
+    return {
+      success: true,
+      ack: result.ack,
+      resultsStored: result.results.length,
+    };
+  }
+
+  @Get('logs')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH)
+  async getLogs(
+    @Query('machineId') machineId?: string,
+    @Query('protocol') protocol?: string,
+    @Query('status') status?: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const filters: any = {
+      machineId,
+      protocol,
+      status,
+      page: page ? parseInt(page) : 1,
+      limit: limit ? parseInt(limit) : 50,
+    };
+
+    if (startDate) {
+      filters.startDate = new Date(startDate);
+    }
+    if (endDate) {
+      filters.endDate = new Date(endDate);
+    }
+
+    return this.hl7Service.getCommunicationLogs(filters);
+  }
+
+  @Get('logs/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH)
+  async getLogById(@Param('id') id: string) {
+    return this.hl7Service.getCommunicationLogById(id);
+  }
+}
+
+  @Get('unmatched-results')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH)
+  async getUnmatchedResults() {
+    return this.tcpListenerService.getUnmatchedResults();
+  }
+
+  @Post('match-result')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH)
+  async matchResult(
+    @Body() body: { resultIndex: number; orderId: string },
+  ) {
+    const { resultIndex, orderId } = body;
+
+    if (resultIndex === undefined || !orderId) {
+      throw new BadRequestException('resultIndex and orderId are required');
+    }
+
+    return this.tcpListenerService.matchResult(resultIndex, orderId);
+  }
+
+  @Post('reject-result/:index')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH)
+  async rejectResult(@Param('index') index: string) {
+    const resultIndex = parseInt(index);
+    const success = this.tcpListenerService.rejectResult(resultIndex);
+    
+    if (!success) {
+      throw new BadRequestException('Result not found or already processed');
+    }
+
+    return { success: true, message: 'Result rejected' };
+  }

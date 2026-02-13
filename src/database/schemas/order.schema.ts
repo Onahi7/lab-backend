@@ -1,0 +1,111 @@
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, Types } from 'mongoose';
+
+export enum OrderStatusEnum {
+  PENDING_PAYMENT = 'pending_payment',
+  PENDING_COLLECTION = 'pending_collection',
+  COLLECTED = 'collected',
+  PROCESSING = 'processing',
+  COMPLETED = 'completed',
+  CANCELLED = 'cancelled',
+}
+
+export enum PaymentStatusEnum {
+  PENDING = 'pending',
+  PAID = 'paid',
+  PARTIAL = 'partial',
+  REFUNDED = 'refunded',
+}
+
+export enum PriorityEnum {
+  ROUTINE = 'routine',
+  URGENT = 'urgent',
+  STAT = 'stat',
+}
+
+export enum DiscountTypeEnum {
+  PERCENTAGE = 'percentage',
+  FIXED = 'fixed',
+}
+
+export enum PaymentMethodEnum {
+  CASH = 'cash',
+  CARD = 'card',
+  MOBILE_MONEY = 'mobile_money',
+}
+
+@Schema({ timestamps: true, collection: 'orders' })
+export class Order extends Document {
+  @Prop({ required: true, unique: true })
+  orderNumber: string; // ORD-YYYYMMDD-XXXX
+
+  @Prop({ type: Types.ObjectId, ref: 'Patient', required: true })
+  patientId: Types.ObjectId;
+
+  @Prop({
+    required: true,
+    enum: Object.values(OrderStatusEnum),
+    index: true,
+  })
+  status: OrderStatusEnum;
+
+  @Prop({ required: true, enum: Object.values(PriorityEnum) })
+  priority: PriorityEnum;
+
+  @Prop({ required: true })
+  subtotal: number;
+
+  @Prop({ default: 0 })
+  discount: number;
+
+  @Prop({ enum: Object.values(DiscountTypeEnum) })
+  discountType?: DiscountTypeEnum;
+
+  @Prop({ required: true })
+  total: number;
+
+  @Prop({
+    required: true,
+    enum: Object.values(PaymentStatusEnum),
+    default: PaymentStatusEnum.PENDING,
+  })
+  paymentStatus: PaymentStatusEnum;
+
+  @Prop({ enum: Object.values(PaymentMethodEnum) })
+  paymentMethod?: PaymentMethodEnum;
+
+  @Prop()
+  notes?: string;
+
+  @Prop({ type: Types.ObjectId, ref: 'Profile' })
+  orderedBy?: Types.ObjectId;
+
+  @Prop()
+  collectedAt?: Date;
+
+  @Prop({ type: Types.ObjectId, ref: 'Profile' })
+  collectedBy?: Types.ObjectId;
+
+  @Prop()
+  completedAt?: Date;
+
+  @Prop()
+  cancelledAt?: Date;
+
+  @Prop({ type: Types.ObjectId, ref: 'Profile' })
+  cancelledBy?: Types.ObjectId;
+
+  @Prop()
+  cancellationReason?: string;
+
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export const OrderSchema = SchemaFactory.createForClass(Order);
+
+// Indexes
+OrderSchema.index({ orderNumber: 1 }, { unique: true });
+OrderSchema.index({ patientId: 1 });
+OrderSchema.index({ status: 1 });
+OrderSchema.index({ createdAt: -1 });
