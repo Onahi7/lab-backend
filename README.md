@@ -1,129 +1,139 @@
-# Hobour Diagnostics - Laboratory Information System Backend
+# Laboratory Information System - Backend
 
-NestJS REST API backend for Hobour Diagnostics Laboratory Information System (LIS).
+A comprehensive Laboratory Information System (LIS) backend built with NestJS, MongoDB, and real-time analyzer integration.
 
-## Description
+## Features
 
-This is the backend API server for the Hobour Diagnostics LIS application, built with NestJS and MongoDB. It provides REST endpoints for managing patients, orders, samples, results, test catalog, machines, quality control, and analyzer integration.
+- 🔐 **Authentication & Authorization** - JWT-based auth with role-based access control
+- 👥 **User Management** - Admin, Lab Tech, and Receptionist roles
+- 🧪 **Test Catalog Management** - Comprehensive test and panel management
+- 📋 **Order Management** - Complete order lifecycle from creation to completion
+- 🔬 **Analyzer Integration** - TCP/IP listeners for HL7, ASTM, and LIS2-A2 protocols
+- 📊 **Result Management** - Automated result import with manual matching
+- 🏥 **Patient Management** - Full patient registration and tracking
+- 💰 **Payment Processing** - Multiple payment methods support
+- 📈 **Real-time Updates** - WebSocket support for live notifications
+- 📝 **Audit Logging** - Complete audit trail for all operations
+- 🔧 **Machine Management** - Monitor and manage laboratory analyzers
 
-## Technology Stack
+## Tech Stack
 
-- **Framework**: NestJS 11.x
-- **Database**: MongoDB 7.x with Mongoose ODM
-- **Authentication**: JWT (JSON Web Tokens)
-- **Validation**: Class Validator
+- **Framework**: NestJS
+- **Database**: MongoDB with Mongoose
+- **Authentication**: JWT + Passport
+- **Real-time**: Socket.IO
+- **Protocols**: HL7, ASTM, LIS2-A2
+- **Validation**: class-validator
 - **Testing**: Jest
-- **Documentation**: Swagger/OpenAPI
 
-## Prerequisites
+## Getting Started
 
-- Node.js 18+ or 20+
-- pnpm 8+
-- MongoDB 7+ (local or MongoDB Atlas)
+### Prerequisites
 
-## Installation
+- Node.js 18+
+- MongoDB 6+
+- pnpm (recommended) or npm
+
+### Installation
 
 ```bash
 # Install dependencies
 pnpm install
-```
 
-## Configuration
-
-1. Copy the example environment file:
-```bash
+# Copy environment file
 cp .env.example .env
+
+# Configure your MongoDB connection in .env
 ```
 
-2. Update the `.env` file with your configuration:
-   - `MONGODB_URI`: Your MongoDB connection string
-   - `JWT_SECRET`: Secret key for JWT tokens (change in production!)
-   - `CORS_ORIGIN`: Frontend URL for CORS configuration
-
-## Running the Application
+### Database Setup
 
 ```bash
-# Development mode with hot-reload
+# Seed admin user
+pnpm run seed:admin
+
+# Seed test catalog
+pnpm run seed:tests
+
+# Seed laboratory machines
+pnpm run seed:machines
+```
+
+### Running the Application
+
+```bash
+# Development
 pnpm run start:dev
 
-# Production mode
+# Production
 pnpm run build
 pnpm run start:prod
-
-# Debug mode
-pnpm run start:debug
 ```
 
 The API will be available at `http://localhost:3000`
 
+## Analyzer Integration
+
+The system supports automated result import from laboratory analyzers:
+
+1. **ZYBIO EXC 200** (Hematology) - Port 5000
+2. **ZYBIO Z52** (Chemistry) - Port 5001
+3. **WONDFO Finecare PLUS** (Immunoassay)
+
+TCP listeners start automatically when the server runs. See `ANALYZER_INTEGRATION_GUIDE.md` for setup instructions.
+
 ## API Documentation
 
-Once the application is running, access the Swagger documentation at:
-```
-http://localhost:3000/api/docs
-```
-
-## Testing
-
-```bash
-# Unit tests
-pnpm run test
-
-# E2E tests
-pnpm run test:e2e
-
-# Test coverage
-pnpm run test:cov
-
-# Watch mode
-pnpm run test:watch
-```
+Once running, visit:
+- Swagger UI: `http://localhost:3000/api`
+- Health Check: `http://localhost:3000/health`
 
 ## Project Structure
 
 ```
-backend/
-├── src/
-│   ├── modules/          # Feature modules
-│   │   ├── auth/         # Authentication
-│   │   ├── users/        # User management
-│   │   ├── patients/     # Patient management
-│   │   ├── orders/       # Order management
-│   │   ├── samples/      # Sample tracking
-│   │   ├── results/      # Result management
-│   │   ├── test-catalog/ # Test catalog
-│   │   ├── machines/     # Machine management
-│   │   ├── hl7/          # HL7/ASTM/LIS2-A2 processing
-│   │   ├── qc/           # Quality control
-│   │   ├── audit/        # Audit logging
-│   │   └── reports/      # Reporting
-│   ├── common/           # Shared code
-│   │   ├── guards/       # Auth & role guards
-│   │   ├── interceptors/ # Logging, transform
-│   │   ├── pipes/        # Validation
-│   │   ├── decorators/   # Custom decorators
-│   │   └── filters/      # Exception filters
-│   ├── config/           # Configuration
-│   ├── database/         # Database connection
-│   └── main.ts           # Application entry
-├── test/                 # E2E tests
-└── package.json
-```
-
-## Code Quality
-
-```bash
-# Lint code
-pnpm run lint
-
-# Format code
-pnpm run format
+src/
+├── auth/           # Authentication & authorization
+├── users/          # User management
+├── patients/       # Patient management
+├── orders/         # Order management
+├── results/        # Result management
+├── samples/        # Sample tracking
+├── test-catalog/   # Test catalog management
+├── machines/       # Machine management
+├── hl7/            # HL7/ASTM protocol handlers
+├── reports/        # Report generation
+├── qc/             # Quality control
+├── audit/          # Audit logging
+├── realtime/       # WebSocket gateway
+├── database/       # Database schemas & seeds
+└── common/         # Shared utilities
 ```
 
 ## Environment Variables
 
-See `.env.example` for all available environment variables and their descriptions.
+See `.env.example` for all available configuration options.
+
+Key variables:
+- `MONGODB_URI` - MongoDB connection string
+- `JWT_SECRET` - JWT signing secret
+- `JWT_REFRESH_SECRET` - Refresh token secret
+- `PORT` - Server port (default: 3000)
+
+## Scripts
+
+```bash
+pnpm run start:dev      # Start development server
+pnpm run build          # Build for production
+pnpm run test           # Run tests
+pnpm run seed:admin     # Seed admin user
+pnpm run seed:tests     # Seed test catalog
+pnpm run seed:machines  # Seed laboratory machines
+```
 
 ## License
 
-UNLICENSED - Private project
+Proprietary - Hobour Diagnostics
+
+## Support
+
+For issues or questions, contact the development team.
