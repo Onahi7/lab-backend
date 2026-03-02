@@ -1,0 +1,965 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/components/receipts/ThermalReceipt.tsx");import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+
+let prevRefreshReg;
+let prevRefreshSig;
+
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react-swc can't detect preamble. Something is wrong."
+    );
+  }
+
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+
+import __vite__cjsImport2_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=27cfabb6"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime["jsxDEV"];
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=27cfabb6"; const forwardRef = __vite__cjsImport3_react["forwardRef"];
+import { format } from "/node_modules/.vite/deps/date-fns.js?v=27cfabb6";
+export const ThermalReceipt = /*#__PURE__*/ forwardRef(_c = ({ data, copyType }, ref)=>{
+    const formatCurrency = (amount)=>{
+        return `Le ${amount.toLocaleString()}`;
+    };
+    const discountAmount = data.discountType === 'percentage' ? data.subtotal * data.discount / 100 : data.discount;
+    return /*#__PURE__*/ _jsxDEV("div", {
+        ref: ref,
+        className: "receipt",
+        children: [
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "header",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "logo",
+                        children: "🏥"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 46,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "company-name",
+                        children: "HARBOUR MEDICAL"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 47,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "company-name",
+                        children: "DIAGNOSTIC"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 48,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "company-info",
+                        children: "114 Fourah Bay Road"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 49,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "company-info",
+                        children: "Freetown, Sierra Leone"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 50,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "company-info",
+                        children: "Tel: 075 766461, 031-551811"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 51,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "company-info",
+                        children: "ogbenecarefarmsig@gmail.com"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 52,
+                        columnNumber: 11
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                lineNumber: 45,
+                columnNumber: 9
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "copy-type",
+                children: copyType === 'patient' ? '📋 PATIENT COPY' : '🔬 LAB COPY'
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                lineNumber: 56,
+                columnNumber: 9
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "section",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "info-row",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: "info-label",
+                                children: "Receipt No:"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                lineNumber: 63,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: "info-value",
+                                children: data.receiptNumber
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                lineNumber: 64,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 62,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "info-row",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: "info-label",
+                                children: "Order No:"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                lineNumber: 67,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: "info-value",
+                                children: data.orderNumber
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                lineNumber: 68,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 66,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "info-row",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: "info-label",
+                                children: "Date:"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                lineNumber: 71,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: "info-value",
+                                children: format(new Date(data.paymentDate), 'dd/MM/yyyy HH:mm')
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                lineNumber: 72,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 70,
+                        columnNumber: 11
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                lineNumber: 61,
+                columnNumber: 9
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "section",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "section-title",
+                        children: "Patient Information"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 80,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "info-row",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: "info-label",
+                                children: "Name:"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                lineNumber: 82,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: "info-value",
+                                children: data.patientName
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                lineNumber: 83,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 81,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "info-row",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: "info-label",
+                                children: "Patient ID:"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                lineNumber: 86,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: "info-value",
+                                children: data.patientId
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                lineNumber: 87,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 85,
+                        columnNumber: 11
+                    }, this),
+                    data.patientPhone && /*#__PURE__*/ _jsxDEV("div", {
+                        className: "info-row",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: "info-label",
+                                children: "Phone:"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                lineNumber: 91,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: "info-value",
+                                children: data.patientPhone
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                lineNumber: 92,
+                                columnNumber: 15
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 90,
+                        columnNumber: 13
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                lineNumber: 79,
+                columnNumber: 9
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "items-table",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "section-title",
+                        children: "Tests Ordered"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 99,
+                        columnNumber: 11
+                    }, this),
+                    data.tests.map((test, index)=>/*#__PURE__*/ _jsxDEV("div", {
+                            className: "item-row",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "item-name",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            style: {
+                                                fontWeight: 'bold'
+                                            },
+                                            children: test.code
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                            lineNumber: 103,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            style: {
+                                                fontSize: '10px'
+                                            },
+                                            children: test.name
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                            lineNumber: 104,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                    lineNumber: 102,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "item-price",
+                                    children: formatCurrency(test.price)
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                    lineNumber: 106,
+                                    columnNumber: 15
+                                }, this)
+                            ]
+                        }, index, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                            lineNumber: 101,
+                            columnNumber: 13
+                        }, this))
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                lineNumber: 98,
+                columnNumber: 9
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "totals",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "total-row",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                children: "Subtotal:"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                lineNumber: 114,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                children: formatCurrency(data.subtotal)
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                lineNumber: 115,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 113,
+                        columnNumber: 11
+                    }, this),
+                    data.discount > 0 && /*#__PURE__*/ _jsxDEV("div", {
+                        className: "total-row",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                children: [
+                                    "Discount (",
+                                    data.discountType === 'percentage' ? `${data.discount}%` : formatCurrency(data.discount),
+                                    "):"
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                lineNumber: 119,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                children: [
+                                    "-",
+                                    formatCurrency(discountAmount)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                lineNumber: 126,
+                                columnNumber: 15
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 118,
+                        columnNumber: 13
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "total-row grand-total",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                children: "TOTAL:"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                lineNumber: 130,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                children: formatCurrency(data.total)
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                lineNumber: 131,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 129,
+                        columnNumber: 11
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                lineNumber: 112,
+                columnNumber: 9
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "payment-info",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "info-row",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: "info-label",
+                                children: "Payment Method:"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                lineNumber: 138,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: "info-value",
+                                style: {
+                                    textTransform: 'uppercase'
+                                },
+                                children: data.paymentMethod.replace('-', ' ')
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                lineNumber: 139,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 137,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "info-row",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: "info-label",
+                                children: "Amount Paid:"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                lineNumber: 144,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: "info-value",
+                                children: formatCurrency(data.amountPaid)
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                lineNumber: 145,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 143,
+                        columnNumber: 11
+                    }, this),
+                    data.amountPaid > data.total && /*#__PURE__*/ _jsxDEV("div", {
+                        className: "info-row",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: "info-label",
+                                children: "Change:"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                lineNumber: 149,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: "info-value",
+                                children: formatCurrency(data.amountPaid - data.total)
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                lineNumber: 150,
+                                columnNumber: 15
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 148,
+                        columnNumber: 13
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "info-row",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: "info-label",
+                                children: "Cashier:"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                lineNumber: 156,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: "info-value",
+                                children: data.cashier
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                lineNumber: 157,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 155,
+                        columnNumber: 11
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                lineNumber: 136,
+                columnNumber: 9
+            }, this),
+            data.collectionDate && /*#__PURE__*/ _jsxDEV("div", {
+                className: "section",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "section-title",
+                        children: "Sample Collection"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 164,
+                        columnNumber: 13
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "info-row",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: "info-label",
+                                children: "Scheduled:"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                lineNumber: 166,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: "info-value",
+                                children: data.collectionDate
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                                lineNumber: 167,
+                                columnNumber: 15
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 165,
+                        columnNumber: 13
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                lineNumber: 163,
+                columnNumber: 11
+            }, this),
+            copyType === 'patient' ? /*#__PURE__*/ _jsxDEV("div", {
+                className: "instructions",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        style: {
+                            fontWeight: 'bold',
+                            marginBottom: '5px'
+                        },
+                        children: "IMPORTANT INSTRUCTIONS:"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 175,
+                        columnNumber: 13
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        children: "• Please arrive 15 minutes before scheduled time"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 178,
+                        columnNumber: 13
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        children: "• Bring this receipt for sample collection"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 179,
+                        columnNumber: 13
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        children: "• Fasting may be required for some tests"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 180,
+                        columnNumber: 13
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        children: "• Results ready within 24-48 hours"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 181,
+                        columnNumber: 13
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        children: "• Contact us for any queries"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 182,
+                        columnNumber: 13
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                lineNumber: 174,
+                columnNumber: 11
+            }, this) : /*#__PURE__*/ _jsxDEV("div", {
+                className: "instructions lab-instructions",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        style: {
+                            fontWeight: 'bold',
+                            marginBottom: '5px'
+                        },
+                        children: "LAB TECHNICIAN NOTES:"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 186,
+                        columnNumber: 13
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        children: "• Verify patient ID before collection"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 189,
+                        columnNumber: 13
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        children: "• Check test requirements and prep"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 190,
+                        columnNumber: 13
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        children: "• Label samples with order number"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 191,
+                        columnNumber: 13
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        children: "• Update system after collection"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 192,
+                        columnNumber: 13
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        children: "• Handle samples per protocol"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 193,
+                        columnNumber: 13
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                lineNumber: 185,
+                columnNumber: 11
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "barcode",
+                children: data.orderNumber
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                lineNumber: 198,
+                columnNumber: 9
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "thank-you",
+                children: "THANK YOU FOR CHOOSING US!"
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                lineNumber: 201,
+                columnNumber: 9
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "footer",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        children: "Open 24/7 | Onsite & Online Access"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 203,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        children: "Trusted by Clinics & Hospitals"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 204,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        style: {
+                            marginTop: '10px',
+                            fontSize: '9px'
+                        },
+                        children: "This is a computer-generated receipt"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 205,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        style: {
+                            fontSize: '9px'
+                        },
+                        children: [
+                            "Printed: ",
+                            format(new Date(), 'dd/MM/yyyy HH:mm:ss')
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                        lineNumber: 208,
+                        columnNumber: 11
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+                lineNumber: 202,
+                columnNumber: 9
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx",
+        lineNumber: 43,
+        columnNumber: 7
+    }, this);
+});
+_c1 = ThermalReceipt;
+ThermalReceipt.displayName = 'ThermalReceipt';
+// Thermal printer styles to be injected into print window
+export const thermalPrintStyles = `
+  @page {
+    size: 80mm auto;
+    margin: 0;
+  }
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.4;
+    color: #000;
+    width: 80mm;
+    padding: 5mm;
+    background: white;
+  }
+  
+  .receipt {
+    width: 100%;
+  }
+  
+  .header {
+    text-align: center;
+    margin-bottom: 10px;
+    border-bottom: 2px dashed #000;
+    padding-bottom: 10px;
+  }
+  
+  .logo {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  .company-name {
+    font-size: 14px;
+    font-weight: bold;
+  }
+  
+  .company-info {
+    font-size: 10px;
+    margin-top: 3px;
+  }
+  
+  .copy-type {
+    font-size: 14px;
+    font-weight: bold;
+    margin: 10px 0;
+    text-align: center;
+    padding: 5px;
+    border: 2px solid #000;
+  }
+  
+  .section {
+    margin: 10px 0;
+    padding: 5px 0;
+  }
+  
+  .section-title {
+    font-weight: bold;
+    font-size: 11px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+  }
+  
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 3px 0;
+    font-size: 11px;
+  }
+  
+  .info-label {
+    font-weight: bold;
+  }
+  
+  .info-value {
+    text-align: right;
+  }
+  
+  .items-table {
+    width: 100%;
+    margin: 10px 0;
+    border-top: 1px dashed #000;
+    border-bottom: 1px dashed #000;
+    padding: 5px 0;
+  }
+  
+  .item-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 5px 0;
+    font-size: 11px;
+  }
+  
+  .item-name {
+    flex: 1;
+    padding-right: 10px;
+  }
+  
+  .item-price {
+    white-space: nowrap;
+    font-weight: bold;
+  }
+  
+  .totals {
+    margin: 10px 0;
+    padding: 5px 0;
+    border-top: 2px solid #000;
+  }
+  
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 5px 0;
+    font-size: 12px;
+  }
+  
+  .total-row.grand-total {
+    font-size: 14px;
+    font-weight: bold;
+    border-top: 1px dashed #000;
+    padding-top: 5px;
+    margin-top: 5px;
+  }
+  
+  .payment-info {
+    margin: 10px 0;
+    padding: 10px 0;
+    border-top: 1px dashed #000;
+    border-bottom: 1px dashed #000;
+  }
+  
+  .footer {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 10px;
+  }
+  
+  .barcode {
+    text-align: center;
+    font-family: 'Libre Barcode 128', cursive;
+    font-size: 40px;
+    margin: 10px 0;
+    letter-spacing: 0;
+  }
+  
+  .thank-you {
+    text-align: center;
+    font-weight: bold;
+    margin: 10px 0;
+    font-size: 12px;
+  }
+  
+  .instructions {
+    font-size: 10px;
+    margin: 10px 0;
+    padding: 5px;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+  }
+  
+  .lab-instructions {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+  }
+  
+  @media print {
+    body {
+      width: 80mm;
+    }
+  }
+`;
+var _c, _c1;
+$RefreshReg$(_c, "ThermalReceipt$forwardRef");
+$RefreshReg$(_c1, "ThermalReceipt");
+
+
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+
+
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/HP/Downloads/lab/frontend/src/components/receipts/ThermalReceipt.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIlRoZXJtYWxSZWNlaXB0LnRzeCJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBmb3J3YXJkUmVmIH0gZnJvbSAncmVhY3QnO1xyXG5pbXBvcnQgeyBmb3JtYXQgfSBmcm9tICdkYXRlLWZucyc7XHJcblxyXG5pbnRlcmZhY2UgUmVjZWlwdERhdGEge1xyXG4gIHJlY2VpcHROdW1iZXI6IHN0cmluZztcclxuICBvcmRlck51bWJlcjogc3RyaW5nO1xyXG4gIHBhdGllbnROYW1lOiBzdHJpbmc7XHJcbiAgcGF0aWVudElkOiBzdHJpbmc7XHJcbiAgcGF0aWVudFBob25lPzogc3RyaW5nO1xyXG4gIHRlc3RzOiBBcnJheTx7XHJcbiAgICBjb2RlOiBzdHJpbmc7XHJcbiAgICBuYW1lOiBzdHJpbmc7XHJcbiAgICBwcmljZTogbnVtYmVyO1xyXG4gIH0+O1xyXG4gIHN1YnRvdGFsOiBudW1iZXI7XHJcbiAgZGlzY291bnQ6IG51bWJlcjtcclxuICBkaXNjb3VudFR5cGU6ICdwZXJjZW50YWdlJyB8ICdmaXhlZCc7XHJcbiAgdG90YWw6IG51bWJlcjtcclxuICBhbW91bnRQYWlkOiBudW1iZXI7XHJcbiAgcGF5bWVudE1ldGhvZDogJ2Nhc2gnIHwgJ2NhcmQnIHwgJ21vYmlsZS1tb25leSc7XHJcbiAgcGF5bWVudERhdGU6IHN0cmluZztcclxuICBjYXNoaWVyOiBzdHJpbmc7XHJcbiAgY29sbGVjdGlvbkRhdGU/OiBzdHJpbmc7XHJcbn1cclxuXHJcbmludGVyZmFjZSBUaGVybWFsUmVjZWlwdFByb3BzIHtcclxuICBkYXRhOiBSZWNlaXB0RGF0YTtcclxuICBjb3B5VHlwZTogJ3BhdGllbnQnIHwgJ2xhYic7XHJcbn1cclxuXHJcbmV4cG9ydCBjb25zdCBUaGVybWFsUmVjZWlwdCA9IGZvcndhcmRSZWY8SFRNTERpdkVsZW1lbnQsIFRoZXJtYWxSZWNlaXB0UHJvcHM+KFxyXG4gICh7IGRhdGEsIGNvcHlUeXBlIH0sIHJlZikgPT4ge1xyXG4gICAgY29uc3QgZm9ybWF0Q3VycmVuY3kgPSAoYW1vdW50OiBudW1iZXIpID0+IHtcclxuICAgICAgcmV0dXJuIGBMZSAke2Ftb3VudC50b0xvY2FsZVN0cmluZygpfWA7XHJcbiAgICB9O1xyXG5cclxuICAgIGNvbnN0IGRpc2NvdW50QW1vdW50ID1cclxuICAgICAgZGF0YS5kaXNjb3VudFR5cGUgPT09ICdwZXJjZW50YWdlJ1xyXG4gICAgICAgID8gKGRhdGEuc3VidG90YWwgKiBkYXRhLmRpc2NvdW50KSAvIDEwMFxyXG4gICAgICAgIDogZGF0YS5kaXNjb3VudDtcclxuXHJcbiAgICByZXR1cm4gKFxyXG4gICAgICA8ZGl2IHJlZj17cmVmfSBjbGFzc05hbWU9XCJyZWNlaXB0XCI+XHJcbiAgICAgICAgey8qIEhlYWRlciAqL31cclxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImhlYWRlclwiPlxyXG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJsb2dvXCI+8J+PpTwvZGl2PlxyXG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb21wYW55LW5hbWVcIj5IQVJCT1VSIE1FRElDQUw8L2Rpdj5cclxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29tcGFueS1uYW1lXCI+RElBR05PU1RJQzwvZGl2PlxyXG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb21wYW55LWluZm9cIj4xMTQgRm91cmFoIEJheSBSb2FkPC9kaXY+XHJcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvbXBhbnktaW5mb1wiPkZyZWV0b3duLCBTaWVycmEgTGVvbmU8L2Rpdj5cclxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29tcGFueS1pbmZvXCI+VGVsOiAwNzUgNzY2NDYxLCAwMzEtNTUxODExPC9kaXY+XHJcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvbXBhbnktaW5mb1wiPm9nYmVuZWNhcmVmYXJtc2lnQGdtYWlsLmNvbTwvZGl2PlxyXG4gICAgICAgIDwvZGl2PlxyXG5cclxuICAgICAgICB7LyogQ29weSBUeXBlIEJhZGdlICovfVxyXG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29weS10eXBlXCI+XHJcbiAgICAgICAgICB7Y29weVR5cGUgPT09ICdwYXRpZW50JyA/ICfwn5OLIFBBVElFTlQgQ09QWScgOiAn8J+UrCBMQUIgQ09QWSd9XHJcbiAgICAgICAgPC9kaXY+XHJcblxyXG4gICAgICAgIHsvKiBSZWNlaXB0IEluZm8gKi99XHJcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzZWN0aW9uXCI+XHJcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImluZm8tcm93XCI+XHJcbiAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImluZm8tbGFiZWxcIj5SZWNlaXB0IE5vOjwvc3Bhbj5cclxuICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiaW5mby12YWx1ZVwiPntkYXRhLnJlY2VpcHROdW1iZXJ9PC9zcGFuPlxyXG4gICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImluZm8tcm93XCI+XHJcbiAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImluZm8tbGFiZWxcIj5PcmRlciBObzo8L3NwYW4+XHJcbiAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImluZm8tdmFsdWVcIj57ZGF0YS5vcmRlck51bWJlcn08L3NwYW4+XHJcbiAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiaW5mby1yb3dcIj5cclxuICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiaW5mby1sYWJlbFwiPkRhdGU6PC9zcGFuPlxyXG4gICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJpbmZvLXZhbHVlXCI+XHJcbiAgICAgICAgICAgICAge2Zvcm1hdChuZXcgRGF0ZShkYXRhLnBheW1lbnREYXRlKSwgJ2RkL01NL3l5eXkgSEg6bW0nKX1cclxuICAgICAgICAgICAgPC9zcGFuPlxyXG4gICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgPC9kaXY+XHJcblxyXG4gICAgICAgIHsvKiBQYXRpZW50IEluZm8gKi99XHJcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzZWN0aW9uXCI+XHJcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNlY3Rpb24tdGl0bGVcIj5QYXRpZW50IEluZm9ybWF0aW9uPC9kaXY+XHJcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImluZm8tcm93XCI+XHJcbiAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImluZm8tbGFiZWxcIj5OYW1lOjwvc3Bhbj5cclxuICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiaW5mby12YWx1ZVwiPntkYXRhLnBhdGllbnROYW1lfTwvc3Bhbj5cclxuICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJpbmZvLXJvd1wiPlxyXG4gICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJpbmZvLWxhYmVsXCI+UGF0aWVudCBJRDo8L3NwYW4+XHJcbiAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImluZm8tdmFsdWVcIj57ZGF0YS5wYXRpZW50SWR9PC9zcGFuPlxyXG4gICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICB7ZGF0YS5wYXRpZW50UGhvbmUgJiYgKFxyXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImluZm8tcm93XCI+XHJcbiAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiaW5mby1sYWJlbFwiPlBob25lOjwvc3Bhbj5cclxuICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJpbmZvLXZhbHVlXCI+e2RhdGEucGF0aWVudFBob25lfTwvc3Bhbj5cclxuICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICApfVxyXG4gICAgICAgIDwvZGl2PlxyXG5cclxuICAgICAgICB7LyogVGVzdHMvSXRlbXMgKi99XHJcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJpdGVtcy10YWJsZVwiPlxyXG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzZWN0aW9uLXRpdGxlXCI+VGVzdHMgT3JkZXJlZDwvZGl2PlxyXG4gICAgICAgICAge2RhdGEudGVzdHMubWFwKCh0ZXN0LCBpbmRleCkgPT4gKFxyXG4gICAgICAgICAgICA8ZGl2IGtleT17aW5kZXh9IGNsYXNzTmFtZT1cIml0ZW0tcm93XCI+XHJcbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJpdGVtLW5hbWVcIj5cclxuICAgICAgICAgICAgICAgIDxkaXYgc3R5bGU9e3sgZm9udFdlaWdodDogJ2JvbGQnIH19Pnt0ZXN0LmNvZGV9PC9kaXY+XHJcbiAgICAgICAgICAgICAgICA8ZGl2IHN0eWxlPXt7IGZvbnRTaXplOiAnMTBweCcgfX0+e3Rlc3QubmFtZX08L2Rpdj5cclxuICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cIml0ZW0tcHJpY2VcIj57Zm9ybWF0Q3VycmVuY3kodGVzdC5wcmljZSl9PC9kaXY+XHJcbiAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgKSl9XHJcbiAgICAgICAgPC9kaXY+XHJcblxyXG4gICAgICAgIHsvKiBUb3RhbHMgKi99XHJcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJ0b3RhbHNcIj5cclxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwidG90YWwtcm93XCI+XHJcbiAgICAgICAgICAgIDxzcGFuPlN1YnRvdGFsOjwvc3Bhbj5cclxuICAgICAgICAgICAgPHNwYW4+e2Zvcm1hdEN1cnJlbmN5KGRhdGEuc3VidG90YWwpfTwvc3Bhbj5cclxuICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAge2RhdGEuZGlzY291bnQgPiAwICYmIChcclxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJ0b3RhbC1yb3dcIj5cclxuICAgICAgICAgICAgICA8c3Bhbj5cclxuICAgICAgICAgICAgICAgIERpc2NvdW50IChcclxuICAgICAgICAgICAgICAgIHtkYXRhLmRpc2NvdW50VHlwZSA9PT0gJ3BlcmNlbnRhZ2UnXHJcbiAgICAgICAgICAgICAgICAgID8gYCR7ZGF0YS5kaXNjb3VudH0lYFxyXG4gICAgICAgICAgICAgICAgICA6IGZvcm1hdEN1cnJlbmN5KGRhdGEuZGlzY291bnQpfVxyXG4gICAgICAgICAgICAgICAgKTpcclxuICAgICAgICAgICAgICA8L3NwYW4+XHJcbiAgICAgICAgICAgICAgPHNwYW4+LXtmb3JtYXRDdXJyZW5jeShkaXNjb3VudEFtb3VudCl9PC9zcGFuPlxyXG4gICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICl9XHJcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInRvdGFsLXJvdyBncmFuZC10b3RhbFwiPlxyXG4gICAgICAgICAgICA8c3Bhbj5UT1RBTDo8L3NwYW4+XHJcbiAgICAgICAgICAgIDxzcGFuPntmb3JtYXRDdXJyZW5jeShkYXRhLnRvdGFsKX08L3NwYW4+XHJcbiAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgey8qIFBheW1lbnQgSW5mbyAqL31cclxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInBheW1lbnQtaW5mb1wiPlxyXG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJpbmZvLXJvd1wiPlxyXG4gICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJpbmZvLWxhYmVsXCI+UGF5bWVudCBNZXRob2Q6PC9zcGFuPlxyXG4gICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJpbmZvLXZhbHVlXCIgc3R5bGU9e3sgdGV4dFRyYW5zZm9ybTogJ3VwcGVyY2FzZScgfX0+XHJcbiAgICAgICAgICAgICAge2RhdGEucGF5bWVudE1ldGhvZC5yZXBsYWNlKCctJywgJyAnKX1cclxuICAgICAgICAgICAgPC9zcGFuPlxyXG4gICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImluZm8tcm93XCI+XHJcbiAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImluZm8tbGFiZWxcIj5BbW91bnQgUGFpZDo8L3NwYW4+XHJcbiAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImluZm8tdmFsdWVcIj57Zm9ybWF0Q3VycmVuY3koZGF0YS5hbW91bnRQYWlkKX08L3NwYW4+XHJcbiAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgIHtkYXRhLmFtb3VudFBhaWQgPiBkYXRhLnRvdGFsICYmIChcclxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJpbmZvLXJvd1wiPlxyXG4gICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImluZm8tbGFiZWxcIj5DaGFuZ2U6PC9zcGFuPlxyXG4gICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImluZm8tdmFsdWVcIj5cclxuICAgICAgICAgICAgICAgIHtmb3JtYXRDdXJyZW5jeShkYXRhLmFtb3VudFBhaWQgLSBkYXRhLnRvdGFsKX1cclxuICAgICAgICAgICAgICA8L3NwYW4+XHJcbiAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgKX1cclxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiaW5mby1yb3dcIj5cclxuICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiaW5mby1sYWJlbFwiPkNhc2hpZXI6PC9zcGFuPlxyXG4gICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJpbmZvLXZhbHVlXCI+e2RhdGEuY2FzaGllcn08L3NwYW4+XHJcbiAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgey8qIENvbGxlY3Rpb24gSW5mbyAqL31cclxuICAgICAgICB7ZGF0YS5jb2xsZWN0aW9uRGF0ZSAmJiAoXHJcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNlY3Rpb25cIj5cclxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzZWN0aW9uLXRpdGxlXCI+U2FtcGxlIENvbGxlY3Rpb248L2Rpdj5cclxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJpbmZvLXJvd1wiPlxyXG4gICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImluZm8tbGFiZWxcIj5TY2hlZHVsZWQ6PC9zcGFuPlxyXG4gICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImluZm8tdmFsdWVcIj57ZGF0YS5jb2xsZWN0aW9uRGF0ZX08L3NwYW4+XHJcbiAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgKX1cclxuXHJcbiAgICAgICAgey8qIEluc3RydWN0aW9ucyBiYXNlZCBvbiBjb3B5IHR5cGUgKi99XHJcbiAgICAgICAge2NvcHlUeXBlID09PSAncGF0aWVudCcgPyAoXHJcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImluc3RydWN0aW9uc1wiPlxyXG4gICAgICAgICAgICA8ZGl2IHN0eWxlPXt7IGZvbnRXZWlnaHQ6ICdib2xkJywgbWFyZ2luQm90dG9tOiAnNXB4JyB9fT5cclxuICAgICAgICAgICAgICBJTVBPUlRBTlQgSU5TVFJVQ1RJT05TOlxyXG4gICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgPGRpdj7igKIgUGxlYXNlIGFycml2ZSAxNSBtaW51dGVzIGJlZm9yZSBzY2hlZHVsZWQgdGltZTwvZGl2PlxyXG4gICAgICAgICAgICA8ZGl2PuKAoiBCcmluZyB0aGlzIHJlY2VpcHQgZm9yIHNhbXBsZSBjb2xsZWN0aW9uPC9kaXY+XHJcbiAgICAgICAgICAgIDxkaXY+4oCiIEZhc3RpbmcgbWF5IGJlIHJlcXVpcmVkIGZvciBzb21lIHRlc3RzPC9kaXY+XHJcbiAgICAgICAgICAgIDxkaXY+4oCiIFJlc3VsdHMgcmVhZHkgd2l0aGluIDI0LTQ4IGhvdXJzPC9kaXY+XHJcbiAgICAgICAgICAgIDxkaXY+4oCiIENvbnRhY3QgdXMgZm9yIGFueSBxdWVyaWVzPC9kaXY+XHJcbiAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICApIDogKFxyXG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJpbnN0cnVjdGlvbnMgbGFiLWluc3RydWN0aW9uc1wiPlxyXG4gICAgICAgICAgICA8ZGl2IHN0eWxlPXt7IGZvbnRXZWlnaHQ6ICdib2xkJywgbWFyZ2luQm90dG9tOiAnNXB4JyB9fT5cclxuICAgICAgICAgICAgICBMQUIgVEVDSE5JQ0lBTiBOT1RFUzpcclxuICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgIDxkaXY+4oCiIFZlcmlmeSBwYXRpZW50IElEIGJlZm9yZSBjb2xsZWN0aW9uPC9kaXY+XHJcbiAgICAgICAgICAgIDxkaXY+4oCiIENoZWNrIHRlc3QgcmVxdWlyZW1lbnRzIGFuZCBwcmVwPC9kaXY+XHJcbiAgICAgICAgICAgIDxkaXY+4oCiIExhYmVsIHNhbXBsZXMgd2l0aCBvcmRlciBudW1iZXI8L2Rpdj5cclxuICAgICAgICAgICAgPGRpdj7igKIgVXBkYXRlIHN5c3RlbSBhZnRlciBjb2xsZWN0aW9uPC9kaXY+XHJcbiAgICAgICAgICAgIDxkaXY+4oCiIEhhbmRsZSBzYW1wbGVzIHBlciBwcm90b2NvbDwvZGl2PlxyXG4gICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgKX1cclxuXHJcbiAgICAgICAgey8qIEJhcmNvZGUgKi99XHJcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJiYXJjb2RlXCI+e2RhdGEub3JkZXJOdW1iZXJ9PC9kaXY+XHJcblxyXG4gICAgICAgIHsvKiBGb290ZXIgKi99XHJcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJ0aGFuay15b3VcIj5USEFOSyBZT1UgRk9SIENIT09TSU5HIFVTITwvZGl2PlxyXG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZm9vdGVyXCI+XHJcbiAgICAgICAgICA8ZGl2Pk9wZW4gMjQvNyB8IE9uc2l0ZSAmIE9ubGluZSBBY2Nlc3M8L2Rpdj5cclxuICAgICAgICAgIDxkaXY+VHJ1c3RlZCBieSBDbGluaWNzICYgSG9zcGl0YWxzPC9kaXY+XHJcbiAgICAgICAgICA8ZGl2IHN0eWxlPXt7IG1hcmdpblRvcDogJzEwcHgnLCBmb250U2l6ZTogJzlweCcgfX0+XHJcbiAgICAgICAgICAgIFRoaXMgaXMgYSBjb21wdXRlci1nZW5lcmF0ZWQgcmVjZWlwdFxyXG4gICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICA8ZGl2IHN0eWxlPXt7IGZvbnRTaXplOiAnOXB4JyB9fT5cclxuICAgICAgICAgICAgUHJpbnRlZDoge2Zvcm1hdChuZXcgRGF0ZSgpLCAnZGQvTU0veXl5eSBISDptbTpzcycpfVxyXG4gICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgPC9kaXY+XHJcbiAgICAgIDwvZGl2PlxyXG4gICAgKTtcclxuICB9XHJcbik7XHJcblxyXG5UaGVybWFsUmVjZWlwdC5kaXNwbGF5TmFtZSA9ICdUaGVybWFsUmVjZWlwdCc7XHJcblxyXG4vLyBUaGVybWFsIHByaW50ZXIgc3R5bGVzIHRvIGJlIGluamVjdGVkIGludG8gcHJpbnQgd2luZG93XHJcbmV4cG9ydCBjb25zdCB0aGVybWFsUHJpbnRTdHlsZXMgPSBgXHJcbiAgQHBhZ2Uge1xyXG4gICAgc2l6ZTogODBtbSBhdXRvO1xyXG4gICAgbWFyZ2luOiAwO1xyXG4gIH1cclxuICBcclxuICAqIHtcclxuICAgIG1hcmdpbjogMDtcclxuICAgIHBhZGRpbmc6IDA7XHJcbiAgICBib3gtc2l6aW5nOiBib3JkZXItYm94O1xyXG4gIH1cclxuICBcclxuICBib2R5IHtcclxuICAgIGZvbnQtZmFtaWx5OiAnQ291cmllciBOZXcnLCBtb25vc3BhY2U7XHJcbiAgICBmb250LXNpemU6IDEycHg7XHJcbiAgICBsaW5lLWhlaWdodDogMS40O1xyXG4gICAgY29sb3I6ICMwMDA7XHJcbiAgICB3aWR0aDogODBtbTtcclxuICAgIHBhZGRpbmc6IDVtbTtcclxuICAgIGJhY2tncm91bmQ6IHdoaXRlO1xyXG4gIH1cclxuICBcclxuICAucmVjZWlwdCB7XHJcbiAgICB3aWR0aDogMTAwJTtcclxuICB9XHJcbiAgXHJcbiAgLmhlYWRlciB7XHJcbiAgICB0ZXh0LWFsaWduOiBjZW50ZXI7XHJcbiAgICBtYXJnaW4tYm90dG9tOiAxMHB4O1xyXG4gICAgYm9yZGVyLWJvdHRvbTogMnB4IGRhc2hlZCAjMDAwO1xyXG4gICAgcGFkZGluZy1ib3R0b206IDEwcHg7XHJcbiAgfVxyXG4gIFxyXG4gIC5sb2dvIHtcclxuICAgIGZvbnQtc2l6ZTogMThweDtcclxuICAgIGZvbnQtd2VpZ2h0OiBib2xkO1xyXG4gICAgbWFyZ2luLWJvdHRvbTogNXB4O1xyXG4gIH1cclxuICBcclxuICAuY29tcGFueS1uYW1lIHtcclxuICAgIGZvbnQtc2l6ZTogMTRweDtcclxuICAgIGZvbnQtd2VpZ2h0OiBib2xkO1xyXG4gIH1cclxuICBcclxuICAuY29tcGFueS1pbmZvIHtcclxuICAgIGZvbnQtc2l6ZTogMTBweDtcclxuICAgIG1hcmdpbi10b3A6IDNweDtcclxuICB9XHJcbiAgXHJcbiAgLmNvcHktdHlwZSB7XHJcbiAgICBmb250LXNpemU6IDE0cHg7XHJcbiAgICBmb250LXdlaWdodDogYm9sZDtcclxuICAgIG1hcmdpbjogMTBweCAwO1xyXG4gICAgdGV4dC1hbGlnbjogY2VudGVyO1xyXG4gICAgcGFkZGluZzogNXB4O1xyXG4gICAgYm9yZGVyOiAycHggc29saWQgIzAwMDtcclxuICB9XHJcbiAgXHJcbiAgLnNlY3Rpb24ge1xyXG4gICAgbWFyZ2luOiAxMHB4IDA7XHJcbiAgICBwYWRkaW5nOiA1cHggMDtcclxuICB9XHJcbiAgXHJcbiAgLnNlY3Rpb24tdGl0bGUge1xyXG4gICAgZm9udC13ZWlnaHQ6IGJvbGQ7XHJcbiAgICBmb250LXNpemU6IDExcHg7XHJcbiAgICBtYXJnaW4tYm90dG9tOiA1cHg7XHJcbiAgICB0ZXh0LXRyYW5zZm9ybTogdXBwZXJjYXNlO1xyXG4gIH1cclxuICBcclxuICAuaW5mby1yb3cge1xyXG4gICAgZGlzcGxheTogZmxleDtcclxuICAgIGp1c3RpZnktY29udGVudDogc3BhY2UtYmV0d2VlbjtcclxuICAgIG1hcmdpbjogM3B4IDA7XHJcbiAgICBmb250LXNpemU6IDExcHg7XHJcbiAgfVxyXG4gIFxyXG4gIC5pbmZvLWxhYmVsIHtcclxuICAgIGZvbnQtd2VpZ2h0OiBib2xkO1xyXG4gIH1cclxuICBcclxuICAuaW5mby12YWx1ZSB7XHJcbiAgICB0ZXh0LWFsaWduOiByaWdodDtcclxuICB9XHJcbiAgXHJcbiAgLml0ZW1zLXRhYmxlIHtcclxuICAgIHdpZHRoOiAxMDAlO1xyXG4gICAgbWFyZ2luOiAxMHB4IDA7XHJcbiAgICBib3JkZXItdG9wOiAxcHggZGFzaGVkICMwMDA7XHJcbiAgICBib3JkZXItYm90dG9tOiAxcHggZGFzaGVkICMwMDA7XHJcbiAgICBwYWRkaW5nOiA1cHggMDtcclxuICB9XHJcbiAgXHJcbiAgLml0ZW0tcm93IHtcclxuICAgIGRpc3BsYXk6IGZsZXg7XHJcbiAgICBqdXN0aWZ5LWNvbnRlbnQ6IHNwYWNlLWJldHdlZW47XHJcbiAgICBtYXJnaW46IDVweCAwO1xyXG4gICAgZm9udC1zaXplOiAxMXB4O1xyXG4gIH1cclxuICBcclxuICAuaXRlbS1uYW1lIHtcclxuICAgIGZsZXg6IDE7XHJcbiAgICBwYWRkaW5nLXJpZ2h0OiAxMHB4O1xyXG4gIH1cclxuICBcclxuICAuaXRlbS1wcmljZSB7XHJcbiAgICB3aGl0ZS1zcGFjZTogbm93cmFwO1xyXG4gICAgZm9udC13ZWlnaHQ6IGJvbGQ7XHJcbiAgfVxyXG4gIFxyXG4gIC50b3RhbHMge1xyXG4gICAgbWFyZ2luOiAxMHB4IDA7XHJcbiAgICBwYWRkaW5nOiA1cHggMDtcclxuICAgIGJvcmRlci10b3A6IDJweCBzb2xpZCAjMDAwO1xyXG4gIH1cclxuICBcclxuICAudG90YWwtcm93IHtcclxuICAgIGRpc3BsYXk6IGZsZXg7XHJcbiAgICBqdXN0aWZ5LWNvbnRlbnQ6IHNwYWNlLWJldHdlZW47XHJcbiAgICBtYXJnaW46IDVweCAwO1xyXG4gICAgZm9udC1zaXplOiAxMnB4O1xyXG4gIH1cclxuICBcclxuICAudG90YWwtcm93LmdyYW5kLXRvdGFsIHtcclxuICAgIGZvbnQtc2l6ZTogMTRweDtcclxuICAgIGZvbnQtd2VpZ2h0OiBib2xkO1xyXG4gICAgYm9yZGVyLXRvcDogMXB4IGRhc2hlZCAjMDAwO1xyXG4gICAgcGFkZGluZy10b3A6IDVweDtcclxuICAgIG1hcmdpbi10b3A6IDVweDtcclxuICB9XHJcbiAgXHJcbiAgLnBheW1lbnQtaW5mbyB7XHJcbiAgICBtYXJnaW46IDEwcHggMDtcclxuICAgIHBhZGRpbmc6IDEwcHggMDtcclxuICAgIGJvcmRlci10b3A6IDFweCBkYXNoZWQgIzAwMDtcclxuICAgIGJvcmRlci1ib3R0b206IDFweCBkYXNoZWQgIzAwMDtcclxuICB9XHJcbiAgXHJcbiAgLmZvb3RlciB7XHJcbiAgICB0ZXh0LWFsaWduOiBjZW50ZXI7XHJcbiAgICBtYXJnaW4tdG9wOiAxNXB4O1xyXG4gICAgZm9udC1zaXplOiAxMHB4O1xyXG4gIH1cclxuICBcclxuICAuYmFyY29kZSB7XHJcbiAgICB0ZXh0LWFsaWduOiBjZW50ZXI7XHJcbiAgICBmb250LWZhbWlseTogJ0xpYnJlIEJhcmNvZGUgMTI4JywgY3Vyc2l2ZTtcclxuICAgIGZvbnQtc2l6ZTogNDBweDtcclxuICAgIG1hcmdpbjogMTBweCAwO1xyXG4gICAgbGV0dGVyLXNwYWNpbmc6IDA7XHJcbiAgfVxyXG4gIFxyXG4gIC50aGFuay15b3Uge1xyXG4gICAgdGV4dC1hbGlnbjogY2VudGVyO1xyXG4gICAgZm9udC13ZWlnaHQ6IGJvbGQ7XHJcbiAgICBtYXJnaW46IDEwcHggMDtcclxuICAgIGZvbnQtc2l6ZTogMTJweDtcclxuICB9XHJcbiAgXHJcbiAgLmluc3RydWN0aW9ucyB7XHJcbiAgICBmb250LXNpemU6IDEwcHg7XHJcbiAgICBtYXJnaW46IDEwcHggMDtcclxuICAgIHBhZGRpbmc6IDVweDtcclxuICAgIGJhY2tncm91bmQ6ICNmNWY1ZjU7XHJcbiAgICBib3JkZXI6IDFweCBzb2xpZCAjZGRkO1xyXG4gIH1cclxuICBcclxuICAubGFiLWluc3RydWN0aW9ucyB7XHJcbiAgICBiYWNrZ3JvdW5kOiAjZmZmM2NkO1xyXG4gICAgYm9yZGVyOiAxcHggc29saWQgI2ZmYzEwNztcclxuICB9XHJcbiAgXHJcbiAgQG1lZGlhIHByaW50IHtcclxuICAgIGJvZHkge1xyXG4gICAgICB3aWR0aDogODBtbTtcclxuICAgIH1cclxuICB9XHJcbmA7XHJcbiJdLCJuYW1lcyI6WyJmb3J3YXJkUmVmIiwiZm9ybWF0IiwiVGhlcm1hbFJlY2VpcHQiLCJkYXRhIiwiY29weVR5cGUiLCJyZWYiLCJmb3JtYXRDdXJyZW5jeSIsImFtb3VudCIsInRvTG9jYWxlU3RyaW5nIiwiZGlzY291bnRBbW91bnQiLCJkaXNjb3VudFR5cGUiLCJzdWJ0b3RhbCIsImRpc2NvdW50IiwiZGl2IiwiY2xhc3NOYW1lIiwic3BhbiIsInJlY2VpcHROdW1iZXIiLCJvcmRlck51bWJlciIsIkRhdGUiLCJwYXltZW50RGF0ZSIsInBhdGllbnROYW1lIiwicGF0aWVudElkIiwicGF0aWVudFBob25lIiwidGVzdHMiLCJtYXAiLCJ0ZXN0IiwiaW5kZXgiLCJzdHlsZSIsImZvbnRXZWlnaHQiLCJjb2RlIiwiZm9udFNpemUiLCJuYW1lIiwicHJpY2UiLCJ0b3RhbCIsInRleHRUcmFuc2Zvcm0iLCJwYXltZW50TWV0aG9kIiwicmVwbGFjZSIsImFtb3VudFBhaWQiLCJjYXNoaWVyIiwiY29sbGVjdGlvbkRhdGUiLCJtYXJnaW5Cb3R0b20iLCJtYXJnaW5Ub3AiLCJkaXNwbGF5TmFtZSIsInRoZXJtYWxQcmludFN0eWxlcyJdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7QUFBQSxTQUFTQSxVQUFVLFFBQVEsUUFBUTtBQUNuQyxTQUFTQyxNQUFNLFFBQVEsV0FBVztBQTZCbEMsT0FBTyxNQUFNQywrQkFBaUJGLGdCQUM1QixDQUFDLEVBQUVHLElBQUksRUFBRUMsUUFBUSxFQUFFLEVBQUVDO0lBQ25CLE1BQU1DLGlCQUFpQixDQUFDQztRQUN0QixPQUFPLENBQUMs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

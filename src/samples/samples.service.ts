@@ -103,6 +103,7 @@ export class SamplesService {
     }
 
     this.logger.log(`Sample created: ${savedSample.sampleId}`);
+    this.realtimeGateway.notifySampleCollected(savedSample);
 
     return this.findOne(savedSample._id.toString());
   }

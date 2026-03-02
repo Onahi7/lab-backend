@@ -1,0 +1,664 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/components/orders/PaymentDialog.tsx");import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+
+let prevRefreshReg;
+let prevRefreshSig;
+
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react-swc can't detect preamble. Something is wrong."
+    );
+  }
+
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+
+import __vite__cjsImport2_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=27cfabb6"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime["jsxDEV"]; const _Fragment = __vite__cjsImport2_react_jsxDevRuntime["Fragment"];
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=27cfabb6"; const useState = __vite__cjsImport3_react["useState"]; const useRef = __vite__cjsImport3_react["useRef"];
+import { useNavigate } from "/node_modules/.vite/deps/react-router-dom.js?v=27cfabb6";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "/src/components/ui/dialog.tsx";
+import { Button } from "/src/components/ui/button.tsx";
+import { Input } from "/src/components/ui/input.tsx";
+import { Label } from "/src/components/ui/label.tsx";
+import { Separator } from "/src/components/ui/separator.tsx";
+import { ThermalReceipt } from "/src/components/receipts/ThermalReceipt.tsx";
+import { useThermalPrint } from "/src/hooks/useThermalPrint.ts";
+import { toast } from "/node_modules/.vite/deps/sonner.js?v=27cfabb6";
+import { CreditCard, Banknote, Smartphone, Printer, Check } from "/node_modules/.vite/deps/lucide-react.js?v=27cfabb6";
+import { format } from "/node_modules/.vite/deps/date-fns.js?v=27cfabb6";
+export function PaymentDialog({ open, onOpenChange, order, cashierName }) {
+    _s();
+    const navigate = useNavigate();
+    const { printBothCopies } = useThermalPrint();
+    const patientReceiptRef = useRef(null);
+    const labReceiptRef = useRef(null);
+    const [paymentMethod, setPaymentMethod] = useState('cash');
+    const [amountPaid, setAmountPaid] = useState(order.total.toString());
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [isPrinting, setIsPrinting] = useState(false);
+    const [paymentComplete, setPaymentComplete] = useState(false);
+    const receiptNumber = `RCP-${format(new Date(), 'yyyyMMdd')}-${order.id.slice(0, 3).toUpperCase()}`;
+    const receiptData = {
+        receiptNumber,
+        orderNumber: order.orderNumber,
+        patientName: order.patientName,
+        patientId: order.patientId,
+        patientPhone: order.patientPhone,
+        tests: order.tests,
+        subtotal: order.subtotal,
+        discount: order.discount,
+        discountType: order.discountType,
+        total: order.total,
+        amountPaid: parseFloat(amountPaid) || 0,
+        paymentMethod,
+        paymentDate: new Date().toISOString(),
+        cashier: cashierName,
+        collectionDate: format(new Date(), 'yyyy-MM-dd HH:mm')
+    };
+    const change = receiptData.amountPaid - order.total;
+    const handleProcessPayment = async ()=>{
+        if (receiptData.amountPaid < order.total) {
+            toast.error('Amount paid is less than total');
+            return;
+        }
+        setIsProcessing(true);
+        try {
+            // Simulate payment processing
+            await new Promise((resolve)=>setTimeout(resolve, 1500));
+            // Here you would typically call your API to record the payment
+            // await api.processPayment({ orderId: order.id, ...receiptData });
+            setPaymentComplete(true);
+            toast.success('Payment processed successfully');
+        } catch (error) {
+            toast.error('Failed to process payment');
+            console.error('Payment error:', error);
+        } finally{
+            setIsProcessing(false);
+        }
+    };
+    const handlePrintReceipts = async ()=>{
+        setIsPrinting(true);
+        try {
+            const result = await printBothCopies(patientReceiptRef.current, labReceiptRef.current, receiptNumber);
+            if (result.success) {
+                toast.success('Both receipts printed successfully');
+                setTimeout(()=>{
+                    onOpenChange(false);
+                // Optionally navigate to receipt page
+                // navigate(`/reception/receipt/${order.id}`);
+                }, 1000);
+            } else {
+                toast.error(`Only ${result.printedCount} of 2 receipts printed`);
+            }
+        } catch (error) {
+            toast.error('Failed to print receipts');
+            console.error('Print error:', error);
+        } finally{
+            setIsPrinting(false);
+        }
+    };
+    const handleViewReceipt = ()=>{
+        navigate(`/reception/receipt/${order.id}`);
+    };
+    return /*#__PURE__*/ _jsxDEV(Dialog, {
+        open: open,
+        onOpenChange: onOpenChange,
+        children: /*#__PURE__*/ _jsxDEV(DialogContent, {
+            className: "max-w-2xl max-h-[90vh] overflow-y-auto",
+            children: [
+                /*#__PURE__*/ _jsxDEV(DialogHeader, {
+                    children: [
+                        /*#__PURE__*/ _jsxDEV(DialogTitle, {
+                            children: "Process Payment"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                            lineNumber: 150,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV(DialogDescription, {
+                            children: [
+                                "Order: ",
+                                order.orderNumber,
+                                " - ",
+                                order.patientName
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                            lineNumber: 151,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                    lineNumber: 149,
+                    columnNumber: 9
+                }, this),
+                /*#__PURE__*/ _jsxDEV("div", {
+                    className: "space-y-6",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "space-y-3",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("h4", {
+                                    className: "font-semibold text-sm",
+                                    children: "Order Summary"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                    lineNumber: 159,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "bg-gray-50 rounded-lg p-4 space-y-2",
+                                    children: [
+                                        order.tests.map((test, index)=>/*#__PURE__*/ _jsxDEV("div", {
+                                                className: "flex justify-between text-sm",
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV("span", {
+                                                        children: [
+                                                            test.code,
+                                                            " - ",
+                                                            test.name
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                                        lineNumber: 163,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("span", {
+                                                        className: "font-medium",
+                                                        children: [
+                                                            "Le ",
+                                                            test.price.toLocaleString()
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                                        lineNumber: 166,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, index, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                                lineNumber: 162,
+                                                columnNumber: 17
+                                            }, this)),
+                                        /*#__PURE__*/ _jsxDEV(Separator, {}, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                            lineNumber: 169,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            className: "flex justify-between text-sm",
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("span", {
+                                                    children: "Subtotal:"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                                    lineNumber: 171,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("span", {
+                                                    children: [
+                                                        "Le ",
+                                                        order.subtotal.toLocaleString()
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                                    lineNumber: 172,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                            lineNumber: 170,
+                                            columnNumber: 15
+                                        }, this),
+                                        order.discount > 0 && /*#__PURE__*/ _jsxDEV("div", {
+                                            className: "flex justify-between text-sm text-green-600",
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("span", {
+                                                    children: [
+                                                        "Discount (",
+                                                        order.discountType === 'percentage' ? `${order.discount}%` : `Le ${order.discount.toLocaleString()}`,
+                                                        "):"
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                                    lineNumber: 176,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("span", {
+                                                    children: [
+                                                        "-Le",
+                                                        ' ',
+                                                        (order.discountType === 'percentage' ? order.subtotal * order.discount / 100 : order.discount).toLocaleString()
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                                    lineNumber: 183,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                            lineNumber: 175,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            className: "flex justify-between font-bold text-lg pt-2 border-t",
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("span", {
+                                                    children: "Total:"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                                    lineNumber: 193,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("span", {
+                                                    children: [
+                                                        "Le ",
+                                                        order.total.toLocaleString()
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                                    lineNumber: 194,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                            lineNumber: 192,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                    lineNumber: 160,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                            lineNumber: 158,
+                            columnNumber: 11
+                        }, this),
+                        !paymentComplete ? /*#__PURE__*/ _jsxDEV(_Fragment, {
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "space-y-2",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV(Label, {
+                                            children: "Payment Method"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                            lineNumber: 203,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            className: "grid grid-cols-3 gap-2",
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV(Button, {
+                                                    type: "button",
+                                                    variant: paymentMethod === 'cash' ? 'default' : 'outline',
+                                                    className: "h-20 flex flex-col gap-2",
+                                                    onClick: ()=>setPaymentMethod('cash'),
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV(Banknote, {
+                                                            className: "w-6 h-6"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                                            lineNumber: 211,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("span", {
+                                                            children: "Cash"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                                            lineNumber: 212,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                                    lineNumber: 205,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV(Button, {
+                                                    type: "button",
+                                                    variant: paymentMethod === 'card' ? 'default' : 'outline',
+                                                    className: "h-20 flex flex-col gap-2",
+                                                    onClick: ()=>setPaymentMethod('card'),
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV(CreditCard, {
+                                                            className: "w-6 h-6"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                                            lineNumber: 220,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("span", {
+                                                            children: "Card"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                                            lineNumber: 221,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                                    lineNumber: 214,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV(Button, {
+                                                    type: "button",
+                                                    variant: paymentMethod === 'mobile-money' ? 'default' : 'outline',
+                                                    className: "h-20 flex flex-col gap-2",
+                                                    onClick: ()=>setPaymentMethod('mobile-money'),
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV(Smartphone, {
+                                                            className: "w-6 h-6"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                                            lineNumber: 229,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("span", {
+                                                            children: "Mobile Money"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                                            lineNumber: 230,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                                    lineNumber: 223,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                            lineNumber: 204,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                    lineNumber: 202,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "space-y-2",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV(Label, {
+                                            htmlFor: "amountPaid",
+                                            children: "Amount Paid"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                            lineNumber: 237,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(Input, {
+                                            id: "amountPaid",
+                                            type: "number",
+                                            value: amountPaid,
+                                            onChange: (e)=>setAmountPaid(e.target.value),
+                                            placeholder: "Enter amount",
+                                            className: "text-lg font-semibold"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                            lineNumber: 238,
+                                            columnNumber: 17
+                                        }, this),
+                                        change > 0 && /*#__PURE__*/ _jsxDEV("p", {
+                                            className: "text-sm text-green-600 font-medium",
+                                            children: [
+                                                "Change: Le ",
+                                                change.toLocaleString()
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                            lineNumber: 247,
+                                            columnNumber: 19
+                                        }, this),
+                                        change < 0 && /*#__PURE__*/ _jsxDEV("p", {
+                                            className: "text-sm text-red-600 font-medium",
+                                            children: [
+                                                "Insufficient amount: Le ",
+                                                Math.abs(change).toLocaleString(),
+                                                " short"
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                            lineNumber: 252,
+                                            columnNumber: 19
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                    lineNumber: 236,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV(Button, {
+                                    onClick: handleProcessPayment,
+                                    disabled: isProcessing || receiptData.amountPaid < order.total,
+                                    className: "w-full",
+                                    size: "lg",
+                                    children: isProcessing ? 'Processing...' : 'Process Payment'
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                    lineNumber: 259,
+                                    columnNumber: 15
+                                }, this)
+                            ]
+                        }, void 0, true) : /*#__PURE__*/ _jsxDEV(_Fragment, {
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "bg-green-50 border border-green-200 rounded-lg p-6 text-center space-y-3",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            className: "w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto",
+                                            children: /*#__PURE__*/ _jsxDEV(Check, {
+                                                className: "w-8 h-8 text-green-600"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                                lineNumber: 273,
+                                                columnNumber: 19
+                                            }, this)
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                            lineNumber: 272,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("h3", {
+                                                    className: "font-semibold text-lg text-green-900",
+                                                    children: "Payment Successful!"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                                    lineNumber: 276,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("p", {
+                                                    className: "text-sm text-green-700",
+                                                    children: [
+                                                        "Receipt Number: ",
+                                                        receiptNumber
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                                    lineNumber: 277,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                            lineNumber: 275,
+                                            columnNumber: 17
+                                        }, this),
+                                        change > 0 && /*#__PURE__*/ _jsxDEV("div", {
+                                            className: "bg-white rounded-lg p-3",
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("p", {
+                                                    className: "text-sm text-gray-600",
+                                                    children: "Change to return:"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                                    lineNumber: 281,
+                                                    columnNumber: 21
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("p", {
+                                                    className: "text-2xl font-bold text-green-600",
+                                                    children: [
+                                                        "Le ",
+                                                        change.toLocaleString()
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                                    lineNumber: 282,
+                                                    columnNumber: 21
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                            lineNumber: 280,
+                                            columnNumber: 19
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                    lineNumber: 271,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "space-y-3",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV(Button, {
+                                            onClick: handlePrintReceipts,
+                                            disabled: isPrinting,
+                                            className: "w-full",
+                                            size: "lg",
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV(Printer, {
+                                                    className: "w-4 h-4 mr-2"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                                    lineNumber: 297,
+                                                    columnNumber: 19
+                                                }, this),
+                                                isPrinting ? 'Printing...' : 'Print Both Receipts'
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                            lineNumber: 291,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(Button, {
+                                            onClick: handleViewReceipt,
+                                            variant: "outline",
+                                            className: "w-full",
+                                            children: "View Receipt Page"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                            lineNumber: 300,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                    lineNumber: 290,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "hidden",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            ref: patientReceiptRef,
+                                            children: /*#__PURE__*/ _jsxDEV(ThermalReceipt, {
+                                                data: receiptData,
+                                                copyType: "patient"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                                lineNumber: 312,
+                                                columnNumber: 19
+                                            }, this)
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                            lineNumber: 311,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            ref: labReceiptRef,
+                                            children: /*#__PURE__*/ _jsxDEV(ThermalReceipt, {
+                                                data: receiptData,
+                                                copyType: "lab"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                                lineNumber: 315,
+                                                columnNumber: 19
+                                            }, this)
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                            lineNumber: 314,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                                    lineNumber: 310,
+                                    columnNumber: 15
+                                }, this)
+                            ]
+                        }, void 0, true)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+                    lineNumber: 156,
+                    columnNumber: 9
+                }, this)
+            ]
+        }, void 0, true, {
+            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+            lineNumber: 148,
+            columnNumber: 7
+        }, this)
+    }, void 0, false, {
+        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx",
+        lineNumber: 147,
+        columnNumber: 5
+    }, this);
+}
+_s(PaymentDialog, "BGsa3AonYcCpRw3FHh6hNyC3R7o=", false, function() {
+    return [
+        useNavigate,
+        useThermalPrint
+    ];
+});
+_c = PaymentDialog;
+var _c;
+$RefreshReg$(_c, "PaymentDialog");
+
+
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+
+
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/HP/Downloads/lab/frontend/src/components/orders/PaymentDialog.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIlBheW1lbnREaWFsb2cudHN4Il0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IHVzZVN0YXRlLCB1c2VSZWYgfSBmcm9tICdyZWFjdCc7XHJcbmltcG9ydCB7IHVzZU5hdmlnYXRlIH0gZnJvbSAncmVhY3Qtcm91dGVyLWRvbSc7XHJcbmltcG9ydCB7XHJcbiAgRGlhbG9nLFxyXG4gIERpYWxvZ0NvbnRlbnQsXHJcbiAgRGlhbG9nRGVzY3JpcHRpb24sXHJcbiAgRGlhbG9nSGVhZGVyLFxyXG4gIERpYWxvZ1RpdGxlLFxyXG59IGZyb20gJ0AvY29tcG9uZW50cy91aS9kaWFsb2cnO1xyXG5pbXBvcnQgeyBCdXR0b24gfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvYnV0dG9uJztcclxuaW1wb3J0IHsgSW5wdXQgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvaW5wdXQnO1xyXG5pbXBvcnQgeyBMYWJlbCB9IGZyb20gJ0AvY29tcG9uZW50cy91aS9sYWJlbCc7XHJcbmltcG9ydCB7XHJcbiAgU2VsZWN0LFxyXG4gIFNlbGVjdENvbnRlbnQsXHJcbiAgU2VsZWN0SXRlbSxcclxuICBTZWxlY3RUcmlnZ2VyLFxyXG4gIFNlbGVjdFZhbHVlLFxyXG59IGZyb20gJ0AvY29tcG9uZW50cy91aS9zZWxlY3QnO1xyXG5pbXBvcnQgeyBCYWRnZSB9IGZyb20gJ0AvY29tcG9uZW50cy91aS9iYWRnZSc7XHJcbmltcG9ydCB7IFNlcGFyYXRvciB9IGZyb20gJ0AvY29tcG9uZW50cy91aS9zZXBhcmF0b3InO1xyXG5pbXBvcnQgeyBUaGVybWFsUmVjZWlwdCB9IGZyb20gJ0AvY29tcG9uZW50cy9yZWNlaXB0cy9UaGVybWFsUmVjZWlwdCc7XHJcbmltcG9ydCB7IHVzZVRoZXJtYWxQcmludCB9IGZyb20gJ0AvaG9va3MvdXNlVGhlcm1hbFByaW50JztcclxuaW1wb3J0IHsgdG9hc3QgfSBmcm9tICdzb25uZXInO1xyXG5pbXBvcnQgeyBDcmVkaXRDYXJkLCBCYW5rbm90ZSwgU21hcnRwaG9uZSwgUHJpbnRlciwgQ2hlY2sgfSBmcm9tICdsdWNpZGUtcmVhY3QnO1xyXG5pbXBvcnQgeyBmb3JtYXQgfSBmcm9tICdkYXRlLWZucyc7XHJcblxyXG5pbnRlcmZhY2UgUGF5bWVudERpYWxvZ1Byb3BzIHtcclxuICBvcGVuOiBib29sZWFuO1xyXG4gIG9uT3BlbkNoYW5nZTogKG9wZW46IGJvb2xlYW4pID0+IHZvaWQ7XHJcbiAgb3JkZXI6IHtcclxuICAgIGlkOiBzdHJpbmc7XHJcbiAgICBvcmRlck51bWJlcjogc3RyaW5nO1xyXG4gICAgcGF0aWVudE5hbWU6IHN0cmluZztcclxuICAgIHBhdGllbnRJZDogc3RyaW5nO1xyXG4gICAgcGF0aWVudFBob25lPzogc3RyaW5nO1xyXG4gICAgdGVzdHM6IEFycmF5PHtcclxuICAgICAgY29kZTogc3RyaW5nO1xyXG4gICAgICBuYW1lOiBzdHJpbmc7XHJcbiAgICAgIHByaWNlOiBudW1iZXI7XHJcbiAgICB9PjtcclxuICAgIHN1YnRvdGFsOiBudW1iZXI7XHJcbiAgICBkaXNjb3VudDogbnVtYmVyO1xyXG4gICAgZGlzY291bnRUeXBlOiAncGVyY2VudGFnZScgfCAnZml4ZWQnO1xyXG4gICAgdG90YWw6IG51bWJlcjtcclxuICB9O1xyXG4gIGNhc2hpZXJOYW1lOiBzdHJpbmc7XHJcbn1cclxuXHJcbmV4cG9ydCBmdW5jdGlvbiBQYXltZW50RGlhbG9nKHtcclxuICBvcGVuLFxyXG4gIG9uT3BlbkNoYW5nZSxcclxuICBvcmRlcixcclxuICBjYXNoaWVyTmFtZSxcclxufTogUGF5bWVudERpYWxvZ1Byb3BzKSB7XHJcbiAgY29uc3QgbmF2aWdhdGUgPSB1c2VOYXZpZ2F0ZSgpO1xyXG4gIGNvbnN0IHsgcHJpbnRCb3RoQ29waWVzIH0gPSB1c2VUaGVybWFsUHJpbnQoKTtcclxuICBjb25zdCBwYXRpZW50UmVjZWlwdFJlZiA9IHVzZVJlZjxIVE1MRGl2RWxlbWVudD4obnVsbCk7XHJcbiAgY29uc3QgbGFiUmVjZWlwdFJlZiA9IHVzZVJlZjxIVE1MRGl2RWxlbWVudD4obnVsbCk7XHJcblxyXG4gIGNvbnN0IFtwYXltZW50TWV0aG9kLCBzZXRQYXltZW50TWV0aG9kXSA9IHVzZVN0YXRlPCdjYXNoJyB8ICdjYXJkJyB8ICdtb2JpbGUtbW9uZXknPignY2FzaCcpO1xyXG4gIGNvbnN0IFthbW91bnRQYWlkLCBzZXRBbW91bnRQYWlkXSA9IHVzZVN0YXRlPHN0cmluZz4ob3JkZXIudG90YWwudG9TdHJpbmcoKSk7XHJcbiAgY29uc3QgW2lzUHJvY2Vzc2luZywgc2V0SXNQcm9jZXNzaW5nXSA9IHVzZVN0YXRlKGZhbHNlKTtcclxuICBjb25zdCBbaXNQcmludGluZywgc2V0SXNQcmludGluZ10gPSB1c2VTdGF0ZShmYWxzZSk7XHJcbiAgY29uc3QgW3BheW1lbnRDb21wbGV0ZSwgc2V0UGF5bWVudENvbXBsZXRlXSA9IHVzZVN0YXRlKGZhbHNlKTtcclxuXHJcbiAgY29uc3QgcmVjZWlwdE51bWJlciA9IGBSQ1AtJHtmb3JtYXQobmV3IERhdGUoKSwgJ3l5eXlNTWRkJyl9LSR7b3JkZXIuaWQuc2xpY2UoMCwgMykudG9VcHBlckNhc2UoKX1gO1xyXG4gIFxyXG4gIGNvbnN0IHJlY2VpcHREYXRhID0ge1xyXG4gICAgcmVjZWlwdE51bWJlcixcclxuICAgIG9yZGVyTnVtYmVyOiBvcmRlci5vcmRlck51bWJlcixcclxuICAgIHBhdGllbnROYW1lOiBvcmRlci5wYXRpZW50TmFtZSxcclxuICAgIHBhdGllbnRJZDogb3JkZXIucGF0aWVudElkLFxyXG4gICAgcGF0aWVudFBob25lOiBvcmRlci5wYXRpZW50UGhvbmUsXHJcbiAgICB0ZXN0czogb3JkZXIudGVzdHMsXHJcbiAgICBzdWJ0b3RhbDogb3JkZXIuc3VidG90YWwsXHJcbiAgICBkaXNjb3VudDogb3JkZXIuZGlzY291bnQsXHJcbiAgICBkaXNjb3VudFR5cGU6IG9yZGVyLmRpc2NvdW50VHlwZSxcclxuICAgIHRvdGFsOiBvcmRlci50b3RhbCxcclxuICAgIGFtb3VudFBhaWQ6IHBhcnNlRmxvYXQoYW1vdW50UGFpZCkgfHwgMCxcclxuICAgIHBheW1lbnRNZXRob2QsXHJcbiAgICBwYXltZW50RGF0ZTogbmV3IERhdGUoKS50b0lTT1N0cmluZygpLFxyXG4gICAgY2FzaGllcjogY2FzaGllck5hbWUsXHJcbiAgICBjb2xsZWN0aW9uRGF0ZTogZm9ybWF0KG5ldyBEYXRlKCksICd5eXl5LU1NLWRkIEhIOm1tJyksXHJcbiAgfTtcclxuXHJcbiAgY29uc3QgY2hhbmdlID0gcmVjZWlwdERhdGEuYW1vdW50UGFpZCAtIG9yZGVyLnRvdGFsO1xyXG5cclxuICBjb25zdCBoYW5kbGVQcm9jZXNzUGF5bWVudCA9IGFzeW5jICgpID0+IHtcclxuICAgIGlmIChyZWNlaXB0RGF0YS5hbW91bnRQYWlkIDwgb3JkZXIudG90YWwpIHtcclxuICAgICAgdG9hc3QuZXJyb3IoJ0Ftb3VudCBwYWlkIGlzIGxlc3MgdGhhbiB0b3RhbCcpO1xyXG4gICAgICByZXR1cm47XHJcbiAgICB9XHJcblxyXG4gICAgc2V0SXNQcm9jZXNzaW5nKHRydWUpO1xyXG5cclxuICAgIHRyeSB7XHJcbiAgICAgIC8vIFNpbXVsYXRlIHBheW1lbnQgcHJvY2Vzc2luZ1xyXG4gICAgICBhd2FpdCBuZXcgUHJvbWlzZSgocmVzb2x2ZSkgPT4gc2V0VGltZW91dChyZXNvbHZlLCAxNTAwKSk7XHJcblxyXG4gICAgICAvLyBIZXJlIHlvdSB3b3VsZCB0eXBpY2FsbHkgY2FsbCB5b3VyIEFQSSB0byByZWNvcmQgdGhlIHBheW1lbnRcclxuICAgICAgLy8gYXdhaXQgYXBpLnByb2Nlc3NQYXltZW50KHsgb3JkZXJJZDogb3JkZXIuaWQsIC4uLnJlY2VpcHREYXRhIH0pO1xyXG5cclxuICAgICAgc2V0UGF5bWVudENvbXBsZXRlKHRydWUpO1xyXG4gICAgICB0b2FzdC5zdWNjZXNzKCdQYXltZW50IHByb2Nlc3NlZCBzdWNjZXNzZnVsbHknKTtcclxuICAgIH0gY2F0Y2ggKGVycm9yKSB7XHJcbiAgICAgIHRvYXN0LmVycm9yKCdGYWlsZWQgdG8gcHJvY2VzcyBwYXltZW50Jyk7XHJcbiAgICAgIGNvbnNvbGUuZXJyb3IoJ1BheW1lbnQgZXJyb3I6JywgZXJyb3IpO1xyXG4gICAgfSBmaW5hbGx5IHtcclxuICAgICAgc2V0SXNQcm9jZXNzaW5nKGZhbHNlKTtcclxuICAgIH1cclxuICB9O1xyXG5cclxuICBjb25zdCBoYW5kbGVQcmludFJlY2VpcHRzID0gYXN5bmMgKCkgPT4ge1xyXG4gICAgc2V0SXNQcmludGluZyh0cnVlKTtcclxuXHJcbiAgICB0cnkge1xyXG4gICAgICBjb25zdCByZXN1bHQgPSBhd2FpdCBwcmludEJvdGhDb3BpZXMoXHJcbiAgICAgICAgcGF0aWVudFJlY2VpcHRSZWYuY3VycmVudCxcclxuICAgICAgICBsYWJSZWNlaXB0UmVmLmN1cnJlbnQsXHJcbiAgICAgICAgcmVjZWlwdE51bWJlclxyXG4gICAgICApO1xyXG5cclxuICAgICAgaWYgKHJlc3VsdC5zdWNjZXNzKSB7XHJcbiAgICAgICAgdG9hc3Quc3VjY2VzcygnQm90aCByZWNlaXB0cyBwcmludGVkIHN1Y2Nlc3NmdWxseScpO1xyXG4gICAgICAgIHNldFRpbWVvdXQoKCkgPT4ge1xyXG4gICAgICAgICAgb25PcGVuQ2hhbmdlKGZhbHNlKTtcclxuICAgICAgICAgIC8vIE9wdGlvbmFsbHkgbmF2aWdhdGUgdG8gcmVjZWlwdCBwYWdlXHJcbiAgICAgICAgICAvLyBuYXZpZ2F0ZShgL3JlY2VwdGlvbi9yZWNlaXB0LyR7b3JkZXIuaWR9YCk7XHJcbiAgICAgICAgfSwgMTAwMCk7XHJcbiAgICAgIH0gZWxzZSB7XHJcbiAgICAgICAgdG9hc3QuZXJyb3IoYE9ubHkgJHtyZXN1bHQucHJpbnRlZENvdW50fSBvZiAyIHJlY2VpcHRzIHByaW50ZWRgKTtcclxuICAgICAgfVxyXG4gICAgfSBjYXRjaCAoZXJyb3IpIHtcclxuICAgICAgdG9hc3QuZXJyb3IoJ0ZhaWxlZCB0byBwcmludCByZWNlaXB0cycpO1xyXG4gICAgICBjb25zb2xlLmVycm9yKCdQcmludCBlcnJvcjonLCBlcnJvcik7XHJcbiAgICB9IGZpbmFsbHkge1xyXG4gICAgICBzZXRJc1ByaW50aW5nKGZhbHNlKTtcclxuICAgIH1cclxuICB9O1xyXG5cclxuICBjb25zdCBoYW5kbGVWaWV3UmVjZWlwdCA9ICgpID0+IHtcclxuICAgIG5hdmlnYXRlKGAvcmVjZXB0aW9uL3JlY2VpcHQvJHtvcmRlci5pZH1gKTtcclxuICB9O1xyXG5cclxuICByZXR1cm4gKFxyXG4gICAgPERpYWxvZyBvcGVuPXtvcGVufSBvbk9wZW5DaGFuZ2U9e29uT3BlbkNoYW5nZX0+XHJcbiAgICAgIDxEaWFsb2dDb250ZW50IGNsYXNzTmFtZT1cIm1heC13LTJ4bCBtYXgtaC1bOTB2aF0gb3ZlcmZsb3cteS1hdXRvXCI+XHJcbiAgICAgICAgPERpYWxvZ0hlYWRlcj5cclxuICAgICAgICAgIDxEaWFsb2dUaXRsZT5Qcm9jZXNzIFBheW1lbnQ8L0RpYWxvZ1RpdGxlPlxyXG4gICAgICAgICAgPERpYWxvZ0Rlc2NyaXB0aW9uPlxyXG4gICAgICAgICAgICBPcmRlcjoge29yZGVyLm9yZGVyTnVtYmVyfSAtIHtvcmRlci5wYXRpZW50TmFtZX1cclxuICAgICAgICAgIDwvRGlhbG9nRGVzY3JpcHRpb24+XHJcbiAgICAgICAgPC9EaWFsb2dIZWFkZXI+XHJcblxyXG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS02XCI+XHJcbiAgICAgICAgICB7LyogT3JkZXIgU3VtbWFyeSAqL31cclxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0zXCI+XHJcbiAgICAgICAgICAgIDxoNCBjbGFzc05hbWU9XCJmb250LXNlbWlib2xkIHRleHQtc21cIj5PcmRlciBTdW1tYXJ5PC9oND5cclxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJiZy1ncmF5LTUwIHJvdW5kZWQtbGcgcC00IHNwYWNlLXktMlwiPlxyXG4gICAgICAgICAgICAgIHtvcmRlci50ZXN0cy5tYXAoKHRlc3QsIGluZGV4KSA9PiAoXHJcbiAgICAgICAgICAgICAgICA8ZGl2IGtleT17aW5kZXh9IGNsYXNzTmFtZT1cImZsZXgganVzdGlmeS1iZXR3ZWVuIHRleHQtc21cIj5cclxuICAgICAgICAgICAgICAgICAgPHNwYW4+XHJcbiAgICAgICAgICAgICAgICAgICAge3Rlc3QuY29kZX0gLSB7dGVzdC5uYW1lfVxyXG4gICAgICAgICAgICAgICAgICA8L3NwYW4+XHJcbiAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImZvbnQtbWVkaXVtXCI+TGUge3Rlc3QucHJpY2UudG9Mb2NhbGVTdHJpbmcoKX08L3NwYW4+XHJcbiAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICApKX1cclxuICAgICAgICAgICAgICA8U2VwYXJhdG9yIC8+XHJcbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGp1c3RpZnktYmV0d2VlbiB0ZXh0LXNtXCI+XHJcbiAgICAgICAgICAgICAgICA8c3Bhbj5TdWJ0b3RhbDo8L3NwYW4+XHJcbiAgICAgICAgICAgICAgICA8c3Bhbj5MZSB7b3JkZXIuc3VidG90YWwudG9Mb2NhbGVTdHJpbmcoKX08L3NwYW4+XHJcbiAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAge29yZGVyLmRpc2NvdW50ID4gMCAmJiAoXHJcbiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXgganVzdGlmeS1iZXR3ZWVuIHRleHQtc20gdGV4dC1ncmVlbi02MDBcIj5cclxuICAgICAgICAgICAgICAgICAgPHNwYW4+XHJcbiAgICAgICAgICAgICAgICAgICAgRGlzY291bnQgKFxyXG4gICAgICAgICAgICAgICAgICAgIHtvcmRlci5kaXNjb3VudFR5cGUgPT09ICdwZXJjZW50YWdlJ1xyXG4gICAgICAgICAgICAgICAgICAgICAgPyBgJHtvcmRlci5kaXNjb3VudH0lYFxyXG4gICAgICAgICAgICAgICAgICAgICAgOiBgTGUgJHtvcmRlci5kaXNjb3VudC50b0xvY2FsZVN0cmluZygpfWB9XHJcbiAgICAgICAgICAgICAgICAgICAgKTpcclxuICAgICAgICAgICAgICAgICAgPC9zcGFuPlxyXG4gICAgICAgICAgICAgICAgICA8c3Bhbj5cclxuICAgICAgICAgICAgICAgICAgICAtTGV7JyAnfVxyXG4gICAgICAgICAgICAgICAgICAgIHsob3JkZXIuZGlzY291bnRUeXBlID09PSAncGVyY2VudGFnZSdcclxuICAgICAgICAgICAgICAgICAgICAgID8gKG9yZGVyLnN1YnRvdGFsICogb3JkZXIuZGlzY291bnQpIC8gMTAwXHJcbiAgICAgICAgICAgICAgICAgICAgICA6IG9yZGVyLmRpc2NvdW50XHJcbiAgICAgICAgICAgICAgICAgICAgKS50b0xvY2FsZVN0cmluZygpfVxyXG4gICAgICAgICAgICAgICAgICA8L3NwYW4+XHJcbiAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICApfVxyXG4gICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBqdXN0aWZ5LWJldHdlZW4gZm9udC1ib2xkIHRleHQtbGcgcHQtMiBib3JkZXItdFwiPlxyXG4gICAgICAgICAgICAgICAgPHNwYW4+VG90YWw6PC9zcGFuPlxyXG4gICAgICAgICAgICAgICAgPHNwYW4+TGUge29yZGVyLnRvdGFsLnRvTG9jYWxlU3RyaW5nKCl9PC9zcGFuPlxyXG4gICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgIDwvZGl2PlxyXG5cclxuICAgICAgICAgIHshcGF5bWVudENvbXBsZXRlID8gKFxyXG4gICAgICAgICAgICA8PlxyXG4gICAgICAgICAgICAgIHsvKiBQYXltZW50IE1ldGhvZCAqL31cclxuICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNwYWNlLXktMlwiPlxyXG4gICAgICAgICAgICAgICAgPExhYmVsPlBheW1lbnQgTWV0aG9kPC9MYWJlbD5cclxuICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZ3JpZCBncmlkLWNvbHMtMyBnYXAtMlwiPlxyXG4gICAgICAgICAgICAgICAgICA8QnV0dG9uXHJcbiAgICAgICAgICAgICAgICAgICAgdHlwZT1cImJ1dHRvblwiXHJcbiAgICAgICAgICAgICAgICAgICAgdmFyaWFudD17cGF5bWVudE1ldGhvZCA9PT0gJ2Nhc2gnID8gJ2RlZmF1bHQnIDogJ291dGxpbmUnfVxyXG4gICAgICAgICAgICAgICAgICAgIGNsYXNzTmFtZT1cImgtMjAgZmxleCBmbGV4LWNvbCBnYXAtMlwiXHJcbiAgICAgICAgICAgICAgICAgICAgb25DbGljaz17KCkgPT4gc2V0UGF5bWVudE1ldGhvZCgnY2FzaCcpfVxyXG4gICAgICAgICAgICAgICAgICA+XHJcbiAgICAgICAgICAgICAgICAgICAgPEJhbmtub3RlIGNsYXNzTmFtZT1cInctNiBoLTZcIiAvPlxyXG4gICAgICAgICAgICAgICAgICAgIDxzcGFuPkNhc2g8L3NwYW4+XHJcbiAgICAgICAgICAgICAgICAgIDwvQnV0dG9uPlxyXG4gICAgICAgICAgICAgICAgICA8QnV0dG9uXHJcbiAgICAgICAgICAgICAgICAgICAgdHlwZT1cImJ1dHRvblwiXHJcbiAgICAgICAgICAgICAgICAgICAgdmFyaWFudD17cGF5bWVudE1ldGhvZCA9PT0gJ2NhcmQnID8gJ2RlZmF1bHQnIDogJ291dGxpbmUnfVxyXG4gICAgICAgICAgICAgICAgICAgIGNsYXNzTmFtZT1cImgtMjAgZmxleCBmbGV4LWNvbCBnYXAtMlwiXHJcbiAgICAgICAgICAgICAgICAgICAgb25DbGljaz17KCkgPT4gc2V0UGF5bWVudE1ldGhvZCgnY2FyZCcpfVxyXG4gICAgICAgICAgICAgICAgICA+XHJcbiAgICAgICAgICAgICAgICAgICAgPENyZWRpdENhcmQgY2xhc3NOYW1lPVwidy02IGgtNlwiIC8+XHJcbiAgICAgICAgICAgICAgICAgICAgPHNwYW4+Q2FyZDwvc3Bhbj5cclxuICAgICAgICAgICAgICAgICAgPC9CdXR0b24+XHJcbiAgICAgICAgICAgICAgICAgIDxCdXR0b25cclxuICAgICAgICAgICAgICAgICAgICB0eXBlPVwiYnV0dG9uXCJcclxuICAgICAgICAgICAgICAgICAgICB2YXJpYW50PXtwYXltZW50TWV0aG9kID09PSAnbW9iaWxlLW1vbmV5JyA/ICdkZWZhdWx0JyA6ICdvdXRsaW5lJ31cclxuICAgICAgICAgICAgICAgICAgICBjbGFzc05hbWU9XCJoLTIwIGZsZXggZmxleC1jb2wgZ2FwLTJcIlxyXG4gICAgICAgICAgICAgICAgICAgIG9uQ2xpY2s9eygpID0+IHNldFBheW1lbnRNZXRob2QoJ21vYmlsZS1tb25leScpfVxyXG4gICAgICAgICAgICAgICAgICA+XHJcbiAgICAgICAgICAgICAgICAgICAgPFNtYXJ0cGhvbmUgY2xhc3NOYW1lPVwidy02IGgtNlwiIC8+XHJcbiAgICAgICAgICAgICAgICAgICAgPHNwYW4+TW9iaWxlIE1vbmV5PC9zcGFuPlxyXG4gICAgICAgICAgICAgICAgICA8L0J1dHRvbj5cclxuICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgIDwvZGl2PlxyXG5cclxuICAgICAgICAgICAgICB7LyogQW1vdW50IFBhaWQgKi99XHJcbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTJcIj5cclxuICAgICAgICAgICAgICAgIDxMYWJlbCBodG1sRm9yPVwiYW1vdW50UGFpZFwiPkFtb3VudCBQYWlkPC9MYWJlbD5cclxuICAgICAgICAgICAgICAgIDxJbnB1dFxyXG4gICAgICAgICAgICAgICAgICBpZD1cImFtb3VudFBhaWRcIlxyXG4gICAgICAgICAgICAgICAgICB0eXBlPVwibnVtYmVyXCJcclxuICAgICAgICAgICAgICAgICAgdmFsdWU9e2Ftb3VudFBhaWR9XHJcbiAgICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXsoZSkgPT4gc2V0QW1vdW50UGFpZChlLnRhcmdldC52YWx1ZSl9XHJcbiAgICAgICAgICAgICAgICAgIHBsYWNlaG9sZGVyPVwiRW50ZXIgYW1vdW50XCJcclxuICAgICAgICAgICAgICAgICAgY2xhc3NOYW1lPVwidGV4dC1sZyBmb250LXNlbWlib2xkXCJcclxuICAgICAgICAgICAgICAgIC8+XHJcbiAgICAgICAgICAgICAgICB7Y2hhbmdlID4gMCAmJiAoXHJcbiAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc20gdGV4dC1ncmVlbi02MDAgZm9udC1tZWRpdW1cIj5cclxuICAgICAgICAgICAgICAgICAgICBDaGFuZ2U6IExlIHtjaGFuZ2UudG9Mb2NhbGVTdHJpbmcoKX1cclxuICAgICAgICAgICAgICAgICAgPC9wPlxyXG4gICAgICAgICAgICAgICAgKX1cclxuICAgICAgICAgICAgICAgIHtjaGFuZ2UgPCAwICYmIChcclxuICAgICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1zbSB0ZXh0LXJlZC02MDAgZm9udC1tZWRpdW1cIj5cclxuICAgICAgICAgICAgICAgICAgICBJbnN1ZmZpY2llbnQgYW1vdW50OiBMZSB7TWF0aC5hYnMoY2hhbmdlKS50b0xvY2FsZVN0cmluZygpfSBzaG9ydFxyXG4gICAgICAgICAgICAgICAgICA8L3A+XHJcbiAgICAgICAgICAgICAgICApfVxyXG4gICAgICAgICAgICAgIDwvZGl2PlxyXG5cclxuICAgICAgICAgICAgICB7LyogUHJvY2VzcyBQYXltZW50IEJ1dHRvbiAqL31cclxuICAgICAgICAgICAgICA8QnV0dG9uXHJcbiAgICAgICAgICAgICAgICBvbkNsaWNrPXtoYW5kbGVQcm9jZXNzUGF5bWVudH1cclxuICAgICAgICAgICAgICAgIGRpc2FibGVkPXtpc1Byb2Nlc3NpbmcgfHwgcmVjZWlwdERhdGEuYW1vdW50UGFpZCA8IG9yZGVyLnRvdGFsfVxyXG4gICAgICAgICAgICAgICAgY2xhc3NOYW1lPVwidy1mdWxsXCJcclxuICAgICAgICAgICAgICAgIHNpemU9XCJsZ1wiXHJcbiAgICAgICAgICAgICAgPlxyXG4gICAgICAgICAgICAgICAge2lzUHJvY2Vzc2luZyA/ICdQcm9jZXNzaW5nLi4uJyA6ICdQcm9jZXNzIFBheW1lbnQnfVxyXG4gICAgICAgICAgICAgIDwvQnV0dG9uPlxyXG4gICAgICAgICAgICA8Lz5cclxuICAgICAgICAgICkgOiAoXHJcbiAgICAgICAgICAgIDw+XHJcbiAgICAgICAgICAgICAgey8qIFBheW1lbnQgU3VjY2VzcyAqL31cclxuICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImJnLWdyZWVuLTUwIGJvcmRlciBib3JkZXItZ3JlZW4tMjAwIHJvdW5kZWQtbGcgcC02IHRleHQtY2VudGVyIHNwYWNlLXktM1wiPlxyXG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJ3LTE2IGgtMTYgYmctZ3JlZW4tMTAwIHJvdW5kZWQtZnVsbCBmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWNlbnRlciBteC1hdXRvXCI+XHJcbiAgICAgICAgICAgICAgICAgIDxDaGVjayBjbGFzc05hbWU9XCJ3LTggaC04IHRleHQtZ3JlZW4tNjAwXCIgLz5cclxuICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgPGRpdj5cclxuICAgICAgICAgICAgICAgICAgPGgzIGNsYXNzTmFtZT1cImZvbnQtc2VtaWJvbGQgdGV4dC1sZyB0ZXh0LWdyZWVuLTkwMFwiPlBheW1lbnQgU3VjY2Vzc2Z1bCE8L2gzPlxyXG4gICAgICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LXNtIHRleHQtZ3JlZW4tNzAwXCI+UmVjZWlwdCBOdW1iZXI6IHtyZWNlaXB0TnVtYmVyfTwvcD5cclxuICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAge2NoYW5nZSA+IDAgJiYgKFxyXG4gICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImJnLXdoaXRlIHJvdW5kZWQtbGcgcC0zXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1zbSB0ZXh0LWdyYXktNjAwXCI+Q2hhbmdlIHRvIHJldHVybjo8L3A+XHJcbiAgICAgICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC0yeGwgZm9udC1ib2xkIHRleHQtZ3JlZW4tNjAwXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgICBMZSB7Y2hhbmdlLnRvTG9jYWxlU3RyaW5nKCl9XHJcbiAgICAgICAgICAgICAgICAgICAgPC9wPlxyXG4gICAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgICl9XHJcbiAgICAgICAgICAgICAgPC9kaXY+XHJcblxyXG4gICAgICAgICAgICAgIHsvKiBQcmludCBSZWNlaXB0cyBCdXR0b24gKi99XHJcbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTNcIj5cclxuICAgICAgICAgICAgICAgIDxCdXR0b25cclxuICAgICAgICAgICAgICAgICAgb25DbGljaz17aGFuZGxlUHJpbnRSZWNlaXB0c31cclxuICAgICAgICAgICAgICAgICAgZGlzYWJsZWQ9e2lzUHJpbnRpbmd9XHJcbiAgICAgICAgICAgICAgICAgIGNsYXNzTmFtZT1cInctZnVsbFwiXHJcbiAgICAgICAgICAgICAgICAgIHNpemU9XCJsZ1wiXHJcbiAgICAgICAgICAgICAgICA+XHJcbiAgICAgICAgICAgICAgICAgIDxQcmludGVyIGNsYXNzTmFtZT1cInctNCBoLTQgbXItMlwiIC8+XHJcbiAgICAgICAgICAgICAgICAgIHtpc1ByaW50aW5nID8gJ1ByaW50aW5nLi4uJyA6ICdQcmludCBCb3RoIFJlY2VpcHRzJ31cclxuICAgICAgICAgICAgICAgIDwvQnV0dG9uPlxyXG4gICAgICAgICAgICAgICAgPEJ1dHRvblxyXG4gICAgICAgICAgICAgICAgICBvbkNsaWNrPXtoYW5kbGVWaWV3UmVjZWlwdH1cclxuICAgICAgICAgICAgICAgICAgdmFyaWFudD1cIm91dGxpbmVcIlxyXG4gICAgICAgICAgICAgICAgICBjbGFzc05hbWU9XCJ3LWZ1bGxcIlxyXG4gICAgICAgICAgICAgICAgPlxyXG4gICAgICAgICAgICAgICAgICBWaWV3IFJlY2VpcHQgUGFnZVxyXG4gICAgICAgICAgICAgICAgPC9CdXR0b24+XHJcbiAgICAgICAgICAgICAgPC9kaXY+XHJcblxyXG4gICAgICAgICAgICAgIHsvKiBIaWRkZW4gUmVjZWlwdCBFbGVtZW50cyBmb3IgUHJpbnRpbmcgKi99XHJcbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJoaWRkZW5cIj5cclxuICAgICAgICAgICAgICAgIDxkaXYgcmVmPXtwYXRpZW50UmVjZWlwdFJlZn0+XHJcbiAgICAgICAgICAgICAgICAgIDxUaGVybWFsUmVjZWlwdCBkYXRhPXtyZWNlaXB0RGF0YX0gY29weVR5cGU9XCJwYXRpZW50XCIgLz5cclxuICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgPGRpdiByZWY9e2xhYlJlY2VpcHRSZWZ9PlxyXG4gICAgICAgICAgICAgICAgICA8VGhlcm1hbFJlY2VpcHQgZGF0YT17cmVjZWlwdERhdGF9IGNvcHlUeXBlPVwibGFiXCIgLz5cclxuICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICA8Lz5cclxuICAgICAgICAgICl9XHJcbiAgICAgICAgPC9kaXY+XHJcbiAgICAgIDwvRGlhbG9nQ29udGVudD5cclxuICAgIDwvRGlhbG9nPlxyXG4gICk7XHJcbn1cclxuIl0sIm5hbWVzIjpbInVzZVN0YXRlIiwidXNlUmVmIiwidXNlTmF2aWdhdGUiLCJEaWFsb2ciLCJEaWFsb2dDb250ZW50IiwiRGlhbG9nRGVzY3JpcHRpb24iLCJEaWFsb2dIZWFkZXIiLCJEaWFsb2dUaXRsZSIsIkJ1dHRvbiIsIklucHV0IiwiTGFiZWwiLCJTZXBhcmF0b3IiLCJUaGVybWFsUmVjZWlwdCIsInVzZVRoZXJtYWxQcmludCIsInRvYXN0IiwiQ3JlZGl0Q2FyZCIsIkJhbmtub3RlIiwiU21hcnRwaG9uZSIsIlByaW50ZXIiLCJDaGVjayIsImZvcm1hdCIsIlBheW1lbnREaWFsb2ciLCJvcGVuIiwib25PcGVuQ2hhbmdlIiwib3JkZXIiLCJjYXNoaWVyTmFtZSIsIm5hdmlnYXRlIiwicHJpbnRCb3RoQ29waWVzIiwicGF0aWVudFJlY2VpcHRSZWYiLCJsYWJSZWNlaXB0UmVmIiwicGF5bWVudE1ldGhvZCIsInNldFBheW1lbnRNZXRob2QiLCJhbW91bnRQYWlkIiwic2V0QW1vdW50UGFpZCIsInRvdGFsIiwidG9TdHJpbmciLCJpc1Byb2Nlc3NpbmciLCJzZXRJc1Byb2Nlc3NpbmciLCJpc1ByaW50aW5nIiwic2V0SXNQcmludGluZyIsInBheW1lbnRDb21wbGV0ZSIsInNldFBheW1lbnRDb21wbGV0ZSIsInJlY2VpcHROdW1iZXIiLCJEYXRlIiwiaWQiLCJzbGljZSIsInRvVXBwZXJDYXNlIiwicmVjZWlwdERhdGEiLCJvcmRlck51bWJlciIsInBhdGllbnROYW1lIiwicGF0aWVudElkIiwicGF0aWVudFBob25lIiwidGVzdHMiLCJzdWJ0b3RhbCIsImRpc2NvdW50IiwiZGlzY291bnRUeXBlIiwicGFyc2VGbG9hdCIsInBheW1lbnREYXRlIiwidG9JU09TdHJpbmciLCJjYXNoaWVyIiwiY29sbGVjdGlvbkRhdGUiLCJjaGFuZ2UiLCJoYW5kbGVQcm9jZXNzUGF5bWVudCIsImVycm9yIiwiUHJvbWlzZSIsInJlc29sdmUiLCJzZXRUaW1lb3V0Iiwic3VjY2VzcyIsImNvbnNvbGUiLCJoYW5kbGVQcmludFJlY2VpcHRzIiwicmVzdWx0IiwiY3VycmVudCIsInByaW50ZWRDb3VudCIsImhhbmRsZVZpZXdSZWNlaXB0IiwiY2xhc3NOYW1lIiwiZGl2IiwiaDQiLCJtYXAiLCJ0ZXN0IiwiaW5kZXgiLCJzcGFuIiwiY29kZSIsIm5hbWUiLCJwcmljZSIsInRvTG9jYWxlU3RyaW5nIiwidHlwZSIsInZhcmlhbnQiLCJvbkNsaWNrIiwiaHRtbEZvciIsInZhbHVlIiwib25DaGFuZ2UiLCJlIiwidGFyZ2V0IiwicGxhY2Vob2xkZXIiLCJwIiwiTWF0aCIsImFicyIsImRpc2FibGVkIiwic2l6ZSIsImgzIiwicmVmIiwiZGF0YSIsImNvcHlUeXBlIl0sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7QUFBQSxTQUFTQSxRQUFRLEVBQUVDLE1BQU0sUUFBUSxRQUFRO0FBQ3pDLFNBQVNDLFdBQVcsUUFBUSxtQkFBbUI7QUFDL0MsU0FDRUMsTUFBTSxFQUNOQyxhQUFhLEVBQ2JDLGlCQUFpQixFQUNqQkMsWUFBWSxFQUNaQyxXQUFXLFFBQ04seUJBQXlCO0FBQ2hDLFNBQVNDLE1BQU0sUUFBUSx5QkFBeUI7QUFDaEQsU0FBU0MsS0FBSyxRQUFRLHdCQUF3QjtBQUM5QyxTQUFTQyxLQUFLLFFBQVEsd0JBQXdCO0FBUzlDLFNBQVNDLFNBQVMsUUFBUSw0QkFBNEI7QUFDdEQsU0FBU0MsY0FBYyxRQUFRLHVDQUF1QztBQUN0RSxTQUFTQyxlQUFlLFFBQVEsMEJBQTBCO0FBQzFELFNBQVNDLEtBQUssUUFBUSxTQUFTO0FBQy9CLFNBQVNDLFVBQVUsRUFBRUMsUUFBUSxFQUFFQyxVQUFVLEVBQUVDLE9BQU8sRUFBRUMsS0FBSyxRQUFRLGVBQWU7QUFDaEYsU0FBU0MsTUFBTSxRQUFRLFdBQVc7QUF3QmxDLE9BQU8sU0FBU0MsY0FBYyxFQUM1QkMsSUFBSSxFQUNKQyxZQUFZLEVBQ1pDLEtBQUssRUFDTEMsV0FBVyxFQUNROztJQUNuQixNQUFNQyxXQUFXeEI7SUFDakIsTUFBTSxFQUFFeUIsZUFBZSxFQUFFLEdBQUdkO0lBQzVCLE1BQU1lLG9CQUFvQjNCLE9BQXVCO0lBQ2pELE1BQU00QixnQkFBZ0I1QixPQUF1QjtJQUU3QyxNQUFNLENBQUM2QixlQUFlQyxpQkFBaUIsR0FBRy9CLFNBQTJDO0lBQ3JGLE1BQU0sQ0FBQ2dDLFlBQVlDLGNBQWMsR0FBR2pDLFNBQWlCd0IsTUFBTVUsS0FBSyxDQUFDQyxRQUFRO0lBQ3pFLE1BQU0sQ0FBQ0MsY0FBY0MsZ0JBQWdCLEdBQUdyQyxTQUFTO0lBQ2pE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

@@ -1,0 +1,762 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/pages/lab/ResultsPage.tsx");import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+
+let prevRefreshReg;
+let prevRefreshSig;
+
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react-swc can't detect preamble. Something is wrong."
+    );
+  }
+
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+
+import __vite__cjsImport2_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=27cfabb6"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime["jsxDEV"];
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=27cfabb6"; const useState = __vite__cjsImport3_react["useState"];
+import { useNavigate } from "/node_modules/.vite/deps/react-router-dom.js?v=27cfabb6";
+import { RoleLayout } from "/src/components/layout/RoleLayout.tsx";
+import { useAuth } from "/src/context/AuthContext.tsx";
+import { useResults, useVerifyResult } from "/src/hooks/useResults.ts";
+import { Button } from "/src/components/ui/button.tsx";
+import { Input } from "/src/components/ui/input.tsx";
+import { Badge } from "/src/components/ui/badge.tsx";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "/src/components/ui/select.tsx";
+import { toast } from "/node_modules/.vite/deps/sonner.js?v=27cfabb6";
+import { Search, CheckCircle, Download, Loader2, Eye, FileText } from "/node_modules/.vite/deps/lucide-react.js?v=27cfabb6";
+import { format } from "/node_modules/.vite/deps/date-fns.js?v=27cfabb6";
+import { cn } from "/src/lib/utils.ts";
+import { getPatientName, getPatientId } from "/src/utils/orderHelpers.ts";
+export default function ResultsPage() {
+    _s();
+    const { profile, user } = useAuth();
+    const navigate = useNavigate();
+    const { data: results, isLoading } = useResults();
+    const verifyResult = useVerifyResult();
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('all');
+    const [flagFilter, setFlagFilter] = useState('all');
+    const [selectedIds, setSelectedIds] = useState(new Set());
+    const filteredResults = results?.filter((result)=>{
+        // Filter by status
+        if (statusFilter !== 'all' && result.status !== statusFilter) return false;
+        // Filter by flag
+        if (flagFilter !== 'all' && result.flag !== flagFilter) return false;
+        // Filter by search
+        if (!searchTerm) return true;
+        const search = searchTerm.toLowerCase();
+        const order = result.orders || result.orderId;
+        const testCode = result.testCode || result.test_code || '';
+        const testName = result.testName || result.test_name || '';
+        const orderNumber = order?.orderNumber || order?.order_number || '';
+        const firstName = order?.patient?.firstName || order?.patients?.first_name || '';
+        const lastName = order?.patient?.lastName || order?.patients?.last_name || '';
+        return testCode.toLowerCase().includes(search) || testName.toLowerCase().includes(search) || orderNumber.toLowerCase().includes(search) || firstName.toLowerCase().includes(search) || lastName.toLowerCase().includes(search);
+    });
+    const handleVerify = async (id)=>{
+        if (!user?.id) return;
+        try {
+            await verifyResult.mutateAsync({
+                id,
+                verifiedBy: user.id
+            });
+            toast.success('Result verified');
+            setSelectedIds((prev)=>{
+                const next = new Set(prev);
+                next.delete(id);
+                return next;
+            });
+        } catch (error) {
+            toast.error('Failed to verify result');
+        }
+    };
+    const handleVerifySelected = async ()=>{
+        if (!user?.id) return;
+        for (const id of selectedIds){
+            try {
+                await verifyResult.mutateAsync({
+                    id,
+                    verifiedBy: user.id
+                });
+            } catch (error) {
+                console.error('Failed to verify:', id);
+            }
+        }
+        toast.success(`Verified ${selectedIds.size} results`);
+        setSelectedIds(new Set());
+    };
+    const toggleSelect = (id)=>{
+        setSelectedIds((prev)=>{
+            const next = new Set(prev);
+            if (next.has(id)) {
+                next.delete(id);
+            } else {
+                next.add(id);
+            }
+            return next;
+        });
+    };
+    const toggleSelectAll = ()=>{
+        if (selectedIds.size === filteredResults?.length) {
+            setSelectedIds(new Set());
+        } else {
+            setSelectedIds(new Set(filteredResults?.map((r)=>r.id) || []));
+        }
+    };
+    const flagStyles = {
+        normal: 'bg-status-normal/10 text-status-normal border-status-normal/20',
+        low: 'bg-status-warning/10 text-status-warning border-status-warning/20',
+        high: 'bg-status-warning/10 text-status-warning border-status-warning/20',
+        critical_low: 'bg-status-critical/10 text-status-critical border-status-critical/20',
+        critical_high: 'bg-status-critical/10 text-status-critical border-status-critical/20'
+    };
+    return /*#__PURE__*/ _jsxDEV(RoleLayout, {
+        title: "Results",
+        subtitle: "View and verify test results",
+        role: "lab-tech",
+        userName: profile?.full_name,
+        children: [
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "flex items-center justify-between mb-6",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "flex items-center gap-3",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "relative",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(Search, {
+                                        className: "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                        lineNumber: 124,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(Input, {
+                                        placeholder: "Search results...",
+                                        className: "pl-10 w-80",
+                                        value: searchTerm,
+                                        onChange: (e)=>setSearchTerm(e.target.value)
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                        lineNumber: 125,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                lineNumber: 123,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV(Select, {
+                                value: statusFilter,
+                                onValueChange: setStatusFilter,
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(SelectTrigger, {
+                                        className: "w-40",
+                                        children: /*#__PURE__*/ _jsxDEV(SelectValue, {
+                                            placeholder: "Status"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                            lineNumber: 134,
+                                            columnNumber: 15
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                        lineNumber: 133,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(SelectContent, {
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                value: "all",
+                                                children: "All Status"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                lineNumber: 137,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                value: "preliminary",
+                                                children: "Preliminary"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                lineNumber: 138,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                value: "verified",
+                                                children: "Verified"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                lineNumber: 139,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                        lineNumber: 136,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                lineNumber: 132,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV(Select, {
+                                value: flagFilter,
+                                onValueChange: setFlagFilter,
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(SelectTrigger, {
+                                        className: "w-40",
+                                        children: /*#__PURE__*/ _jsxDEV(SelectValue, {
+                                            placeholder: "Flag"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                            lineNumber: 144,
+                                            columnNumber: 15
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                        lineNumber: 143,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(SelectContent, {
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                value: "all",
+                                                children: "All Flags"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                lineNumber: 147,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                value: "normal",
+                                                children: "Normal"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                lineNumber: 148,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                value: "low",
+                                                children: "Low"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                lineNumber: 149,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                value: "high",
+                                                children: "High"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                lineNumber: 150,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                value: "critical_low",
+                                                children: "Critical Low"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                lineNumber: 151,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                value: "critical_high",
+                                                children: "Critical High"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                lineNumber: 152,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                        lineNumber: 146,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                lineNumber: 142,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                        lineNumber: 122,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "flex gap-2",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(Button, {
+                                variant: "outline",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(Download, {
+                                        className: "w-4 h-4 mr-2"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                        lineNumber: 158,
+                                        columnNumber: 13
+                                    }, this),
+                                    "Export"
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                lineNumber: 157,
+                                columnNumber: 11
+                            }, this),
+                            selectedIds.size > 0 && /*#__PURE__*/ _jsxDEV(Button, {
+                                onClick: handleVerifySelected,
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(CheckCircle, {
+                                        className: "w-4 h-4 mr-2"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                        lineNumber: 163,
+                                        columnNumber: 15
+                                    }, this),
+                                    "Verify Selected (",
+                                    selectedIds.size,
+                                    ")"
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                lineNumber: 162,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                        lineNumber: 156,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                lineNumber: 121,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "bg-card border rounded-lg overflow-hidden",
+                children: isLoading ? /*#__PURE__*/ _jsxDEV("div", {
+                    className: "flex items-center justify-center py-12",
+                    children: /*#__PURE__*/ _jsxDEV(Loader2, {
+                        className: "w-6 h-6 animate-spin text-muted-foreground"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                        lineNumber: 174,
+                        columnNumber: 13
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                    lineNumber: 173,
+                    columnNumber: 11
+                }, this) : /*#__PURE__*/ _jsxDEV("table", {
+                    className: "data-table",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV("thead", {
+                            children: /*#__PURE__*/ _jsxDEV("tr", {
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        className: "w-8",
+                                        children: /*#__PURE__*/ _jsxDEV("input", {
+                                            type: "checkbox",
+                                            className: "rounded",
+                                            checked: selectedIds.size === filteredResults?.length && (filteredResults?.length || 0) > 0,
+                                            onChange: toggleSelectAll
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                            lineNumber: 181,
+                                            columnNumber: 19
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                        lineNumber: 180,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Order"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                        lineNumber: 188,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Patient"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                        lineNumber: 189,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Test"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                        lineNumber: 190,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Value"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                        lineNumber: 191,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Reference"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                        lineNumber: 192,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Flag"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                        lineNumber: 193,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Status"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                        lineNumber: 194,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Resulted"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                        lineNumber: 195,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Actions"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                        lineNumber: 196,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                lineNumber: 179,
+                                columnNumber: 15
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                            lineNumber: 178,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("tbody", {
+                            children: [
+                                filteredResults?.map((result)=>{
+                                    const order = result.orders || result.orderId;
+                                    const resultId = result.id || result._id;
+                                    const testCode = result.testCode || result.test_code;
+                                    const testName = result.testName || result.test_name;
+                                    const referenceRange = result.referenceRange || result.reference_range;
+                                    const resultedAt = result.resulted_at || result.createdAt;
+                                    const orderNumber = order?.orderNumber || order?.order_number;
+                                    return /*#__PURE__*/ _jsxDEV("tr", {
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                children: /*#__PURE__*/ _jsxDEV("input", {
+                                                    type: "checkbox",
+                                                    className: "rounded",
+                                                    checked: selectedIds.has(resultId),
+                                                    onChange: ()=>toggleSelect(resultId)
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                    lineNumber: 211,
+                                                    columnNumber: 23
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                lineNumber: 210,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                className: "font-mono text-sm",
+                                                children: orderNumber || '-'
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                lineNumber: 218,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                children: (order?.patient || order?.patients || order?.patientId) && /*#__PURE__*/ _jsxDEV("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV("p", {
+                                                            className: "font-medium",
+                                                            children: getPatientName(order)
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                            lineNumber: 222,
+                                                            columnNumber: 27
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("p", {
+                                                            className: "text-xs text-muted-foreground",
+                                                            children: getPatientId(order)
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                            lineNumber: 225,
+                                                            columnNumber: 27
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                    lineNumber: 221,
+                                                    columnNumber: 25
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                lineNumber: 219,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                children: /*#__PURE__*/ _jsxDEV("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV("p", {
+                                                            className: "font-medium",
+                                                            children: testCode
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                            lineNumber: 233,
+                                                            columnNumber: 25
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("p", {
+                                                            className: "text-xs text-muted-foreground",
+                                                            children: testName
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                            lineNumber: 234,
+                                                            columnNumber: 25
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                    lineNumber: 232,
+                                                    columnNumber: 23
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                lineNumber: 231,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                className: "font-mono font-bold",
+                                                children: [
+                                                    result.value,
+                                                    " ",
+                                                    /*#__PURE__*/ _jsxDEV("span", {
+                                                        className: "font-normal text-muted-foreground",
+                                                        children: result.unit
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                        lineNumber: 238,
+                                                        columnNumber: 38
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                lineNumber: 237,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                className: "text-muted-foreground",
+                                                children: referenceRange || '-'
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                lineNumber: 240,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                children: /*#__PURE__*/ _jsxDEV(Badge, {
+                                                    variant: "outline",
+                                                    className: cn(flagStyles[result.flag]),
+                                                    children: result.flag === 'normal' ? 'Normal' : result.flag.replace('_', ' ')
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                    lineNumber: 242,
+                                                    columnNumber: 23
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                lineNumber: 241,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                children: /*#__PURE__*/ _jsxDEV(Badge, {
+                                                    variant: result.status === 'verified' ? 'default' : 'secondary',
+                                                    children: result.status
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                    lineNumber: 247,
+                                                    columnNumber: 23
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                lineNumber: 246,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                className: "text-muted-foreground text-sm",
+                                                children: resultedAt ? format(new Date(resultedAt), 'MMM dd, HH:mm') : '-'
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                lineNumber: 251,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                children: /*#__PURE__*/ _jsxDEV("div", {
+                                                    className: "flex gap-1",
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV(Button, {
+                                                            variant: "ghost",
+                                                            size: "sm",
+                                                            onClick: ()=>navigate(`/lab/reports/${order?.id || order?._id}`),
+                                                            title: "View Report",
+                                                            children: /*#__PURE__*/ _jsxDEV(FileText, {
+                                                                className: "w-4 h-4"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                                lineNumber: 262,
+                                                                columnNumber: 27
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                            lineNumber: 256,
+                                                            columnNumber: 25
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV(Button, {
+                                                            variant: "ghost",
+                                                            size: "sm",
+                                                            children: /*#__PURE__*/ _jsxDEV(Eye, {
+                                                                className: "w-4 h-4"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                                lineNumber: 265,
+                                                                columnNumber: 27
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                            lineNumber: 264,
+                                                            columnNumber: 25
+                                                        }, this),
+                                                        result.status !== 'verified' && /*#__PURE__*/ _jsxDEV(Button, {
+                                                            variant: "ghost",
+                                                            size: "sm",
+                                                            onClick: ()=>handleVerify(resultId),
+                                                            disabled: verifyResult.isPending,
+                                                            children: /*#__PURE__*/ _jsxDEV(CheckCircle, {
+                                                                className: "w-4 h-4"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                                lineNumber: 274,
+                                                                columnNumber: 29
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                            lineNumber: 268,
+                                                            columnNumber: 27
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                    lineNumber: 255,
+                                                    columnNumber: 23
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                                lineNumber: 254,
+                                                columnNumber: 21
+                                            }, this)
+                                        ]
+                                    }, resultId, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                        lineNumber: 209,
+                                        columnNumber: 19
+                                    }, this);
+                                }),
+                                (!filteredResults || filteredResults.length === 0) && /*#__PURE__*/ _jsxDEV("tr", {
+                                    children: /*#__PURE__*/ _jsxDEV("td", {
+                                        colSpan: 10,
+                                        className: "text-center py-8 text-muted-foreground",
+                                        children: "No results found"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                        lineNumber: 284,
+                                        columnNumber: 19
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                                    lineNumber: 283,
+                                    columnNumber: 17
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                            lineNumber: 199,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                    lineNumber: 177,
+                    columnNumber: 11
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+                lineNumber: 171,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx",
+        lineNumber: 114,
+        columnNumber: 5
+    }, this);
+}
+_s(ResultsPage, "ENz8WYHtfm6lnFHqWFf3a0ZO/XE=", false, function() {
+    return [
+        useAuth,
+        useNavigate,
+        useResults,
+        useVerifyResult
+    ];
+});
+_c = ResultsPage;
+var _c;
+$RefreshReg$(_c, "ResultsPage");
+
+
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+
+
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/HP/Downloads/lab/frontend/src/pages/lab/ResultsPage.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIlJlc3VsdHNQYWdlLnRzeCJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyB1c2VTdGF0ZSB9IGZyb20gJ3JlYWN0JztcbmltcG9ydCB7IHVzZU5hdmlnYXRlIH0gZnJvbSAncmVhY3Qtcm91dGVyLWRvbSc7XG5pbXBvcnQgeyBSb2xlTGF5b3V0IH0gZnJvbSAnQC9jb21wb25lbnRzL2xheW91dC9Sb2xlTGF5b3V0JztcbmltcG9ydCB7IHVzZUF1dGggfSBmcm9tICdAL2NvbnRleHQvQXV0aENvbnRleHQnO1xuaW1wb3J0IHsgdXNlUmVzdWx0cywgdXNlVmVyaWZ5UmVzdWx0IH0gZnJvbSAnQC9ob29rcy91c2VSZXN1bHRzJztcbmltcG9ydCB7IEJ1dHRvbiB9IGZyb20gJ0AvY29tcG9uZW50cy91aS9idXR0b24nO1xuaW1wb3J0IHsgSW5wdXQgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvaW5wdXQnO1xuaW1wb3J0IHsgQmFkZ2UgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvYmFkZ2UnO1xuaW1wb3J0IHsgU2VsZWN0LCBTZWxlY3RDb250ZW50LCBTZWxlY3RJdGVtLCBTZWxlY3RUcmlnZ2VyLCBTZWxlY3RWYWx1ZSB9IGZyb20gJ0AvY29tcG9uZW50cy91aS9zZWxlY3QnO1xuaW1wb3J0IHsgdG9hc3QgfSBmcm9tICdzb25uZXInO1xuaW1wb3J0IHsgU2VhcmNoLCBDaGVja0NpcmNsZSwgRG93bmxvYWQsIExvYWRlcjIsIEV5ZSwgRmlsZVRleHQgfSBmcm9tICdsdWNpZGUtcmVhY3QnO1xuaW1wb3J0IHsgZm9ybWF0IH0gZnJvbSAnZGF0ZS1mbnMnO1xuaW1wb3J0IHsgY24gfSBmcm9tICdAL2xpYi91dGlscyc7XG5pbXBvcnQgeyBnZXRQYXRpZW50TmFtZSwgZ2V0UGF0aWVudElkIH0gZnJvbSAnQC91dGlscy9vcmRlckhlbHBlcnMnO1xuaW1wb3J0IHR5cGUgeyBEYXRhYmFzZSB9IGZyb20gJ0AvaW50ZWdyYXRpb25zL3N1cGFiYXNlL3R5cGVzJztcblxudHlwZSBSZXN1bHRGbGFnID0gRGF0YWJhc2VbJ3B1YmxpYyddWydFbnVtcyddWydyZXN1bHRfZmxhZyddO1xuXG5leHBvcnQgZGVmYXVsdCBmdW5jdGlvbiBSZXN1bHRzUGFnZSgpIHtcbiAgY29uc3QgeyBwcm9maWxlLCB1c2VyIH0gPSB1c2VBdXRoKCk7XG4gIGNvbnN0IG5hdmlnYXRlID0gdXNlTmF2aWdhdGUoKTtcbiAgY29uc3QgeyBkYXRhOiByZXN1bHRzLCBpc0xvYWRpbmcgfSA9IHVzZVJlc3VsdHMoKTtcbiAgY29uc3QgdmVyaWZ5UmVzdWx0ID0gdXNlVmVyaWZ5UmVzdWx0KCk7XG5cbiAgY29uc3QgW3NlYXJjaFRlcm0sIHNldFNlYXJjaFRlcm1dID0gdXNlU3RhdGUoJycpO1xuICBjb25zdCBbc3RhdHVzRmlsdGVyLCBzZXRTdGF0dXNGaWx0ZXJdID0gdXNlU3RhdGU8c3RyaW5nPignYWxsJyk7XG4gIGNvbnN0IFtmbGFnRmlsdGVyLCBzZXRGbGFnRmlsdGVyXSA9IHVzZVN0YXRlPHN0cmluZz4oJ2FsbCcpO1xuICBjb25zdCBbc2VsZWN0ZWRJZHMsIHNldFNlbGVjdGVkSWRzXSA9IHVzZVN0YXRlPFNldDxzdHJpbmc+PihuZXcgU2V0KCkpO1xuXG4gIGNvbnN0IGZpbHRlcmVkUmVzdWx0cyA9IHJlc3VsdHM/LmZpbHRlcihyZXN1bHQgPT4ge1xuICAgIC8vIEZpbHRlciBieSBzdGF0dXNcbiAgICBpZiAoc3RhdHVzRmlsdGVyICE9PSAnYWxsJyAmJiByZXN1bHQuc3RhdHVzICE9PSBzdGF0dXNGaWx0ZXIpIHJldHVybiBmYWxzZTtcbiAgICBcbiAgICAvLyBGaWx0ZXIgYnkgZmxhZ1xuICAgIGlmIChmbGFnRmlsdGVyICE9PSAnYWxsJyAmJiByZXN1bHQuZmxhZyAhPT0gZmxhZ0ZpbHRlcikgcmV0dXJuIGZhbHNlO1xuICAgIFxuICAgIC8vIEZpbHRlciBieSBzZWFyY2hcbiAgICBpZiAoIXNlYXJjaFRlcm0pIHJldHVybiB0cnVlO1xuICAgIGNvbnN0IHNlYXJjaCA9IHNlYXJjaFRlcm0udG9Mb3dlckNhc2UoKTtcbiAgICBjb25zdCBvcmRlciA9IChyZXN1bHQub3JkZXJzIHx8IHJlc3VsdC5vcmRlcklkKSBhcyBhbnk7XG4gICAgY29uc3QgdGVzdENvZGUgPSByZXN1bHQudGVzdENvZGUgfHwgcmVzdWx0LnRlc3RfY29kZSB8fCAnJztcbiAgICBjb25zdCB0ZXN0TmFtZSA9IHJlc3VsdC50ZXN0TmFtZSB8fCByZXN1bHQudGVzdF9uYW1lIHx8ICcnO1xuICAgIGNvbnN0IG9yZGVyTnVtYmVyID0gb3JkZXI/Lm9yZGVyTnVtYmVyIHx8IG9yZGVyPy5vcmRlcl9udW1iZXIgfHwgJyc7XG4gICAgY29uc3QgZmlyc3ROYW1lID0gb3JkZXI/LnBhdGllbnQ/LmZpcnN0TmFtZSB8fCBvcmRlcj8ucGF0aWVudHM/LmZpcnN0X25hbWUgfHwgJyc7XG4gICAgY29uc3QgbGFzdE5hbWUgPSBvcmRlcj8ucGF0aWVudD8ubGFzdE5hbWUgfHwgb3JkZXI/LnBhdGllbnRzPy5sYXN0X25hbWUgfHwgJyc7XG4gICAgcmV0dXJuIChcbiAgICAgIHRlc3RDb2RlLnRvTG93ZXJDYXNlKCkuaW5jbHVkZXMoc2VhcmNoKSB8fFxuICAgICAgdGVzdE5hbWUudG9Mb3dlckNhc2UoKS5pbmNsdWRlcyhzZWFyY2gpIHx8XG4gICAgICBvcmRlck51bWJlci50b0xvd2VyQ2FzZSgpLmluY2x1ZGVzKHNlYXJjaCkgfHxcbiAgICAgIGZpcnN0TmFtZS50b0xvd2VyQ2FzZSgpLmluY2x1ZGVzKHNlYXJjaCkgfHxcbiAgICAgIGxhc3ROYW1lLnRvTG93ZXJDYXNlKCkuaW5jbHVkZXMoc2VhcmNoKVxuICAgICk7XG4gIH0pO1xuXG4gIGNvbnN0IGhhbmRsZVZlcmlmeSA9IGFzeW5jIChpZDogc3RyaW5nKSA9PiB7XG4gICAgaWYgKCF1c2VyPy5pZCkgcmV0dXJuO1xuXG4gICAgdHJ5IHtcbiAgICAgIGF3YWl0IHZlcmlmeVJlc3VsdC5tdXRhdGVBc3luYyh7IGlkLCB2ZXJpZmllZEJ5OiB1c2VyLmlkIH0pO1xuICAgICAgdG9hc3Quc3VjY2VzcygnUmVzdWx0IHZlcmlmaWVkJyk7XG4gICAgICBzZXRTZWxlY3RlZElkcyhwcmV2ID0+IHtcbiAgICAgICAgY29uc3QgbmV4dCA9IG5ldyBTZXQocHJldik7XG4gICAgICAgIG5leHQuZGVsZXRlKGlkKTtcbiAgICAgICAgcmV0dXJuIG5leHQ7XG4gICAgICB9KTtcbiAgICB9IGNhdGNoIChlcnJvcikge1xuICAgICAgdG9hc3QuZXJyb3IoJ0ZhaWxlZCB0byB2ZXJpZnkgcmVzdWx0Jyk7XG4gICAgfVxuICB9O1xuXG4gIGNvbnN0IGhhbmRsZVZlcmlmeVNlbGVjdGVkID0gYXN5bmMgKCkgPT4ge1xuICAgIGlmICghdXNlcj8uaWQpIHJldHVybjtcblxuICAgIGZvciAoY29uc3QgaWQgb2Ygc2VsZWN0ZWRJZHMpIHtcbiAgICAgIHRyeSB7XG4gICAgICAgIGF3YWl0IHZlcmlmeVJlc3VsdC5tdXRhdGVBc3luYyh7IGlkLCB2ZXJpZmllZEJ5OiB1c2VyLmlkIH0pO1xuICAgICAgfSBjYXRjaCAoZXJyb3IpIHtcbiAgICAgICAgY29uc29sZS5lcnJvcignRmFpbGVkIHRvIHZlcmlmeTonLCBpZCk7XG4gICAgICB9XG4gICAgfVxuICAgIHRvYXN0LnN1Y2Nlc3MoYFZlcmlmaWVkICR7c2VsZWN0ZWRJZHMuc2l6ZX0gcmVzdWx0c2ApO1xuICAgIHNldFNlbGVjdGVkSWRzKG5ldyBTZXQoKSk7XG4gIH07XG5cbiAgY29uc3QgdG9nZ2xlU2VsZWN0ID0gKGlkOiBzdHJpbmcpID0+IHtcbiAgICBzZXRTZWxlY3RlZElkcyhwcmV2ID0+IHtcbiAgICAgIGNvbnN0IG5leHQgPSBuZXcgU2V0KHByZXYpO1xuICAgICAgaWYgKG5leHQuaGFzKGlkKSkge1xuICAgICAgICBuZXh0LmRlbGV0ZShpZCk7XG4gICAgICB9IGVsc2Uge1xuICAgICAgICBuZXh0LmFkZChpZCk7XG4gICAgICB9XG4gICAgICByZXR1cm4gbmV4dDtcbiAgICB9KTtcbiAgfTtcblxuICBjb25zdCB0b2dnbGVTZWxlY3RBbGwgPSAoKSA9PiB7XG4gICAgaWYgKHNlbGVjdGVkSWRzLnNpemUgPT09IGZpbHRlcmVkUmVzdWx0cz8ubGVuZ3RoKSB7XG4gICAgICBzZXRTZWxlY3RlZElkcyhuZXcgU2V0KCkpO1xuICAgIH0gZWxzZSB7XG4gICAgICBzZXRTZWxlY3RlZElkcyhuZXcgU2V0KGZpbHRlcmVkUmVzdWx0cz8ubWFwKHIgPT4gci5pZCkgfHwgW10pKTtcbiAgICB9XG4gIH07XG5cbiAgY29uc3QgZmxhZ1N0eWxlczogUmVjb3JkPFJlc3VsdEZsYWcsIHN0cmluZz4gPSB7XG4gICAgbm9ybWFsOiAnYmctc3RhdHVzLW5vcm1hbC8xMCB0ZXh0LXN0YXR1cy1ub3JtYWwgYm9yZGVyLXN0YXR1cy1ub3JtYWwvMjAnLFxuICAgIGxvdzogJ2JnLXN0YXR1cy13YXJuaW5nLzEwIHRleHQtc3RhdHVzLXdhcm5pbmcgYm9yZGVyLXN0YXR1cy13YXJuaW5nLzIwJyxcbiAgICBoaWdoOiAnYmctc3RhdHVzLXdhcm5pbmcvMTAgdGV4dC1zdGF0dXMtd2FybmluZyBib3JkZXItc3RhdHVzLXdhcm5pbmcvMjAnLFxuICAgIGNyaXRpY2FsX2xvdzogJ2JnLXN0YXR1cy1jcml0aWNhbC8xMCB0ZXh0LXN0YXR1cy1jcml0aWNhbCBib3JkZXItc3RhdHVzLWNyaXRpY2FsLzIwJyxcbiAgICBjcml0aWNhbF9oaWdoOiAnYmctc3RhdHVzLWNyaXRpY2FsLzEwIHRleHQtc3RhdHVzLWNyaXRpY2FsIGJvcmRlci1zdGF0dXMtY3JpdGljYWwvMjAnLFxuICB9O1xuXG4gIHJldHVybiAoXG4gICAgPFJvbGVMYXlvdXQgXG4gICAgICB0aXRsZT1cIlJlc3VsdHNcIiBcbiAgICAgIHN1YnRpdGxlPVwiVmlldyBhbmQgdmVyaWZ5IHRlc3QgcmVzdWx0c1wiXG4gICAgICByb2xlPVwibGFiLXRlY2hcIlxuICAgICAgdXNlck5hbWU9e3Byb2ZpbGU/LmZ1bGxfbmFtZX1cbiAgICA+XG4gICAgICB7LyogQWN0aW9ucyBCYXIgKi99XG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGp1c3RpZnktYmV0d2VlbiBtYi02XCI+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIgZ2FwLTNcIj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInJlbGF0aXZlXCI+XG4gICAgICAgICAgICA8U2VhcmNoIGNsYXNzTmFtZT1cImFic29sdXRlIGxlZnQtMyB0b3AtMS8yIC10cmFuc2xhdGUteS0xLzIgdy00IGgtNCB0ZXh0LW11dGVkLWZvcmVncm91bmRcIiAvPlxuICAgICAgICAgICAgPElucHV0IFxuICAgICAgICAgICAgICBwbGFjZWhvbGRlcj1cIlNlYXJjaCByZXN1bHRzLi4uXCIgXG4gICAgICAgICAgICAgIGNsYXNzTmFtZT1cInBsLTEwIHctODBcIlxuICAgICAgICAgICAgICB2YWx1ZT17c2VhcmNoVGVybX1cbiAgICAgICAgICAgICAgb25DaGFuZ2U9e2UgPT4gc2V0U2VhcmNoVGVybShlLnRhcmdldC52YWx1ZSl9XG4gICAgICAgICAgICAvPlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDxTZWxlY3QgdmFsdWU9e3N0YXR1c0ZpbHRlcn0gb25WYWx1ZUNoYW5nZT17c2V0U3RhdHVzRmlsdGVyfT5cbiAgICAgICAgICAgIDxTZWxlY3RUcmlnZ2VyIGNsYXNzTmFtZT1cInctNDBcIj5cbiAgICAgICAgICAgICAgPFNlbGVjdFZhbHVlIHBsYWNlaG9sZGVyPVwiU3RhdHVzXCIgLz5cbiAgICAgICAgICAgIDwvU2VsZWN0VHJpZ2dlcj5cbiAgICAgICAgICAgIDxTZWxlY3RDb250ZW50PlxuICAgICAgICAgICAgICA8U2VsZWN0SXRlbSB2YWx1ZT1cImFsbFwiPkFsbCBTdGF0dXM8L1NlbGVjdEl0ZW0+XG4gICAgICAgICAgICAgIDxTZWxlY3RJdGVtIHZhbHVlPVwicHJlbGltaW5hcnlcIj5QcmVsaW1pbmFyeTwvU2VsZWN0SXRlbT5cbiAgICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJ2ZXJpZmllZFwiPlZlcmlmaWVkPC9TZWxlY3RJdGVtPlxuICAgICAgICAgICAgPC9TZWxlY3RDb250ZW50PlxuICAgICAgICAgIDwvU2VsZWN0PlxuICAgICAgICAgIDxTZWxlY3QgdmFsdWU9e2ZsYWdGaWx0ZXJ9IG9uVmFsdWVDaGFuZ2U9e3NldEZsYWdGaWx0ZXJ9PlxuICAgICAgICAgICAgPFNlbGVjdFRyaWdnZXIgY2xhc3NOYW1lPVwidy00MFwiPlxuICAgICAgICAgICAgICA8U2VsZWN0VmFsdWUgcGxhY2Vob2xkZXI9XCJGbGFnXCIgLz5cbiAgICAgICAgICAgIDwvU2VsZWN0VHJpZ2dlcj5cbiAgICAgICAgICAgIDxTZWxlY3RDb250ZW50PlxuICAgICAgICAgICAgICA8U2VsZWN0SXRlbSB2YWx1ZT1cImFsbFwiPkFsbCBGbGFnczwvU2VsZWN0SXRlbT5cbiAgICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJub3JtYWxcIj5Ob3JtYWw8L1NlbGVjdEl0ZW0+XG4gICAgICAgICAgICAgIDxTZWxlY3RJdGVtIHZhbHVlPVwibG93XCI+TG93PC9TZWxlY3RJdGVtPlxuICAgICAgICAgICAgICA8U2VsZWN0SXRlbSB2YWx1ZT1cImhpZ2hcIj5IaWdoPC9TZWxlY3RJdGVtPlxuICAgICAgICAgICAgICA8U2VsZWN0SXRlbSB2YWx1ZT1cImNyaXRpY2FsX2xvd1wiPkNyaXRpY2FsIExvdzwvU2VsZWN0SXRlbT5cbiAgICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJjcml0aWNhbF9oaWdoXCI+Q3JpdGljYWwgSGlnaDwvU2VsZWN0SXRlbT5cbiAgICAgICAgICAgIDwvU2VsZWN0Q29udGVudD5cbiAgICAgICAgICA8L1NlbGVjdD5cbiAgICAgICAgPC9kaXY+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBnYXAtMlwiPlxuICAgICAgICAgIDxCdXR0b24gdmFyaWFudD1cIm91dGxpbmVcIj5cbiAgICAgICAgICAgIDxEb3dubG9hZCBjbGFzc05hbWU9XCJ3LTQgaC00IG1yLTJcIiAvPlxuICAgICAgICAgICAgRXhwb3J0XG4gICAgICAgICAgPC9CdXR0b24+XG4gICAgICAgICAge3NlbGVjdGVkSWRzLnNpemUgPiAwICYmIChcbiAgICAgICAgICAgIDxCdXR0b24gb25DbGljaz17aGFuZGxlVmVyaWZ5U2VsZWN0ZWR9PlxuICAgICAgICAgICAgICA8Q2hlY2tDaXJjbGUgY2xhc3NOYW1lPVwidy00IGgtNCBtci0yXCIgLz5cbiAgICAgICAgICAgICAgVmVyaWZ5IFNlbGVjdGVkICh7c2VsZWN0ZWRJZHMuc2l6ZX0pXG4gICAgICAgICAgICA8L0J1dHRvbj5cbiAgICAgICAgICApfVxuICAgICAgICA8L2Rpdj5cbiAgICAgIDwvZGl2PlxuXG4gICAgICB7LyogUmVzdWx0cyBUYWJsZSAqL31cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiYmctY2FyZCBib3JkZXIgcm91bmRlZC1sZyBvdmVyZmxvdy1oaWRkZW5cIj5cbiAgICAgICAge2lzTG9hZGluZyA/IChcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGp1c3RpZnktY2VudGVyIHB5LTEyXCI+XG4gICAgICAgICAgICA8TG9hZGVyMiBjbGFzc05hbWU9XCJ3LTYgaC02IGFuaW1hdGUtc3BpbiB0ZXh0LW11dGVkLWZvcmVncm91bmRcIiAvPlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICApIDogKFxuICAgICAgICAgIDx0YWJsZSBjbGFzc05hbWU9XCJkYXRhLXRhYmxlXCI+XG4gICAgICAgICAgICA8dGhlYWQ+XG4gICAgICAgICAgICAgIDx0cj5cbiAgICAgICAgICAgICAgICA8dGggY2xhc3NOYW1lPVwidy04XCI+XG4gICAgICAgICAgICAgICAgICA8aW5wdXQgXG4gICAgICAgICAgICAgICAgICAgIHR5cGU9XCJjaGVja2JveFwiIFxuICAgICAgICAgICAgICAgICAgICBjbGFzc05hbWU9XCJyb3VuZGVkXCJcbiAgICAgICAgICAgICAgICAgICAgY2hlY2tlZD17c2VsZWN0ZWRJZHMuc2l6ZSA9PT0gZmlsdGVyZWRSZXN1bHRzPy5sZW5ndGggJiYgKGZpbHRlcmVkUmVzdWx0cz8ubGVuZ3RoIHx8IDApID4gMH1cbiAgICAgICAgICAgICAgICAgICAgb25DaGFuZ2U9e3RvZ2dsZVNlbGVjdEFsbH1cbiAgICAgICAgICAgICAgICAgIC8+XG4gICAgICAgICAgICAgICAgPC90aD5cbiAgICAgICAgICAgICAgICA8dGg+T3JkZXI8L3RoPlxuICAgICAgICAgICAgICAgIDx0aD5QYXRpZW50PC90aD5cbiAgICAgICAgICAgICAgICA8dGg+VGVzdDwvdGg+XG4gICAgICAgICAgICAgICAgPHRoPlZhbHVlPC90aD5cbiAgICAgICAgICAgICAgICA8dGg+UmVmZXJlbmNlPC90aD5cbiAgICAgICAgICAgICAgICA8dGg+RmxhZzwvdGg+XG4gICAgICAgICAgICAgICAgPHRoPlN0YXR1czwvdGg+XG4gICAgICAgICAgICAgICAgPHRoPlJlc3VsdGVkPC90aD5cbiAgICAgICAgICAgICAgICA8dGg+QWN0aW9uczwvdGg+XG4gICAgICAgICAgICAgIDwvdHI+XG4gICAgICAgICAgICA8L3RoZWFkPlxuICAgICAgICAgICAgPHRib2R5PlxuICAgICAgICAgICAgICB7ZmlsdGVyZWRSZXN1bHRzPy5tYXAocmVzdWx0ID0+IHtcbiAgICAgICAgICAgICAgICBjb25zdCBvcmRlciA9IChyZXN1bHQub3JkZXJzIHx8IHJlc3VsdC5vcmRlcklkKSBhcyBhbnk7XG4gICAgICAgICAgICAgICAgY29uc3QgcmVzdWx0SWQgPSByZXN1bHQuaWQgfHwgcmVzdWx0Ll9pZDtcbiAgICAgICAgICAgICAgICBjb25zdCB0ZXN0Q29kZSA9IHJlc3VsdC50ZXN0Q29kZSB8fCByZXN1bHQudGVzdF9jb2RlO1xuICAgICAgICAgICAgICAgIGNvbnN0IHRlc3ROYW1lID0gcmVzdWx0LnRlc3ROYW1lIHx8IHJlc3VsdC50ZXN0X25hbWU7XG4gICAgICAgICAgICAgICAgY29uc3QgcmVmZXJlbmNlUmFuZ2UgPSByZXN1bHQucmVmZXJlbmNlUmFuZ2UgfHwgcmVzdWx0LnJlZmVyZW5jZV9yYW5nZTtcbiAgICAgICAgICAgICAgICBjb25zdCByZXN1bHRlZEF0ID0gcmVzdWx0LnJlc3VsdGVkX2F0IHx8IHJlc3VsdC5jcmVhdGVkQXQ7XG4gICAgICAgICAgICAgICAgY29uc3Qgb3JkZXJOdW1iZXIgPSBvcmRlcj8ub3JkZXJOdW1iZXIgfHwgb3JkZXI/Lm9yZGVyX251bWJlcjtcbiAgICAgICAgICAgICAgICByZXR1cm4gKFxuICAgICAgICAgICAgICAgICAgPHRyIGtleT17cmVzdWx0SWR9PlxuICAgICAgICAgICAgICAgICAgICA8dGQ+XG4gICAgICAgICAgICAgICAgICAgICAgPGlucHV0IFxuICAgICAgICAgICAgICAgICAgICAgICAgdHlwZT1cImNoZWNrYm94XCIgXG4gICAgICAgICAgICAgICAgICAgICAgICBjbGFzc05hbWU9XCJyb3VuZGVkXCJcbiAgICAgICAgICAgICAgICAgICAgICAgIGNoZWNrZWQ9e3NlbGVjdGVkSWRzLmhhcyhyZXN1bHRJZCl9XG4gICAgICAgICAgICAgICAgICAgICAgICBvbkNoYW5nZT17KCkgPT4gdG9nZ2xlU2VsZWN0KHJlc3VsdElkKX1cbiAgICAgICAgICAgICAgICAgICAgICAvPlxuICAgICAgICAgICAgICAgICAgICA8L3RkPlxuICAgICAgICAgICAgICAgICAgICA8dGQgY2xhc3NOYW1lPVwiZm9udC1tb25vIHRleHQtc21cIj57b3JkZXJOdW1iZXIgfHwgJy0nfTwvdGQ+XG4gICAgICAgICAgICAgICAgICAgIDx0ZD5cbiAgICAgICAgICAgICAgICAgICAgICB7KG9yZGVyPy5wYXRpZW50IHx8IG9yZGVyPy5wYXRpZW50cyB8fCBvcmRlcj8ucGF0aWVudElkKSAmJiAoXG4gICAgICAgICAgICAgICAgICAgICAgICA8ZGl2PlxuICAgICAgICAgICAgICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJmb250LW1lZGl1bVwiPlxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIHtnZXRQYXRpZW50TmFtZShvcmRlcil9XG4gICAgICAgICAgICAgICAgICAgICAgICAgIDwvcD5cbiAgICAgICAgICAgICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC14cyB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5cbiAgICAgICAgICAgICAgICAgICAgICAgICAgICB7Z2V0UGF0aWVudElkKG9yZGVyKX1cbiAgICAgICAgICAgICAgICAgICAgICAgICAgPC9wPlxuICAgICAgICAgICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICAgICAgICAgKX1cbiAgICAgICAgICAgICAgICAgICAgPC90ZD5cbiAgICAgICAgICAgICAgICAgICAgPHRkPlxuICAgICAgICAgICAgICAgICAgICAgIDxkaXY+XG4gICAgICAgICAgICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJmb250LW1lZGl1bVwiPnt0ZXN0Q29kZX08L3A+XG4gICAgICAgICAgICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LXhzIHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPnt0ZXN0TmFtZX08L3A+XG4gICAgICAgICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICAgICAgIDwvdGQ+XG4gICAgICAgICAgICAgICAgICAgIDx0ZCBjbGFzc05hbWU9XCJmb250LW1vbm8gZm9udC1ib2xkXCI+XG4gICAgICAgICAgICAgICAgICAgICAge3Jlc3VsdC52YWx1ZX0gPHNwYW4gY2xhc3NOYW1lPVwiZm9udC1ub3JtYWwgdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+e3Jlc3VsdC51bml0fTwvc3Bhbj5cbiAgICAgICAgICAgICAgICAgICAgPC90ZD5cbiAgICAgICAgICAgICAgICAgICAgPHRkIGNsYXNzTmFtZT1cInRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPntyZWZlcmVuY2VSYW5nZSB8fCAnLSd9PC90ZD5cbiAgICAgICAgICAgICAgICAgICAgPHRkPlxuICAgICAgICAgICAgICAgICAgICAgIDxCYWRnZSB2YXJpYW50PVwib3V0bGluZVwiIGNsYXNzTmFtZT17Y24oZmxhZ1N0eWxlc1tyZXN1bHQuZmxhZ10pfT5cbiAgICAgICAgICAgICAgICAgICAgICAgIHtyZXN1bHQuZmxhZyA9PT0gJ25vcm1hbCcgPyAnTm9ybWFsJyA6IHJlc3VsdC5mbGFnLnJlcGxhY2UoJ18nLCAnICcpfVxuICAgICAgICAgICAgICAgICAgICAgIDwvQmFkZ2U+XG4gICAgICAgICAgICAgICAgICAgIDwvdGQ+XG4gICAgICAgICAgICAgICAgICAgIDx0ZD5cbiAgICAgICAgICAgICAgICAgICAgICA8QmFkZ2UgdmFyaWFudD17cmVzdWx0LnN0YXR1cyA9PT0gJ3ZlcmlmaWVkJyA/ICdkZWZhdWx0JyA6ICdzZWNvbmRhcnknfT5cbiAgICAgICAgICAgICAgICAgICAgICAgIHtyZXN1bHQuc3RhdHVzfVxuICAgICAgICAgICAgICAgICAgICAgIDwvQmFkZ2U+XG4gICAgICAgICAgICAgICAgICAgIDwvdGQ+XG4gICAgICAgICAgICAgICAgICAgIDx0ZCBjbGFzc05hbWU9XCJ0ZXh0LW11dGVkLWZvcmVncm91bmQgdGV4dC1zbVwiPlxuICAgICAgICAgICAgICAgICAgICAgIHtyZXN1bHRlZEF0ID8gZm9ybWF0KG5ldyBEYXRlKHJlc3VsdGVkQXQpLCAnTU1NIGRkLCBISDptbScpIDogJy0nfVxuICAgICAgICAgICAgICAgICAgICA8L3RkPlxuICAgICAgICAgICAgICAgICAgICA8dGQ+XG4gICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGdhcC0xXCI+XG4gICAgICAgICAgICAgICAgICAgICAgICA8QnV0dG9uIFxuICAgICAgICAgICAgICAgICAgICAgICAgICB2YXJpYW50PVwiZ2hvc3RcIiBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgc2l6ZT1cInNtXCJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgb25DbGljaz17KCkgPT4gbmF2aWdhdGUoYC9sYWIvcmVwb3J0cy8ke29yZGVyPy5pZCB8fCBvcmRlcj8uX2lkfWApfVxuICAgICAgICAgICAgICAgICAgICAgICAgICB0aXRsZT1cIlZpZXcgUmVwb3J0XCJcbiAgICAgICAgICAgICAgICAgICAgICAgID5cbiAgICAgICAgICAgICAgICAgICAgICAgICAgPEZpbGVUZXh0IGNsYXNzTmFtZT1cInctNCBoLTRcIiAvPlxuICAgICAgICAgICAgICAgICAgICAgICAgPC9CdXR0b24+XG4gICAgICAgICAgICAgICAgICAgICAgICA8QnV0dG9uIHZhcmlhbnQ9XCJnaG9zdFwiIHNpemU9XCJzbVwiPlxuICAgICAgICAgICAgICAgICAgICAgICAgICA8RXllIGNsYXNzTmFtZT1cInctNCBoLTRcIiAvPlxuICAgICAgICAgICAgICAgICAgICAgICAgPC9CdXR0b24+XG4gICAgICAgICAgICAgICAgICAgICAgICB7cmVzdWx0LnN0YXR1cyAhPT0gJ3ZlcmlmaWVkJyAmJiAoXG4gICAgICAgICAgICAgICAgICAgICAgICAgIDxCdXR0b24gXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgdmFyaWFudD1cImdob3N0XCIgXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgc2l6ZT1cInNtXCJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICBvbkNsaWNrPXsoKSA9PiBoYW5kbGVWZXJpZnkocmVzdWx0SWQpfVxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIGRpc2FibGVkPXt2ZXJpZnlSZXN1bHQuaXNQZW5kaW5nfVxuICAgICAgICAgICAgICAgICAgICAgICAgICA+XG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgPENoZWNrQ2lyY2xlIGNsYXNzTmFtZT1cInctNCBoLTRcIiAvPlxuICAgICAgICAgICAgICAgICAgICAgICAgICA8L0J1dHRvbj5cbiAgICAgICAgICAgICAgICAgICAgICAgICl9XG4gICAgICAgICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICAgICAgIDwvdGQ+XG4gICAgICAgICAgICAgICAgICA8L3RyPlxuICAgICAgICAgICAgICAgICk7XG4gICAgICAgICAgICAgIH0pfVxuICAgICAgICAgICAgICB7KCFmaWx0ZXJlZFJlc3VsdHMgfHwgZmlsdGVyZWRSZXN1bHRzLmxlbmd0aCA9PT0gMCkgJiYgKFxuICAgICAgICAgICAgICAgIDx0cj5cbiAgICAgICAgICAgICAgICAgIDx0ZCBjb2xTcGFuPXsxMH0gY2xhc3NOYW1lPVwidGV4dC1jZW50ZXIgcHktOCB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5cbiAgICAgICAgICAgICAgICAgICAgTm8gcmVzdWx0cyBmb3VuZFxuICAgICAgICAgICAgICAgICAgPC90ZD5cbiAgICAgICAgICAgICAgICA8L3RyPlxuICAgICAgICAgICAgICApfVxuICAgICAgICAgICAgPC90Ym9keT5cbiAgICAgICAgICA8L3RhYmxlPlxuICAgICAgICApfVxuICAgICAgPC9kaXY+XG4gICAgPC9Sb2xlTGF5b3V0PlxuICApO1xufVxuIl0sIm5hbWVzIjpbInVzZVN0YXRlIiwidXNlTmF2aWdhdGUiLCJSb2xlTGF5b3V0IiwidXNlQXV0aCIsInVzZVJlc3VsdHMiLCJ1c2VWZXJpZnlSZXN1bHQiLCJCdXR0b24iLCJJbnB1dCIsIkJhZGdlIiwiU2VsZWN0IiwiU2VsZWN0Q29udGVudCIsIlNlbGVjdEl0ZW0iLCJTZWxlY3RUcmlnZ2VyIiwiU2VsZWN0VmFsdWUiLCJ0b2FzdCIsIlNlYXJjaCIsIkNoZWNrQ2lyY2xlIiwiRG93bmxvYWQiLCJMb2FkZXIyIiwiRXllIiwiRmlsZVRleHQiLCJmb3JtYXQiLCJjbiIsImdldFBhdGllbnROYW1lIiwiZ2V0UGF0aWVudElkIiwiUmVzdWx0c1BhZ2UiLCJwcm9maWxlIiwidXNlciIsIm5hdmlnYXRlIiwiZGF0YSIsInJlc3VsdHMiLCJpc0xvYWRpbmciLCJ2ZXJpZnlSZXN1bHQiLCJzZWFyY2hUZXJtIiwic2V0U2VhcmNoVGVybSIsInN0YXR1c0ZpbHRlciIsInNldFN0YXR1c0ZpbHRlciIsImZsYWdGaWx0ZXIiLCJzZXRGbGFnRmlsdGVyIiwic2VsZWN0ZWRJZHMiLCJzZXRTZWxlY3RlZElkcyIsIlNldCIsImZpbHRlcmVkUmVzdWx0cyIsImZpbHRlciIsInJlc3VsdCIsInN0YXR1cyIsImZsYWciLCJzZWFyY2giLCJ0b0xvd2VyQ2FzZSIsIm9yZGVyIiwib3JkZXJzIiwib3JkZXJJZCIsInRlc3RDb2RlIiwidGVzdF9jb2RlIiwidGVzdE5hbWUiLCJ0ZXN0X25hbWUiLCJvcmRlck51bWJlciIsIm9yZGVyX251bWJlciIsImZpcnN0TmFtZSIsInBhdGllbnQiLCJwYXRpZW50cyIsImZpcnN0X25hbWUiLCJsYXN0TmFtZSIsImxhc3RfbmFtZSIsImluY2x1ZGVzIiwiaGFuZGxlVmVyaWZ5IiwiaWQiLCJtdXRhdGVBc3luYyIsInZlcmlmaWVkQnkiLCJzdWNjZXNzIiwicHJldiIsIm5leHQiLCJkZWxldGUiLCJlcnJvciIsImhhbmRsZVZlcmlmeVNlbGVjdGVkIiwiY29uc29sZSIsInNpemUiLCJ0b2dnbGVTZWxlY3QiLCJoYXMiLCJhZGQiLCJ0b2dnbGVTZWxlY3RBbGwiLCJsZW5ndGgiLCJtYXAiLCJyIiwiZmxhZ1N0eWxlcyIsIm5vcm1hbCIsImxvdyIsImhpZ2giLCJjcml0aWNhbF9sb3ciLCJjcml0aWNhbF9oaWdoIiwidGl0bGUiLCJzdWJ0aXRsZSIsInJvbGUiLCJ1c2VyTmFtZSIsImZ1bGxfbmFtZSIsImRpdiIsImNsYXNzTmFtZSIsInBsYWNlaG9sZGVyIiwidmFsdWUiLCJvbkNoYW5nZSIsImUiLCJ0YXJnZXQiLCJvblZhbHVlQ2hhbmdlIiwidmFyaWFudCIsIm9uQ2xpY2siLCJ0YWJsZSIsInRoZWFkIiwidHIiLCJ0aCIsImlucHV0IiwidHlwZSIsImNoZWNrZWQiLCJ0Ym9keSIsInJlc3VsdElkIiwiX2lkIiwicmVmZXJlbmNlUmFuZ2UiLCJyZWZlcmVuY2VfcmFuZ2UiLCJyZXN1bHRlZEF0IiwicmVzdWx0ZWRfYXQiLCJjcmVhdGVkQXQiLCJ0ZCIsInBhdGllbnRJZCIsInAi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

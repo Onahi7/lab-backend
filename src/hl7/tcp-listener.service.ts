@@ -1,11 +1,12 @@
-import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit, OnModuleDestroy, Inject, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as net from 'net';
 import { Hl7Service } from './hl7.service';
 import { Machine } from '../database/schemas/machine.schema';
+import { RealtimeGateway } from '../realtime/realtime.gateway';
 
-interface UnmatchedResult {
+export interface UnmatchedResult {
   machineId: string;
   machineName: string;
   protocol: string;
@@ -25,6 +26,8 @@ export class TcpListenerService implements OnModuleInit, OnModuleDestroy {
   constructor(
     private readonly hl7Service: Hl7Service,
     @InjectModel(Machine.name) private machineModel: Model<Machine>,
+    @Inject(forwardRef(() => RealtimeGateway))
+    private readonly realtimeGateway: RealtimeGateway,
   ) {}
 
   async onModuleInit() {
@@ -165,10 +168,22 @@ export class TcpListenerService implements OnModuleInit, OnModuleDestroy {
     socket.write(ack);
 
     // Update machine status
-    await this.machineModel.findByIdAndUpdate(machineId, {
+    const updatedMachine = await this.machineModel.findByIdAndUpdate(machineId, {
       status: 'online',
       lastCommunication: new Date(),
+    }, { new: true });
+
+    // Emit real-time events
+    if (updatedMachine) {
+      this.realtimeGateway.notifyMachineStatusChanged(updatedMachine);
+    }
+    this.realtimeGateway.notifyMachineResultReceived({
+      machineId,
+      machineName,
+      resultCount: parsed.results?.length || 0,
+      protocol,
     });
+    this.realtimeGateway.notifyUnmatchedResult(unmatchedResult);
   }
 
   /**
@@ -289,5 +304,16 @@ export class TcpListenerService implements OnModuleInit, OnModuleDestroy {
         machine.protocol,
       );
     }
+  }
+
+  /**
+   * Get status of all TCP listeners
+   */
+  getListenerStatus(): Array<{ machineId: string; listening: boolean }> {
+    const statuses: Array<{ machineId: string; listening: boolean }> = [];
+    this.servers.forEach((server, machineId) => {
+      statuses.push({ machineId, listening: server.listening });
+    });
+    return statuses;
   }
 }

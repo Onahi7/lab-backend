@@ -37,7 +37,6 @@ export class CommunicationLog extends Document {
   @Prop({
     required: true,
     enum: Object.values(CommunicationStatusEnum),
-    index: true,
   })
   status: CommunicationStatusEnum;
 

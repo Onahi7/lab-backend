@@ -1,0 +1,760 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/pages/admin/AdminDashboard.tsx");import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+
+let prevRefreshReg;
+let prevRefreshSig;
+
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react-swc can't detect preamble. Something is wrong."
+    );
+  }
+
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+
+import __vite__cjsImport2_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=27cfabb6"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime["jsxDEV"];
+var _s = $RefreshSig$();
+import { RoleLayout } from "/src/components/layout/RoleLayout.tsx";
+import { useAuth } from "/src/context/AuthContext.tsx";
+import { useSearchPatients } from "/src/hooks/usePatients.ts";
+import { useOrders } from "/src/hooks/useOrders.ts";
+import { useResults } from "/src/hooks/useResults.ts";
+import { useMachines } from "/src/hooks/useMachines.ts";
+import { useRealtimeOrders } from "/src/hooks/useRealtimeOrders.ts";
+import { useRealtimeResults } from "/src/hooks/useRealtimeResults.ts";
+import { useRealtimePatients } from "/src/hooks/useRealtimePatients.ts";
+import { MetricCard } from "/src/components/dashboard/MetricCard.tsx";
+import { Button } from "/src/components/ui/button.tsx";
+import { getPatientName, getTestCodes, getOrderNumber } from "/src/utils/orderHelpers.ts";
+import { Users, ClipboardList, FileText, TrendingUp, AlertTriangle, Cpu, DollarSign, Clock, BarChart3 } from "/node_modules/.vite/deps/lucide-react.js?v=27cfabb6";
+import { useNavigate } from "/node_modules/.vite/deps/react-router-dom.js?v=27cfabb6";
+import { cn } from "/src/lib/utils.ts";
+export default function AdminDashboard() {
+    _s();
+    const { profile } = useAuth();
+    // Enable real-time updates
+    useRealtimeOrders();
+    useRealtimeResults();
+    useRealtimePatients();
+    const { data: patients = [] } = useSearchPatients('');
+    const { data: orders = [] } = useOrders('all');
+    const { data: results = [] } = useResults();
+    const { data: machines } = useMachines();
+    const navigate = useNavigate();
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayPatients = patients.filter((p)=>new Date(p.createdAt) >= todayStart).length;
+    const todayOrders = orders.filter((o)=>new Date(o.createdAt) >= todayStart).length;
+    const completedOrders = orders.filter((o)=>o.status === 'completed').length;
+    const pendingOrders = orders.filter((o)=>o.status !== 'completed' && o.status !== 'cancelled').length;
+    const criticalResults = results.filter((r)=>r.flag === 'critical_high' || r.flag === 'critical_low').length;
+    const todayRevenue = orders.filter((o)=>new Date(o.createdAt) >= todayStart && o.paymentStatus === 'paid').reduce((sum, o)=>sum + Number(o.total || o.totalAmount || 0), 0);
+    const onlineMachines = machines?.filter((m)=>m.status === 'online' || m.status === 'processing').length || 0;
+    const totalMachines = machines?.length || 0;
+    // Calculate average turnaround time (in minutes)
+    const completedOrdersWithTime = orders.filter((o)=>o.status === 'completed' && o.completedAt);
+    const avgTAT = completedOrdersWithTime.length > 0 ? Math.round(completedOrdersWithTime.reduce((sum, o)=>{
+        const start = new Date(o.createdAt).getTime();
+        const end = new Date(o.completedAt).getTime();
+        return sum + (end - start) / (1000 * 60); // Convert to minutes
+    }, 0) / completedOrdersWithTime.length) : 0;
+    return /*#__PURE__*/ _jsxDEV(RoleLayout, {
+        title: "Admin Dashboard",
+        subtitle: "System overview and management",
+        role: "admin",
+        userName: profile?.full_name,
+        children: [
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 mb-6",
+                children: [
+                    /*#__PURE__*/ _jsxDEV(MetricCard, {
+                        title: "Patients Today",
+                        value: todayPatients,
+                        icon: Users,
+                        trend: {
+                            value: 12,
+                            isPositive: true
+                        }
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                        lineNumber: 76,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(MetricCard, {
+                        title: "Orders Today",
+                        value: todayOrders,
+                        icon: ClipboardList
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                        lineNumber: 82,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(MetricCard, {
+                        title: "Pending",
+                        value: pendingOrders,
+                        icon: Clock,
+                        variant: pendingOrders > 10 ? 'warning' : 'default'
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                        lineNumber: 87,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(MetricCard, {
+                        title: "Completed",
+                        value: completedOrders,
+                        icon: FileText
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                        lineNumber: 93,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(MetricCard, {
+                        title: "Critical Results",
+                        value: criticalResults,
+                        icon: AlertTriangle,
+                        variant: criticalResults > 0 ? 'critical' : 'default'
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                        lineNumber: 98,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(MetricCard, {
+                        title: "Machines",
+                        value: `${onlineMachines}/${totalMachines}`,
+                        icon: Cpu
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                        lineNumber: 104,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(MetricCard, {
+                        title: "Revenue Today",
+                        value: `Le ${(todayRevenue / 1000).toFixed(0)}K`,
+                        icon: DollarSign,
+                        trend: {
+                            value: 8,
+                            isPositive: true
+                        }
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                        lineNumber: 109,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(MetricCard, {
+                        title: "Avg TAT",
+                        value: avgTAT > 0 ? `${avgTAT}m` : 'N/A',
+                        icon: TrendingUp
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                        lineNumber: 115,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                lineNumber: 75,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "grid grid-cols-1 md:grid-cols-4 gap-4 mb-6",
+                children: [
+                    /*#__PURE__*/ _jsxDEV(Button, {
+                        variant: "outline",
+                        className: "h-16 justify-start px-4",
+                        onClick: ()=>navigate('/admin/users'),
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(Users, {
+                                className: "w-5 h-5 mr-3"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                lineNumber: 129,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: "font-medium",
+                                children: "User Management"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                lineNumber: 130,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                        lineNumber: 124,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(Button, {
+                        variant: "outline",
+                        className: "h-16 justify-start px-4",
+                        onClick: ()=>navigate('/admin/reports'),
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(BarChart3, {
+                                className: "w-5 h-5 mr-3"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                lineNumber: 137,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: "font-medium",
+                                children: "Reports & Analytics"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                lineNumber: 138,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                        lineNumber: 132,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(Button, {
+                        variant: "outline",
+                        className: "h-16 justify-start px-4",
+                        onClick: ()=>navigate('/admin/machines'),
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(Cpu, {
+                                className: "w-5 h-5 mr-3"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                lineNumber: 145,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: "font-medium",
+                                children: "Machine Config"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                lineNumber: 146,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                        lineNumber: 140,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(Button, {
+                        variant: "outline",
+                        className: "h-16 justify-start px-4",
+                        onClick: ()=>navigate('/admin/settings'),
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(TrendingUp, {
+                                className: "w-5 h-5 mr-3"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                lineNumber: 153,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: "font-medium",
+                                children: "System Settings"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                lineNumber: 154,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                        lineNumber: 148,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                lineNumber: 123,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "grid grid-cols-1 lg:grid-cols-3 gap-6",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "lg:col-span-2 bg-card border rounded-lg",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "px-4 py-3 border-b flex items-center justify-between",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("h3", {
+                                        className: "font-semibold",
+                                        children: "Recent Orders"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                        lineNumber: 162,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(Button, {
+                                        variant: "ghost",
+                                        size: "sm",
+                                        onClick: ()=>navigate('/admin/orders'),
+                                        children: "View All"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                        lineNumber: 163,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                lineNumber: 161,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "overflow-x-auto",
+                                children: /*#__PURE__*/ _jsxDEV("table", {
+                                    className: "data-table",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("thead", {
+                                            children: /*#__PURE__*/ _jsxDEV("tr", {
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV("th", {
+                                                        children: "Order #"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                        lineNumber: 171,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("th", {
+                                                        children: "Patient"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                        lineNumber: 172,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("th", {
+                                                        children: "Tests"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                        lineNumber: 173,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("th", {
+                                                        children: "Total"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                        lineNumber: 174,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("th", {
+                                                        children: "Status"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                        lineNumber: 175,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                lineNumber: 170,
+                                                columnNumber: 17
+                                            }, this)
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                            lineNumber: 169,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("tbody", {
+                                            children: [
+                                                orders.slice(-5).reverse().map((order)=>/*#__PURE__*/ _jsxDEV("tr", {
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                                className: "font-mono text-sm",
+                                                                children: getOrderNumber(order)
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                                lineNumber: 181,
+                                                                columnNumber: 21
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                                children: getPatientName(order)
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                                lineNumber: 182,
+                                                                columnNumber: 21
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                                children: getTestCodes(order)
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                                lineNumber: 183,
+                                                                columnNumber: 21
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                                className: "font-medium",
+                                                                children: [
+                                                                    "Le ",
+                                                                    (order.total || order.totalAmount || 0).toLocaleString()
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                                lineNumber: 184,
+                                                                columnNumber: 21
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                                children: /*#__PURE__*/ _jsxDEV("span", {
+                                                                    className: cn('status-badge capitalize', order.status === 'completed' && 'status-normal', order.status === 'processing' && 'bg-primary/10 text-primary', (order.status === 'pending_collection' || order.status === 'pending_payment') && 'status-pending'),
+                                                                    children: order.status.replace(/_/g, ' ')
+                                                                }, void 0, false, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                                    lineNumber: 186,
+                                                                    columnNumber: 23
+                                                                }, this)
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                                lineNumber: 185,
+                                                                columnNumber: 21
+                                                            }, this)
+                                                        ]
+                                                    }, order.id || order._id, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                        lineNumber: 180,
+                                                        columnNumber: 19
+                                                    }, this)),
+                                                orders.length === 0 && /*#__PURE__*/ _jsxDEV("tr", {
+                                                    children: /*#__PURE__*/ _jsxDEV("td", {
+                                                        colSpan: 5,
+                                                        className: "text-center py-8 text-muted-foreground",
+                                                        children: "No orders yet"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                        lineNumber: 199,
+                                                        columnNumber: 21
+                                                    }, this)
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                    lineNumber: 198,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                            lineNumber: 178,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                    lineNumber: 168,
+                                    columnNumber: 13
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                lineNumber: 167,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                        lineNumber: 160,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "px-4 py-3 border-b",
+                                children: /*#__PURE__*/ _jsxDEV("h3", {
+                                    className: "font-semibold",
+                                    children: "System Status"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                    lineNumber: 212,
+                                    columnNumber: 13
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                lineNumber: 211,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "p-4 space-y-4",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                className: "text-sm text-muted-foreground mb-2",
+                                                children: "Analyzers"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                lineNumber: 217,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                className: "space-y-2",
+                                                children: machines && machines.length > 0 ? machines.map((machine)=>/*#__PURE__*/ _jsxDEV("div", {
+                                                        className: "flex items-center justify-between text-sm",
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV("span", {
+                                                                children: machine.model || machine.name
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                                lineNumber: 222,
+                                                                columnNumber: 23
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                                className: "flex items-center gap-2",
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV("span", {
+                                                                        className: cn('machine-indicator', machine.status === 'online' && 'machine-online', machine.status === 'offline' && 'machine-offline', machine.status === 'error' && 'machine-error', machine.status === 'processing' && 'machine-processing')
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                                        lineNumber: 224,
+                                                                        columnNumber: 25
+                                                                    }, this),
+                                                                    /*#__PURE__*/ _jsxDEV("span", {
+                                                                        className: cn('text-xs font-medium capitalize', machine.status === 'online' && 'text-status-normal', machine.status === 'offline' && 'text-muted-foreground', machine.status === 'error' && 'text-status-critical', machine.status === 'processing' && 'text-primary'),
+                                                                        children: machine.status
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                                        lineNumber: 231,
+                                                                        columnNumber: 25
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                                lineNumber: 223,
+                                                                columnNumber: 23
+                                                            }, this)
+                                                        ]
+                                                    }, machine.id, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                        lineNumber: 221,
+                                                        columnNumber: 21
+                                                    }, this)) : /*#__PURE__*/ _jsxDEV("p", {
+                                                    className: "text-sm text-muted-foreground",
+                                                    children: "No machines configured"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                    lineNumber: 244,
+                                                    columnNumber: 19
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                lineNumber: 218,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                        lineNumber: 216,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "pt-4 border-t",
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                className: "text-sm text-muted-foreground mb-2",
+                                                children: "Active Staff"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                lineNumber: 251,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                className: "space-y-2",
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                        className: "flex items-center justify-between text-sm",
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV("span", {
+                                                                children: "Receptionists"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                                lineNumber: 254,
+                                                                columnNumber: 19
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("span", {
+                                                                className: "font-medium",
+                                                                children: "2 online"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                                lineNumber: 255,
+                                                                columnNumber: 19
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                        lineNumber: 253,
+                                                        columnNumber: 17
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                        className: "flex items-center justify-between text-sm",
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV("span", {
+                                                                children: "Lab Technicians"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                                lineNumber: 258,
+                                                                columnNumber: 19
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("span", {
+                                                                className: "font-medium",
+                                                                children: "3 online"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                                lineNumber: 259,
+                                                                columnNumber: 19
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                        lineNumber: 257,
+                                                        columnNumber: 17
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                lineNumber: 252,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                        lineNumber: 250,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "pt-4 border-t",
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                className: "text-sm text-muted-foreground mb-2",
+                                                children: "Today's Summary"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                lineNumber: 266,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                className: "space-y-2 text-sm",
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                        className: "flex justify-between",
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV("span", {
+                                                                children: "Total Tests"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                                lineNumber: 269,
+                                                                columnNumber: 19
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("span", {
+                                                                className: "font-medium",
+                                                                children: orders.reduce((sum, o)=>sum + (o.order_tests?.length || 0), 0)
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                                lineNumber: 270,
+                                                                columnNumber: 19
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                        lineNumber: 268,
+                                                        columnNumber: 17
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                        className: "flex justify-between",
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV("span", {
+                                                                children: "Revenue"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                                lineNumber: 273,
+                                                                columnNumber: 19
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("span", {
+                                                                className: "font-medium text-status-normal",
+                                                                children: [
+                                                                    "Le ",
+                                                                    todayRevenue.toLocaleString()
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                                lineNumber: 274,
+                                                                columnNumber: 19
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                        lineNumber: 272,
+                                                        columnNumber: 17
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                                lineNumber: 267,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                        lineNumber: 265,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                                lineNumber: 214,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                        lineNumber: 210,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+                lineNumber: 158,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx",
+        lineNumber: 68,
+        columnNumber: 5
+    }, this);
+}
+_s(AdminDashboard, "XaesPh8NghQyN0phNld6fnPXFDg=", false, function() {
+    return [
+        useAuth,
+        useRealtimeOrders,
+        useRealtimeResults,
+        useRealtimePatients,
+        useSearchPatients,
+        useOrders,
+        useResults,
+        useMachines,
+        useNavigate
+    ];
+});
+_c = AdminDashboard;
+var _c;
+$RefreshReg$(_c, "AdminDashboard");
+
+
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+
+
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/HP/Downloads/lab/frontend/src/pages/admin/AdminDashboard.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIkFkbWluRGFzaGJvYXJkLnRzeCJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBSb2xlTGF5b3V0IH0gZnJvbSAnQC9jb21wb25lbnRzL2xheW91dC9Sb2xlTGF5b3V0JztcbmltcG9ydCB7IHVzZUF1dGggfSBmcm9tICdAL2NvbnRleHQvQXV0aENvbnRleHQnO1xuaW1wb3J0IHsgdXNlU2VhcmNoUGF0aWVudHMgfSBmcm9tICdAL2hvb2tzL3VzZVBhdGllbnRzJztcbmltcG9ydCB7IHVzZU9yZGVycyB9IGZyb20gJ0AvaG9va3MvdXNlT3JkZXJzJztcbmltcG9ydCB7IHVzZVJlc3VsdHMgfSBmcm9tICdAL2hvb2tzL3VzZVJlc3VsdHMnO1xuaW1wb3J0IHsgdXNlTWFjaGluZXMgfSBmcm9tICdAL2hvb2tzL3VzZU1hY2hpbmVzJztcbmltcG9ydCB7IHVzZVJlYWx0aW1lT3JkZXJzIH0gZnJvbSAnQC9ob29rcy91c2VSZWFsdGltZU9yZGVycyc7XG5pbXBvcnQgeyB1c2VSZWFsdGltZVJlc3VsdHMgfSBmcm9tICdAL2hvb2tzL3VzZVJlYWx0aW1lUmVzdWx0cyc7XG5pbXBvcnQgeyB1c2VSZWFsdGltZVBhdGllbnRzIH0gZnJvbSAnQC9ob29rcy91c2VSZWFsdGltZVBhdGllbnRzJztcbmltcG9ydCB7IE1ldHJpY0NhcmQgfSBmcm9tICdAL2NvbXBvbmVudHMvZGFzaGJvYXJkL01ldHJpY0NhcmQnO1xuaW1wb3J0IHsgQnV0dG9uIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL2J1dHRvbic7XG5pbXBvcnQgeyBnZXRQYXRpZW50TmFtZSwgZ2V0VGVzdENvZGVzLCBnZXRPcmRlck51bWJlciB9IGZyb20gJ0AvdXRpbHMvb3JkZXJIZWxwZXJzJztcbmltcG9ydCB7IFxuICBVc2VycywgXG4gIENsaXBib2FyZExpc3QsIFxuICBGaWxlVGV4dCwgXG4gIFRyZW5kaW5nVXAsXG4gIEFsZXJ0VHJpYW5nbGUsXG4gIENwdSxcbiAgRG9sbGFyU2lnbixcbiAgQ2xvY2ssXG4gIEJhckNoYXJ0M1xufSBmcm9tICdsdWNpZGUtcmVhY3QnO1xuaW1wb3J0IHsgdXNlTmF2aWdhdGUgfSBmcm9tICdyZWFjdC1yb3V0ZXItZG9tJztcbmltcG9ydCB7IGNuIH0gZnJvbSAnQC9saWIvdXRpbHMnO1xuXG5leHBvcnQgZGVmYXVsdCBmdW5jdGlvbiBBZG1pbkRhc2hib2FyZCgpIHtcbiAgY29uc3QgeyBwcm9maWxlIH0gPSB1c2VBdXRoKCk7XG4gIFxuICAvLyBFbmFibGUgcmVhbC10aW1lIHVwZGF0ZXNcbiAgdXNlUmVhbHRpbWVPcmRlcnMoKTtcbiAgdXNlUmVhbHRpbWVSZXN1bHRzKCk7XG4gIHVzZVJlYWx0aW1lUGF0aWVudHMoKTtcbiAgXG4gIGNvbnN0IHsgZGF0YTogcGF0aWVudHMgPSBbXSB9ID0gdXNlU2VhcmNoUGF0aWVudHMoJycpO1xuICBjb25zdCB7IGRhdGE6IG9yZGVycyA9IFtdIH0gPSB1c2VPcmRlcnMoJ2FsbCcpO1xuICBjb25zdCB7IGRhdGE6IHJlc3VsdHMgPSBbXSB9ID0gdXNlUmVzdWx0cygpO1xuICBjb25zdCB7IGRhdGE6IG1hY2hpbmVzIH0gPSB1c2VNYWNoaW5lcygpO1xuICBjb25zdCBuYXZpZ2F0ZSA9IHVzZU5hdmlnYXRlKCk7XG5cbiAgY29uc3QgdG9kYXlTdGFydCA9IG5ldyBEYXRlKCk7XG4gIHRvZGF5U3RhcnQuc2V0SG91cnMoMCwgMCwgMCwgMCk7XG5cbiAgY29uc3QgdG9kYXlQYXRpZW50cyA9IHBhdGllbnRzLmZpbHRlcihwID0+IG5ldyBEYXRlKHAuY3JlYXRlZEF0KSA+PSB0b2RheVN0YXJ0KS5sZW5ndGg7XG4gIGNvbnN0IHRvZGF5T3JkZXJzID0gb3JkZXJzLmZpbHRlcihvID0+IG5ldyBEYXRlKG8uY3JlYXRlZEF0KSA+PSB0b2RheVN0YXJ0KS5sZW5ndGg7XG4gIGNvbnN0IGNvbXBsZXRlZE9yZGVycyA9IG9yZGVycy5maWx0ZXIobyA9PiBvLnN0YXR1cyA9PT0gJ2NvbXBsZXRlZCcpLmxlbmd0aDtcbiAgY29uc3QgcGVuZGluZ09yZGVycyA9IG9yZGVycy5maWx0ZXIobyA9PiBvLnN0YXR1cyAhPT0gJ2NvbXBsZXRlZCcgJiYgby5zdGF0dXMgIT09ICdjYW5jZWxsZWQnKS5sZW5ndGg7XG4gIGNvbnN0IGNyaXRpY2FsUmVzdWx0cyA9IHJlc3VsdHMuZmlsdGVyKHIgPT4gci5mbGFnID09PSAnY3JpdGljYWxfaGlnaCcgfHwgci5mbGFnID09PSAnY3JpdGljYWxfbG93JykubGVuZ3RoO1xuICBjb25zdCB0b2RheVJldmVudWUgPSBvcmRlcnNcbiAgICAuZmlsdGVyKG8gPT4gbmV3IERhdGUoby5jcmVhdGVkQXQpID49IHRvZGF5U3RhcnQgJiYgby5wYXltZW50U3RhdHVzID09PSAncGFpZCcpXG4gICAgLnJlZHVjZSgoc3VtLCBvKSA9PiBzdW0gKyBOdW1iZXIoby50b3RhbCB8fCBvLnRvdGFsQW1vdW50IHx8IDApLCAwKTtcbiAgY29uc3Qgb25saW5lTWFjaGluZXMgPSBtYWNoaW5lcz8uZmlsdGVyKChtOiBhbnkpID0+IG0uc3RhdHVzID09PSAnb25saW5lJyB8fCBtLnN0YXR1cyA9PT0gJ3Byb2Nlc3NpbmcnKS5sZW5ndGggfHwgMDtcbiAgY29uc3QgdG90YWxNYWNoaW5lcyA9IG1hY2hpbmVzPy5sZW5ndGggfHwgMDtcbiAgXG4gIC8vIENhbGN1bGF0ZSBhdmVyYWdlIHR1cm5hcm91bmQgdGltZSAoaW4gbWludXRlcylcbiAgY29uc3QgY29tcGxldGVkT3JkZXJzV2l0aFRpbWUgPSBvcmRlcnMuZmlsdGVyKG8gPT4gby5zdGF0dXMgPT09ICdjb21wbGV0ZWQnICYmIG8uY29tcGxldGVkQXQpO1xuICBjb25zdCBhdmdUQVQgPSBjb21wbGV0ZWRPcmRlcnNXaXRoVGltZS5sZW5ndGggPiAwXG4gICAgPyBNYXRoLnJvdW5kKFxuICAgICAgICBjb21wbGV0ZWRPcmRlcnNXaXRoVGltZS5yZWR1Y2UoKHN1bSwgbykgPT4ge1xuICAgICAgICAgIGNvbnN0IHN0YXJ0ID0gbmV3IERhdGUoby5jcmVhdGVkQXQpLmdldFRpbWUoKTtcbiAgICAgICAgICBjb25zdCBlbmQgPSBuZXcgRGF0ZShvLmNvbXBsZXRlZEF0ISkuZ2V0VGltZSgpO1xuICAgICAgICAgIHJldHVybiBzdW0gKyAoZW5kIC0gc3RhcnQpIC8gKDEwMDAgKiA2MCk7IC8vIENvbnZlcnQgdG8gbWludXRlc1xuICAgICAgICB9LCAwKSAvIGNvbXBsZXRlZE9yZGVyc1dpdGhUaW1lLmxlbmd0aFxuICAgICAgKVxuICAgIDogMDtcblxuICByZXR1cm4gKFxuICAgIDxSb2xlTGF5b3V0IFxuICAgICAgdGl0bGU9XCJBZG1pbiBEYXNoYm9hcmRcIiBcbiAgICAgIHN1YnRpdGxlPVwiU3lzdGVtIG92ZXJ2aWV3IGFuZCBtYW5hZ2VtZW50XCJcbiAgICAgIHJvbGU9XCJhZG1pblwiXG4gICAgICB1c2VyTmFtZT17cHJvZmlsZT8uZnVsbF9uYW1lfVxuICAgID5cbiAgICAgIHsvKiBLZXkgTWV0cmljcyAqL31cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZ3JpZCBncmlkLWNvbHMtMiBtZDpncmlkLWNvbHMtNCBsZzpncmlkLWNvbHMtOCBnYXAtNCBtYi02XCI+XG4gICAgICAgIDxNZXRyaWNDYXJkXG4gICAgICAgICAgdGl0bGU9XCJQYXRpZW50cyBUb2RheVwiXG4gICAgICAgICAgdmFsdWU9e3RvZGF5UGF0aWVudHN9XG4gICAgICAgICAgaWNvbj17VXNlcnN9XG4gICAgICAgICAgdHJlbmQ9e3sgdmFsdWU6IDEyLCBpc1Bvc2l0aXZlOiB0cnVlIH19XG4gICAgICAgIC8+XG4gICAgICAgIDxNZXRyaWNDYXJkXG4gICAgICAgICAgdGl0bGU9XCJPcmRlcnMgVG9kYXlcIlxuICAgICAgICAgIHZhbHVlPXt0b2RheU9yZGVyc31cbiAgICAgICAgICBpY29uPXtDbGlwYm9hcmRMaXN0fVxuICAgICAgICAvPlxuICAgICAgICA8TWV0cmljQ2FyZFxuICAgICAgICAgIHRpdGxlPVwiUGVuZGluZ1wiXG4gICAgICAgICAgdmFsdWU9e3BlbmRpbmdPcmRlcnN9XG4gICAgICAgICAgaWNvbj17Q2xvY2t9XG4gICAgICAgICAgdmFyaWFudD17cGVuZGluZ09yZGVycyA+IDEwID8gJ3dhcm5pbmcnIDogJ2RlZmF1bHQnfVxuICAgICAgICAvPlxuICAgICAgICA8TWV0cmljQ2FyZFxuICAgICAgICAgIHRpdGxlPVwiQ29tcGxldGVkXCJcbiAgICAgICAgICB2YWx1ZT17Y29tcGxldGVkT3JkZXJzfVxuICAgICAgICAgIGljb249e0ZpbGVUZXh0fVxuICAgICAgICAvPlxuICAgICAgICA8TWV0cmljQ2FyZFxuICAgICAgICAgIHRpdGxlPVwiQ3JpdGljYWwgUmVzdWx0c1wiXG4gICAgICAgICAgdmFsdWU9e2NyaXRpY2FsUmVzdWx0c31cbiAgICAgICAgICBpY29uPXtBbGVydFRyaWFuZ2xlfVxuICAgICAgICAgIHZhcmlhbnQ9e2NyaXRpY2FsUmVzdWx0cyA+IDAgPyAnY3JpdGljYWwnIDogJ2RlZmF1bHQnfVxuICAgICAgICAvPlxuICAgICAgICA8TWV0cmljQ2FyZFxuICAgICAgICAgIHRpdGxlPVwiTWFjaGluZXNcIlxuICAgICAgICAgIHZhbHVlPXtgJHtvbmxpbmVNYWNoaW5lc30vJHt0b3RhbE1hY2hpbmVzfWB9XG4gICAgICAgICAgaWNvbj17Q3B1fVxuICAgICAgICAvPlxuICAgICAgICA8TWV0cmljQ2FyZFxuICAgICAgICAgIHRpdGxlPVwiUmV2ZW51ZSBUb2RheVwiXG4gICAgICAgICAgdmFsdWU9e2BMZSAkeyh0b2RheVJldmVudWUgLyAxMDAwKS50b0ZpeGVkKDApfUtgfVxuICAgICAgICAgIGljb249e0RvbGxhclNpZ259XG4gICAgICAgICAgdHJlbmQ9e3sgdmFsdWU6IDgsIGlzUG9zaXRpdmU6IHRydWUgfX1cbiAgICAgICAgLz5cbiAgICAgICAgPE1ldHJpY0NhcmRcbiAgICAgICAgICB0aXRsZT1cIkF2ZyBUQVRcIlxuICAgICAgICAgIHZhbHVlPXthdmdUQVQgPiAwID8gYCR7YXZnVEFUfW1gIDogJ04vQSd9XG4gICAgICAgICAgaWNvbj17VHJlbmRpbmdVcH1cbiAgICAgICAgLz5cbiAgICAgIDwvZGl2PlxuXG4gICAgICB7LyogUXVpY2sgTGlua3MgKi99XG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImdyaWQgZ3JpZC1jb2xzLTEgbWQ6Z3JpZC1jb2xzLTQgZ2FwLTQgbWItNlwiPlxuICAgICAgICA8QnV0dG9uIFxuICAgICAgICAgIHZhcmlhbnQ9XCJvdXRsaW5lXCIgXG4gICAgICAgICAgY2xhc3NOYW1lPVwiaC0xNiBqdXN0aWZ5LXN0YXJ0IHB4LTRcIlxuICAgICAgICAgIG9uQ2xpY2s9eygpID0+IG5hdmlnYXRlKCcvYWRtaW4vdXNlcnMnKX1cbiAgICAgICAgPlxuICAgICAgICAgIDxVc2VycyBjbGFzc05hbWU9XCJ3LTUgaC01IG1yLTNcIiAvPlxuICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImZvbnQtbWVkaXVtXCI+VXNlciBNYW5hZ2VtZW50PC9zcGFuPlxuICAgICAgICA8L0J1dHRvbj5cbiAgICAgICAgPEJ1dHRvbiBcbiAgICAgICAgICB2YXJpYW50PVwib3V0bGluZVwiIFxuICAgICAgICAgIGNsYXNzTmFtZT1cImgtMTYganVzdGlmeS1zdGFydCBweC00XCJcbiAgICAgICAgICBvbkNsaWNrPXsoKSA9PiBuYXZpZ2F0ZSgnL2FkbWluL3JlcG9ydHMnKX1cbiAgICAgICAgPlxuICAgICAgICAgIDxCYXJDaGFydDMgY2xhc3NOYW1lPVwidy01IGgtNSBtci0zXCIgLz5cbiAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJmb250LW1lZGl1bVwiPlJlcG9ydHMgJiBBbmFseXRpY3M8L3NwYW4+XG4gICAgICAgIDwvQnV0dG9uPlxuICAgICAgICA8QnV0dG9uIFxuICAgICAgICAgIHZhcmlhbnQ9XCJvdXRsaW5lXCIgXG4gICAgICAgICAgY2xhc3NOYW1lPVwiaC0xNiBqdXN0aWZ5LXN0YXJ0IHB4LTRcIlxuICAgICAgICAgIG9uQ2xpY2s9eygpID0+IG5hdmlnYXRlKCcvYWRtaW4vbWFjaGluZXMnKX1cbiAgICAgICAgPlxuICAgICAgICAgIDxDcHUgY2xhc3NOYW1lPVwidy01IGgtNSBtci0zXCIgLz5cbiAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJmb250LW1lZGl1bVwiPk1hY2hpbmUgQ29uZmlnPC9zcGFuPlxuICAgICAgICA8L0J1dHRvbj5cbiAgICAgICAgPEJ1dHRvbiBcbiAgICAgICAgICB2YXJpYW50PVwib3V0bGluZVwiIFxuICAgICAgICAgIGNsYXNzTmFtZT1cImgtMTYganVzdGlmeS1zdGFydCBweC00XCJcbiAgICAgICAgICBvbkNsaWNrPXsoKSA9PiBuYXZpZ2F0ZSgnL2FkbWluL3NldHRpbmdzJyl9XG4gICAgICAgID5cbiAgICAgICAgICA8VHJlbmRpbmdVcCBjbGFzc05hbWU9XCJ3LTUgaC01IG1yLTNcIiAvPlxuICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImZvbnQtbWVkaXVtXCI+U3lzdGVtIFNldHRpbmdzPC9zcGFuPlxuICAgICAgICA8L0J1dHRvbj5cbiAgICAgIDwvZGl2PlxuXG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImdyaWQgZ3JpZC1jb2xzLTEgbGc6Z3JpZC1jb2xzLTMgZ2FwLTZcIj5cbiAgICAgICAgey8qIFJlY2VudCBPcmRlcnMgKi99XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwibGc6Y29sLXNwYW4tMiBiZy1jYXJkIGJvcmRlciByb3VuZGVkLWxnXCI+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJweC00IHB5LTMgYm9yZGVyLWIgZmxleCBpdGVtcy1jZW50ZXIganVzdGlmeS1iZXR3ZWVuXCI+XG4gICAgICAgICAgICA8aDMgY2xhc3NOYW1lPVwiZm9udC1zZW1pYm9sZFwiPlJlY2VudCBPcmRlcnM8L2gzPlxuICAgICAgICAgICAgPEJ1dHRvbiB2YXJpYW50PVwiZ2hvc3RcIiBzaXplPVwic21cIiBvbkNsaWNrPXsoKSA9PiBuYXZpZ2F0ZSgnL2FkbWluL29yZGVycycpfT5cbiAgICAgICAgICAgICAgVmlldyBBbGxcbiAgICAgICAgICAgIDwvQnV0dG9uPlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwib3ZlcmZsb3cteC1hdXRvXCI+XG4gICAgICAgICAgICA8dGFibGUgY2xhc3NOYW1lPVwiZGF0YS10YWJsZVwiPlxuICAgICAgICAgICAgICA8dGhlYWQ+XG4gICAgICAgICAgICAgICAgPHRyPlxuICAgICAgICAgICAgICAgICAgPHRoPk9yZGVyICM8L3RoPlxuICAgICAgICAgICAgICAgICAgPHRoPlBhdGllbnQ8L3RoPlxuICAgICAgICAgICAgICAgICAgPHRoPlRlc3RzPC90aD5cbiAgICAgICAgICAgICAgICAgIDx0aD5Ub3RhbDwvdGg+XG4gICAgICAgICAgICAgICAgICA8dGg+U3RhdHVzPC90aD5cbiAgICAgICAgICAgICAgICA8L3RyPlxuICAgICAgICAgICAgICA8L3RoZWFkPlxuICAgICAgICAgICAgICA8dGJvZHk+XG4gICAgICAgICAgICAgICAge29yZGVycy5zbGljZSgtNSkucmV2ZXJzZSgpLm1hcChvcmRlciA9PiAoXG4gICAgICAgICAgICAgICAgICA8dHIga2V5PXtvcmRlci5pZCB8fCBvcmRlci5faWR9PlxuICAgICAgICAgICAgICAgICAgICA8dGQgY2xhc3NOYW1lPVwiZm9udC1tb25vIHRleHQtc21cIj57Z2V0T3JkZXJOdW1iZXIob3JkZXIpfTwvdGQ+XG4gICAgICAgICAgICAgICAgICAgIDx0ZD57Z2V0UGF0aWVudE5hbWUob3JkZXIpfTwvdGQ+XG4gICAgICAgICAgICAgICAgICAgIDx0ZD57Z2V0VGVzdENvZGVzKG9yZGVyKX08L3RkPlxuICAgICAgICAgICAgICAgICAgICA8dGQgY2xhc3NOYW1lPVwiZm9udC1tZWRpdW1cIj5MZSB7KG9yZGVyLnRvdGFsIHx8IG9yZGVyLnRvdGFsQW1vdW50IHx8IDApLnRvTG9jYWxlU3RyaW5nKCl9PC90ZD5cbiAgICAgICAgICAgICAgICAgICAgPHRkPlxuICAgICAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT17Y24oXG4gICAgICAgICAgICAgICAgICAgICAgICAnc3RhdHVzLWJhZGdlIGNhcGl0YWxpemUnLFxuICAgICAgICAgICAgICAgICAgICAgICAgb3JkZXIuc3RhdHVzID09PSAnY29tcGxldGVkJyAmJiAnc3RhdHVzLW5vcm1hbCcsXG4gICAgICAgICAgICAgICAgICAgICAgICBvcmRlci5zdGF0dXMgPT09ICdwcm9jZXNzaW5nJyAmJiAnYmctcHJpbWFyeS8xMCB0ZXh0LXByaW1hcnknLFxuICAgICAgICAgICAgICAgICAgICAgICAgKG9yZGVyLnN0YXR1cyA9PT0gJ3BlbmRpbmdfY29sbGVjdGlvbicgfHwgb3JkZXIuc3RhdHVzID09PSAncGVuZGluZ19wYXltZW50JykgJiYgJ3N0YXR1cy1wZW5kaW5nJ1xuICAgICAgICAgICAgICAgICAgICAgICl9PlxuICAgICAgICAgICAgICAgICAgICAgICAge29yZGVyLnN0YXR1cy5yZXBsYWNlKC9fL2csICcgJyl9XG4gICAgICAgICAgICAgICAgICAgICAgPC9zcGFuPlxuICAgICAgICAgICAgICAgICAgICA8L3RkPlxuICAgICAgICAgICAgICAgICAgPC90cj5cbiAgICAgICAgICAgICAgICApKX1cbiAgICAgICAgICAgICAgICB7b3JkZXJzLmxlbmd0aCA9PT0gMCAmJiAoXG4gICAgICAgICAgICAgICAgICA8dHI+XG4gICAgICAgICAgICAgICAgICAgIDx0ZCBjb2xTcGFuPXs1fSBjbGFzc05hbWU9XCJ0ZXh0LWNlbnRlciBweS04IHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPlxuICAgICAgICAgICAgICAgICAgICAgIE5vIG9yZGVycyB5ZXRcbiAgICAgICAgICAgICAgICAgICAgPC90ZD5cbiAgICAgICAgICAgICAgICAgIDwvdHI+XG4gICAgICAgICAgICAgICAgKX1cbiAgICAgICAgICAgICAgPC90Ym9keT5cbiAgICAgICAgICAgIDwvdGFibGU+XG4gICAgICAgICAgPC9kaXY+XG4gICAgICAgIDwvZGl2PlxuXG4gICAgICAgIHsvKiBTeXN0ZW0gU3RhdHVzICovfVxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImJnLWNhcmQgYm9yZGVyIHJvdW5kZWQtbGdcIj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInB4LTQgcHktMyBib3JkZXItYlwiPlxuICAgICAgICAgICAgPGgzIGNsYXNzTmFtZT1cImZvbnQtc2VtaWJvbGRcIj5TeXN0ZW0gU3RhdHVzPC9oMz5cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInAtNCBzcGFjZS15LTRcIj5cbiAgICAgICAgICAgIHsvKiBNYWNoaW5lIFN0YXR1cyBTdW1tYXJ5ICovfVxuICAgICAgICAgICAgPGRpdj5cbiAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1zbSB0ZXh0LW11dGVkLWZvcmVncm91bmQgbWItMlwiPkFuYWx5emVyczwvcD5cbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTJcIj5cbiAgICAgICAgICAgICAgICB7bWFjaGluZXMgJiYgbWFjaGluZXMubGVuZ3RoID4gMCA/IChcbiAgICAgICAgICAgICAgICAgIG1hY2hpbmVzLm1hcCgobWFjaGluZTogYW55KSA9PiAoXG4gICAgICAgICAgICAgICAgICAgIDxkaXYga2V5PXttYWNoaW5lLmlkfSBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWJldHdlZW4gdGV4dC1zbVwiPlxuICAgICAgICAgICAgICAgICAgICAgIDxzcGFuPnttYWNoaW5lLm1vZGVsIHx8IG1hY2hpbmUubmFtZX08L3NwYW4+XG4gICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBnYXAtMlwiPlxuICAgICAgICAgICAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPXtjbihcbiAgICAgICAgICAgICAgICAgICAgICAgICAgJ21hY2hpbmUtaW5kaWNhdG9yJyxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgbWFjaGluZS5zdGF0dXMgPT09ICdvbmxpbmUnICYmICdtYWNoaW5lLW9ubGluZScsXG4gICAgICAgICAgICAgICAgICAgICAgICAgIG1hY2hpbmUuc3RhdHVzID09PSAnb2ZmbGluZScgJiYgJ21hY2hpbmUtb2ZmbGluZScsXG4gICAgICAgICAgICAgICAgICAgICAgICAgIG1hY2hpbmUuc3RhdHVzID09PSAnZXJyb3InICYmICdtYWNoaW5lLWVycm9yJyxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgbWFjaGluZS5zdGF0dXMgPT09ICdwcm9jZXNzaW5nJyAmJiAnbWFjaGluZS1wcm9jZXNzaW5nJyxcbiAgICAgICAgICAgICAgICAgICAgICAgICl9IC8+XG4gICAgICAgICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9e2NuKFxuICAgICAgICAgICAgICAgICAgICAgICAgICAndGV4dC14cyBmb250LW1lZGl1bSBjYXBpdGFsaXplJyxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgbWFjaGluZS5zdGF0dXMgPT09ICdvbmxpbmUnICYmICd0ZXh0LXN0YXR1cy1ub3JtYWwnLFxuICAgICAgICAgICAgICAgICAgICAgICAgICBtYWNoaW5lLnN0YXR1cyA9PT0gJ29mZmxpbmUnICYmICd0ZXh0LW11dGVkLWZvcmVncm91bmQnLFxuICAgICAgICAgICAgICAgICAgICAgICAgICBtYWNoaW5lLnN0YXR1cyA9PT0gJ2Vycm9yJyAmJiAndGV4dC1zdGF0dXMtY3JpdGljYWwnLFxuICAgICAgICAgICAgICAgICAgICAgICAgICBtYWNoaW5lLnN0YXR1cyA9PT0gJ3Byb2Nlc3NpbmcnICYmICd0ZXh0LXByaW1hcnknLFxuICAgICAgICAgICAgICAgICAgICAgICAgKX0+XG4gICAgICAgICAgICAgICAgICAgICAgICAgIHttYWNoaW5lLnN0YXR1c31cbiAgICAgICAgICAgICAgICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICAgICApKVxuICAgICAgICAgICAgICAgICkgOiAoXG4gICAgICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LXNtIHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPk5vIG1hY2hpbmVzIGNvbmZpZ3VyZWQ8L3A+XG4gICAgICAgICAgICAgICAgKX1cbiAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICA8L2Rpdj5cblxuICAgICAgICAgICAgey8qIFN0YWZmIEFjdGl2aXR5ICovfVxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJwdC00IGJvcmRlci10XCI+XG4gICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc20gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kIG1iLTJcIj5BY3RpdmUgU3RhZmY8L3A+XG4gICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0yXCI+XG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWJldHdlZW4gdGV4dC1zbVwiPlxuICAgICAgICAgICAgICAgICAgPHNwYW4+UmVjZXB0aW9uaXN0czwvc3Bhbj5cbiAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImZvbnQtbWVkaXVtXCI+MiBvbmxpbmU8L3NwYW4+XG4gICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWJldHdlZW4gdGV4dC1zbVwiPlxuICAgICAgICAgICAgICAgICAgPHNwYW4+TGFiIFRlY2huaWNpYW5zPC9zcGFuPlxuICAgICAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiZm9udC1tZWRpdW1cIj4zIG9ubGluZTwvc3Bhbj5cbiAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICA8L2Rpdj5cblxuICAgICAgICAgICAgey8qIFF1aWNrIFN0YXRzICovfVxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJwdC00IGJvcmRlci10XCI+XG4gICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc20gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kIG1iLTJcIj5Ub2RheSdzIFN1bW1hcnk8L3A+XG4gICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0yIHRleHQtc21cIj5cbiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXgganVzdGlmeS1iZXR3ZWVuXCI+XG4gICAgICAgICAgICAgICAgICA8c3Bhbj5Ub3RhbCBUZXN0czwvc3Bhbj5cbiAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImZvbnQtbWVkaXVtXCI+e29yZGVycy5yZWR1Y2UoKHN1bSwgbykgPT4gc3VtICsgKG8ub3JkZXJfdGVzdHM/Lmxlbmd0aCB8fCAwKSwgMCl9PC9zcGFuPlxuICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBqdXN0aWZ5LWJldHdlZW5cIj5cbiAgICAgICAgICAgICAgICAgIDxzcGFuPlJldmVudWU8L3NwYW4+XG4gICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJmb250LW1lZGl1bSB0ZXh0LXN0YXR1cy1ub3JtYWxcIj5MZSB7dG9kYXlSZXZlbnVlLnRvTG9jYWxlU3RyaW5nKCl9PC9zcGFuPlxuICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICA8L2Rpdj5cbiAgICAgIDwvZGl2PlxuICAgIDwvUm9sZUxheW91dD5cbiAgKTtcbn1cbiJdLCJuYW1lcyI6WyJSb2xlTGF5b3V0IiwidXNlQXV0aCIsInVzZVNlYXJjaFBhdGllbnRzIiwidXNlT3JkZXJzIiwidXNlUmVzdWx0cyIsInVzZU1hY2hpbmVzIiwidXNlUmVhbHRpbWVPcmRlcnMiLCJ1c2VSZWFsdGltZVJlc3VsdHMiLCJ1c2VSZWFsdGltZVBhdGllbnRzIiwiTWV0cmljQ2FyZCIsIkJ1dHRvbiIsImdldFBhdGllbnROYW1lIiwiZ2V0VGVzdENvZGVzIiwiZ2V0T3JkZXJOdW1iZXIiLCJVc2VycyIsIkNsaXBib2FyZExpc3QiLCJGaWxlVGV4dCIsIlRyZW5kaW5nVXAiLCJBbGVydFRyaWFuZ2xlIiwiQ3B1IiwiRG9sbGFyU2lnbiIsIkNsb2NrIiwiQmFyQ2hhcnQzIiwidXNlTmF2aWdhdGUiLCJjbiIsIkFkbWluRGFzaGJvYXJkIiwicHJvZmlsZSIsImRhdGEiLCJwYXRpZW50cyIsIm9yZGVycyIsInJlc3VsdHMiLCJtYWNoaW5lcyIsIm5hdmlnYXRlIiwidG9kYXlTdGFydCIsIkRhdGUiLCJzZXRIb3VycyIsInRvZGF5UGF0aWVudHMiLCJmaWx0ZXIiLCJwIiwiY3JlYXRlZEF0IiwibGVuZ3RoIiwidG9kYXlPcmRlcnMiLCJvIiwiY29tcGxldGVkT3JkZXJzIiwic3RhdHVzIiwicGVuZGluZ09yZGVycyIsImNyaXRpY2FsUmVzdWx0cyIsInIiLCJmbGFnIiwidG9kYXlSZXZlbnVlIiwicGF5bWVudFN0YXR1cyIsInJlZHVjZSIsInN1bSIsIk51bWJlciIsInRvdGFsIiwidG90YWxBbW91bnQiLCJvbmxpbmVNYWNoaW5lcyIsIm0iLCJ0b3RhbE1hY2hpbmVzIiwiY29tcGxldGVkT3JkZXJzV2l0aFRpbWUiLCJjb21wbGV0ZWRBdCIsImF2Z1RBVCIsIk1hdGgiLCJyb3VuZCIsInN0YXJ0IiwiZ2V0VGltZSIsImVuZCIsInRpdGxlIiwic3VidGl0bGUiLCJyb2xlIiwidXNlck5hbWUiLCJmdWxsX25hbWUiLCJkaXYiLCJjbGFzc05hbWUiLCJ2YWx1ZSIsImljb24iLCJ0cmVuZCIsImlzUG9zaXRpdmUiLCJ2YXJpYW50IiwidG9GaXhlZCIsIm9uQ2xpY2siLCJzcGFuIiwiaDMiLCJzaXplIiwidGFibGUiLCJ0aGVhZCIsInRyIiwidGgiLCJ0Ym9keSIsInNsaWNlIiwicmV2ZXJzZSIsIm1hcCIsIm9yZGVyIiwidGQiLCJ0b0xvY2FsZVN0cmluZyIsInJlcGxhY2UiLCJpZCIsIl9pZCIsImNvbFNwYW4iLCJtYWNoaW5lIiwibW9kZWwiLCJuYW1lIiwib3JkZXJfdGVzdHMiXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OztBQUFBLFNBQVNBLFVBQVUsUUFBUSxpQ0FBaUM7QUFDNUQsU0FBU0MsT0FBTyxRQUFRLHdCQUF3QjtBQUNoRCxTQUFTQyxpQkFBaUIsUUFBUSxzQkFBc0I7QUFDeEQsU0FBU0MsU0FBUyxRQUFRLG9CQUFvQjtBQUM5QyxTQUFTQyxVQUFVLFFBQVEscUJBQXFCO0FBQ2hELFNBQVNDLFdBQVcsUUFBUSxzQkFBc0I7QUFDbEQsU0FBU0MsaUJBQWlCLFFBQVEsNEJBQTRCO0FBQzlELFNBQVNDLGtCQUFrQixRQUFRLDZCQUE2QjtBQUNoRSxTQUFTQyxtQkFBbUIsUUFBUSw4QkFBOEI7QUFDbEUsU0FBU0MsVUFBVSxRQUFRLG9DQUFvQztBQUMvRCxTQUFTQyxNQUFNLFFBQVEseUJBQXlCO0FBQ2hELFNBQVNDLGNBQWMsRUFBRUMsWUFBWSxFQUFFQyxjQUFjLFFBQVEsdUJBQXVCO0FBQ3BGLFNBQ0VDLEtBQUssRUFDTEMsYUFBYSxFQUNiQyxRQUFRLEVBQ1JDLFVBQVUsRUFDVkMsYUFBYSxFQUNiQyxHQUFHLEVBQ0hDLFVBQVUsRUFDVkMsS0FBSyxFQUNMQyxTQUFTLFFBQ0osZUFBZTtBQUN0QixTQUFTQyxXQUFXLFFBQVEsbUJBQW1CO0FBQy9DLFNBQVNDLEVBQUUsUUFBUSxjQUFjO0FBRWpDLGVBQWUsU0FBU0M7O0lBQ3RCLE1BQU0sRUFBRUMsT0FBTyxFQUFFLEdBQUd6QjtJQUVwQiwyQkFBMkI7SUFDM0JLO0lBQ0FDO0lBQ0FDO0lBRUEsTUFBTSxFQUFFbUIsTUFBTUMsV0FBVyxFQUFFLEVBQUUsR0FBRzFCLGtCQUFrQjtJQUNsRCxNQUFNLEVBQUV5QixNQUFNRSxTQUFTLEVBQUUsRUFBRSxHQUFHMUIsVUFBVTtJQUN4QyxNQUFN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

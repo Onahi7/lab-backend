@@ -1,0 +1,4 @@
+2026/03/02-01:09:02.696 5e34 Creating DB c:\Users\HP\Downloads\lab\backend\.edge-headless-profile\Default\EdgeCoupons/coupons_data.db since it was missing.
+2026/03/02-01:09:02.709 5e34 Reusing MANIFEST c:\Users\HP\Downloads\lab\backend\.edge-headless-profile\Default\EdgeCoupons/coupons_data.db/MANIFEST-000001
+2026/03/02-01:09:02.753 5fa8 Level-0 table #5: started
+2026/03/02-01:09:02.759 5fa8 Level-0 table #5: 681596 bytes OK

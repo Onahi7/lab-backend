@@ -1,0 +1,820 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/pages/admin/Reports.tsx");import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+
+let prevRefreshReg;
+let prevRefreshSig;
+
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react-swc can't detect preamble. Something is wrong."
+    );
+  }
+
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+
+import __vite__cjsImport2_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=27cfabb6"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime["jsxDEV"];
+var _s = $RefreshSig$();
+import { RoleLayout } from "/src/components/layout/RoleLayout.tsx";
+import { useAuth } from "/src/context/AuthContext.tsx";
+import { useOrders, useTodayOrders } from "/src/hooks/useOrders.ts";
+import { useMachines } from "/src/hooks/useMachines.ts";
+import { Card, CardContent, CardHeader, CardTitle } from "/src/components/ui/card.tsx";
+import { Button } from "/src/components/ui/button.tsx";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "/src/components/ui/select.tsx";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "/node_modules/.vite/deps/recharts.js?v=27cfabb6";
+import { Download, TrendingUp, Users, DollarSign, TestTube, Loader2 } from "/node_modules/.vite/deps/lucide-react.js?v=27cfabb6";
+import __vite__cjsImport12_react from "/node_modules/.vite/deps/react.js?v=27cfabb6"; const useState = __vite__cjsImport12_react["useState"]; const useMemo = __vite__cjsImport12_react["useMemo"];
+const COLORS = [
+    'hsl(var(--primary))',
+    'hsl(var(--status-normal))',
+    'hsl(var(--status-warning))',
+    'hsl(var(--status-critical))',
+    'hsl(var(--muted-foreground))'
+];
+export default function Reports() {
+    _s();
+    const { profile } = useAuth();
+    const { data: allOrders, isLoading: ordersLoading } = useOrders('all');
+    const { data: todayOrders } = useTodayOrders();
+    const { data: machines } = useMachines();
+    const [dateRange, setDateRange] = useState('7days');
+    // Calculate metrics
+    const metrics = useMemo(()=>{
+        if (!allOrders) return null;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const paidOrders = allOrders.filter((o)=>o.paymentStatus === 'paid');
+        const todayRevenue = todayOrders?.filter((o)=>o.paymentStatus === 'paid').reduce((sum, o)=>sum + Number(o.total || o.totalAmount || 0), 0) || 0;
+        const totalRevenue = paidOrders.reduce((sum, o)=>sum + Number(o.total || o.totalAmount || 0), 0);
+        const avgOrderValue = paidOrders.length > 0 ? totalRevenue / paidOrders.length : 0;
+        const totalTests = allOrders.reduce((sum, o)=>sum + (o.order_tests?.length || o.tests?.length || 0), 0);
+        return {
+            todayRevenue,
+            totalRevenue,
+            avgOrderValue,
+            totalOrders: allOrders.length,
+            completedOrders: allOrders.filter((o)=>o.status === 'completed').length,
+            totalTests,
+            uniquePatients: new Set(allOrders.map((o)=>{
+                if (typeof o.patientId === 'string') return o.patientId;
+                if (o.patientId?._id) return o.patientId._id;
+                if (o.patientId?.id) return o.patientId.id;
+                return '';
+            })).size
+        };
+    }, [
+        allOrders,
+        todayOrders
+    ]);
+    // Orders by status chart data
+    const statusData = useMemo(()=>{
+        if (!allOrders) return [];
+        const statusCounts = {};
+        allOrders.forEach((order)=>{
+            statusCounts[order.status] = (statusCounts[order.status] || 0) + 1;
+        });
+        return Object.entries(statusCounts).map(([status, count])=>({
+                name: status.replace(/_/g, ' '),
+                value: count
+            }));
+    }, [
+        allOrders
+    ]);
+    // Tests by category chart data
+    const categoryData = useMemo(()=>{
+        if (!allOrders) return [];
+        const categoryCounts = {};
+        allOrders.forEach((order)=>{
+            const orderTests = order.tests || order.order_tests || [];
+            orderTests.forEach((test)=>{
+                // Use test code prefix as category approximation
+                const testCode = test.testCode || '';
+                const category = testCode.substring(0, 3);
+                categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+            });
+        });
+        return Object.entries(categoryCounts).map(([category, count])=>({
+                name: category,
+                count
+            })).sort((a, b)=>b.count - a.count).slice(0, 10);
+    }, [
+        allOrders
+    ]);
+    // Daily revenue trend (last 7 days)
+    const revenueData = useMemo(()=>{
+        if (!allOrders) return [];
+        const days = {};
+        const now = new Date();
+        // Initialize last 7 days
+        for(let i = 6; i >= 0; i--){
+            const date = new Date(now);
+            date.setDate(date.getDate() - i);
+            const key = date.toLocaleDateString('en-US', {
+                weekday: 'short'
+            });
+            days[key] = 0;
+        }
+        // Aggregate revenue
+        allOrders.forEach((order)=>{
+            if (order.paymentStatus !== 'paid') return;
+            const orderDate = new Date(order.createdAt);
+            const daysDiff = Math.floor((now.getTime() - orderDate.getTime()) / (1000 * 60 * 60 * 24));
+            if (daysDiff < 7) {
+                const key = orderDate.toLocaleDateString('en-US', {
+                    weekday: 'short'
+                });
+                days[key] = (days[key] || 0) + Number(order.total || order.totalAmount || 0);
+            }
+        });
+        return Object.entries(days).map(([day, revenue])=>({
+                day,
+                revenue: revenue / 1000
+            }));
+    }, [
+        allOrders
+    ]);
+    if (ordersLoading) {
+        return /*#__PURE__*/ _jsxDEV(RoleLayout, {
+            title: "Reports",
+            subtitle: "Analytics and insights",
+            role: "admin",
+            userName: profile?.full_name,
+            children: /*#__PURE__*/ _jsxDEV("div", {
+                className: "flex items-center justify-center py-20",
+                children: /*#__PURE__*/ _jsxDEV(Loader2, {
+                    className: "w-8 h-8 animate-spin text-muted-foreground"
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                    lineNumber: 137,
+                    columnNumber: 11
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                lineNumber: 136,
+                columnNumber: 9
+            }, this)
+        }, void 0, false, {
+            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+            lineNumber: 135,
+            columnNumber: 7
+        }, this);
+    }
+    return /*#__PURE__*/ _jsxDEV(RoleLayout, {
+        title: "Reports & Analytics",
+        subtitle: "Business insights and performance metrics",
+        role: "admin",
+        userName: profile?.full_name,
+        children: [
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "flex items-center justify-between mb-6",
+                children: [
+                    /*#__PURE__*/ _jsxDEV(Select, {
+                        value: dateRange,
+                        onValueChange: setDateRange,
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(SelectTrigger, {
+                                className: "w-40",
+                                children: /*#__PURE__*/ _jsxDEV(SelectValue, {}, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                    lineNumber: 154,
+                                    columnNumber: 13
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                lineNumber: 153,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV(SelectContent, {
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                        value: "today",
+                                        children: "Today"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                        lineNumber: 157,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                        value: "7days",
+                                        children: "Last 7 Days"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                        lineNumber: 158,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                        value: "30days",
+                                        children: "Last 30 Days"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                        lineNumber: 159,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                        value: "90days",
+                                        children: "Last 90 Days"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                        lineNumber: 160,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                lineNumber: 156,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                        lineNumber: 152,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(Button, {
+                        variant: "outline",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(Download, {
+                                className: "w-4 h-4 mr-2"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                lineNumber: 164,
+                                columnNumber: 11
+                            }, this),
+                            "Export Report"
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                        lineNumber: 163,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                lineNumber: 151,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "grid grid-cols-1 md:grid-cols-4 gap-4 mb-6",
+                children: [
+                    /*#__PURE__*/ _jsxDEV(Card, {
+                        children: /*#__PURE__*/ _jsxDEV(CardContent, {
+                            className: "pt-6",
+                            children: /*#__PURE__*/ _jsxDEV("div", {
+                                className: "flex items-center justify-between",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                className: "text-sm text-muted-foreground",
+                                                children: "Today's Revenue"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                                lineNumber: 175,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                className: "text-2xl font-bold",
+                                                children: [
+                                                    "Le ",
+                                                    (metrics?.todayRevenue || 0).toLocaleString()
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                                lineNumber: 176,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                        lineNumber: 174,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "p-3 rounded-full bg-status-normal/10",
+                                        children: /*#__PURE__*/ _jsxDEV(DollarSign, {
+                                            className: "w-6 h-6 text-status-normal"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                            lineNumber: 179,
+                                            columnNumber: 17
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                        lineNumber: 178,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                lineNumber: 173,
+                                columnNumber: 13
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                            lineNumber: 172,
+                            columnNumber: 11
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                        lineNumber: 171,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(Card, {
+                        children: /*#__PURE__*/ _jsxDEV(CardContent, {
+                            className: "pt-6",
+                            children: /*#__PURE__*/ _jsxDEV("div", {
+                                className: "flex items-center justify-between",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                className: "text-sm text-muted-foreground",
+                                                children: "Total Orders"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                                lineNumber: 188,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                className: "text-2xl font-bold",
+                                                children: metrics?.totalOrders || 0
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                                lineNumber: 189,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                        lineNumber: 187,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "p-3 rounded-full bg-primary/10",
+                                        children: /*#__PURE__*/ _jsxDEV(TrendingUp, {
+                                            className: "w-6 h-6 text-primary"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                            lineNumber: 192,
+                                            columnNumber: 17
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                        lineNumber: 191,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                lineNumber: 186,
+                                columnNumber: 13
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                            lineNumber: 185,
+                            columnNumber: 11
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                        lineNumber: 184,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(Card, {
+                        children: /*#__PURE__*/ _jsxDEV(CardContent, {
+                            className: "pt-6",
+                            children: /*#__PURE__*/ _jsxDEV("div", {
+                                className: "flex items-center justify-between",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                className: "text-sm text-muted-foreground",
+                                                children: "Total Tests"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                                lineNumber: 201,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                className: "text-2xl font-bold",
+                                                children: metrics?.totalTests || 0
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                                lineNumber: 202,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                        lineNumber: 200,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "p-3 rounded-full bg-status-warning/10",
+                                        children: /*#__PURE__*/ _jsxDEV(TestTube, {
+                                            className: "w-6 h-6 text-status-warning"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                            lineNumber: 205,
+                                            columnNumber: 17
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                        lineNumber: 204,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                lineNumber: 199,
+                                columnNumber: 13
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                            lineNumber: 198,
+                            columnNumber: 11
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                        lineNumber: 197,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(Card, {
+                        children: /*#__PURE__*/ _jsxDEV(CardContent, {
+                            className: "pt-6",
+                            children: /*#__PURE__*/ _jsxDEV("div", {
+                                className: "flex items-center justify-between",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                className: "text-sm text-muted-foreground",
+                                                children: "Unique Patients"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                                lineNumber: 214,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                className: "text-2xl font-bold",
+                                                children: metrics?.uniquePatients || 0
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                                lineNumber: 215,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                        lineNumber: 213,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "p-3 rounded-full bg-muted",
+                                        children: /*#__PURE__*/ _jsxDEV(Users, {
+                                            className: "w-6 h-6 text-muted-foreground"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                            lineNumber: 218,
+                                            columnNumber: 17
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                        lineNumber: 217,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                lineNumber: 212,
+                                columnNumber: 13
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                            lineNumber: 211,
+                            columnNumber: 11
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                        lineNumber: 210,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                lineNumber: 170,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6",
+                children: [
+                    /*#__PURE__*/ _jsxDEV(Card, {
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(CardHeader, {
+                                children: /*#__PURE__*/ _jsxDEV(CardTitle, {
+                                    className: "text-lg",
+                                    children: "Revenue Trend (Last 7 Days)"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                    lineNumber: 230,
+                                    columnNumber: 13
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                lineNumber: 229,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV(CardContent, {
+                                children: /*#__PURE__*/ _jsxDEV(ResponsiveContainer, {
+                                    width: "100%",
+                                    height: 250,
+                                    children: /*#__PURE__*/ _jsxDEV(LineChart, {
+                                        data: revenueData,
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV(CartesianGrid, {
+                                                strokeDasharray: "3 3",
+                                                className: "stroke-muted"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                                lineNumber: 235,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(XAxis, {
+                                                dataKey: "day",
+                                                className: "text-xs"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                                lineNumber: 236,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(YAxis, {
+                                                tickFormatter: (v)=>`Le ${v}K`,
+                                                className: "text-xs"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                                lineNumber: 237,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(Tooltip, {
+                                                formatter: (value)=>[
+                                                        `Le ${(value * 1000).toLocaleString()}`,
+                                                        'Revenue'
+                                                    ],
+                                                contentStyle: {
+                                                    backgroundColor: 'hsl(var(--card))',
+                                                    border: '1px solid hsl(var(--border))'
+                                                }
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                                lineNumber: 238,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(Line, {
+                                                type: "monotone",
+                                                dataKey: "revenue",
+                                                stroke: "hsl(var(--primary))",
+                                                strokeWidth: 2,
+                                                dot: {
+                                                    fill: 'hsl(var(--primary))'
+                                                }
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                                lineNumber: 242,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                        lineNumber: 234,
+                                        columnNumber: 15
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                    lineNumber: 233,
+                                    columnNumber: 13
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                lineNumber: 232,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                        lineNumber: 228,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(Card, {
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(CardHeader, {
+                                children: /*#__PURE__*/ _jsxDEV(CardTitle, {
+                                    className: "text-lg",
+                                    children: "Order Status Distribution"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                    lineNumber: 257,
+                                    columnNumber: 13
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                lineNumber: 256,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV(CardContent, {
+                                children: /*#__PURE__*/ _jsxDEV(ResponsiveContainer, {
+                                    width: "100%",
+                                    height: 250,
+                                    children: /*#__PURE__*/ _jsxDEV(PieChart, {
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV(Pie, {
+                                                data: statusData,
+                                                cx: "50%",
+                                                cy: "50%",
+                                                innerRadius: 60,
+                                                outerRadius: 100,
+                                                paddingAngle: 2,
+                                                dataKey: "value",
+                                                label: ({ name, percent })=>`${name} (${(percent * 100).toFixed(0)}%)`,
+                                                children: statusData.map((_, index)=>/*#__PURE__*/ _jsxDEV(Cell, {
+                                                        fill: COLORS[index % COLORS.length]
+                                                    }, `cell-${index}`, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                                        lineNumber: 273,
+                                                        columnNumber: 21
+                                                    }, this))
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                                lineNumber: 262,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(Tooltip, {}, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                                lineNumber: 276,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                        lineNumber: 261,
+                                        columnNumber: 15
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                    lineNumber: 260,
+                                    columnNumber: 13
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                lineNumber: 259,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                        lineNumber: 255,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                lineNumber: 226,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Card, {
+                children: [
+                    /*#__PURE__*/ _jsxDEV(CardHeader, {
+                        children: /*#__PURE__*/ _jsxDEV(CardTitle, {
+                            className: "text-lg",
+                            children: "Top Tests by Volume"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                            lineNumber: 286,
+                            columnNumber: 11
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                        lineNumber: 285,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(CardContent, {
+                        children: /*#__PURE__*/ _jsxDEV(ResponsiveContainer, {
+                            width: "100%",
+                            height: 300,
+                            children: /*#__PURE__*/ _jsxDEV(BarChart, {
+                                data: categoryData,
+                                layout: "vertical",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(CartesianGrid, {
+                                        strokeDasharray: "3 3",
+                                        className: "stroke-muted"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                        lineNumber: 291,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(XAxis, {
+                                        type: "number"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                        lineNumber: 292,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(YAxis, {
+                                        dataKey: "name",
+                                        type: "category",
+                                        width: 60,
+                                        className: "text-xs"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                        lineNumber: 293,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(Tooltip, {
+                                        contentStyle: {
+                                            backgroundColor: 'hsl(var(--card))',
+                                            border: '1px solid hsl(var(--border))'
+                                        }
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                        lineNumber: 294,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(Bar, {
+                                        dataKey: "count",
+                                        fill: "hsl(var(--primary))",
+                                        radius: [
+                                            0,
+                                            4,
+                                            4,
+                                            0
+                                        ]
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                        lineNumber: 297,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                                lineNumber: 290,
+                                columnNumber: 13
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                            lineNumber: 289,
+                            columnNumber: 11
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                        lineNumber: 288,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+                lineNumber: 284,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx",
+        lineNumber: 144,
+        columnNumber: 5
+    }, this);
+}
+_s(Reports, "HSDCdvvYRwEX9e4IT91WVzfjonE=", false, function() {
+    return [
+        useAuth,
+        useOrders,
+        useTodayOrders,
+        useMachines
+    ];
+});
+_c = Reports;
+var _c;
+$RefreshReg$(_c, "Reports");
+
+
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+
+
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/HP/Downloads/lab/frontend/src/pages/admin/Reports.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIlJlcG9ydHMudHN4Il0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IFJvbGVMYXlvdXQgfSBmcm9tICdAL2NvbXBvbmVudHMvbGF5b3V0L1JvbGVMYXlvdXQnO1xuaW1wb3J0IHsgdXNlQXV0aCB9IGZyb20gJ0AvY29udGV4dC9BdXRoQ29udGV4dCc7XG5pbXBvcnQgeyB1c2VPcmRlcnMsIHVzZVRvZGF5T3JkZXJzIH0gZnJvbSAnQC9ob29rcy91c2VPcmRlcnMnO1xuaW1wb3J0IHsgdXNlTWFjaGluZXMgfSBmcm9tICdAL2hvb2tzL3VzZU1hY2hpbmVzJztcbmltcG9ydCB7IENhcmQsIENhcmRDb250ZW50LCBDYXJkSGVhZGVyLCBDYXJkVGl0bGUgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvY2FyZCc7XG5pbXBvcnQgeyBCdXR0b24gfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvYnV0dG9uJztcbmltcG9ydCB7IFNlbGVjdCwgU2VsZWN0Q29udGVudCwgU2VsZWN0SXRlbSwgU2VsZWN0VHJpZ2dlciwgU2VsZWN0VmFsdWUgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvc2VsZWN0JztcbmltcG9ydCB7IFxuICBCYXJDaGFydCwgXG4gIEJhciwgXG4gIFhBeGlzLCBcbiAgWUF4aXMsIFxuICBDYXJ0ZXNpYW5HcmlkLCBcbiAgVG9vbHRpcCwgXG4gIFJlc3BvbnNpdmVDb250YWluZXIsXG4gIFBpZUNoYXJ0LFxuICBQaWUsXG4gIENlbGwsXG4gIExpbmVDaGFydCxcbiAgTGluZSxcbiAgTGVnZW5kXG59IGZyb20gJ3JlY2hhcnRzJztcbmltcG9ydCB7IERvd25sb2FkLCBUcmVuZGluZ1VwLCBVc2VycywgRG9sbGFyU2lnbiwgVGVzdFR1YmUsIExvYWRlcjIgfSBmcm9tICdsdWNpZGUtcmVhY3QnO1xuaW1wb3J0IHsgdXNlU3RhdGUsIHVzZU1lbW8gfSBmcm9tICdyZWFjdCc7XG5cbmNvbnN0IENPTE9SUyA9IFsnaHNsKHZhcigtLXByaW1hcnkpKScsICdoc2wodmFyKC0tc3RhdHVzLW5vcm1hbCkpJywgJ2hzbCh2YXIoLS1zdGF0dXMtd2FybmluZykpJywgJ2hzbCh2YXIoLS1zdGF0dXMtY3JpdGljYWwpKScsICdoc2wodmFyKC0tbXV0ZWQtZm9yZWdyb3VuZCkpJ107XG5cbmV4cG9ydCBkZWZhdWx0IGZ1bmN0aW9uIFJlcG9ydHMoKSB7XG4gIGNvbnN0IHsgcHJvZmlsZSB9ID0gdXNlQXV0aCgpO1xuICBjb25zdCB7IGRhdGE6IGFsbE9yZGVycywgaXNMb2FkaW5nOiBvcmRlcnNMb2FkaW5nIH0gPSB1c2VPcmRlcnMoJ2FsbCcpO1xuICBjb25zdCB7IGRhdGE6IHRvZGF5T3JkZXJzIH0gPSB1c2VUb2RheU9yZGVycygpO1xuICBjb25zdCB7IGRhdGE6IG1hY2hpbmVzIH0gPSB1c2VNYWNoaW5lcygpO1xuXG4gIGNvbnN0IFtkYXRlUmFuZ2UsIHNldERhdGVSYW5nZV0gPSB1c2VTdGF0ZSgnN2RheXMnKTtcblxuICAvLyBDYWxjdWxhdGUgbWV0cmljc1xuICBjb25zdCBtZXRyaWNzID0gdXNlTWVtbygoKSA9PiB7XG4gICAgaWYgKCFhbGxPcmRlcnMpIHJldHVybiBudWxsO1xuXG4gICAgY29uc3QgdG9kYXkgPSBuZXcgRGF0ZSgpO1xuICAgIHRvZGF5LnNldEhvdXJzKDAsIDAsIDAsIDApO1xuXG4gICAgY29uc3QgcGFpZE9yZGVycyA9IGFsbE9yZGVycy5maWx0ZXIobyA9PiBvLnBheW1lbnRTdGF0dXMgPT09ICdwYWlkJyk7XG4gICAgY29uc3QgdG9kYXlSZXZlbnVlID0gdG9kYXlPcmRlcnM/LmZpbHRlcihvID0+IG8ucGF5bWVudFN0YXR1cyA9PT0gJ3BhaWQnKVxuICAgICAgLnJlZHVjZSgoc3VtLCBvKSA9PiBzdW0gKyBOdW1iZXIoby50b3RhbCB8fCBvLnRvdGFsQW1vdW50IHx8IDApLCAwKSB8fCAwO1xuICAgIGNvbnN0IHRvdGFsUmV2ZW51ZSA9IHBhaWRPcmRlcnMucmVkdWNlKChzdW0sIG8pID0+IHN1bSArIE51bWJlcihvLnRvdGFsIHx8IG8udG90YWxBbW91bnQgfHwgMCksIDApO1xuICAgIGNvbnN0IGF2Z09yZGVyVmFsdWUgPSBwYWlkT3JkZXJzLmxlbmd0aCA+IDAgPyB0b3RhbFJldmVudWUgLyBwYWlkT3JkZXJzLmxlbmd0aCA6IDA7XG4gICAgY29uc3QgdG90YWxUZXN0cyA9IGFsbE9yZGVycy5yZWR1Y2UoKHN1bSwgbykgPT4gc3VtICsgKG8ub3JkZXJfdGVzdHM/Lmxlbmd0aCB8fCBvLnRlc3RzPy5sZW5ndGggfHwgMCksIDApO1xuXG4gICAgcmV0dXJuIHtcbiAgICAgIHRvZGF5UmV2ZW51ZSxcbiAgICAgIHRvdGFsUmV2ZW51ZSxcbiAgICAgIGF2Z09yZGVyVmFsdWUsXG4gICAgICB0b3RhbE9yZGVyczogYWxsT3JkZXJzLmxlbmd0aCxcbiAgICAgIGNvbXBsZXRlZE9yZGVyczogYWxsT3JkZXJzLmZpbHRlcihvID0+IG8uc3RhdHVzID09PSAnY29tcGxldGVkJykubGVuZ3RoLFxuICAgICAgdG90YWxUZXN0cyxcbiAgICAgIHVuaXF1ZVBhdGllbnRzOiBuZXcgU2V0KFxuICAgICAgICBhbGxPcmRlcnMubWFwKChvKSA9PiB7XG4gICAgICAgICAgaWYgKHR5cGVvZiBvLnBhdGllbnRJZCA9PT0gJ3N0cmluZycpIHJldHVybiBvLnBhdGllbnRJZDtcbiAgICAgICAgICBpZiAoby5wYXRpZW50SWQ/Ll9pZCkgcmV0dXJuIG8ucGF0aWVudElkLl9pZDtcbiAgICAgICAgICBpZiAoby5wYXRpZW50SWQ/LmlkKSByZXR1cm4gby5wYXRpZW50SWQuaWQ7XG4gICAgICAgICAgcmV0dXJuICcnO1xuICAgICAgICB9KSxcbiAgICAgICkuc2l6ZSxcbiAgICB9O1xuICB9LCBbYWxsT3JkZXJzLCB0b2RheU9yZGVyc10pO1xuXG4gIC8vIE9yZGVycyBieSBzdGF0dXMgY2hhcnQgZGF0YVxuICBjb25zdCBzdGF0dXNEYXRhID0gdXNlTWVtbygoKSA9PiB7XG4gICAgaWYgKCFhbGxPcmRlcnMpIHJldHVybiBbXTtcbiAgICBcbiAgICBjb25zdCBzdGF0dXNDb3VudHM6IFJlY29yZDxzdHJpbmcsIG51bWJlcj4gPSB7fTtcbiAgICBhbGxPcmRlcnMuZm9yRWFjaChvcmRlciA9PiB7XG4gICAgICBzdGF0dXNDb3VudHNbb3JkZXIuc3RhdHVzXSA9IChzdGF0dXNDb3VudHNbb3JkZXIuc3RhdHVzXSB8fCAwKSArIDE7XG4gICAgfSk7XG5cbiAgICByZXR1cm4gT2JqZWN0LmVudHJpZXMoc3RhdHVzQ291bnRzKS5tYXAoKFtzdGF0dXMsIGNvdW50XSkgPT4gKHtcbiAgICAgIG5hbWU6IHN0YXR1cy5yZXBsYWNlKC9fL2csICcgJyksXG4gICAgICB2YWx1ZTogY291bnQsXG4gICAgfSkpO1xuICB9LCBbYWxsT3JkZXJzXSk7XG5cbiAgLy8gVGVzdHMgYnkgY2F0ZWdvcnkgY2hhcnQgZGF0YVxuICBjb25zdCBjYXRlZ29yeURhdGEgPSB1c2VNZW1vKCgpID0+IHtcbiAgICBpZiAoIWFsbE9yZGVycykgcmV0dXJuIFtdO1xuICAgIFxuICAgIGNvbnN0IGNhdGVnb3J5Q291bnRzOiBSZWNvcmQ8c3RyaW5nLCBudW1iZXI+ID0ge307XG4gICAgYWxsT3JkZXJzLmZvckVhY2gob3JkZXIgPT4ge1xuICAgICAgY29uc3Qgb3JkZXJUZXN0cyA9IG9yZGVyLnRlc3RzIHx8IG9yZGVyLm9yZGVyX3Rlc3RzIHx8IFtdO1xuICAgICAgb3JkZXJUZXN0cy5mb3JFYWNoKHRlc3QgPT4ge1xuICAgICAgICAvLyBVc2UgdGVzdCBjb2RlIHByZWZpeCBhcyBjYXRlZ29yeSBhcHByb3hpbWF0aW9uXG4gICAgICAgIGNvbnN0IHRlc3RDb2RlID0gdGVzdC50ZXN0Q29kZSB8fCAnJztcbiAgICAgICAgY29uc3QgY2F0ZWdvcnkgPSB0ZXN0Q29kZS5zdWJzdHJpbmcoMCwgMyk7XG4gICAgICAgIGNhdGVnb3J5Q291bnRzW2NhdGVnb3J5XSA9IChjYXRlZ29yeUNvdW50c1tjYXRlZ29yeV0gfHwgMCkgKyAxO1xuICAgICAgfSk7XG4gICAgfSk7XG5cbiAgICByZXR1cm4gT2JqZWN0LmVudHJpZXMoY2F0ZWdvcnlDb3VudHMpXG4gICAgICAubWFwKChbY2F0ZWdvcnksIGNvdW50XSkgPT4gKHsgbmFtZTogY2F0ZWdvcnksIGNvdW50IH0pKVxuICAgICAgLnNvcnQoKGEsIGIpID0+IGIuY291bnQgLSBhLmNvdW50KVxuICAgICAgLnNsaWNlKDAsIDEwKTtcbiAgfSwgW2FsbE9yZGVyc10pO1xuXG4gIC8vIERhaWx5IHJldmVudWUgdHJlbmQgKGxhc3QgNyBkYXlzKVxuICBjb25zdCByZXZlbnVlRGF0YSA9IHVzZU1lbW8oKCkgPT4ge1xuICAgIGlmICghYWxsT3JkZXJzKSByZXR1cm4gW107XG5cbiAgICBjb25zdCBkYXlzOiBSZWNvcmQ8c3RyaW5nLCBudW1iZXI+ID0ge307XG4gICAgY29uc3Qgbm93ID0gbmV3IERhdGUoKTtcbiAgICBcbiAgICAvLyBJbml0aWFsaXplIGxhc3QgNyBkYXlzXG4gICAgZm9yIChsZXQgaSA9IDY7IGkgPj0gMDsgaS0tKSB7XG4gICAgICBjb25zdCBkYXRlID0gbmV3IERhdGUobm93KTtcbiAgICAgIGRhdGUuc2V0RGF0ZShkYXRlLmdldERhdGUoKSAtIGkpO1xuICAgICAgY29uc3Qga2V5ID0gZGF0ZS50b0xvY2FsZURhdGVTdHJpbmcoJ2VuLVVTJywgeyB3ZWVrZGF5OiAnc2hvcnQnIH0pO1xuICAgICAgZGF5c1trZXldID0gMDtcbiAgICB9XG5cbiAgICAvLyBBZ2dyZWdhdGUgcmV2ZW51ZVxuICAgIGFsbE9yZGVycy5mb3JFYWNoKG9yZGVyID0+IHtcbiAgICAgIGlmIChvcmRlci5wYXltZW50U3RhdHVzICE9PSAncGFpZCcpIHJldHVybjtcbiAgICAgIGNvbnN0IG9yZGVyRGF0ZSA9IG5ldyBEYXRlKG9yZGVyLmNyZWF0ZWRBdCk7XG4gICAgICBjb25zdCBkYXlzRGlmZiA9IE1hdGguZmxvb3IoKG5vdy5nZXRUaW1lKCkgLSBvcmRlckRhdGUuZ2V0VGltZSgpKSAvICgxMDAwICogNjAgKiA2MCAqIDI0KSk7XG4gICAgICBpZiAoZGF5c0RpZmYgPCA3KSB7XG4gICAgICAgIGNvbnN0IGtleSA9IG9yZGVyRGF0ZS50b0xvY2FsZURhdGVTdHJpbmcoJ2VuLVVTJywgeyB3ZWVrZGF5OiAnc2hvcnQnIH0pO1xuICAgICAgICBkYXlzW2tleV0gPSAoZGF5c1trZXldIHx8IDApICsgTnVtYmVyKG9yZGVyLnRvdGFsIHx8IG9yZGVyLnRvdGFsQW1vdW50IHx8IDApO1xuICAgICAgfVxuICAgIH0pO1xuXG4gICAgcmV0dXJuIE9iamVjdC5lbnRyaWVzKGRheXMpLm1hcCgoW2RheSwgcmV2ZW51ZV0pID0+ICh7IGRheSwgcmV2ZW51ZTogcmV2ZW51ZSAvIDEwMDAgfSkpO1xuICB9LCBbYWxsT3JkZXJzXSk7XG5cbiAgaWYgKG9yZGVyc0xvYWRpbmcpIHtcbiAgICByZXR1cm4gKFxuICAgICAgPFJvbGVMYXlvdXQgdGl0bGU9XCJSZXBvcnRzXCIgc3VidGl0bGU9XCJBbmFseXRpY3MgYW5kIGluc2lnaHRzXCIgcm9sZT1cImFkbWluXCIgdXNlck5hbWU9e3Byb2ZpbGU/LmZ1bGxfbmFtZX0+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIganVzdGlmeS1jZW50ZXIgcHktMjBcIj5cbiAgICAgICAgICA8TG9hZGVyMiBjbGFzc05hbWU9XCJ3LTggaC04IGFuaW1hdGUtc3BpbiB0ZXh0LW11dGVkLWZvcmVncm91bmRcIiAvPlxuICAgICAgICA8L2Rpdj5cbiAgICAgIDwvUm9sZUxheW91dD5cbiAgICApO1xuICB9XG5cbiAgcmV0dXJuIChcbiAgICA8Um9sZUxheW91dCBcbiAgICAgIHRpdGxlPVwiUmVwb3J0cyAmIEFuYWx5dGljc1wiIFxuICAgICAgc3VidGl0bGU9XCJCdXNpbmVzcyBpbnNpZ2h0cyBhbmQgcGVyZm9ybWFuY2UgbWV0cmljc1wiXG4gICAgICByb2xlPVwiYWRtaW5cIlxuICAgICAgdXNlck5hbWU9e3Byb2ZpbGU/LmZ1bGxfbmFtZX1cbiAgICA+XG4gICAgICB7LyogQWN0aW9ucyAqL31cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIganVzdGlmeS1iZXR3ZWVuIG1iLTZcIj5cbiAgICAgICAgPFNlbGVjdCB2YWx1ZT17ZGF0ZVJhbmdlfSBvblZhbHVlQ2hhbmdlPXtzZXREYXRlUmFuZ2V9PlxuICAgICAgICAgIDxTZWxlY3RUcmlnZ2VyIGNsYXNzTmFtZT1cInctNDBcIj5cbiAgICAgICAgICAgIDxTZWxlY3RWYWx1ZSAvPlxuICAgICAgICAgIDwvU2VsZWN0VHJpZ2dlcj5cbiAgICAgICAgICA8U2VsZWN0Q29udGVudD5cbiAgICAgICAgICAgIDxTZWxlY3RJdGVtIHZhbHVlPVwidG9kYXlcIj5Ub2RheTwvU2VsZWN0SXRlbT5cbiAgICAgICAgICAgIDxTZWxlY3RJdGVtIHZhbHVlPVwiN2RheXNcIj5MYXN0IDcgRGF5czwvU2VsZWN0SXRlbT5cbiAgICAgICAgICAgIDxTZWxlY3RJdGVtIHZhbHVlPVwiMzBkYXlzXCI+TGFzdCAzMCBEYXlzPC9TZWxlY3RJdGVtPlxuICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCI5MGRheXNcIj5MYXN0IDkwIERheXM8L1NlbGVjdEl0ZW0+XG4gICAgICAgICAgPC9TZWxlY3RDb250ZW50PlxuICAgICAgICA8L1NlbGVjdD5cbiAgICAgICAgPEJ1dHRvbiB2YXJpYW50PVwib3V0bGluZVwiPlxuICAgICAgICAgIDxEb3dubG9hZCBjbGFzc05hbWU9XCJ3LTQgaC00IG1yLTJcIiAvPlxuICAgICAgICAgIEV4cG9ydCBSZXBvcnRcbiAgICAgICAgPC9CdXR0b24+XG4gICAgICA8L2Rpdj5cblxuICAgICAgey8qIEtleSBNZXRyaWNzICovfVxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJncmlkIGdyaWQtY29scy0xIG1kOmdyaWQtY29scy00IGdhcC00IG1iLTZcIj5cbiAgICAgICAgPENhcmQ+XG4gICAgICAgICAgPENhcmRDb250ZW50IGNsYXNzTmFtZT1cInB0LTZcIj5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIganVzdGlmeS1iZXR3ZWVuXCI+XG4gICAgICAgICAgICAgIDxkaXY+XG4gICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1zbSB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5Ub2RheSdzIFJldmVudWU8L3A+XG4gICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC0yeGwgZm9udC1ib2xkXCI+TGUgeyhtZXRyaWNzPy50b2RheVJldmVudWUgfHwgMCkudG9Mb2NhbGVTdHJpbmcoKX08L3A+XG4gICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInAtMyByb3VuZGVkLWZ1bGwgYmctc3RhdHVzLW5vcm1hbC8xMFwiPlxuICAgICAgICAgICAgICAgIDxEb2xsYXJTaWduIGNsYXNzTmFtZT1cInctNiBoLTYgdGV4dC1zdGF0dXMtbm9ybWFsXCIgLz5cbiAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICA8L0NhcmRDb250ZW50PlxuICAgICAgICA8L0NhcmQ+XG4gICAgICAgIDxDYXJkPlxuICAgICAgICAgIDxDYXJkQ29udGVudCBjbGFzc05hbWU9XCJwdC02XCI+XG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGp1c3RpZnktYmV0d2VlblwiPlxuICAgICAgICAgICAgICA8ZGl2PlxuICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc20gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+VG90YWwgT3JkZXJzPC9wPlxuICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtMnhsIGZvbnQtYm9sZFwiPnttZXRyaWNzPy50b3RhbE9yZGVycyB8fCAwfTwvcD5cbiAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwicC0zIHJvdW5kZWQtZnVsbCBiZy1wcmltYXJ5LzEwXCI+XG4gICAgICAgICAgICAgICAgPFRyZW5kaW5nVXAgY2xhc3NOYW1lPVwidy02IGgtNiB0ZXh0LXByaW1hcnlcIiAvPlxuICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDwvQ2FyZENvbnRlbnQ+XG4gICAgICAgIDwvQ2FyZD5cbiAgICAgICAgPENhcmQ+XG4gICAgICAgICAgPENhcmRDb250ZW50IGNsYXNzTmFtZT1cInB0LTZcIj5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIganVzdGlmeS1iZXR3ZWVuXCI+XG4gICAgICAgICAgICAgIDxkaXY+XG4gICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1zbSB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5Ub3RhbCBUZXN0czwvcD5cbiAgICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LTJ4bCBmb250LWJvbGRcIj57bWV0cmljcz8udG90YWxUZXN0cyB8fCAwfTwvcD5cbiAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwicC0zIHJvdW5kZWQtZnVsbCBiZy1zdGF0dXMtd2FybmluZy8xMFwiPlxuICAgICAgICAgICAgICAgIDxUZXN0VHViZSBjbGFzc05hbWU9XCJ3LTYgaC02IHRleHQtc3RhdHVzLXdhcm5pbmdcIiAvPlxuICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDwvQ2FyZENvbnRlbnQ+XG4gICAgICAgIDwvQ2FyZD5cbiAgICAgICAgPENhcmQ+XG4gICAgICAgICAgPENhcmRDb250ZW50IGNsYXNzTmFtZT1cInB0LTZcIj5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIganVzdGlmeS1iZXR3ZWVuXCI+XG4gICAgICAgICAgICAgIDxkaXY+XG4gICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1zbSB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5VbmlxdWUgUGF0aWVudHM8L3A+XG4gICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC0yeGwgZm9udC1ib2xkXCI+e21ldHJpY3M/LnVuaXF1ZVBhdGllbnRzIHx8IDB9PC9wPlxuICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJwLTMgcm91bmRlZC1mdWxsIGJnLW11dGVkXCI+XG4gICAgICAgICAgICAgICAgPFVzZXJzIGNsYXNzTmFtZT1cInctNiBoLTYgdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCIgLz5cbiAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICA8L0NhcmRDb250ZW50PlxuICAgICAgICA8L0NhcmQ+XG4gICAgICA8L2Rpdj5cblxuICAgICAgey8qIENoYXJ0cyBSb3cgKi99XG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImdyaWQgZ3JpZC1jb2xzLTEgbGc6Z3JpZC1jb2xzLTIgZ2FwLTYgbWItNlwiPlxuICAgICAgICB7LyogUmV2ZW51ZSBUcmVuZCAqL31cbiAgICAgICAgPENhcmQ+XG4gICAgICAgICAgPENhcmRIZWFkZXI+XG4gICAgICAgICAgICA8Q2FyZFRpdGxlIGNsYXNzTmFtZT1cInRleHQtbGdcIj5SZXZlbnVlIFRyZW5kIChMYXN0IDcgRGF5cyk8L0NhcmRUaXRsZT5cbiAgICAgICAgICA8L0NhcmRIZWFkZXI+XG4gICAgICAgICAgPENhcmRDb250ZW50PlxuICAgICAgICAgICAgPFJlc3BvbnNpdmVDb250YWluZXIgd2lkdGg9XCIxMDAlXCIgaGVpZ2h0PXsyNTB9PlxuICAgICAgICAgICAgICA8TGluZUNoYXJ0IGRhdGE9e3JldmVudWVEYXRhfT5cbiAgICAgICAgICAgICAgICA8Q2FydGVzaWFuR3JpZCBzdHJva2VEYXNoYXJyYXk9XCIzIDNcIiBjbGFzc05hbWU9XCJzdHJva2UtbXV0ZWRcIiAvPlxuICAgICAgICAgICAgICAgIDxYQXhpcyBkYXRhS2V5PVwiZGF5XCIgY2xhc3NOYW1lPVwidGV4dC14c1wiIC8+XG4gICAgICAgICAgICAgICAgPFlBeGlzIHRpY2tGb3JtYXR0ZXI9eyh2KSA9PiBgTGUgJHt2fUtgfSBjbGFzc05hbWU9XCJ0ZXh0LXhzXCIgLz5cbiAgICAgICAgICAgICAgICA8VG9vbHRpcCBcbiAgICAgICAgICAgICAgICAgIGZvcm1hdHRlcj17KHZhbHVlOiBudW1iZXIpID0+IFtgTGUgJHsodmFsdWUgKiAxMDAwKS50b0xvY2FsZVN0cmluZygpfWAsICdSZXZlbnVlJ119XG4gICAgICAgICAgICAgICAgICBjb250ZW50U3R5bGU9e3sgYmFja2dyb3VuZENvbG9yOiAnaHNsKHZhcigtLWNhcmQpKScsIGJvcmRlcjogJzFweCBzb2xpZCBoc2wodmFyKC0tYm9yZGVyKSknIH19XG4gICAgICAgICAgICAgICAgLz5cbiAgICAgICAgICAgICAgICA8TGluZSBcbiAgICAgICAgICAgICAgICAgIHR5cGU9XCJtb25vdG9uZVwiIFxuICAgICAgICAgICAgICAgICAgZGF0YUtleT1cInJldmVudWVcIiBcbiAgICAgICAgICAgICAgICAgIHN0cm9rZT1cImhzbCh2YXIoLS1wcmltYXJ5KSlcIiBcbiAgICAgICAgICAgICAgICAgIHN0cm9rZVdpZHRoPXsyfVxuICAgICAgICAgICAgICAgICAgZG90PXt7IGZpbGw6ICdoc2wodmFyKC0tcHJpbWFyeSkpJyB9fVxuICAgICAgICAgICAgICAgIC8+XG4gICAgICAgICAgICAgIDwvTGluZUNoYXJ0PlxuICAgICAgICAgICAgPC9SZXNwb25zaXZlQ29udGFpbmVyPlxuICAgICAgICAgIDwvQ2FyZENvbnRlbnQ+XG4gICAgICAgIDwvQ2FyZD5cblxuICAgICAgICB7LyogT3JkZXIgU3RhdHVzIERpc3RyaWJ1dGlvbiAqL31cbiAgICAgICAgPENhcmQ+XG4gICAgICAgICAgPENhcmRIZWFkZXI+XG4gICAgICAgICAgICA8Q2FyZFRpdGxlIGNsYXNzTmFtZT1cInRleHQtbGdcIj5PcmRlciBTdGF0dXMgRGlzdHJpYnV0aW9uPC9DYXJkVGl0bGU+XG4gICAgICAgICAgPC9DYXJkSGVhZGVyPlxuICAgICAgICAgIDxDYXJkQ29udGVudD5cbiAgICAgICAgICAgIDxSZXNwb25zaXZlQ29udGFpbmVyIHdpZHRoPVwiMTAwJVwiIGhlaWdodD17MjUwfT5cbiAgICAgICAgICAgICAgPFBpZUNoYXJ0PlxuICAgICAgICAgICAgICAgIDxQaWVcbiAgICAgICAgICAgICAgICAgIGRhdGE9e3N0YXR1c0RhdGF9XG4gICAgICAgICAgICAgICAgICBjeD1cIjUwJVwiXG4gICAgICAgICAgICAgICAgICBjeT1cIjUwJVwiXG4gICAgICAgICAgICAgICAgICBpbm5lclJhZGl1cz17NjB9XG4gICAgICAgICAgICAgICAgICBvdXRlclJhZGl1cz17MTAwfVxuICAgICAgICAgICAgICAgICAgcGFkZGluZ0FuZ2xlPXsyfVxuICAgICAgICAgICAgICAgICAgZGF0YUtleT1cInZhbHVlXCJcbiAgICAgICAgICAgICAgICAgIGxhYmVsPXsoeyBuYW1lLCBwZXJjZW50IH0pID0+IGAke25hbWV9ICgkeyhwZXJjZW50ICogMTAwKS50b0ZpeGVkKDApfSUpYH1cbiAgICAgICAgICAgICAgICA+XG4gICAgICAgICAgICAgICAgICB7c3RhdHVzRGF0YS5tYXAoKF8sIGluZGV4KSA9PiAoXG4gICAgICAgICAgICAgICAgICAgIDxDZWxsIGtleT17YGNlbGwtJHtpbmRleH1gfSBmaWxsPXtDT0xPUlNbaW5kZXggJSBDT0xPUlMubGVuZ3RoXX0gLz5cbiAgICAgICAgICAgICAgICAgICkpfVxuICAgICAgICAgICAgICAgIDwvUGllPlxuICAgICAgICAgICAgICAgIDxUb29sdGlwIC8+XG4gICAgICAgICAgICAgIDwvUGllQ2hhcnQ+XG4gICAgICAgICAgICA8L1Jlc3BvbnNpdmVDb250YWluZXI+XG4gICAgICAgICAgPC9DYXJkQ29udGVudD5cbiAgICAgICAgPC9DYXJkPlxuICAgICAgPC9kaXY+XG5cbiAgICAgIHsvKiBUb3AgVGVzdHMgKi99XG4gICAgICA8Q2FyZD5cbiAgICAgICAgPENhcmRIZWFkZXI+XG4gICAgICAgICAgPENhcmRUaXRsZSBjbGFzc05hbWU9XCJ0ZXh0LWxnXCI+VG9wIFRlc3RzIGJ5IFZvbHVtZTwvQ2FyZFRpdGxlPlxuICAgICAgICA8L0NhcmRIZWFkZXI+XG4gICAgICAgIDxDYXJkQ29udGVudD5cbiAgICAgICAgICA8UmVzcG9uc2l2ZUNvbnRhaW5lciB3aWR0aD1cIjEwMCVcIiBoZWlnaHQ9ezMwMH0+XG4gICAgICAgICAgICA8QmFyQ2hhcnQgZGF0YT17Y2F0ZWdvcnlEYXRhfSBsYXlvdXQ9XCJ2ZXJ0aWNhbFwiPlxuICAgICAgICAgICAgICA8Q2FydGVzaWFuR3JpZCBzdHJva2VEYXNoYXJyYXk9XCIzIDNcIiBjbGFzc05hbWU9XCJzdHJva2UtbXV0ZWRcIiAvPlxuICAgICAgICAgICAgICA8WEF4aXMgdHlwZT1cIm51bWJlclwiIC8+XG4gICAgICAgICAgICAgIDxZQXhpcyBkYXRhS2V5PVwibmFtZVwiIHR5cGU9XCJjYXRlZ29yeVwiIHdpZHRoPXs2MH0gY2xhc3NOYW1lPVwidGV4dC14c1wiIC8+XG4gICAgICAgICAgICAgIDxUb29sdGlwIFxuICAgICAgICAgICAgICAgIGNvbnRlbnRTdHlsZT17eyBiYWNrZ3JvdW5kQ29sb3I6ICdoc2wodmFyKC0tY2FyZCkpJywgYm9yZGVyOiAnMXB4IHNvbGlkIGhzbCh2YXIoLS1ib3JkZXIpKScgfX1cbiAgICAgICAgICAgICAgLz5cbiAgICAgICAgICAgICAgPEJhciBkYXRhS2V5PVwiY291bnRcIiBmaWxsPVwiaHNsKHZhcigtLXByaW1hcnkpKVwiIHJhZGl1cz17WzAsIDQsIDQsIDBdfSAvPlxuICAgICAgICAgICAgPC9CYXJDaGFydD5cbiAgICAgICAgICA8L1Jlc3BvbnNpdmVDb250YWluZXI+XG4gICAgICAgIDwvQ2FyZENvbnRlbnQ+XG4gICAgICA8L0NhcmQ+XG4gICAgPC9Sb2xlTGF5b3V0PlxuICApO1xufVxuIl0sIm5hbWVzIjpbIlJvbGVMYXlvdXQiLCJ1c2VBdXRoIiwidXNlT3JkZXJzIiwidXNlVG9kYXlPcmRlcnMiLCJ1c2VNYWNoaW5lcyIsIkNhcmQiLCJDYXJkQ29udGVudCIsIkNhcmRIZWFkZXIiLCJDYXJkVGl0bGUiLCJCdXR0b24iLCJTZWxlY3QiLCJTZWxlY3RDb250ZW50IiwiU2VsZWN0SXRlbSIsIlNlbGVjdFRyaWdnZXIiLCJTZWxlY3RWYWx1ZSIsIkJhckNoYXJ0IiwiQmFyIiwiWEF4aXMiLCJZQXhpcyIsIkNhcnRlc2lhbkdyaWQiLCJUb29sdGlwIiwiUmVzcG9uc2l2ZUNvbnRhaW5lciIsIlBpZUNoYXJ0IiwiUGllIiwiQ2VsbCIsIkxpbmVDaGFydCIsIkxpbmUiLCJEb3dubG9hZCIsIlRyZW5kaW5nVXAiLCJVc2VycyIsIkRvbGxhclNpZ24iLCJUZXN0VHViZSIsIkxvYWRlcjIiLCJ1c2VTdGF0ZSIsInVzZU1lbW8iLCJDT0xPUlMiLCJSZXBvcnRzIiwicHJvZmlsZSIsImRhdGEiLCJhbGxPcmRlcnMiLCJpc0xvYWRpbmciLCJvcmRlcnNMb2FkaW5nIiwidG9kYXlPcmRlcnMiLCJtYWNoaW5lcyIsImRhdGVSYW5nZSIsInNldERhdGVSYW5nZSIsIm1ldHJpY3MiLCJ0b2RheSIsIkRhdGUiLCJzZXRIb3VycyIsInBhaWRPcmRlcnMiLCJmaWx0ZXIiLCJvIiwicGF5bWVudFN0YXR1cyIsInRvZGF5UmV2ZW51ZSIsInJlZHVjZSIsInN1bSIsIk51bWJlciIsInRvdGFsIiwidG90YWxBbW91bnQiLCJ0b3RhbFJldmVudWUiLCJhdmdPcmRlclZhbHVlIiwibGVuZ3RoIiwidG90YWxUZXN0cyIsIm9yZGVyX3Rlc3RzIiwidGVzdHMiLCJ0b3RhbE9yZGVycyIsImNvbXBsZXRlZE9yZGVycyIsInN0YXR1cyIsInVuaXF1ZVBhdGllbnRzIiwiU2V0IiwibWFwIiwicGF0aWVudElkIiwiX2lkIiwiaWQiLCJzaXplIiwic3RhdHVzRGF0YSIsInN0YXR1c0NvdW50cyIsImZvckVhY2giLCJvcmRlciIsIk9iamVjdCIsImVudHJpZXMiLCJjb3VudCIsIm5hbWUiLCJyZXBsYWNlIiwidmFsdWUiLCJjYXRlZ29yeURhdGEiLCJjYXRlZ29yeUNvdW50cyIsIm9yZGVyVGVzdHMiLCJ0ZXN0IiwidGVzdENvZGUiLCJjYXRlZ29yeSIsInN1YnN0cmluZyIsInNvcnQiLCJhIiwiYiIsInNsaWNlIiwicmV2ZW51ZURhdGEiLCJkYXlzIiwibm93IiwiaSIsImRhdGUiLCJzZXREYXRlIiwiZ2V0RGF0ZSIsImtleSIsInRvTG9jYWxlRGF0ZVN0cmluZyIsIndlZWtkYXkiLCJvcmRlckRhdGUiLCJjcmVhdGVkQXQiLCJkYXlzRGlmZiIsIk1hdGgiLCJmbG9vciIsImdldFRpbWUiLCJkYXkiLCJyZXZlbnVlIiwidGl0bGUiLCJzdWJ0aXRsZSIsInJvbGUiLCJ1c2VyTmFtZSIsImZ1bGxfbmFtZSIsImRpdiIsImNsYXNzTmFtZSIsIm9uVmFsdWVDaGFuZ2UiLCJ2YXJpYW50IiwicCIsInRvTG9jYWxlU3RyaW5nIiwid2lkdGgiLCJoZWlnaHQiLCJzdHJva2VEYXNoYXJyYXkiLCJkYXRhS2V5IiwidGlja0Zvcm1hdHRlciIsInYiLCJmb3JtYXR0ZXIiLCJjb250ZW50U3R5bGUiLCJiYWNrZ3JvdW5kQ29sb3IiLCJib3JkZXIiLCJ0eXBlIiwic3Ryb2tlIiwic3Ryb2tlV2lkdGgiLCJkb3QiLCJmaWxsIiwiY3giLCJjeSIsImlubmVyUmFkaXVzIiwib3V0ZXJSYWRpdXMiLCJwYWRkaW5nQW5nbGUiLCJsYWJlbCIsInBlcmNlbnQiLCJ0b0ZpeGVkIiwiXyIsImluZGV4IiwibGF5b3V0IiwicmFkaXVzIl0sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7QUFBQSxTQUFTQSxVQUFVLFFBQVEsaUNBQWlDO0FBQzVELFNBQVNDLE9BQU8sUUFBUSx3QkFBd0I7QUFDaEQsU0FBU0MsU0FBUyxFQUFFQyxjQUFjLFFBQVEsb0JBQW9CO0FBQzlELFNBQVNDLFdBQVcsUUFBUSxzQkFBc0I7QUFDbEQsU0FBU0MsSUFBSSxFQUFFQyxXQUFX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

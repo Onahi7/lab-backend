@@ -19,8 +19,17 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "seed:admin": "ts-node -r tsconfig-paths/register src/database/seed-admin.ts",
-    "seed:tests": "ts-node -r tsconfig-paths/register src/database/seed-test-catalog.ts",
-    "seed:machines": "ts-node -r tsconfig-paths/register src/database/seed-machines.ts"
+    "seed:catalog": "ts-node -r tsconfig-paths/register src/database/seed-test-catalog.ts",
+    "seed:panels": "ts-node -r tsconfig-paths/register src/database/seed-test-panels.ts",
+    "seed:machines": "ts-node -r tsconfig-paths/register src/database/seed-machines.ts",
+    "adjust:catalog": "ts-node -r tsconfig-paths/register src/database/adjust-catalog-from-panels.ts",
+    "seed:all": "npm run seed:catalog && npm run seed:panels && npm run adjust:catalog",
+    "list:tests": "ts-node -r tsconfig-paths/register src/database/list-all-tests.ts",
+    "check:ranges": "ts-node -r tsconfig-paths/register src/database/check-test-ranges.ts",
+    "check:tests": "node check-test-parameters.js",
+    "check:tests:json": "node check-test-parameters-json.js",
+    "sample:fbc:api": "node fbc-api-sample.js",
+    "sample:fbc:pdf": "node fbc-report-to-pdf.js"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -53,6 +62,7 @@
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",
+    "@types/multer": "^2.0.0",
     "@types/node": "^22.10.7",
     "@types/passport-jwt": "^4.0.1",
     "@types/passport-local": "^1.0.38",

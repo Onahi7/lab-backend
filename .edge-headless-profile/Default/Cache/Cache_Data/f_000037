@@ -1,0 +1,1505 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/pages/admin/ReportTemplateEditor.tsx");import.meta.env = {"BASE_URL": "/", "DEV": true, "MODE": "development", "PROD": false, "SSR": false, "VITE_API_URL": "http://localhost:3000"};import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+
+let prevRefreshReg;
+let prevRefreshSig;
+
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react-swc can't detect preamble. Something is wrong."
+    );
+  }
+
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+
+import __vite__cjsImport2_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=27cfabb6"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime["jsxDEV"];
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=27cfabb6"; const useState = __vite__cjsImport3_react["useState"]; const useEffect = __vite__cjsImport3_react["useEffect"];
+import { RoleLayout } from "/src/components/layout/RoleLayout.tsx";
+import { useAuth } from "/src/context/AuthContext.tsx";
+import { useDefaultTemplate, useUpdateTemplate, useUploadLogo } from "/src/hooks/useReportTemplates.ts";
+import { Button } from "/src/components/ui/button.tsx";
+import { Input } from "/src/components/ui/input.tsx";
+import { Label } from "/src/components/ui/label.tsx";
+import { Textarea } from "/src/components/ui/textarea.tsx";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "/src/components/ui/select.tsx";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "/src/components/ui/tabs.tsx";
+import { toast } from "/node_modules/.vite/deps/sonner.js?v=27cfabb6";
+import { Save, Loader2, Eye } from "/node_modules/.vite/deps/lucide-react.js?v=27cfabb6";
+export default function ReportTemplateEditor() {
+    _s();
+    const { profile } = useAuth();
+    const { data: template, isLoading } = useDefaultTemplate();
+    const updateTemplate = useUpdateTemplate();
+    const uploadLogo = useUploadLogo();
+    const [formData, setFormData] = useState(null);
+    const [logoFile, setLogoFile] = useState(null);
+    const [logoPreview, setLogoPreview] = useState('');
+    useEffect(()=>{
+        if (template) {
+            setFormData(template);
+            if (template.header?.logoUrl) {
+                setLogoPreview(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}${template.header.logoUrl}`);
+            }
+        }
+    }, [
+        template
+    ]);
+    const handleLogoChange = (e)=>{
+        const file = e.target.files?.[0];
+        if (file) {
+            setLogoFile(file);
+            const reader = new FileReader();
+            reader.onloadend = ()=>{
+                setLogoPreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+    const handleSave = async ()=>{
+        if (!formData) return;
+        try {
+            let logoUrl = formData.header?.logoUrl;
+            // Upload logo if changed
+            if (logoFile) {
+                const uploadResult = await uploadLogo.mutateAsync(logoFile);
+                logoUrl = uploadResult.url;
+            }
+            // Update template
+            await updateTemplate.mutateAsync({
+                id: formData._id || formData.id,
+                data: {
+                    ...formData,
+                    header: {
+                        ...formData.header,
+                        logoUrl
+                    }
+                }
+            });
+            toast.success('Template saved successfully');
+        } catch (error) {
+            toast.error('Failed to save template');
+        }
+    };
+    const updateField = (section, field, value)=>{
+        setFormData((prev)=>({
+                ...prev,
+                [section]: {
+                    ...prev[section],
+                    [field]: value
+                }
+            }));
+    };
+    if (isLoading || !formData) {
+        return /*#__PURE__*/ _jsxDEV(RoleLayout, {
+            title: "Report Template",
+            subtitle: "Loading...",
+            role: "admin",
+            userName: profile?.full_name,
+            children: /*#__PURE__*/ _jsxDEV("div", {
+                className: "flex items-center justify-center py-12",
+                children: /*#__PURE__*/ _jsxDEV(Loader2, {
+                    className: "w-8 h-8 animate-spin"
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                    lineNumber: 93,
+                    columnNumber: 11
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                lineNumber: 92,
+                columnNumber: 9
+            }, this)
+        }, void 0, false, {
+            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+            lineNumber: 91,
+            columnNumber: 7
+        }, this);
+    }
+    return /*#__PURE__*/ _jsxDEV(RoleLayout, {
+        title: "Report Template Editor",
+        subtitle: "Customize lab report appearance",
+        role: "admin",
+        userName: profile?.full_name,
+        children: /*#__PURE__*/ _jsxDEV("div", {
+            className: "grid grid-cols-1 lg:grid-cols-3 gap-6",
+            children: [
+                /*#__PURE__*/ _jsxDEV("div", {
+                    className: "lg:col-span-2",
+                    children: /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg p-6",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(Tabs, {
+                                defaultValue: "header",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(TabsList, {
+                                        className: "grid w-full grid-cols-5",
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV(TabsTrigger, {
+                                                value: "header",
+                                                children: "Header"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 112,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(TabsTrigger, {
+                                                value: "patient",
+                                                children: "Patient"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 113,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(TabsTrigger, {
+                                                value: "results",
+                                                children: "Results"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 114,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(TabsTrigger, {
+                                                value: "footer",
+                                                children: "Footer"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 115,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(TabsTrigger, {
+                                                value: "paper",
+                                                children: "Paper"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 116,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                        lineNumber: 111,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(TabsContent, {
+                                        value: "header",
+                                        className: "space-y-4",
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                                        children: "Lab Logo"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 122,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                        className: "mt-2 flex items-center gap-4",
+                                                        children: [
+                                                            logoPreview && /*#__PURE__*/ _jsxDEV("img", {
+                                                                src: logoPreview,
+                                                                alt: "Logo",
+                                                                className: "h-20 w-auto border rounded"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 125,
+                                                                columnNumber: 23
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV(Input, {
+                                                                        type: "file",
+                                                                        accept: "image/*",
+                                                                        onChange: handleLogoChange,
+                                                                        className: "max-w-xs"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                        lineNumber: 128,
+                                                                        columnNumber: 23
+                                                                    }, this),
+                                                                    /*#__PURE__*/ _jsxDEV("p", {
+                                                                        className: "text-xs text-muted-foreground mt-1",
+                                                                        children: "Recommended: 120x80px, PNG or JPG"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                        lineNumber: 134,
+                                                                        columnNumber: 23
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 127,
+                                                                columnNumber: 21
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 123,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 121,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                                        children: "Lab Name"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 142,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV(Input, {
+                                                        value: formData.header?.labName || '',
+                                                        onChange: (e)=>updateField('header', 'labName', e.target.value)
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 143,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 141,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                                        children: "Motto/Tagline"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 150,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV(Input, {
+                                                        value: formData.header?.motto || '',
+                                                        onChange: (e)=>updateField('header', 'motto', e.target.value),
+                                                        placeholder: "Motto: Automated Precision..."
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 151,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 149,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                                        children: "Address"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 159,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV(Textarea, {
+                                                        value: formData.header?.address || '',
+                                                        onChange: (e)=>updateField('header', 'address', e.target.value),
+                                                        rows: 2
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 160,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 158,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                className: "grid grid-cols-2 gap-4",
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV(Label, {
+                                                                children: "Phone"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 169,
+                                                                columnNumber: 21
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV(Input, {
+                                                                value: formData.header?.phone || '',
+                                                                onChange: (e)=>updateField('header', 'phone', e.target.value)
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 170,
+                                                                columnNumber: 21
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 168,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV(Label, {
+                                                                children: "Email"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 176,
+                                                                columnNumber: 21
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV(Input, {
+                                                                value: formData.header?.email || '',
+                                                                onChange: (e)=>updateField('header', 'email', e.target.value)
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 177,
+                                                                columnNumber: 21
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 175,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 167,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                                        children: "Website"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 185,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV(Input, {
+                                                        value: formData.header?.website || '',
+                                                        onChange: (e)=>updateField('header', 'website', e.target.value)
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 186,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 184,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                                        children: "Header Border Color"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 193,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                        className: "flex gap-2",
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV(Input, {
+                                                                type: "color",
+                                                                value: formData.header?.headerBorderColor || '#1e40af',
+                                                                onChange: (e)=>updateField('header', 'headerBorderColor', e.target.value),
+                                                                className: "w-20"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 195,
+                                                                columnNumber: 21
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV(Input, {
+                                                                value: formData.header?.headerBorderColor || '#1e40af',
+                                                                onChange: (e)=>updateField('header', 'headerBorderColor', e.target.value),
+                                                                placeholder: "#1e40af"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 201,
+                                                                columnNumber: 21
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 194,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 192,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                        lineNumber: 120,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(TabsContent, {
+                                        value: "patient",
+                                        className: "space-y-4",
+                                        children: /*#__PURE__*/ _jsxDEV("div", {
+                                            className: "space-y-2",
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("label", {
+                                                    className: "flex items-center gap-2",
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV("input", {
+                                                            type: "checkbox",
+                                                            checked: formData.patientSection?.showDoctor || false,
+                                                            onChange: (e)=>updateField('patientSection', 'showDoctor', e.target.checked)
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                            lineNumber: 214,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("span", {
+                                                            children: "Show Doctor Field"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                            lineNumber: 219,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                    lineNumber: 213,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("label", {
+                                                    className: "flex items-center gap-2",
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV("input", {
+                                                            type: "checkbox",
+                                                            checked: formData.patientSection?.showCopiesTo || false,
+                                                            onChange: (e)=>updateField('patientSection', 'showCopiesTo', e.target.checked)
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                            lineNumber: 222,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("span", {
+                                                            children: "Show Copies To Field"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                            lineNumber: 227,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                    lineNumber: 221,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("label", {
+                                                    className: "flex items-center gap-2",
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV("input", {
+                                                            type: "checkbox",
+                                                            checked: formData.patientSection?.showCollectionDate || false,
+                                                            onChange: (e)=>updateField('patientSection', 'showCollectionDate', e.target.checked)
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                            lineNumber: 230,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("span", {
+                                                            children: "Show Collection Date"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                            lineNumber: 235,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                    lineNumber: 229,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("label", {
+                                                    className: "flex items-center gap-2",
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV("input", {
+                                                            type: "checkbox",
+                                                            checked: formData.patientSection?.showReceivedDate || false,
+                                                            onChange: (e)=>updateField('patientSection', 'showReceivedDate', e.target.checked)
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                            lineNumber: 238,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("span", {
+                                                            children: "Show Received Date"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                            lineNumber: 243,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                    lineNumber: 237,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("label", {
+                                                    className: "flex items-center gap-2",
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV("input", {
+                                                            type: "checkbox",
+                                                            checked: formData.patientSection?.showReportedDate || false,
+                                                            onChange: (e)=>updateField('patientSection', 'showReportedDate', e.target.checked)
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                            lineNumber: 246,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("span", {
+                                                            children: "Show Reported Date"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                            lineNumber: 251,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                    lineNumber: 245,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("label", {
+                                                    className: "flex items-center gap-2",
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV("input", {
+                                                            type: "checkbox",
+                                                            checked: formData.patientSection?.showPrintedDate || false,
+                                                            onChange: (e)=>updateField('patientSection', 'showPrintedDate', e.target.checked)
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                            lineNumber: 254,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("span", {
+                                                            children: "Show Printed Date"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                            lineNumber: 259,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                    lineNumber: 253,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                            lineNumber: 212,
+                                            columnNumber: 17
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                        lineNumber: 211,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(TabsContent, {
+                                        value: "results",
+                                        className: "space-y-4",
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                                        children: "Category Header Color"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 267,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                        className: "flex gap-2",
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV(Input, {
+                                                                type: "color",
+                                                                value: formData.resultsSection?.categoryHeaderColor || '#dbeafe',
+                                                                onChange: (e)=>updateField('resultsSection', 'categoryHeaderColor', e.target.value),
+                                                                className: "w-20"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 269,
+                                                                columnNumber: 21
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV(Input, {
+                                                                value: formData.resultsSection?.categoryHeaderColor || '#dbeafe',
+                                                                onChange: (e)=>updateField('resultsSection', 'categoryHeaderColor', e.target.value)
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 275,
+                                                                columnNumber: 21
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 268,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 266,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                                        children: "Abnormal Value Color"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 283,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                        className: "flex gap-2",
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV(Input, {
+                                                                type: "color",
+                                                                value: formData.resultsSection?.abnormalColor || '#ef4444',
+                                                                onChange: (e)=>updateField('resultsSection', 'abnormalColor', e.target.value),
+                                                                className: "w-20"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 285,
+                                                                columnNumber: 21
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV(Input, {
+                                                                value: formData.resultsSection?.abnormalColor || '#ef4444',
+                                                                onChange: (e)=>updateField('resultsSection', 'abnormalColor', e.target.value)
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 291,
+                                                                columnNumber: 21
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 284,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 282,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                        lineNumber: 265,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(TabsContent, {
+                                        value: "footer",
+                                        className: "space-y-4",
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                                        children: "Disclaimer Text"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 302,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV(Textarea, {
+                                                        value: formData.footer?.disclaimerText || '',
+                                                        onChange: (e)=>updateField('footer', 'disclaimerText', e.target.value),
+                                                        rows: 3
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 303,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 301,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                                        children: "Footer Text"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 311,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV(Input, {
+                                                        value: formData.footer?.footerText || '',
+                                                        onChange: (e)=>updateField('footer', 'footerText', e.target.value),
+                                                        placeholder: "OPEN 24/7 | ONSITE & ONLINE ACCESS"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 312,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 310,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                className: "grid grid-cols-2 gap-4",
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV(Label, {
+                                                                children: "Wave Color 1"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 321,
+                                                                columnNumber: 21
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV(Input, {
+                                                                type: "color",
+                                                                value: formData.footer?.waveColor1 || '#1e40af',
+                                                                onChange: (e)=>updateField('footer', 'waveColor1', e.target.value)
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 322,
+                                                                columnNumber: 21
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 320,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV(Label, {
+                                                                children: "Wave Color 2"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 329,
+                                                                columnNumber: 21
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV(Input, {
+                                                                type: "color",
+                                                                value: formData.footer?.waveColor2 || '#10b981',
+                                                                onChange: (e)=>updateField('footer', 'waveColor2', e.target.value)
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 330,
+                                                                columnNumber: 21
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 328,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 319,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                className: "space-y-2",
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV("label", {
+                                                        className: "flex items-center gap-2",
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV("input", {
+                                                                type: "checkbox",
+                                                                checked: formData.footer?.showWaveDesign || false,
+                                                                onChange: (e)=>updateField('footer', 'showWaveDesign', e.target.checked)
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 340,
+                                                                columnNumber: 21
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("span", {
+                                                                children: "Show Wave Design"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 345,
+                                                                columnNumber: 21
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 339,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("label", {
+                                                        className: "flex items-center gap-2",
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV("input", {
+                                                                type: "checkbox",
+                                                                checked: formData.footer?.showVerification || false,
+                                                                onChange: (e)=>updateField('footer', 'showVerification', e.target.checked)
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 348,
+                                                                columnNumber: 21
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("span", {
+                                                                children: "Show Verification Section"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 353,
+                                                                columnNumber: 21
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 347,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("label", {
+                                                        className: "flex items-center gap-2",
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV("input", {
+                                                                type: "checkbox",
+                                                                checked: formData.footer?.showStamp || false,
+                                                                onChange: (e)=>updateField('footer', 'showStamp', e.target.checked)
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 356,
+                                                                columnNumber: 21
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("span", {
+                                                                children: "Show Stamp Placeholder"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 361,
+                                                                columnNumber: 21
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 355,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 338,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                        lineNumber: 300,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(TabsContent, {
+                                        value: "paper",
+                                        className: "space-y-4",
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                                        children: "Paper Size"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 369,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV(Select, {
+                                                        value: formData.paperSize,
+                                                        onValueChange: (value)=>setFormData({
+                                                                ...formData,
+                                                                paperSize: value
+                                                            }),
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV(SelectTrigger, {
+                                                                children: /*#__PURE__*/ _jsxDEV(SelectValue, {}, void 0, false, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                    lineNumber: 375,
+                                                                    columnNumber: 23
+                                                                }, this)
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 374,
+                                                                columnNumber: 21
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV(SelectContent, {
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                                        value: "A4",
+                                                                        children: "A4 (210 x 297 mm)"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                        lineNumber: 378,
+                                                                        columnNumber: 23
+                                                                    }, this),
+                                                                    /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                                        value: "LETTER",
+                                                                        children: "Letter (8.5 x 11 in)"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                        lineNumber: 379,
+                                                                        columnNumber: 23
+                                                                    }, this),
+                                                                    /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                                        value: "LEGAL",
+                                                                        children: "Legal (8.5 x 14 in)"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                        lineNumber: 380,
+                                                                        columnNumber: 23
+                                                                    }, this),
+                                                                    /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                                        value: "A5",
+                                                                        children: "A5 (148 x 210 mm)"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                        lineNumber: 381,
+                                                                        columnNumber: 23
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 377,
+                                                                columnNumber: 21
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 370,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 368,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                                        children: "Orientation"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 387,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV(Select, {
+                                                        value: formData.orientation,
+                                                        onValueChange: (value)=>setFormData({
+                                                                ...formData,
+                                                                orientation: value
+                                                            }),
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV(SelectTrigger, {
+                                                                children: /*#__PURE__*/ _jsxDEV(SelectValue, {}, void 0, false, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                    lineNumber: 393,
+                                                                    columnNumber: 23
+                                                                }, this)
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 392,
+                                                                columnNumber: 21
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV(SelectContent, {
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                                        value: "portrait",
+                                                                        children: "Portrait"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                        lineNumber: 396,
+                                                                        columnNumber: 23
+                                                                    }, this),
+                                                                    /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                                        value: "landscape",
+                                                                        children: "Landscape"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                        lineNumber: 397,
+                                                                        columnNumber: 23
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 395,
+                                                                columnNumber: 21
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 388,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 386,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                                        children: "Margins (mm)"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 403,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                        className: "grid grid-cols-2 gap-4 mt-2",
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                                                        className: "text-xs",
+                                                                        children: "Top"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                        lineNumber: 406,
+                                                                        columnNumber: 23
+                                                                    }, this),
+                                                                    /*#__PURE__*/ _jsxDEV(Input, {
+                                                                        type: "number",
+                                                                        value: formData.margins?.top || 15,
+                                                                        onChange: (e)=>setFormData({
+                                                                                ...formData,
+                                                                                margins: {
+                                                                                    ...formData.margins,
+                                                                                    top: Number(e.target.value)
+                                                                                }
+                                                                            })
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                        lineNumber: 407,
+                                                                        columnNumber: 23
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 405,
+                                                                columnNumber: 21
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                                                        className: "text-xs",
+                                                                        children: "Right"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                        lineNumber: 417,
+                                                                        columnNumber: 23
+                                                                    }, this),
+                                                                    /*#__PURE__*/ _jsxDEV(Input, {
+                                                                        type: "number",
+                                                                        value: formData.margins?.right || 15,
+                                                                        onChange: (e)=>setFormData({
+                                                                                ...formData,
+                                                                                margins: {
+                                                                                    ...formData.margins,
+                                                                                    right: Number(e.target.value)
+                                                                                }
+                                                                            })
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                        lineNumber: 418,
+                                                                        columnNumber: 23
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 416,
+                                                                columnNumber: 21
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                                                        className: "text-xs",
+                                                                        children: "Bottom"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                        lineNumber: 428,
+                                                                        columnNumber: 23
+                                                                    }, this),
+                                                                    /*#__PURE__*/ _jsxDEV(Input, {
+                                                                        type: "number",
+                                                                        value: formData.margins?.bottom || 15,
+                                                                        onChange: (e)=>setFormData({
+                                                                                ...formData,
+                                                                                margins: {
+                                                                                    ...formData.margins,
+                                                                                    bottom: Number(e.target.value)
+                                                                                }
+                                                                            })
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                        lineNumber: 429,
+                                                                        columnNumber: 23
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 427,
+                                                                columnNumber: 21
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                                                        className: "text-xs",
+                                                                        children: "Left"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                        lineNumber: 439,
+                                                                        columnNumber: 23
+                                                                    }, this),
+                                                                    /*#__PURE__*/ _jsxDEV(Input, {
+                                                                        type: "number",
+                                                                        value: formData.margins?.left || 15,
+                                                                        onChange: (e)=>setFormData({
+                                                                                ...formData,
+                                                                                margins: {
+                                                                                    ...formData.margins,
+                                                                                    left: Number(e.target.value)
+                                                                                }
+                                                                            })
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                        lineNumber: 440,
+                                                                        columnNumber: 23
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                                lineNumber: 438,
+                                                                columnNumber: 21
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                        lineNumber: 404,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 402,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                        lineNumber: 367,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                lineNumber: 110,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "flex gap-2 mt-6",
+                                children: /*#__PURE__*/ _jsxDEV(Button, {
+                                    onClick: handleSave,
+                                    disabled: updateTemplate.isPending || uploadLogo.isPending,
+                                    className: "flex-1",
+                                    children: [
+                                        (updateTemplate.isPending || uploadLogo.isPending) && /*#__PURE__*/ _jsxDEV(Loader2, {
+                                            className: "w-4 h-4 mr-2 animate-spin"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                            lineNumber: 461,
+                                            columnNumber: 19
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(Save, {
+                                            className: "w-4 h-4 mr-2"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                            lineNumber: 463,
+                                            columnNumber: 17
+                                        }, this),
+                                        "Save Template"
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                    lineNumber: 455,
+                                    columnNumber: 15
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                lineNumber: 454,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                        lineNumber: 109,
+                        columnNumber: 11
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                    lineNumber: 108,
+                    columnNumber: 9
+                }, this),
+                /*#__PURE__*/ _jsxDEV("div", {
+                    className: "lg:col-span-1",
+                    children: /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg p-4 sticky top-4",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("h3", {
+                                className: "font-semibold mb-4 flex items-center gap-2",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(Eye, {
+                                        className: "w-4 h-4"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                        lineNumber: 474,
+                                        columnNumber: 15
+                                    }, this),
+                                    "Preview"
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                lineNumber: 473,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "bg-white border rounded p-4 text-xs",
+                                style: {
+                                    fontSize: '10px'
+                                },
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "border-b-2 pb-2 mb-2",
+                                        style: {
+                                            borderColor: formData.header?.headerBorderColor
+                                        },
+                                        children: [
+                                            logoPreview && /*#__PURE__*/ _jsxDEV("img", {
+                                                src: logoPreview,
+                                                alt: "Logo",
+                                                className: "h-8 mb-1"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 481,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                className: "font-bold",
+                                                children: formData.header?.labName
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 483,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                className: "text-gray-600 text-[8px]",
+                                                children: formData.header?.motto
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 484,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                className: "text-gray-600 text-[8px]",
+                                                children: formData.header?.phone
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 485,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                        lineNumber: 479,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "text-center font-bold mb-2",
+                                        children: "LABORATORY REPORT"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                        lineNumber: 487,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "bg-gray-50 p-2 mb-2 text-[8px]",
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                children: "Patient: John Doe"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 489,
+                                                columnNumber: 17
+                                            }, this),
+                                            formData.patientSection?.showDoctor && /*#__PURE__*/ _jsxDEV("div", {
+                                                children: "Doctor: Dr. Smith"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 490,
+                                                columnNumber: 57
+                                            }, this),
+                                            formData.patientSection?.showCollectionDate && /*#__PURE__*/ _jsxDEV("div", {
+                                                children: "Collected: 31/01/26"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 491,
+                                                columnNumber: 65
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                        lineNumber: 488,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "mb-2",
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                className: "font-bold p-1 text-[8px]",
+                                                style: {
+                                                    backgroundColor: formData.resultsSection?.categoryHeaderColor
+                                                },
+                                                children: "CLINICAL CHEMISTRY"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 494,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                className: "text-[8px] p-1",
+                                                children: /*#__PURE__*/ _jsxDEV("div", {
+                                                    className: "flex justify-between",
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV("span", {
+                                                            children: "Test"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                            lineNumber: 499,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("span", {
+                                                            children: "Result"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                            lineNumber: 500,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("span", {
+                                                            children: "Range"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                            lineNumber: 501,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                    lineNumber: 498,
+                                                    columnNumber: 19
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                                lineNumber: 497,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                        lineNumber: 493,
+                                        columnNumber: 15
+                                    }, this),
+                                    formData.footer?.showWaveDesign && /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "mt-2 h-4 rounded",
+                                        style: {
+                                            background: `linear-gradient(90deg, ${formData.footer?.waveColor1} 0%, ${formData.footer?.waveColor2} 100%)`
+                                        }
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                        lineNumber: 506,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "text-center text-[7px] mt-1",
+                                        children: formData.footer?.footerText
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                        lineNumber: 510,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                                lineNumber: 477,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                        lineNumber: 472,
+                        columnNumber: 11
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+                    lineNumber: 471,
+                    columnNumber: 9
+                }, this)
+            ]
+        }, void 0, true, {
+            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+            lineNumber: 106,
+            columnNumber: 7
+        }, this)
+    }, void 0, false, {
+        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx",
+        lineNumber: 100,
+        columnNumber: 5
+    }, this);
+}
+_s(ReportTemplateEditor, "C16y3ratjqU7gC0fQps69AlpTIQ=", false, function() {
+    return [
+        useAuth,
+        useDefaultTemplate,
+        useUpdateTemplate,
+        useUploadLogo
+    ];
+});
+_c = ReportTemplateEditor;
+var _c;
+$RefreshReg$(_c, "ReportTemplateEditor");
+
+
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+
+
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/HP/Downloads/lab/frontend/src/pages/admin/ReportTemplateEditor.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIlJlcG9ydFRlbXBsYXRlRWRpdG9yLnRzeCJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyB1c2VTdGF0ZSwgdXNlRWZmZWN0IH0gZnJvbSAncmVhY3QnO1xyXG5pbXBvcnQgeyBSb2xlTGF5b3V0IH0gZnJvbSAnQC9jb21wb25lbnRzL2xheW91dC9Sb2xlTGF5b3V0JztcclxuaW1wb3J0IHsgdXNlQXV0aCB9IGZyb20gJ0AvY29udGV4dC9BdXRoQ29udGV4dCc7XHJcbmltcG9ydCB7XHJcbiAgdXNlRGVmYXVsdFRlbXBsYXRlLFxyXG4gIHVzZVVwZGF0ZVRlbXBsYXRlLFxyXG4gIHVzZVVwbG9hZExvZ28sXHJcbn0gZnJvbSAnQC9ob29rcy91c2VSZXBvcnRUZW1wbGF0ZXMnO1xyXG5pbXBvcnQgeyBCdXR0b24gfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvYnV0dG9uJztcclxuaW1wb3J0IHsgSW5wdXQgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvaW5wdXQnO1xyXG5pbXBvcnQgeyBMYWJlbCB9IGZyb20gJ0AvY29tcG9uZW50cy91aS9sYWJlbCc7XHJcbmltcG9ydCB7IFRleHRhcmVhIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL3RleHRhcmVhJztcclxuaW1wb3J0IHsgU2VsZWN0LCBTZWxlY3RDb250ZW50LCBTZWxlY3RJdGVtLCBTZWxlY3RUcmlnZ2VyLCBTZWxlY3RWYWx1ZSB9IGZyb20gJ0AvY29tcG9uZW50cy91aS9zZWxlY3QnO1xyXG5pbXBvcnQgeyBUYWJzLCBUYWJzQ29udGVudCwgVGFic0xpc3QsIFRhYnNUcmlnZ2VyIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL3RhYnMnO1xyXG5pbXBvcnQgeyB0b2FzdCB9IGZyb20gJ3Nvbm5lcic7XHJcbmltcG9ydCB7IFNhdmUsIFVwbG9hZCwgTG9hZGVyMiwgRXllIH0gZnJvbSAnbHVjaWRlLXJlYWN0JztcclxuXHJcbmV4cG9ydCBkZWZhdWx0IGZ1bmN0aW9uIFJlcG9ydFRlbXBsYXRlRWRpdG9yKCkge1xyXG4gIGNvbnN0IHsgcHJvZmlsZSB9ID0gdXNlQXV0aCgpO1xyXG4gIGNvbnN0IHsgZGF0YTogdGVtcGxhdGUsIGlzTG9hZGluZyB9ID0gdXNlRGVmYXVsdFRlbXBsYXRlKCk7XHJcbiAgY29uc3QgdXBkYXRlVGVtcGxhdGUgPSB1c2VVcGRhdGVUZW1wbGF0ZSgpO1xyXG4gIGNvbnN0IHVwbG9hZExvZ28gPSB1c2VVcGxvYWRMb2dvKCk7XHJcblxyXG4gIGNvbnN0IFtmb3JtRGF0YSwgc2V0Rm9ybURhdGFdID0gdXNlU3RhdGU8YW55PihudWxsKTtcclxuICBjb25zdCBbbG9nb0ZpbGUsIHNldExvZ29GaWxlXSA9IHVzZVN0YXRlPEZpbGUgfCBudWxsPihudWxsKTtcclxuICBjb25zdCBbbG9nb1ByZXZpZXcsIHNldExvZ29QcmV2aWV3XSA9IHVzZVN0YXRlPHN0cmluZz4oJycpO1xyXG5cclxuICB1c2VFZmZlY3QoKCkgPT4ge1xyXG4gICAgaWYgKHRlbXBsYXRlKSB7XHJcbiAgICAgIHNldEZvcm1EYXRhKHRlbXBsYXRlKTtcclxuICAgICAgaWYgKHRlbXBsYXRlLmhlYWRlcj8ubG9nb1VybCkge1xyXG4gICAgICAgIHNldExvZ29QcmV2aWV3KGAke2ltcG9ydC5tZXRhLmVudi5WSVRFX0FQSV9VUkwgfHwgJ2h0dHA6Ly9sb2NhbGhvc3Q6MzAwMCd9JHt0ZW1wbGF0ZS5oZWFkZXIubG9nb1VybH1gKTtcclxuICAgICAgfVxyXG4gICAgfVxyXG4gIH0sIFt0ZW1wbGF0ZV0pO1xyXG5cclxuICBjb25zdCBoYW5kbGVMb2dvQ2hhbmdlID0gKGU6IFJlYWN0LkNoYW5nZUV2ZW50PEhUTUxJbnB1dEVsZW1lbnQ+KSA9PiB7XHJcbiAgICBjb25zdCBmaWxlID0gZS50YXJnZXQuZmlsZXM/LlswXTtcclxuICAgIGlmIChmaWxlKSB7XHJcbiAgICAgIHNldExvZ29GaWxlKGZpbGUpO1xyXG4gICAgICBjb25zdCByZWFkZXIgPSBuZXcgRmlsZVJlYWRlcigpO1xyXG4gICAgICByZWFkZXIub25sb2FkZW5kID0gKCkgPT4ge1xyXG4gICAgICAgIHNldExvZ29QcmV2aWV3KHJlYWRlci5yZXN1bHQgYXMgc3RyaW5nKTtcclxuICAgICAgfTtcclxuICAgICAgcmVhZGVyLnJlYWRBc0RhdGFVUkwoZmlsZSk7XHJcbiAgICB9XHJcbiAgfTtcclxuXHJcbiAgY29uc3QgaGFuZGxlU2F2ZSA9IGFzeW5jICgpID0+IHtcclxuICAgIGlmICghZm9ybURhdGEpIHJldHVybjtcclxuXHJcbiAgICB0cnkge1xyXG4gICAgICBsZXQgbG9nb1VybCA9IGZvcm1EYXRhLmhlYWRlcj8ubG9nb1VybDtcclxuXHJcbiAgICAgIC8vIFVwbG9hZCBsb2dvIGlmIGNoYW5nZWRcclxuICAgICAgaWYgKGxvZ29GaWxlKSB7XHJcbiAgICAgICAgY29uc3QgdXBsb2FkUmVzdWx0ID0gYXdhaXQgdXBsb2FkTG9nby5tdXRhdGVBc3luYyhsb2dvRmlsZSk7XHJcbiAgICAgICAgbG9nb1VybCA9IHVwbG9hZFJlc3VsdC51cmw7XHJcbiAgICAgIH1cclxuXHJcbiAgICAgIC8vIFVwZGF0ZSB0ZW1wbGF0ZVxyXG4gICAgICBhd2FpdCB1cGRhdGVUZW1wbGF0ZS5tdXRhdGVBc3luYyh7XHJcbiAgICAgICAgaWQ6IGZvcm1EYXRhLl9pZCB8fCBmb3JtRGF0YS5pZCxcclxuICAgICAgICBkYXRhOiB7XHJcbiAgICAgICAgICAuLi5mb3JtRGF0YSxcclxuICAgICAgICAgIGhlYWRlcjoge1xyXG4gICAgICAgICAgICAuLi5mb3JtRGF0YS5oZWFkZXIsXHJcbiAgICAgICAgICAgIGxvZ29VcmwsXHJcbiAgICAgICAgICB9LFxyXG4gICAgICAgIH0sXHJcbiAgICAgIH0pO1xyXG5cclxuICAgICAgdG9hc3Quc3VjY2VzcygnVGVtcGxhdGUgc2F2ZWQgc3VjY2Vzc2Z1bGx5Jyk7XHJcbiAgICB9IGNhdGNoIChlcnJvcikge1xyXG4gICAgICB0b2FzdC5lcnJvcignRmFpbGVkIHRvIHNhdmUgdGVtcGxhdGUnKTtcclxuICAgIH1cclxuICB9O1xyXG5cclxuICBjb25zdCB1cGRhdGVGaWVsZCA9IChzZWN0aW9uOiBzdHJpbmcsIGZpZWxkOiBzdHJpbmcsIHZhbHVlOiBhbnkpID0+IHtcclxuICAgIHNldEZvcm1EYXRhKChwcmV2OiBhbnkpID0+ICh7XHJcbiAgICAgIC4uLnByZXYsXHJcbiAgICAgIFtzZWN0aW9uXToge1xyXG4gICAgICAgIC4uLnByZXZbc2VjdGlvbl0sXHJcbiAgICAgICAgW2ZpZWxkXTogdmFsdWUsXHJcbiAgICAgIH0sXHJcbiAgICB9KSk7XHJcbiAgfTtcclxuXHJcbiAgaWYgKGlzTG9hZGluZyB8fCAhZm9ybURhdGEpIHtcclxuICAgIHJldHVybiAoXHJcbiAgICAgIDxSb2xlTGF5b3V0IHRpdGxlPVwiUmVwb3J0IFRlbXBsYXRlXCIgc3VidGl0bGU9XCJMb2FkaW5nLi4uXCIgcm9sZT1cImFkbWluXCIgdXNlck5hbWU9e3Byb2ZpbGU/LmZ1bGxfbmFtZX0+XHJcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWNlbnRlciBweS0xMlwiPlxyXG4gICAgICAgICAgPExvYWRlcjIgY2xhc3NOYW1lPVwidy04IGgtOCBhbmltYXRlLXNwaW5cIiAvPlxyXG4gICAgICAgIDwvZGl2PlxyXG4gICAgICA8L1JvbGVMYXlvdXQ+XHJcbiAgICApO1xyXG4gIH1cclxuXHJcbiAgcmV0dXJuIChcclxuICAgIDxSb2xlTGF5b3V0XHJcbiAgICAgIHRpdGxlPVwiUmVwb3J0IFRlbXBsYXRlIEVkaXRvclwiXHJcbiAgICAgIHN1YnRpdGxlPVwiQ3VzdG9taXplIGxhYiByZXBvcnQgYXBwZWFyYW5jZVwiXHJcbiAgICAgIHJvbGU9XCJhZG1pblwiXHJcbiAgICAgIHVzZXJOYW1lPXtwcm9maWxlPy5mdWxsX25hbWV9XHJcbiAgICA+XHJcbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZ3JpZCBncmlkLWNvbHMtMSBsZzpncmlkLWNvbHMtMyBnYXAtNlwiPlxyXG4gICAgICAgIHsvKiBFZGl0b3IgUGFuZWwgKi99XHJcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJsZzpjb2wtc3Bhbi0yXCI+XHJcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImJnLWNhcmQgYm9yZGVyIHJvdW5kZWQtbGcgcC02XCI+XHJcbiAgICAgICAgICAgIDxUYWJzIGRlZmF1bHRWYWx1ZT1cImhlYWRlclwiPlxyXG4gICAgICAgICAgICAgIDxUYWJzTGlzdCBjbGFzc05hbWU9XCJncmlkIHctZnVsbCBncmlkLWNvbHMtNVwiPlxyXG4gICAgICAgICAgICAgICAgPFRhYnNUcmlnZ2VyIHZhbHVlPVwiaGVhZGVyXCI+SGVhZGVyPC9UYWJzVHJpZ2dlcj5cclxuICAgICAgICAgICAgICAgIDxUYWJzVHJpZ2dlciB2YWx1ZT1cInBhdGllbnRcIj5QYXRpZW50PC9UYWJzVHJpZ2dlcj5cclxuICAgICAgICAgICAgICAgIDxUYWJzVHJpZ2dlciB2YWx1ZT1cInJlc3VsdHNcIj5SZXN1bHRzPC9UYWJzVHJpZ2dlcj5cclxuICAgICAgICAgICAgICAgIDxUYWJzVHJpZ2dlciB2YWx1ZT1cImZvb3RlclwiPkZvb3RlcjwvVGFic1RyaWdnZXI+XHJcbiAgICAgICAgICAgICAgICA8VGFic1RyaWdnZXIgdmFsdWU9XCJwYXBlclwiPlBhcGVyPC9UYWJzVHJpZ2dlcj5cclxuICAgICAgICAgICAgICA8L1RhYnNMaXN0PlxyXG5cclxuICAgICAgICAgICAgICB7LyogSGVhZGVyIFRhYiAqL31cclxuICAgICAgICAgICAgICA8VGFic0NvbnRlbnQgdmFsdWU9XCJoZWFkZXJcIiBjbGFzc05hbWU9XCJzcGFjZS15LTRcIj5cclxuICAgICAgICAgICAgICAgIDxkaXY+XHJcbiAgICAgICAgICAgICAgICAgIDxMYWJlbD5MYWIgTG9nbzwvTGFiZWw+XHJcbiAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwibXQtMiBmbGV4IGl0ZW1zLWNlbnRlciBnYXAtNFwiPlxyXG4gICAgICAgICAgICAgICAgICAgIHtsb2dvUHJldmlldyAmJiAoXHJcbiAgICAgICAgICAgICAgICAgICAgICA8aW1nIHNyYz17bG9nb1ByZXZpZXd9IGFsdD1cIkxvZ29cIiBjbGFzc05hbWU9XCJoLTIwIHctYXV0byBib3JkZXIgcm91bmRlZFwiIC8+XHJcbiAgICAgICAgICAgICAgICAgICAgKX1cclxuICAgICAgICAgICAgICAgICAgICA8ZGl2PlxyXG4gICAgICAgICAgICAgICAgICAgICAgPElucHV0XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIHR5cGU9XCJmaWxlXCJcclxuICAgICAgICAgICAgICAgICAgICAgICAgYWNjZXB0PVwiaW1hZ2UvKlwiXHJcbiAgICAgICAgICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXtoYW5kbGVMb2dvQ2hhbmdlfVxyXG4gICAgICAgICAgICAgICAgICAgICAgICBjbGFzc05hbWU9XCJtYXgtdy14c1wiXHJcbiAgICAgICAgICAgICAgICAgICAgICAvPlxyXG4gICAgICAgICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC14cyB0ZXh0LW11dGVkLWZvcmVncm91bmQgbXQtMVwiPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICBSZWNvbW1lbmRlZDogMTIweDgwcHgsIFBORyBvciBKUEdcclxuICAgICAgICAgICAgICAgICAgICAgIDwvcD5cclxuICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgICAgICAgICA8ZGl2PlxyXG4gICAgICAgICAgICAgICAgICA8TGFiZWw+TGFiIE5hbWU8L0xhYmVsPlxyXG4gICAgICAgICAgICAgICAgICA8SW5wdXRcclxuICAgICAgICAgICAgICAgICAgICB2YWx1ZT17Zm9ybURhdGEuaGVhZGVyPy5sYWJOYW1lIHx8ICcnfVxyXG4gICAgICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXsoZSkgPT4gdXBkYXRlRmllbGQoJ2hlYWRlcicsICdsYWJOYW1lJywgZS50YXJnZXQudmFsdWUpfVxyXG4gICAgICAgICAgICAgICAgICAvPlxyXG4gICAgICAgICAgICAgICAgPC9kaXY+XHJcblxyXG4gICAgICAgICAgICAgICAgPGRpdj5cclxuICAgICAgICAgICAgICAgICAgPExhYmVsPk1vdHRvL1RhZ2xpbmU8L0xhYmVsPlxyXG4gICAgICAgICAgICAgICAgICA8SW5wdXRcclxuICAgICAgICAgICAgICAgICAgICB2YWx1ZT17Zm9ybURhdGEuaGVhZGVyPy5tb3R0byB8fCAnJ31cclxuICAgICAgICAgICAgICAgICAgICBvbkNoYW5nZT17KGUpID0+IHVwZGF0ZUZpZWxkKCdoZWFkZXInLCAnbW90dG8nLCBlLnRhcmdldC52YWx1ZSl9XHJcbiAgICAgICAgICAgICAgICAgICAgcGxhY2Vob2xkZXI9XCJNb3R0bzogQXV0b21hdGVkIFByZWNpc2lvbi4uLlwiXHJcbiAgICAgICAgICAgICAgICAgIC8+XHJcbiAgICAgICAgICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgICAgICAgICA8ZGl2PlxyXG4gICAgICAgICAgICAgICAgICA8TGFiZWw+QWRkcmVzczwvTGFiZWw+XHJcbiAgICAgICAgICAgICAgICAgIDxUZXh0YXJlYVxyXG4gICAgICAgICAgICAgICAgICAgIHZhbHVlPXtmb3JtRGF0YS5oZWFkZXI/LmFkZHJlc3MgfHwgJyd9XHJcbiAgICAgICAgICAgICAgICAgICAgb25DaGFuZ2U9eyhlKSA9PiB1cGRhdGVGaWVsZCgnaGVhZGVyJywgJ2FkZHJlc3MnLCBlLnRhcmdldC52YWx1ZSl9XHJcbiAgICAgICAgICAgICAgICAgICAgcm93cz17Mn1cclxuICAgICAgICAgICAgICAgICAgLz5cclxuICAgICAgICAgICAgICAgIDwvZGl2PlxyXG5cclxuICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZ3JpZCBncmlkLWNvbHMtMiBnYXAtNFwiPlxyXG4gICAgICAgICAgICAgICAgICA8ZGl2PlxyXG4gICAgICAgICAgICAgICAgICAgIDxMYWJlbD5QaG9uZTwvTGFiZWw+XHJcbiAgICAgICAgICAgICAgICAgICAgPElucHV0XHJcbiAgICAgICAgICAgICAgICAgICAgICB2YWx1ZT17Zm9ybURhdGEuaGVhZGVyPy5waG9uZSB8fCAnJ31cclxuICAgICAgICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXsoZSkgPT4gdXBkYXRlRmllbGQoJ2hlYWRlcicsICdwaG9uZScsIGUudGFyZ2V0LnZhbHVlKX1cclxuICAgICAgICAgICAgICAgICAgICAvPlxyXG4gICAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgICAgPGRpdj5cclxuICAgICAgICAgICAgICAgICAgICA8TGFiZWw+RW1haWw8L0xhYmVsPlxyXG4gICAgICAgICAgICAgICAgICAgIDxJbnB1dFxyXG4gICAgICAgICAgICAgICAgICAgICAgdmFsdWU9e2Zvcm1EYXRhLmhlYWRlcj8uZW1haWwgfHwgJyd9XHJcbiAgICAgICAgICAgICAgICAgICAgICBvbkNoYW5nZT17KGUpID0+IHVwZGF0ZUZpZWxkKCdoZWFkZXInLCAnZW1haWwnLCBlLnRhcmdldC52YWx1ZSl9XHJcbiAgICAgICAgICAgICAgICAgICAgLz5cclxuICAgICAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgICAgICAgICA8ZGl2PlxyXG4gICAgICAgICAgICAgICAgICA8TGFiZWw+V2Vic2l0ZTwvTGFiZWw+XHJcbiAgICAgICAgICAgICAgICAgIDxJbnB1dFxyXG4gICAgICAgICAgICAgICAgICAgIHZhbHVlPXtmb3JtRGF0YS5oZWFkZXI/LndlYnNpdGUgfHwgJyd9XHJcbiAgICAgICAgICAgICAgICAgICAgb25DaGFuZ2U9eyhlKSA9PiB1cGRhdGVGaWVsZCgnaGVhZGVyJywgJ3dlYnNpdGUnLCBlLnRhcmdldC52YWx1ZSl9XHJcbiAgICAgICAgICAgICAgICAgIC8+XHJcbiAgICAgICAgICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgICAgICAgICA8ZGl2PlxyXG4gICAgICAgICAgICAgICAgICA8TGFiZWw+SGVhZGVyIEJvcmRlciBDb2xvcjwvTGFiZWw+XHJcbiAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBnYXAtMlwiPlxyXG4gICAgICAgICAgICAgICAgICAgIDxJbnB1dFxyXG4gICAgICAgICAgICAgICAgICAgICAgdHlwZT1cImNvbG9yXCJcclxuICAgICAgICAgICAgICAgICAgICAgIHZhbHVlPXtmb3JtRGF0YS5oZWFkZXI/LmhlYWRlckJvcmRlckNvbG9yIHx8ICcjMWU0MGFmJ31cclxuICAgICAgICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXsoZSkgPT4gdXBkYXRlRmllbGQoJ2hlYWRlcicsICdoZWFkZXJCb3JkZXJDb2xvcicsIGUudGFyZ2V0LnZhbHVlKX1cclxuICAgICAgICAgICAgICAgICAgICAgIGNsYXNzTmFtZT1cInctMjBcIlxyXG4gICAgICAgICAgICAgICAgICAgIC8+XHJcbiAgICAgICAgICAgICAgICAgICAgPElucHV0XHJcbiAgICAgICAgICAgICAgICAgICAgICB2YWx1ZT17Zm9ybURhdGEuaGVhZGVyPy5oZWFkZXJCb3JkZXJDb2xvciB8fCAnIzFlNDBhZid9XHJcbiAgICAgICAgICAgICAgICAgICAgICBvbkNoYW5nZT17KGUpID0+IHVwZGF0ZUZpZWxkKCdoZWFkZXInLCAnaGVhZGVyQm9yZGVyQ29sb3InLCBlLnRhcmdldC52YWx1ZSl9XHJcbiAgICAgICAgICAgICAgICAgICAgICBwbGFjZWhvbGRlcj1cIiMxZTQwYWZcIlxyXG4gICAgICAgICAgICAgICAgICAgIC8+XHJcbiAgICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAgPC9UYWJzQ29udGVudD5cclxuXHJcbiAgICAgICAgICAgICAgey8qIFBhdGllbnQgVGFiICovfVxyXG4gICAgICAgICAgICAgIDxUYWJzQ29udGVudCB2YWx1ZT1cInBhdGllbnRcIiBjbGFzc05hbWU9XCJzcGFjZS15LTRcIj5cclxuICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0yXCI+XHJcbiAgICAgICAgICAgICAgICAgIDxsYWJlbCBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBnYXAtMlwiPlxyXG4gICAgICAgICAgICAgICAgICAgIDxpbnB1dFxyXG4gICAgICAgICAgICAgICAgICAgICAgdHlwZT1cImNoZWNrYm94XCJcclxuICAgICAgICAgICAgICAgICAgICAgIGNoZWNrZWQ9e2Zvcm1EYXRhLnBhdGllbnRTZWN0aW9uPy5zaG93RG9jdG9yIHx8IGZhbHNlfVxyXG4gICAgICAgICAgICAgICAgICAgICAgb25DaGFuZ2U9eyhlKSA9PiB1cGRhdGVGaWVsZCgncGF0aWVudFNlY3Rpb24nLCAnc2hvd0RvY3RvcicsIGUudGFyZ2V0LmNoZWNrZWQpfVxyXG4gICAgICAgICAgICAgICAgICAgIC8+XHJcbiAgICAgICAgICAgICAgICAgICAgPHNwYW4+U2hvdyBEb2N0b3IgRmllbGQ8L3NwYW4+XHJcbiAgICAgICAgICAgICAgICAgIDwvbGFiZWw+XHJcbiAgICAgICAgICAgICAgICAgIDxsYWJlbCBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBnYXAtMlwiPlxyXG4gICAgICAgICAgICAgICAgICAgIDxpbnB1dFxyXG4gICAgICAgICAgICAgICAgICAgICAgdHlwZT1cImNoZWNrYm94XCJcclxuICAgICAgICAgICAgICAgICAgICAgIGNoZWNrZWQ9e2Zvcm1EYXRhLnBhdGllbnRTZWN0aW9uPy5zaG93Q29waWVzVG8gfHwgZmFsc2V9XHJcbiAgICAgICAgICAgICAgICAgICAgICBvbkNoYW5nZT17KGUpID0+IHVwZGF0ZUZpZWxkKCdwYXRpZW50U2VjdGlvbicsICdzaG93Q29waWVzVG8nLCBlLnRhcmdldC5jaGVja2VkKX1cclxuICAgICAgICAgICAgICAgICAgICAvPlxyXG4gICAgICAgICAgICAgICAgICAgIDxzcGFuPlNob3cgQ29waWVzIFRvIEZpZWxkPC9zcGFuPlxyXG4gICAgICAgICAgICAgICAgICA8L2xhYmVsPlxyXG4gICAgICAgICAgICAgICAgICA8bGFiZWwgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIgZ2FwLTJcIj5cclxuICAgICAgICAgICAgICAgICAgICA8aW5wdXRcclxuICAgICAgICAgICAgICAgICAgICAgIHR5cGU9XCJjaGVja2JveFwiXHJcbiAgICAgICAgICAgICAgICAgICAgICBjaGVja2VkPXtmb3JtRGF0YS5wYXRpZW50U2VjdGlvbj8uc2hvd0NvbGxlY3Rpb25EYXRlIHx8IGZhbHNlfVxyXG4gICAgICAgICAgICAgICAgICAgICAgb25DaGFuZ2U9eyhlKSA9PiB1cGRhdGVGaWVsZCgncGF0aWVudFNlY3Rpb24nLCAnc2hvd0NvbGxlY3Rpb25EYXRlJywgZS50YXJnZXQuY2hlY2tlZCl9XHJcbiAgICAgICAgICAgICAgICAgICAgLz5cclxuICAgICAgICAgICAgICAgICAgICA8c3Bhbj5TaG93IENvbGxlY3Rpb24gRGF0ZTwvc3Bhbj5cclxuICAgICAgICAgICAgICAgICAgPC9sYWJlbD5cclxuICAgICAgICAgICAgICAgICAgPGxhYmVsIGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGdhcC0yXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgPGlucHV0XHJcbiAgICAgICAgICAgICAgICAgICAgICB0eXBlPVwiY2hlY2tib3hcIlxyXG4gICAgICAgICAgICAgICAgICAgICAgY2hlY2tlZD17Zm9ybURhdGEucGF0aWVudFNlY3Rpb24/LnNob3dSZWNlaXZlZERhdGUgfHwgZmFsc2V9XHJcbiAgICAgICAgICAgICAgICAgICAgICBvbkNoYW5nZT17KGUpID0+IHVwZGF0ZUZpZWxkKCdwYXRpZW50U2VjdGlvbicsICdzaG93UmVjZWl2ZWREYXRlJywgZS50YXJnZXQuY2hlY2tlZCl9XHJcbiAgICAgICAgICAgICAgICAgICAgLz5cclxuICAgICAgICAgICAgICAgICAgICA8c3Bhbj5TaG93IFJlY2VpdmVkIERhdGU8L3NwYW4+XHJcbiAgICAgICAgICAgICAgICAgIDwvbGFiZWw+XHJcbiAgICAgICAgICAgICAgICAgIDxsYWJlbCBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBnYXAtMlwiPlxyXG4gICAgICAgICAgICAgICAgICAgIDxpbnB1dFxyXG4gICAgICAgICAgICAgICAgICAgICAgdHlwZT1cImNoZWNrYm94XCJcclxuICAgICAgICAgICAgICAgICAgICAgIGNoZWNrZWQ9e2Zvcm1EYXRhLnBhdGllbnRTZWN0aW9uPy5zaG93UmVwb3J0ZWREYXRlIHx8IGZhbHNlfVxyXG4gICAgICAgICAgICAgICAgICAgICAgb25DaGFuZ2U9eyhlKSA9PiB1cGRhdGVGaWVsZCgncGF0aWVudFNlY3Rpb24nLCAnc2hvd1JlcG9ydGVkRGF0ZScsIGUudGFyZ2V0LmNoZWNrZWQpfVxyXG4gICAgICAgICAgICAgICAgICAgIC8+XHJcbiAgICAgICAgICAgICAgICAgICAgPHNwYW4+U2hvdyBSZXBvcnRlZCBEYXRlPC9zcGFuPlxyXG4gICAgICAgICAgICAgICAgICA8L2xhYmVsPlxyXG4gICAgICAgICAgICAgICAgICA8bGFiZWwgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIgZ2FwLTJcIj5cclxuICAgICAgICAgICAgICAgICAgICA8aW5wdXRcclxuICAgICAgICAgICAgICAgICAgICAgIHR5cGU9XCJjaGVja2JveFwiXHJcbiAgICAgICAgICAgICAgICAgICAgICBjaGVja2VkPXtmb3JtRGF0YS5wYXRpZW50U2VjdGlvbj8uc2hvd1ByaW50ZWREYXRlIHx8IGZhbHNlfVxyXG4gICAgICAgICAgICAgICAgICAgICAgb25DaGFuZ2U9eyhlKSA9PiB1cGRhdGVGaWVsZCgncGF0aWVudFNlY3Rpb24nLCAnc2hvd1ByaW50ZWREYXRlJywgZS50YXJnZXQuY2hlY2tlZCl9XHJcbiAgICAgICAgICAgICAgICAgICAgLz5cclxuICAgICAgICAgICAgICAgICAgICA8c3Bhbj5TaG93IFByaW50ZWQgRGF0ZTwvc3Bhbj5cclxuICAgICAgICAgICAgICAgICAgPC9sYWJlbD5cclxuICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgIDwvVGFic0NvbnRlbnQ+XHJcblxyXG4gICAgICAgICAgICAgIHsvKiBSZXN1bHRzIFRhYiAqL31cclxuICAgICAgICAgICAgICA8VGFic0NvbnRlbnQgdmFsdWU9XCJyZXN1bHRzXCIgY2xhc3NOYW1lPVwic3BhY2UteS00XCI+XHJcbiAgICAgICAgICAgICAgICA8ZGl2PlxyXG4gICAgICAgICAgICAgICAgICA8TGFiZWw+Q2F0ZWdvcnkgSGVhZGVyIENvbG9yPC9MYWJlbD5cclxuICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGdhcC0yXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgPElucHV0XHJcbiAgICAgICAgICAgICAgICAgICAgICB0eXBlPVwiY29sb3JcIlxyXG4gICAgICAgICAgICAgICAgICAgICAgdmFsdWU9e2Zvcm1EYXRhLnJlc3VsdHNTZWN0aW9uPy5jYXRlZ29yeUhlYWRlckNvbG9yIHx8ICcjZGJlYWZlJ31cclxuICAgICAgICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXsoZSkgPT4gdXBkYXRlRmllbGQoJ3Jlc3VsdHNTZWN0aW9uJywgJ2NhdGVnb3J5SGVhZGVyQ29sb3InLCBlLnRhcmdldC52YWx1ZSl9XHJcbiAgICAgICAgICAgICAgICAgICAgICBjbGFzc05hbWU9XCJ3LTIwXCJcclxuICAgICAgICAgICAgICAgICAgICAvPlxyXG4gICAgICAgICAgICAgICAgICAgIDxJbnB1dFxyXG4gICAgICAgICAgICAgICAgICAgICAgdmFsdWU9e2Zvcm1EYXRhLnJlc3VsdHNTZWN0aW9uPy5jYXRlZ29yeUhlYWRlckNvbG9yIHx8ICcjZGJlYWZlJ31cclxuICAgICAgICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXsoZSkgPT4gdXBkYXRlRmllbGQoJ3Jlc3VsdHNTZWN0aW9uJywgJ2NhdGVnb3J5SGVhZGVyQ29sb3InLCBlLnRhcmdldC52YWx1ZSl9XHJcbiAgICAgICAgICAgICAgICAgICAgLz5cclxuICAgICAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgICAgICAgICA8ZGl2PlxyXG4gICAgICAgICAgICAgICAgICA8TGFiZWw+QWJub3JtYWwgVmFsdWUgQ29sb3I8L0xhYmVsPlxyXG4gICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggZ2FwLTJcIj5cclxuICAgICAgICAgICAgICAgICAgICA8SW5wdXRcclxuICAgICAgICAgICAgICAgICAgICAgIHR5cGU9XCJjb2xvclwiXHJcbiAgICAgICAgICAgICAgICAgICAgICB2YWx1ZT17Zm9ybURhdGEucmVzdWx0c1NlY3Rpb24/LmFibm9ybWFsQ29sb3IgfHwgJyNlZjQ0NDQnfVxyXG4gICAgICAgICAgICAgICAgICAgICAgb25DaGFuZ2U9eyhlKSA9PiB1cGRhdGVGaWVsZCgncmVzdWx0c1NlY3Rpb24nLCAnYWJub3JtYWxDb2xvcicsIGUudGFyZ2V0LnZhbHVlKX1cclxuICAgICAgICAgICAgICAgICAgICAgIGNsYXNzTmFtZT1cInctMjBcIlxyXG4gICAgICAgICAgICAgICAgICAgIC8+XHJcbiAgICAgICAgICAgICAgICAgICAgPElucHV0XHJcbiAgICAgICAgICAgICAgICAgICAgICB2YWx1ZT17Zm9ybURhdGEucmVzdWx0c1NlY3Rpb24/LmFibm9ybWFsQ29sb3IgfHwgJyNlZjQ0NDQnfVxyXG4gICAgICAgICAgICAgICAgICAgICAgb25DaGFuZ2U9eyhlKSA9PiB1cGRhdGVGaWVsZCgncmVzdWx0c1NlY3Rpb24nLCAnYWJub3JtYWxDb2xvcicsIGUudGFyZ2V0LnZhbHVlKX1cclxuICAgICAgICAgICAgICAgICAgICAvPlxyXG4gICAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgIDwvVGFic0NvbnRlbnQ+XHJcblxyXG4gICAgICAgICAgICAgIHsvKiBGb290ZXIgVGFiICovfVxyXG4gICAgICAgICAgICAgIDxUYWJzQ29udGVudCB2YWx1ZT1cImZvb3RlclwiIGNsYXNzTmFtZT1cInNwYWNlLXktNFwiPlxyXG4gICAgICAgICAgICAgICAgPGRpdj5cclxuICAgICAgICAgICAgICAgICAgPExhYmVsPkRpc2NsYWltZXIgVGV4dDwvTGFiZWw+XHJcbiAgICAgICAgICAgICAgICAgIDxUZXh0YXJlYVxyXG4gICAgICAgICAgICAgICAgICAgIHZhbHVlPXtmb3JtRGF0YS5mb290ZXI/LmRpc2NsYWltZXJUZXh0IHx8ICcnfVxyXG4gICAgICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXsoZSkgPT4gdXBkYXRlRmllbGQoJ2Zvb3RlcicsICdkaXNjbGFpbWVyVGV4dCcsIGUudGFyZ2V0LnZhbHVlKX1cclxuICAgICAgICAgICAgICAgICAgICByb3dzPXszfVxyXG4gICAgICAgICAgICAgICAgICAvPlxyXG4gICAgICAgICAgICAgICAgPC9kaXY+XHJcblxyXG4gICAgICAgICAgICAgICAgPGRpdj5cclxuICAgICAgICAgICAgICAgICAgPExhYmVsPkZvb3RlciBUZXh0PC9MYWJlbD5cclxuICAgICAgICAgICAgICAgICAgPElucHV0XHJcbiAgICAgICAgICAgICAgICAgICAgdmFsdWU9e2Zvcm1EYXRhLmZvb3Rlcj8uZm9vdGVyVGV4dCB8fCAnJ31cclxuICAgICAgICAgICAgICAgICAgICBvbkNoYW5nZT17KGUpID0+IHVwZGF0ZUZpZWxkKCdmb290ZXInLCAnZm9vdGVyVGV4dCcsIGUudGFyZ2V0LnZhbHVlKX1cclxuICAgICAgICAgICAgICAgICAgICBwbGFjZWhvbGRlcj1cIk9QRU4gMjQvNyB8IE9OU0lURSAmIE9OTElORSBBQ0NFU1NcIlxyXG4gICAgICAgICAgICAgICAgICAvPlxyXG4gICAgICAgICAgICAgICAgPC9kaXY+XHJcblxyXG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJncmlkIGdyaWQtY29scy0yIGdhcC00XCI+XHJcbiAgICAgICAgICAgICAgICAgIDxkaXY+XHJcbiAgICAgICAgICAgICAgICAgICAgPExhYmVsPldhdmUgQ29sb3IgMTwvTGFiZWw+XHJcbiAgICAgICAgICAgICAgICAgICAgPElucHV0XHJcbiAgICAgICAgICAgICAgICAgICAgICB0eXBlPVwiY29sb3JcIlxyXG4gICAgICAgICAgICAgICAgICAgICAgdmFsdWU9e2Zvcm1EYXRhLmZvb3Rlcj8ud2F2ZUNvbG9yMSB8fCAnIzFlNDBhZid9XHJcbiAgICAgICAgICAgICAgICAgICAgICBvbkNoYW5nZT17KGUpID0+IHVwZGF0ZUZpZWxkKCdmb290ZXInLCAnd2F2ZUNvbG9yMScsIGUudGFyZ2V0LnZhbHVlKX1cclxuICAgICAgICAgICAgICAgICAgICAvPlxyXG4gICAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgICAgPGRpdj5cclxuICAgICAgICAgICAgICAgICAgICA8TGFiZWw+V2F2ZSBDb2xvciAyPC9MYWJlbD5cclxuICAgICAgICAgICAgICAgICAgICA8SW5wdXRcclxuICAgICAgICAgICAgICAgICAgICAgIHR5cGU9XCJjb2xvclwiXHJcbiAgICAgICAgICAgICAgICAgICAgICB2YWx1ZT17Zm9ybURhdGEuZm9vdGVyPy53YXZlQ29sb3IyIHx8ICcjMTBiOTgxJ31cclxuICAgICAgICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXsoZSkgPT4gdXBkYXRlRmllbGQoJ2Zvb3RlcicsICd3YXZlQ29sb3IyJywgZS50YXJnZXQudmFsdWUpfVxyXG4gICAgICAgICAgICAgICAgICAgIC8+XHJcbiAgICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgPC9kaXY+XHJcblxyXG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTJcIj5cclxuICAgICAgICAgICAgICAgICAgPGxhYmVsIGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGdhcC0yXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgPGlucHV0XHJcbiAgICAgICAgICAgICAgICAgICAgICB0eXBlPVwiY2hlY2tib3hcIlxyXG4gICAgICAgICAgICAgICAgICAgICAgY2hlY2tlZD17Zm9ybURhdGEuZm9vdGVyPy5zaG93V2F2ZURlc2lnbiB8fCBmYWxzZX1cclxuICAgICAgICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXsoZSkgPT4gdXBkYXRlRmllbGQoJ2Zvb3RlcicsICdzaG93V2F2ZURlc2lnbicsIGUudGFyZ2V0LmNoZWNrZWQpfVxyXG4gICAgICAgICAgICAgICAgICAgIC8+XHJcbiAgICAgICAgICAgICAgICAgICAgPHNwYW4+U2hvdyBXYXZlIERlc2lnbjwvc3Bhbj5cclxuICAgICAgICAgICAgICAgICAgPC9sYWJlbD5cclxuICAgICAgICAgICAgICAgICAgPGxhYmVsIGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGdhcC0yXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgPGlucHV0XHJcbiAgICAgICAgICAgICAgICAgICAgICB0eXBlPVwiY2hlY2tib3hcIlxyXG4gICAgICAgICAgICAgICAgICAgICAgY2hlY2tlZD17Zm9ybURhdGEuZm9vdGVyPy5zaG93VmVyaWZpY2F0aW9uIHx8IGZhbHNlfVxyXG4gICAgICAgICAgICAgICAgICAgICAgb25DaGFuZ2U9eyhlKSA9PiB1cGRhdGVGaWVsZCgnZm9vdGVyJywgJ3Nob3dWZXJpZmljYXRpb24nLCBlLnRhcmdldC5jaGVja2VkKX1cclxuICAgICAgICAgICAgICAgICAgICAvPlxyXG4gICAgICAgICAgICAgICAgICAgIDxzcGFuPlNob3cgVmVyaWZpY2F0aW9uIFNlY3Rpb248L3NwYW4+XHJcbiAgICAgICAgICAgICAgICAgIDwvbGFiZWw+XHJcbiAgICAgICAgICAgICAgICAgIDxsYWJlbCBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBnYXAtMlwiPlxyXG4gICAgICAgICAgICAgICAgICAgIDxpbnB1dFxyXG4gICAgICAgICAgICAgICAgICAgICAgdHlwZT1cImNoZWNrYm94XCJcclxuICAgICAgICAgICAgICAgICAgICAgIGNoZWNrZWQ9e2Zvcm1EYXRhLmZvb3Rlcj8uc2hvd1N0YW1wIHx8IGZhbHNlfVxyXG4gICAgICAgICAgICAgICAgICAgICAgb25DaGFuZ2U9eyhlKSA9PiB1cGRhdGVGaWVsZCgnZm9vdGVyJywgJ3Nob3dTdGFtcCcsIGUudGFyZ2V0LmNoZWNrZWQpfVxyXG4gICAgICAgICAgICAgICAgICAgIC8+XHJcbiAgICAgICAgICAgICAgICAgICAgPHNwYW4+U2hvdyBTdGFtcCBQbGFjZWhvbGRlcjwvc3Bhbj5cclxuICAgICAgICAgICAgICAgICAgPC9sYWJlbD5cclxuICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgIDwvVGFic0NvbnRlbnQ+XHJcblxyXG4gICAgICAgICAgICAgIHsvKiBQYXBlciBUYWIgKi99XHJcbiAgICAgICAgICAgICAgPFRhYnNDb250ZW50IHZhbHVlPVwicGFwZXJcIiBjbGFzc05hbWU9XCJzcGFjZS15LTRcIj5cclxuICAgICAgICAgICAgICAgIDxkaXY+XHJcbiAgICAgICAgICAgICAgICAgIDxMYWJlbD5QYXBlciBTaXplPC9MYWJlbD5cclxuICAgICAgICAgICAgICAgICAgPFNlbGVjdFxyXG4gICAgICAgICAgICAgICAgICAgIHZhbHVlPXtmb3JtRGF0YS5wYXBlclNpemV9XHJcbiAgICAgICAgICAgICAgICAgICAgb25WYWx1ZUNoYW5nZT17KHZhbHVlKSA9PiBzZXRGb3JtRGF0YSh7IC4uLmZvcm1EYXRhLCBwYXBlclNpemU6IHZhbHVlIH0pfVxyXG4gICAgICAgICAgICAgICAgICA+XHJcbiAgICAgICAgICAgICAgICAgICAgPFNlbGVjdFRyaWdnZXI+XHJcbiAgICAgICAgICAgICAgICAgICAgICA8U2VsZWN0VmFsdWUgLz5cclxuICAgICAgICAgICAgICAgICAgICA8L1NlbGVjdFRyaWdnZXI+XHJcbiAgICAgICAgICAgICAgICAgICAgPFNlbGVjdENvbnRlbnQ+XHJcbiAgICAgICAgICAgICAgICAgICAgICA8U2VsZWN0SXRlbSB2YWx1ZT1cIkE0XCI+QTQgKDIxMCB4IDI5NyBtbSk8L1NlbGVjdEl0ZW0+XHJcbiAgICAgICAgICAgICAgICAgICAgICA8U2VsZWN0SXRlbSB2YWx1ZT1cIkxFVFRFUlwiPkxldHRlciAoOC41IHggMTEgaW4pPC9TZWxlY3RJdGVtPlxyXG4gICAgICAgICAgICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJMRUdBTFwiPkxlZ2FsICg4LjUgeCAxNCBpbik8L1NlbGVjdEl0ZW0+XHJcbiAgICAgICAgICAgICAgICAgICAgICA8U2VsZWN0SXRlbSB2YWx1ZT1cIkE1XCI+QTUgKDE0OCB4IDIxMCBtbSk8L1NlbGVjdEl0ZW0+XHJcbiAgICAgICAgICAgICAgICAgICAgPC9TZWxlY3RDb250ZW50PlxyXG4gICAgICAgICAgICAgICAgICA8L1NlbGVjdD5cclxuICAgICAgICAgICAgICAgIDwvZGl2PlxyXG5cclxuICAgICAgICAgICAgICAgIDxkaXY+XHJcbiAgICAgICAgICAgICAgICAgIDxMYWJlbD5PcmllbnRhdGlvbjwvTGFiZWw+XHJcbiAgICAgICAgICAgICAgICAgIDxTZWxlY3RcclxuICAgICAgICAgICAgICAgICAgICB2YWx1ZT17Zm9ybURhdGEub3JpZW50YXRpb259XHJcbiAgICAgICAgICAgICAgICAgICAgb25WYWx1ZUNoYW5nZT17KHZhbHVlKSA9PiBzZXRGb3JtRGF0YSh7IC4uLmZvcm1EYXRhLCBvcmllbnRhdGlvbjogdmFsdWUgfSl9XHJcbiAgICAgICAgICAgICAgICAgID5cclxuICAgICAgICAgICAgICAgICAgICA8U2VsZWN0VHJpZ2dlcj5cclxuICAgICAgICAgICAgICAgICAgICAgIDxTZWxlY3RWYWx1ZSAvPlxyXG4gICAgICAgICAgICAgICAgICAgIDwvU2VsZWN0VHJpZ2dlcj5cclxuICAgICAgICAgICAgICAgICAgICA8U2VsZWN0Q29udGVudD5cclxuICAgICAgICAgICAgICAgICAgICAgIDxTZWxlY3RJdGVtIHZhbHVlPVwicG9ydHJhaXRcIj5Qb3J0cmFpdDwvU2VsZWN0SXRlbT5cclxuICAgICAgICAgICAgICAgICAgICAgIDxTZWxlY3RJdGVtIHZhbHVlPVwibGFuZHNjYXBlXCI+TGFuZHNjYXBlPC9TZWxlY3RJdGVtPlxyXG4gICAgICAgICAgICAgICAgICAgIDwvU2VsZWN0Q29udGVudD5cclxuICAgICAgICAgICAgICAgICAgPC9TZWxlY3Q+XHJcbiAgICAgICAgICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgICAgICAgICA8ZGl2PlxyXG4gICAgICAgICAgICAgICAgICA8TGFiZWw+TWFyZ2lucyAobW0pPC9MYWJlbD5cclxuICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJncmlkIGdyaWQtY29scy0yIGdhcC00IG10LTJcIj5cclxuICAgICAgICAgICAgICAgICAgICA8ZGl2PlxyXG4gICAgICAgICAgICAgICAgICAgICAgPExhYmVsIGNsYXNzTmFtZT1cInRleHQteHNcIj5Ub3A8L0xhYmVsPlxyXG4gICAgICAgICAgICAgICAgICAgICAgPElucHV0XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIHR5cGU9XCJudW1iZXJcIlxyXG4gICAgICAgICAgICAgICAgICAgICAgICB2YWx1ZT17Zm9ybURhdGEubWFyZ2lucz8udG9wIHx8IDE1fVxyXG4gICAgICAgICAgICAgICAgICAgICAgICBvbkNoYW5nZT17KGUpID0+IHNldEZvcm1EYXRhKHtcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAuLi5mb3JtRGF0YSxcclxuICAgICAgICAgICAgICAgICAgICAgICAgICBtYXJnaW5zOiB7IC4uLmZvcm1EYXRhLm1hcmdpbnMsIHRvcDogTnVtYmVyKGUudGFyZ2V0LnZhbHVlKSB9XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIH0pfVxyXG4gICAgICAgICAgICAgICAgICAgICAgLz5cclxuICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgICAgICA8ZGl2PlxyXG4gICAgICAgICAgICAgICAgICAgICAgPExhYmVsIGNsYXNzTmFtZT1cInRleHQteHNcIj5SaWdodDwvTGFiZWw+XHJcbiAgICAgICAgICAgICAgICAgICAgICA8SW5wdXRcclxuICAgICAgICAgICAgICAgICAgICAgICAgdHlwZT1cIm51bWJlclwiXHJcbiAgICAgICAgICAgICAgICAgICAgICAgIHZhbHVlPXtmb3JtRGF0YS5tYXJnaW5zPy5yaWdodCB8fCAxNX1cclxuICAgICAgICAgICAgICAgICAgICAgICAgb25DaGFuZ2U9eyhlKSA9PiBzZXRGb3JtRGF0YSh7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgLi4uZm9ybURhdGEsXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgbWFyZ2luczogeyAuLi5mb3JtRGF0YS5tYXJnaW5zLCByaWdodDogTnVtYmVyKGUudGFyZ2V0LnZhbHVlKSB9XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIH0pfVxyXG4gICAgICAgICAgICAgICAgICAgICAgLz5cclxuICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgICAgICA8ZGl2PlxyXG4gICAgICAgICAgICAgICAgICAgICAgPExhYmVsIGNsYXNzTmFtZT1cInRleHQteHNcIj5Cb3R0b208L0xhYmVsPlxyXG4gICAgICAgICAgICAgICAgICAgICAgPElucHV0XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIHR5cGU9XCJudW1iZXJcIlxyXG4gICAgICAgICAgICAgICAgICAgICAgICB2YWx1ZT17Zm9ybURhdGEubWFyZ2lucz8uYm90dG9tIHx8IDE1fVxyXG4gICAgICAgICAgICAgICAgICAgICAgICBvbkNoYW5nZT17KGUpID0+IHNldEZvcm1EYXRhKHtcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAuLi5mb3JtRGF0YSxcclxuICAgICAgICAgICAgICAgICAgICAgICAgICBtYXJnaW5zOiB7IC4uLmZvcm1EYXRhLm1hcmdpbnMsIGJvdHRvbTogTnVtYmVyKGUudGFyZ2V0LnZhbHVlKSB9XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIH0pfVxyXG4gICAgICAgICAgICAgICAgICAgICAgLz5cclxuICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgICAgICA8ZGl2PlxyXG4gICAgICAgICAgICAgICAgICAgICAgPExhYmVsIGNsYXNzTmFtZT1cInRleHQteHNcIj5MZWZ0PC9MYWJlbD5cclxuICAgICAgICAgICAgICAgICAgICAgIDxJbnB1dFxyXG4gICAgICAgICAgICAgICAgICAgICAgICB0eXBlPVwibnVtYmVyXCJcclxuICAgICAgICAgICAgICAgICAgICAgICAgdmFsdWU9e2Zvcm1EYXRhLm1hcmdpbnM/LmxlZnQgfHwgMTV9XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXsoZSkgPT4gc2V0Rm9ybURhdGEoe1xyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIC4uLmZvcm1EYXRhLFxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIG1hcmdpbnM6IHsgLi4uZm9ybURhdGEubWFyZ2lucywgbGVmdDogTnVtYmVyKGUudGFyZ2V0LnZhbHVlKSB9XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIH0pfVxyXG4gICAgICAgICAgICAgICAgICAgICAgLz5cclxuICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICA8L1RhYnNDb250ZW50PlxyXG4gICAgICAgICAgICA8L1RhYnM+XHJcblxyXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggZ2FwLTIgbXQtNlwiPlxyXG4gICAgICAgICAgICAgIDxCdXR0b25cclxuICAgICAgICAgICAgICAgIG9uQ2xpY2s9e2hhbmRsZVNhdmV9XHJcbiAgICAgICAgICAgICAgICBkaXNhYmxlZD17dXBkYXRlVGVtcGxhdGUuaXNQZW5kaW5nIHx8IHVwbG9hZExvZ28uaXNQZW5kaW5nfVxyXG4gICAgICAgICAgICAgICAgY2xhc3NOYW1lPVwiZmxleC0xXCJcclxuICAgICAgICAgICAgICA+XHJcbiAgICAgICAgICAgICAgICB7KHVwZGF0ZVRlbXBsYXRlLmlzUGVuZGluZyB8fCB1cGxvYWRMb2dvLmlzUGVuZGluZykgJiYgKFxyXG4gICAgICAgICAgICAgICAgICA8TG9hZGVyMiBjbGFzc05hbWU9XCJ3LTQgaC00IG1yLTIgYW5pbWF0ZS1zcGluXCIgLz5cclxuICAgICAgICAgICAgICAgICl9XHJcbiAgICAgICAgICAgICAgICA8U2F2ZSBjbGFzc05hbWU9XCJ3LTQgaC00IG1yLTJcIiAvPlxyXG4gICAgICAgICAgICAgICAgU2F2ZSBUZW1wbGF0ZVxyXG4gICAgICAgICAgICAgIDwvQnV0dG9uPlxyXG4gICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgIDwvZGl2PlxyXG5cclxuICAgICAgICB7LyogUHJldmlldyBQYW5lbCAqL31cclxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImxnOmNvbC1zcGFuLTFcIj5cclxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiYmctY2FyZCBib3JkZXIgcm91bmRlZC1sZyBwLTQgc3RpY2t5IHRvcC00XCI+XHJcbiAgICAgICAgICAgIDxoMyBjbGFzc05hbWU9XCJmb250LXNlbWlib2xkIG1iLTQgZmxleCBpdGVtcy1jZW50ZXIgZ2FwLTJcIj5cclxuICAgICAgICAgICAgICA8RXllIGNsYXNzTmFtZT1cInctNCBoLTRcIiAvPlxyXG4gICAgICAgICAgICAgIFByZXZpZXdcclxuICAgICAgICAgICAgPC9oMz5cclxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJiZy13aGl0ZSBib3JkZXIgcm91bmRlZCBwLTQgdGV4dC14c1wiIHN0eWxlPXt7IGZvbnRTaXplOiAnMTBweCcgfX0+XHJcbiAgICAgICAgICAgICAgey8qIE1pbmkgUHJldmlldyAqL31cclxuICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImJvcmRlci1iLTIgcGItMiBtYi0yXCIgc3R5bGU9e3sgYm9yZGVyQ29sb3I6IGZvcm1EYXRhLmhlYWRlcj8uaGVhZGVyQm9yZGVyQ29sb3IgfX0+XHJcbiAgICAgICAgICAgICAgICB7bG9nb1ByZXZpZXcgJiYgKFxyXG4gICAgICAgICAgICAgICAgICA8aW1nIHNyYz17bG9nb1ByZXZpZXd9IGFsdD1cIkxvZ29cIiBjbGFzc05hbWU9XCJoLTggbWItMVwiIC8+XHJcbiAgICAgICAgICAgICAgICApfVxyXG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmb250LWJvbGRcIj57Zm9ybURhdGEuaGVhZGVyPy5sYWJOYW1lfTwvZGl2PlxyXG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJ0ZXh0LWdyYXktNjAwIHRleHQtWzhweF1cIj57Zm9ybURhdGEuaGVhZGVyPy5tb3R0b308L2Rpdj5cclxuICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwidGV4dC1ncmF5LTYwMCB0ZXh0LVs4cHhdXCI+e2Zvcm1EYXRhLmhlYWRlcj8ucGhvbmV9PC9kaXY+XHJcbiAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJ0ZXh0LWNlbnRlciBmb250LWJvbGQgbWItMlwiPkxBQk9SQVRPUlkgUkVQT1JUPC9kaXY+XHJcbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJiZy1ncmF5LTUwIHAtMiBtYi0yIHRleHQtWzhweF1cIj5cclxuICAgICAgICAgICAgICAgIDxkaXY+UGF0aWVudDogSm9obiBEb2U8L2Rpdj5cclxuICAgICAgICAgICAgICAgIHtmb3JtRGF0YS5wYXRpZW50U2VjdGlvbj8uc2hvd0RvY3RvciAmJiA8ZGl2PkRvY3RvcjogRHIuIFNtaXRoPC9kaXY+fVxyXG4gICAgICAgICAgICAgICAge2Zvcm1EYXRhLnBhdGllbnRTZWN0aW9uPy5zaG93Q29sbGVjdGlvbkRhdGUgJiYgPGRpdj5Db2xsZWN0ZWQ6IDMxLzAxLzI2PC9kaXY+fVxyXG4gICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwibWItMlwiPlxyXG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmb250LWJvbGQgcC0xIHRleHQtWzhweF1cIiBzdHlsZT17eyBiYWNrZ3JvdW5kQ29sb3I6IGZvcm1EYXRhLnJlc3VsdHNTZWN0aW9uPy5jYXRlZ29yeUhlYWRlckNvbG9yIH19PlxyXG4gICAgICAgICAgICAgICAgICBDTElOSUNBTCBDSEVNSVNUUllcclxuICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJ0ZXh0LVs4cHhdIHAtMVwiPlxyXG4gICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXgganVzdGlmeS1iZXR3ZWVuXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgPHNwYW4+VGVzdDwvc3Bhbj5cclxuICAgICAgICAgICAgICAgICAgICA8c3Bhbj5SZXN1bHQ8L3NwYW4+XHJcbiAgICAgICAgICAgICAgICAgICAgPHNwYW4+UmFuZ2U8L3NwYW4+XHJcbiAgICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAge2Zvcm1EYXRhLmZvb3Rlcj8uc2hvd1dhdmVEZXNpZ24gJiYgKFxyXG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJtdC0yIGgtNCByb3VuZGVkXCIgc3R5bGU9e3tcclxuICAgICAgICAgICAgICAgICAgYmFja2dyb3VuZDogYGxpbmVhci1ncmFkaWVudCg5MGRlZywgJHtmb3JtRGF0YS5mb290ZXI/LndhdmVDb2xvcjF9IDAlLCAke2Zvcm1EYXRhLmZvb3Rlcj8ud2F2ZUNvbG9yMn0gMTAwJSlgXHJcbiAgICAgICAgICAgICAgICB9fT48L2Rpdj5cclxuICAgICAgICAgICAgICApfVxyXG4gICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwidGV4dC1jZW50ZXIgdGV4dC1bN3B4XSBtdC0xXCI+e2Zvcm1EYXRhLmZvb3Rlcj8uZm9vdGVyVGV4dH08L2Rpdj5cclxuICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICA8L2Rpdj5cclxuICAgICAgPC9kaXY+XHJcbiAgICA8L1JvbGVMYXlvdXQ+XHJcbiAgKTtcclxufVxyXG4iXSwibmFtZXMiOlsidXNlU3RhdGUiLCJ1c2VFZmZlY3QiLCJSb2xlTGF5b3V0IiwidXNlQXV0aCIsInVzZURlZmF1bHRUZW1wbGF0ZSIsInVzZVVwZGF0ZVRlbXBsYXRlIiwidXNlVXBsb2FkTG9nbyIsIkJ1dHRvbiIsIklucHV0IiwiTGFiZWwiLCJUZXh0YXJlYSIsIlNlbGVjdCIsIlNlbGVjdENvbnRlbnQiLCJTZWxlY3RJdGVtIiwiU2VsZWN0VHJpZ2dlciIsIlNlbGVjdFZhbHVlIiwiVGFicyIsIlRhYnNDb250ZW50IiwiVGFic0xpc3QiLCJUYWJzVHJpZ2dlciIsInRvYXN0IiwiU2F2ZSIsIkxvYWRlcjIiLCJFeWUiLCJSZXBvcnRUZW1wbGF0ZUVkaXRvciIsInByb2ZpbGUiLCJkYXRhIiwidGVtcGxhdGUiLCJpc0xvYWRpbmciLCJ1cGRhdGVUZW1wbGF0ZSIsInVwbG9hZExvZ28iLCJmb3JtRGF0YSIsInNldEZvcm1EYXRhIiwibG9nb0ZpbGUiLCJzZXRMb2dvRmlsZSIsImxvZ29QcmV2aWV3Iiwic2V0TG9nb1ByZXZpZXciLCJoZWFkZXIiLCJsb2dvVXJsIiwiZW52IiwiVklURV9BUElfVVJMIiwiaGFuZGxlTG9nb0NoYW5nZSIsImUiLCJmaWxlIiwidGFyZ2V0IiwiZmlsZXMiLCJyZWFkZXIiLCJGaWxlUmVhZGVyIiwib25sb2FkZW5kIiwicmVzdWx0IiwicmVhZEFzRGF0YVVSTCIsImhhbmRsZVNhdmUiLCJ1cGxvYWRSZXN1bHQiLCJtdXRhdGVBc3luYyIsInVybCIsImlkIiwiX2lkIiwic3VjY2VzcyIsImVycm9yIiwidXBkYXRlRmllbGQiLCJzZWN0aW9uIiwiZmllbGQiLCJ2YWx1ZSIsInByZXYiLCJ0aXRsZSIsInN1YnRpdGxlIiwicm9sZSIsInVzZXJOYW1lIiwiZnVsbF9uYW1lIiwiZGl2IiwiY2xhc3NOYW1lIiwiZGVmYXVsdFZhbHVlIiwiaW1nIiwic3JjIiwiYWx0IiwidHlwZSIsImFjY2VwdCIsIm9uQ2hhbmdlIiwicCIsImxhYk5hbWUiLCJtb3R0byIsInBsYWNlaG9sZGVyIiwiYWRkcmVzcyIsInJvd3MiLCJwaG9uZSIsImVtYWlsIiwid2Vic2l0ZSIsImhlYWRlckJvcmRlckNvbG9yIiwibGFiZWwiLCJpbnB1dCIsImNoZWNrZWQiLCJwYXRpZW50U2VjdGlvbiIsInNob3dEb2N0b3IiLCJzcGFuIiwic2hvd0NvcGllc1RvIiwic2hvd0NvbGxlY3Rpb25EYXRlIiwic2hvd1JlY2VpdmVkRGF0ZSIsInNob3dSZXBvcnRlZERhdGUiLCJzaG93UHJpbnRlZERhdGUiLCJyZXN1bHRzU2VjdGlvbiIsImNhdGVnb3J5SGVhZGVyQ29sb3IiLCJhYm5vcm1hbENvbG9yIiwiZm9vdGVyIiwiZGlzY2xhaW1lclRleHQiLCJmb290ZXJUZXh0Iiwid2F2ZUNvbG9yMSIsIndhdmVDb2xvcjIiLCJzaG93V2F2ZURlc2lnbiIsInNob3dWZXJpZmljYXRpb24iLCJzaG93U3RhbXAiLCJwYXBlclNpemUiLCJvblZhbHVlQ2hhbmdlIiwib3JpZW50YXRpb24iLCJtYXJnaW5zIiwidG9wIiwiTnVtYmVyIiwicmlnaHQiLCJib3R0b20iLCJsZWZ0Iiwib25DbGljayIsImRpc2FibGVkIiwiaXNQZW5kaW5nIiwiaDMiLCJzdHlsZSIsImZvbnRTaXplIiwiYm9yZGVyQ29sb3IiLCJiYWNrZ3JvdW5kQ29sb3IiLCJiYWNrZ3JvdW5kIl0s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

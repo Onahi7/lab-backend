@@ -6,17 +6,60 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Result, ResultFlagEnum, ResultStatusEnum } from '../database/schemas/result.schema';
+import { Order } from '../database/schemas/order.schema';
+import { Patient } from '../database/schemas/patient.schema';
+import { TestCatalog } from '../database/schemas/test-catalog.schema';
+import { UserRoleEnum } from '../database/schemas/user-role.schema';
 import { CreateResultDto } from './dto/create-result.dto';
 import { UpdateResultDto } from './dto/update-result.dto';
 import { AmendResultDto } from './dto/amend-result.dto';
 import { RealtimeGateway } from '../realtime/realtime.gateway';
+import { resolveReferenceRange } from '../common/utils/reference-range-resolver';
 
 @Injectable()
 export class ResultsService {
   constructor(
     @InjectModel(Result.name) private resultModel: Model<Result>,
+    @InjectModel(Order.name) private orderModel: Model<Order>,
+    @InjectModel(Patient.name) private patientModel: Model<Patient>,
+    @InjectModel(TestCatalog.name) private testCatalogModel: Model<TestCatalog>,
     private realtimeGateway: RealtimeGateway,
   ) {}
+
+  private async resolveReferenceRangeForResult(
+    orderId: Types.ObjectId,
+    testCode: string,
+    explicitReferenceRange?: string,
+  ): Promise<string | undefined> {
+    if (explicitReferenceRange) {
+      return explicitReferenceRange;
+    }
+
+    const order = await this.orderModel
+      .findById(orderId)
+      .select('patientId')
+      .lean();
+
+    if (!order?.patientId) {
+      return undefined;
+    }
+
+    const [patient, testCatalog] = await Promise.all([
+      this.patientModel.findById(order.patientId).select('age gender').lean(),
+      this.testCatalogModel.findOne({ code: testCode }).select('referenceRange referenceRanges').lean(),
+    ]);
+
+    if (!patient || !testCatalog) {
+      return undefined;
+    }
+
+    return resolveReferenceRange({
+      age: patient.age,
+      gender: patient.gender as any,
+      referenceRanges: testCatalog.referenceRanges,
+      simpleReferenceRange: testCatalog.referenceRange,
+    });
+  }
 
   /**
    * Calculate result flag based on value and reference range
@@ -82,24 +125,78 @@ export class ResultsService {
     return ResultFlagEnum.NORMAL;
   }
 
+  private isNumericReferenceRange(referenceRange?: string): boolean {
+    if (!referenceRange) {
+      return false;
+    }
+
+    const normalized = referenceRange.trim();
+    if (!normalized) {
+      return false;
+    }
+
+    if (/\d+\.?\d*\s*-\s*\d+\.?\d*/.test(normalized)) {
+      return true;
+    }
+
+    if (/^(<|>|<=|>=|≤|≥)\s*\d+\.?\d*$/.test(normalized)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  private isNumericValue(value: string): boolean {
+    if (value === undefined || value === null) {
+      return false;
+    }
+
+    const numericPattern = /^-?\d*\.?\d+$/;
+    return numericPattern.test(String(value).trim());
+  }
+
   /**
    * Create a new result (manual entry)
    */
   async create(
     createResultDto: CreateResultDto,
     userId?: string,
+    userRoles: string[] = [],
   ): Promise<Result> {
+    const isReceptionistEntry = userRoles.includes(UserRoleEnum.RECEPTIONIST);
+    const orderObjectId = new Types.ObjectId(createResultDto.orderId);
+    const resolvedReferenceRange = await this.resolveReferenceRangeForResult(
+      orderObjectId,
+      createResultDto.testCode,
+      isReceptionistEntry ? undefined : createResultDto.referenceRange,
+    );
+
+    if (isReceptionistEntry) {
+      if (!this.isNumericReferenceRange(resolvedReferenceRange)) {
+        throw new BadRequestException(
+          'Receptionist quick entry is only allowed for tests with numeric reference ranges',
+        );
+      }
+
+      if (!this.isNumericValue(createResultDto.value)) {
+        throw new BadRequestException(
+          'Receptionist quick entry only accepts numeric result values',
+        );
+      }
+    }
+
     // Calculate flag if not provided
     const flag =
-      createResultDto.flag ||
-      this.calculateFlag(createResultDto.value, createResultDto.referenceRange);
+      (isReceptionistEntry ? undefined : createResultDto.flag) ||
+      this.calculateFlag(createResultDto.value, resolvedReferenceRange);
 
     const result = new this.resultModel({
       ...createResultDto,
-      orderId: new Types.ObjectId(createResultDto.orderId),
+      orderId: orderObjectId,
       orderTestId: createResultDto.orderTestId
         ? new Types.ObjectId(createResultDto.orderTestId)
         : undefined,
+      referenceRange: resolvedReferenceRange,
       flag,
       status: ResultStatusEnum.PRELIMINARY,
       resultedAt: new Date(),
@@ -207,7 +304,14 @@ export class ResultsService {
     if (updateResultDto.value || updateResultDto.referenceRange) {
       const value = updateResultDto.value || result.value;
       const referenceRange =
-        updateResultDto.referenceRange || result.referenceRange;
+        updateResultDto.referenceRange ||
+        result.referenceRange ||
+        (await this.resolveReferenceRangeForResult(result.orderId, result.testCode));
+
+      if (!updateResultDto.referenceRange && referenceRange && !result.referenceRange) {
+        updateResultDto.referenceRange = referenceRange;
+      }
+
       updateResultDto.flag = this.calculateFlag(value, referenceRange);
     }
 

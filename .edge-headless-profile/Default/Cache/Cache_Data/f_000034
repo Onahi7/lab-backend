@@ -1,0 +1,546 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/pages/lab/LabDashboardPage.tsx");import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+
+let prevRefreshReg;
+let prevRefreshSig;
+
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react-swc can't detect preamble. Something is wrong."
+    );
+  }
+
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+
+import __vite__cjsImport2_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=27cfabb6"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime["jsxDEV"];
+var _s = $RefreshSig$();
+import { RoleLayout } from "/src/components/layout/RoleLayout.tsx";
+import { useAuth } from "/src/context/AuthContext.tsx";
+import { usePendingCollectionOrders, useProcessingOrders, useTodayOrders } from "/src/hooks/useOrders.ts";
+import { useCriticalResults } from "/src/hooks/useResults.ts";
+import { useMachines } from "/src/hooks/useMachines.ts";
+import { useRealtimeOrders } from "/src/hooks/useRealtimeOrders.ts";
+import { useRealtimeResults } from "/src/hooks/useRealtimeResults.ts";
+import { MetricCard } from "/src/components/dashboard/MetricCard.tsx";
+import { MachineStatusCard } from "/src/components/dashboard/MachineStatusCard.tsx";
+import { LiveConnectionMonitor } from "/src/components/machines/LiveConnectionMonitor.tsx";
+import { Button } from "/src/components/ui/button.tsx";
+import { Badge } from "/src/components/ui/badge.tsx";
+import { getPatientName, getTestCodes, getOrderId, getOrderPriority } from "/src/utils/orderHelpers.ts";
+import { TestTube, FileText, FlaskConical, AlertTriangle, CheckCircle, Cpu, Loader2 } from "/node_modules/.vite/deps/lucide-react.js?v=27cfabb6";
+import { useNavigate } from "/node_modules/.vite/deps/react-router-dom.js?v=27cfabb6";
+import { cn } from "/src/lib/utils.ts";
+export default function LabDashboardPage() {
+    _s();
+    const { profile } = useAuth();
+    const navigate = useNavigate();
+    // Enable real-time updates
+    useRealtimeOrders();
+    useRealtimeResults();
+    const { data: pendingOrders, isLoading: pendingLoading } = usePendingCollectionOrders();
+    const { data: processingOrders, isLoading: processingLoading } = useProcessingOrders();
+    const { data: todayOrders } = useTodayOrders();
+    const { data: criticalResults } = useCriticalResults();
+    const { data: machines } = useMachines();
+    const completedToday = Array.isArray(todayOrders) ? todayOrders.filter((o)=>o.status === 'completed').length : 0;
+    const onlineMachines = Array.isArray(machines) ? machines.filter((m)=>m.status === 'online' || m.status === 'processing').length : 0;
+    const isLoading = pendingLoading || processingLoading;
+    return /*#__PURE__*/ _jsxDEV(RoleLayout, {
+        title: "Lab Dashboard",
+        subtitle: "Sample processing and result management",
+        role: "lab-tech",
+        userName: profile?.full_name,
+        children: [
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "grid grid-cols-1 md:grid-cols-3 gap-4 mb-6",
+                children: [
+                    /*#__PURE__*/ _jsxDEV(Button, {
+                        size: "lg",
+                        className: "h-20 text-lg",
+                        onClick: ()=>navigate('/lab/collect'),
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(TestTube, {
+                                className: "w-6 h-6 mr-3"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                lineNumber: 59,
+                                columnNumber: 11
+                            }, this),
+                            "Collect Samples (",
+                            pendingOrders?.length || 0,
+                            ")"
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                        lineNumber: 54,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(Button, {
+                        size: "lg",
+                        variant: "secondary",
+                        className: "h-20 text-lg",
+                        onClick: ()=>navigate('/lab/processing'),
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(FlaskConical, {
+                                className: "w-6 h-6 mr-3"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                lineNumber: 68,
+                                columnNumber: 11
+                            }, this),
+                            "Enter Results (",
+                            processingOrders?.length || 0,
+                            ")"
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                        lineNumber: 62,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(Button, {
+                        size: "lg",
+                        variant: "outline",
+                        className: "h-20 text-lg",
+                        onClick: ()=>navigate('/lab/results'),
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(FileText, {
+                                className: "w-6 h-6 mr-3"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                lineNumber: 77,
+                                columnNumber: 11
+                            }, this),
+                            "View All Results"
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                        lineNumber: 71,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                lineNumber: 53,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "grid grid-cols-1 md:grid-cols-5 gap-4 mb-6",
+                children: [
+                    /*#__PURE__*/ _jsxDEV(MetricCard, {
+                        title: "Pending Collection",
+                        value: pendingOrders?.length || 0,
+                        icon: TestTube,
+                        variant: (pendingOrders?.length || 0) > 5 ? 'warning' : 'default'
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                        lineNumber: 84,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(MetricCard, {
+                        title: "Processing",
+                        value: processingOrders?.length || 0,
+                        icon: FlaskConical
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                        lineNumber: 90,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(MetricCard, {
+                        title: "Completed Today",
+                        value: completedToday,
+                        icon: CheckCircle
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                        lineNumber: 95,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(MetricCard, {
+                        title: "Critical Results",
+                        value: criticalResults?.length || 0,
+                        icon: AlertTriangle,
+                        variant: (criticalResults?.length || 0) > 0 ? 'critical' : 'default'
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                        lineNumber: 100,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(MetricCard, {
+                        title: "Machines Online",
+                        value: `${onlineMachines}/${machines?.length || 0}`,
+                        icon: Cpu
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                        lineNumber: 106,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                lineNumber: 83,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "px-4 py-3 border-b flex items-center justify-between",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("h3", {
+                                        className: "font-semibold",
+                                        children: "Pending Sample Collection"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                        lineNumber: 118,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(Button, {
+                                        variant: "ghost",
+                                        size: "sm",
+                                        onClick: ()=>navigate('/lab/collect'),
+                                        children: "View All"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                        lineNumber: 119,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                lineNumber: 117,
+                                columnNumber: 11
+                            }, this),
+                            isLoading ? /*#__PURE__*/ _jsxDEV("div", {
+                                className: "flex items-center justify-center py-12",
+                                children: /*#__PURE__*/ _jsxDEV(Loader2, {
+                                    className: "w-6 h-6 animate-spin text-muted-foreground"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                    lineNumber: 125,
+                                    columnNumber: 15
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                lineNumber: 124,
+                                columnNumber: 13
+                            }, this) : /*#__PURE__*/ _jsxDEV("div", {
+                                className: "divide-y max-h-80 overflow-y-auto",
+                                children: [
+                                    Array.isArray(pendingOrders) && pendingOrders.slice(0, 5).map((order)=>{
+                                        const patientName = getPatientName(order);
+                                        const orderId = getOrderId(order);
+                                        return /*#__PURE__*/ _jsxDEV("div", {
+                                            className: "px-4 py-3 hover:bg-muted/50 transition-colors",
+                                            children: /*#__PURE__*/ _jsxDEV("div", {
+                                                className: "flex items-center justify-between",
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                                className: "flex items-center gap-2",
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV("p", {
+                                                                        className: "font-medium",
+                                                                        children: patientName
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                                                        lineNumber: 138,
+                                                                        columnNumber: 27
+                                                                    }, this),
+                                                                    /*#__PURE__*/ _jsxDEV(Badge, {
+                                                                        variant: "outline",
+                                                                        className: cn('text-xs', order.priority === 'stat' ? 'bg-status-critical/10 text-status-critical' : order.priority === 'urgent' ? 'bg-status-warning/10 text-status-warning' : 'bg-muted text-muted-foreground'),
+                                                                        children: getOrderPriority(order)
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                                                        lineNumber: 141,
+                                                                        columnNumber: 27
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                                                lineNumber: 137,
+                                                                columnNumber: 25
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                                className: "text-sm text-muted-foreground",
+                                                                children: getTestCodes(order)
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                                                lineNumber: 150,
+                                                                columnNumber: 25
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                                        lineNumber: 136,
+                                                        columnNumber: 23
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV(Button, {
+                                                        size: "sm",
+                                                        onClick: ()=>navigate(`/lab/collect?order=${getOrderId(order)}`),
+                                                        children: "Collect"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                                        lineNumber: 152,
+                                                        columnNumber: 23
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                                lineNumber: 135,
+                                                columnNumber: 21
+                                            }, this)
+                                        }, getOrderId(order), false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                            lineNumber: 134,
+                                            columnNumber: 19
+                                        }, this);
+                                    }),
+                                    (!pendingOrders || !Array.isArray(pendingOrders) || pendingOrders.length === 0) && /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "px-4 py-8 text-center text-muted-foreground",
+                                        children: "No samples pending collection"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                        lineNumber: 160,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                lineNumber: 128,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                        lineNumber: 116,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "px-4 py-3 border-b flex items-center justify-between",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("h3", {
+                                        className: "font-semibold",
+                                        children: "Awaiting Results"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                        lineNumber: 171,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(Button, {
+                                        variant: "ghost",
+                                        size: "sm",
+                                        onClick: ()=>navigate('/lab/processing'),
+                                        children: "View All"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                        lineNumber: 172,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                lineNumber: 170,
+                                columnNumber: 11
+                            }, this),
+                            isLoading ? /*#__PURE__*/ _jsxDEV("div", {
+                                className: "flex items-center justify-center py-12",
+                                children: /*#__PURE__*/ _jsxDEV(Loader2, {
+                                    className: "w-6 h-6 animate-spin text-muted-foreground"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                    lineNumber: 178,
+                                    columnNumber: 15
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                lineNumber: 177,
+                                columnNumber: 13
+                            }, this) : /*#__PURE__*/ _jsxDEV("div", {
+                                className: "divide-y max-h-80 overflow-y-auto",
+                                children: [
+                                    Array.isArray(processingOrders) && processingOrders.slice(0, 5).map((order)=>/*#__PURE__*/ _jsxDEV("div", {
+                                            className: "px-4 py-3 hover:bg-muted/50 transition-colors",
+                                            children: /*#__PURE__*/ _jsxDEV("div", {
+                                                className: "flex items-center justify-between",
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                                className: "font-medium",
+                                                                children: getPatientName(order)
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                                                lineNumber: 186,
+                                                                columnNumber: 23
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                                className: "text-sm text-muted-foreground",
+                                                                children: getTestCodes(order)
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                                                lineNumber: 187,
+                                                                columnNumber: 23
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                                        lineNumber: 185,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV(Button, {
+                                                        variant: "outline",
+                                                        size: "sm",
+                                                        onClick: ()=>navigate(`/lab/processing?order=${getOrderId(order)}`),
+                                                        children: "Enter Results"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                                        lineNumber: 189,
+                                                        columnNumber: 21
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                                lineNumber: 184,
+                                                columnNumber: 19
+                                            }, this)
+                                        }, getOrderId(order), false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                            lineNumber: 183,
+                                            columnNumber: 17
+                                        }, this)),
+                                    (!processingOrders || !Array.isArray(processingOrders) || processingOrders.length === 0) && /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "px-4 py-8 text-center text-muted-foreground",
+                                        children: "No samples currently processing"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                        lineNumber: 196,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                lineNumber: 181,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                        lineNumber: 169,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                lineNumber: 114,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "grid grid-cols-1 lg:grid-cols-2 gap-6",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg p-4",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("h3", {
+                                className: "font-semibold mb-4",
+                                children: "Analyzer Status"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                lineNumber: 209,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "grid grid-cols-1 gap-3",
+                                children: [
+                                    machines?.slice(0, 3).map((machine)=>/*#__PURE__*/ _jsxDEV(MachineStatusCard, {
+                                            machine: machine
+                                        }, machine.id, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                            lineNumber: 212,
+                                            columnNumber: 15
+                                        }, this)),
+                                    (!machines || machines.length === 0) && /*#__PURE__*/ _jsxDEV("p", {
+                                        className: "text-muted-foreground text-center py-4",
+                                        children: "No analyzers configured"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                        lineNumber: 215,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                                lineNumber: 210,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                        lineNumber: 208,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(LiveConnectionMonitor, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                        lineNumber: 221,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+                lineNumber: 206,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx",
+        lineNumber: 46,
+        columnNumber: 5
+    }, this);
+}
+_s(LabDashboardPage, "P1BdTdoN104SmmvuVyr9BjWijXo=", false, function() {
+    return [
+        useAuth,
+        useNavigate,
+        useRealtimeOrders,
+        useRealtimeResults,
+        usePendingCollectionOrders,
+        useProcessingOrders,
+        useTodayOrders,
+        useCriticalResults,
+        useMachines
+    ];
+});
+_c = LabDashboardPage;
+var _c;
+$RefreshReg$(_c, "LabDashboardPage");
+
+
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+
+
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/HP/Downloads/lab/frontend/src/pages/lab/LabDashboardPage.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIkxhYkRhc2hib2FyZFBhZ2UudHN4Il0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IFJvbGVMYXlvdXQgfSBmcm9tICdAL2NvbXBvbmVudHMvbGF5b3V0L1JvbGVMYXlvdXQnO1xuaW1wb3J0IHsgdXNlQXV0aCB9IGZyb20gJ0AvY29udGV4dC9BdXRoQ29udGV4dCc7XG5pbXBvcnQgeyB1c2VQZW5kaW5nQ29sbGVjdGlvbk9yZGVycywgdXNlUHJvY2Vzc2luZ09yZGVycywgdXNlVG9kYXlPcmRlcnMgfSBmcm9tICdAL2hvb2tzL3VzZU9yZGVycyc7XG5pbXBvcnQgeyB1c2VDcml0aWNhbFJlc3VsdHMgfSBmcm9tICdAL2hvb2tzL3VzZVJlc3VsdHMnO1xuaW1wb3J0IHsgdXNlTWFjaGluZXMgfSBmcm9tICdAL2hvb2tzL3VzZU1hY2hpbmVzJztcbmltcG9ydCB7IHVzZVJlYWx0aW1lT3JkZXJzIH0gZnJvbSAnQC9ob29rcy91c2VSZWFsdGltZU9yZGVycyc7XG5pbXBvcnQgeyB1c2VSZWFsdGltZVJlc3VsdHMgfSBmcm9tICdAL2hvb2tzL3VzZVJlYWx0aW1lUmVzdWx0cyc7XG5pbXBvcnQgeyBNZXRyaWNDYXJkIH0gZnJvbSAnQC9jb21wb25lbnRzL2Rhc2hib2FyZC9NZXRyaWNDYXJkJztcbmltcG9ydCB7IE1hY2hpbmVTdGF0dXNDYXJkIH0gZnJvbSAnQC9jb21wb25lbnRzL2Rhc2hib2FyZC9NYWNoaW5lU3RhdHVzQ2FyZCc7XG5pbXBvcnQgeyBMaXZlQ29ubmVjdGlvbk1vbml0b3IgfSBmcm9tICdAL2NvbXBvbmVudHMvbWFjaGluZXMvTGl2ZUNvbm5lY3Rpb25Nb25pdG9yJztcbmltcG9ydCB7IEJ1dHRvbiB9IGZyb20gJ0AvY29tcG9uZW50cy91aS9idXR0b24nO1xuaW1wb3J0IHsgQmFkZ2UgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvYmFkZ2UnO1xuaW1wb3J0IHsgZ2V0UGF0aWVudE5hbWUsIGdldFRlc3RDb2RlcywgZ2V0T3JkZXJJZCwgZ2V0T3JkZXJQcmlvcml0eSB9IGZyb20gJ0AvdXRpbHMvb3JkZXJIZWxwZXJzJztcbmltcG9ydCB7IFxuICBUZXN0VHViZSwgXG4gIEZpbGVUZXh0LCBcbiAgRmxhc2tDb25pY2FsLFxuICBBbGVydFRyaWFuZ2xlLFxuICBDaGVja0NpcmNsZSxcbiAgQ3B1LFxuICBMb2FkZXIyXG59IGZyb20gJ2x1Y2lkZS1yZWFjdCc7XG5pbXBvcnQgeyB1c2VOYXZpZ2F0ZSB9IGZyb20gJ3JlYWN0LXJvdXRlci1kb20nO1xuaW1wb3J0IHsgY24gfSBmcm9tICdAL2xpYi91dGlscyc7XG5cbmV4cG9ydCBkZWZhdWx0IGZ1bmN0aW9uIExhYkRhc2hib2FyZFBhZ2UoKSB7XG4gIGNvbnN0IHsgcHJvZmlsZSB9ID0gdXNlQXV0aCgpO1xuICBjb25zdCBuYXZpZ2F0ZSA9IHVzZU5hdmlnYXRlKCk7XG5cbiAgLy8gRW5hYmxlIHJlYWwtdGltZSB1cGRhdGVzXG4gIHVzZVJlYWx0aW1lT3JkZXJzKCk7XG4gIHVzZVJlYWx0aW1lUmVzdWx0cygpO1xuXG4gIGNvbnN0IHsgZGF0YTogcGVuZGluZ09yZGVycywgaXNMb2FkaW5nOiBwZW5kaW5nTG9hZGluZyB9ID0gdXNlUGVuZGluZ0NvbGxlY3Rpb25PcmRlcnMoKTtcbiAgY29uc3QgeyBkYXRhOiBwcm9jZXNzaW5nT3JkZXJzLCBpc0xvYWRpbmc6IHByb2Nlc3NpbmdMb2FkaW5nIH0gPSB1c2VQcm9jZXNzaW5nT3JkZXJzKCk7XG4gIGNvbnN0IHsgZGF0YTogdG9kYXlPcmRlcnMgfSA9IHVzZVRvZGF5T3JkZXJzKCk7XG4gIGNvbnN0IHsgZGF0YTogY3JpdGljYWxSZXN1bHRzIH0gPSB1c2VDcml0aWNhbFJlc3VsdHMoKTtcbiAgY29uc3QgeyBkYXRhOiBtYWNoaW5lcyB9ID0gdXNlTWFjaGluZXMoKTtcblxuICBjb25zdCBjb21wbGV0ZWRUb2RheSA9IEFycmF5LmlzQXJyYXkodG9kYXlPcmRlcnMpID8gdG9kYXlPcmRlcnMuZmlsdGVyKG8gPT4gby5zdGF0dXMgPT09ICdjb21wbGV0ZWQnKS5sZW5ndGggOiAwO1xuICBjb25zdCBvbmxpbmVNYWNoaW5lcyA9IEFycmF5LmlzQXJyYXkobWFjaGluZXMpID8gbWFjaGluZXMuZmlsdGVyKG0gPT4gbS5zdGF0dXMgPT09ICdvbmxpbmUnIHx8IG0uc3RhdHVzID09PSAncHJvY2Vzc2luZycpLmxlbmd0aCA6IDA7XG5cbiAgY29uc3QgaXNMb2FkaW5nID0gcGVuZGluZ0xvYWRpbmcgfHwgcHJvY2Vzc2luZ0xvYWRpbmc7XG5cbiAgcmV0dXJuIChcbiAgICA8Um9sZUxheW91dCBcbiAgICAgIHRpdGxlPVwiTGFiIERhc2hib2FyZFwiIFxuICAgICAgc3VidGl0bGU9XCJTYW1wbGUgcHJvY2Vzc2luZyBhbmQgcmVzdWx0IG1hbmFnZW1lbnRcIlxuICAgICAgcm9sZT1cImxhYi10ZWNoXCJcbiAgICAgIHVzZXJOYW1lPXtwcm9maWxlPy5mdWxsX25hbWV9XG4gICAgPlxuICAgICAgey8qIFF1aWNrIEFjdGlvbnMgKi99XG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImdyaWQgZ3JpZC1jb2xzLTEgbWQ6Z3JpZC1jb2xzLTMgZ2FwLTQgbWItNlwiPlxuICAgICAgICA8QnV0dG9uIFxuICAgICAgICAgIHNpemU9XCJsZ1wiIFxuICAgICAgICAgIGNsYXNzTmFtZT1cImgtMjAgdGV4dC1sZ1wiXG4gICAgICAgICAgb25DbGljaz17KCkgPT4gbmF2aWdhdGUoJy9sYWIvY29sbGVjdCcpfVxuICAgICAgICA+XG4gICAgICAgICAgPFRlc3RUdWJlIGNsYXNzTmFtZT1cInctNiBoLTYgbXItM1wiIC8+XG4gICAgICAgICAgQ29sbGVjdCBTYW1wbGVzICh7cGVuZGluZ09yZGVycz8ubGVuZ3RoIHx8IDB9KVxuICAgICAgICA8L0J1dHRvbj5cbiAgICAgICAgPEJ1dHRvbiBcbiAgICAgICAgICBzaXplPVwibGdcIiBcbiAgICAgICAgICB2YXJpYW50PVwic2Vjb25kYXJ5XCJcbiAgICAgICAgICBjbGFzc05hbWU9XCJoLTIwIHRleHQtbGdcIlxuICAgICAgICAgIG9uQ2xpY2s9eygpID0+IG5hdmlnYXRlKCcvbGFiL3Byb2Nlc3NpbmcnKX1cbiAgICAgICAgPlxuICAgICAgICAgIDxGbGFza0NvbmljYWwgY2xhc3NOYW1lPVwidy02IGgtNiBtci0zXCIgLz5cbiAgICAgICAgICBFbnRlciBSZXN1bHRzICh7cHJvY2Vzc2luZ09yZGVycz8ubGVuZ3RoIHx8IDB9KVxuICAgICAgICA8L0J1dHRvbj5cbiAgICAgICAgPEJ1dHRvbiBcbiAgICAgICAgICBzaXplPVwibGdcIiBcbiAgICAgICAgICB2YXJpYW50PVwib3V0bGluZVwiXG4gICAgICAgICAgY2xhc3NOYW1lPVwiaC0yMCB0ZXh0LWxnXCJcbiAgICAgICAgICBvbkNsaWNrPXsoKSA9PiBuYXZpZ2F0ZSgnL2xhYi9yZXN1bHRzJyl9XG4gICAgICAgID5cbiAgICAgICAgICA8RmlsZVRleHQgY2xhc3NOYW1lPVwidy02IGgtNiBtci0zXCIgLz5cbiAgICAgICAgICBWaWV3IEFsbCBSZXN1bHRzXG4gICAgICAgIDwvQnV0dG9uPlxuICAgICAgPC9kaXY+XG5cbiAgICAgIHsvKiBNZXRyaWNzICovfVxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJncmlkIGdyaWQtY29scy0xIG1kOmdyaWQtY29scy01IGdhcC00IG1iLTZcIj5cbiAgICAgICAgPE1ldHJpY0NhcmRcbiAgICAgICAgICB0aXRsZT1cIlBlbmRpbmcgQ29sbGVjdGlvblwiXG4gICAgICAgICAgdmFsdWU9e3BlbmRpbmdPcmRlcnM/Lmxlbmd0aCB8fCAwfVxuICAgICAgICAgIGljb249e1Rlc3RUdWJlfVxuICAgICAgICAgIHZhcmlhbnQ9eyhwZW5kaW5nT3JkZXJzPy5sZW5ndGggfHwgMCkgPiA1ID8gJ3dhcm5pbmcnIDogJ2RlZmF1bHQnfVxuICAgICAgICAvPlxuICAgICAgICA8TWV0cmljQ2FyZFxuICAgICAgICAgIHRpdGxlPVwiUHJvY2Vzc2luZ1wiXG4gICAgICAgICAgdmFsdWU9e3Byb2Nlc3NpbmdPcmRlcnM/Lmxlbmd0aCB8fCAwfVxuICAgICAgICAgIGljb249e0ZsYXNrQ29uaWNhbH1cbiAgICAgICAgLz5cbiAgICAgICAgPE1ldHJpY0NhcmRcbiAgICAgICAgICB0aXRsZT1cIkNvbXBsZXRlZCBUb2RheVwiXG4gICAgICAgICAgdmFsdWU9e2NvbXBsZXRlZFRvZGF5fVxuICAgICAgICAgIGljb249e0NoZWNrQ2lyY2xlfVxuICAgICAgICAvPlxuICAgICAgICA8TWV0cmljQ2FyZFxuICAgICAgICAgIHRpdGxlPVwiQ3JpdGljYWwgUmVzdWx0c1wiXG4gICAgICAgICAgdmFsdWU9e2NyaXRpY2FsUmVzdWx0cz8ubGVuZ3RoIHx8IDB9XG4gICAgICAgICAgaWNvbj17QWxlcnRUcmlhbmdsZX1cbiAgICAgICAgICB2YXJpYW50PXsoY3JpdGljYWxSZXN1bHRzPy5sZW5ndGggfHwgMCkgPiAwID8gJ2NyaXRpY2FsJyA6ICdkZWZhdWx0J31cbiAgICAgICAgLz5cbiAgICAgICAgPE1ldHJpY0NhcmRcbiAgICAgICAgICB0aXRsZT1cIk1hY2hpbmVzIE9ubGluZVwiXG4gICAgICAgICAgdmFsdWU9e2Ake29ubGluZU1hY2hpbmVzfS8ke21hY2hpbmVzPy5sZW5ndGggfHwgMH1gfVxuICAgICAgICAgIGljb249e0NwdX1cbiAgICAgICAgLz5cbiAgICAgIDwvZGl2PlxuXG4gICAgICB7LyogTWFpbiBDb250ZW50ICovfVxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJncmlkIGdyaWQtY29scy0xIGxnOmdyaWQtY29scy0yIGdhcC02IG1iLTZcIj5cbiAgICAgICAgey8qIFBlbmRpbmcgU2FtcGxlcyBRdWV1ZSAqL31cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJiZy1jYXJkIGJvcmRlciByb3VuZGVkLWxnXCI+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJweC00IHB5LTMgYm9yZGVyLWIgZmxleCBpdGVtcy1jZW50ZXIganVzdGlmeS1iZXR3ZWVuXCI+XG4gICAgICAgICAgICA8aDMgY2xhc3NOYW1lPVwiZm9udC1zZW1pYm9sZFwiPlBlbmRpbmcgU2FtcGxlIENvbGxlY3Rpb248L2gzPlxuICAgICAgICAgICAgPEJ1dHRvbiB2YXJpYW50PVwiZ2hvc3RcIiBzaXplPVwic21cIiBvbkNsaWNrPXsoKSA9PiBuYXZpZ2F0ZSgnL2xhYi9jb2xsZWN0Jyl9PlxuICAgICAgICAgICAgICBWaWV3IEFsbFxuICAgICAgICAgICAgPC9CdXR0b24+XG4gICAgICAgICAgPC9kaXY+XG4gICAgICAgICAge2lzTG9hZGluZyA/IChcbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIganVzdGlmeS1jZW50ZXIgcHktMTJcIj5cbiAgICAgICAgICAgICAgPExvYWRlcjIgY2xhc3NOYW1lPVwidy02IGgtNiBhbmltYXRlLXNwaW4gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCIgLz5cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICkgOiAoXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImRpdmlkZS15IG1heC1oLTgwIG92ZXJmbG93LXktYXV0b1wiPlxuICAgICAgICAgICAgICB7QXJyYXkuaXNBcnJheShwZW5kaW5nT3JkZXJzKSAmJiBwZW5kaW5nT3JkZXJzLnNsaWNlKDAsIDUpLm1hcChvcmRlciA9PiB7XG4gICAgICAgICAgICAgICAgY29uc3QgcGF0aWVudE5hbWUgPSBnZXRQYXRpZW50TmFtZShvcmRlcik7XG4gICAgICAgICAgICAgICAgY29uc3Qgb3JkZXJJZCA9IGdldE9yZGVySWQob3JkZXIpO1xuICAgICAgICAgICAgICAgIFxuICAgICAgICAgICAgICAgIHJldHVybiAoXG4gICAgICAgICAgICAgICAgICA8ZGl2IGtleT17Z2V0T3JkZXJJZChvcmRlcil9IGNsYXNzTmFtZT1cInB4LTQgcHktMyBob3ZlcjpiZy1tdXRlZC81MCB0cmFuc2l0aW9uLWNvbG9yc1wiPlxuICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGp1c3RpZnktYmV0d2VlblwiPlxuICAgICAgICAgICAgICAgICAgICAgIDxkaXY+XG4gICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGdhcC0yXCI+XG4gICAgICAgICAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cImZvbnQtbWVkaXVtXCI+XG4gICAgICAgICAgICAgICAgICAgICAgICAgICAge3BhdGllbnROYW1lfVxuICAgICAgICAgICAgICAgICAgICAgICAgICA8L3A+XG4gICAgICAgICAgICAgICAgICAgICAgICAgIDxCYWRnZSB2YXJpYW50PVwib3V0bGluZVwiIGNsYXNzTmFtZT17Y24oXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgJ3RleHQteHMnLFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIG9yZGVyLnByaW9yaXR5ID09PSAnc3RhdCcgPyAnYmctc3RhdHVzLWNyaXRpY2FsLzEwIHRleHQtc3RhdHVzLWNyaXRpY2FsJyA6XG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgb3JkZXIucHJpb3JpdHkgPT09ICd1cmdlbnQnID8gJ2JnLXN0YXR1cy13YXJuaW5nLzEwIHRleHQtc3RhdHVzLXdhcm5pbmcnIDpcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAnYmctbXV0ZWQgdGV4dC1tdXRlZC1mb3JlZ3JvdW5kJ1xuICAgICAgICAgICAgICAgICAgICAgICAgICApfT5cbiAgICAgICAgICAgICAgICAgICAgICAgICAgICB7Z2V0T3JkZXJQcmlvcml0eShvcmRlcil9XG4gICAgICAgICAgICAgICAgICAgICAgICAgIDwvQmFkZ2U+XG4gICAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc20gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+e2dldFRlc3RDb2RlcyhvcmRlcil9PC9wPlxuICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICAgICAgICAgIDxCdXR0b24gc2l6ZT1cInNtXCIgb25DbGljaz17KCkgPT4gbmF2aWdhdGUoYC9sYWIvY29sbGVjdD9vcmRlcj0ke2dldE9yZGVySWQob3JkZXIpfWApfT5cbiAgICAgICAgICAgICAgICAgICAgICAgIENvbGxlY3RcbiAgICAgICAgICAgICAgICAgICAgICA8L0J1dHRvbj5cbiAgICAgICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICApO1xuICAgICAgICAgICAgICB9KX1cbiAgICAgICAgICAgICAgeyghcGVuZGluZ09yZGVycyB8fCAhQXJyYXkuaXNBcnJheShwZW5kaW5nT3JkZXJzKSB8fCBwZW5kaW5nT3JkZXJzLmxlbmd0aCA9PT0gMCkgJiYgKFxuICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwicHgtNCBweS04IHRleHQtY2VudGVyIHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPlxuICAgICAgICAgICAgICAgICAgTm8gc2FtcGxlcyBwZW5kaW5nIGNvbGxlY3Rpb25cbiAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgKX1cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICl9XG4gICAgICAgIDwvZGl2PlxuXG4gICAgICAgIHsvKiBQcm9jZXNzaW5nIFF1ZXVlICovfVxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImJnLWNhcmQgYm9yZGVyIHJvdW5kZWQtbGdcIj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInB4LTQgcHktMyBib3JkZXItYiBmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWJldHdlZW5cIj5cbiAgICAgICAgICAgIDxoMyBjbGFzc05hbWU9XCJmb250LXNlbWlib2xkXCI+QXdhaXRpbmcgUmVzdWx0czwvaDM+XG4gICAgICAgICAgICA8QnV0dG9uIHZhcmlhbnQ9XCJnaG9zdFwiIHNpemU9XCJzbVwiIG9uQ2xpY2s9eygpID0+IG5hdmlnYXRlKCcvbGFiL3Byb2Nlc3NpbmcnKX0+XG4gICAgICAgICAgICAgIFZpZXcgQWxsXG4gICAgICAgICAgICA8L0J1dHRvbj5cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICB7aXNMb2FkaW5nID8gKFxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWNlbnRlciBweS0xMlwiPlxuICAgICAgICAgICAgICA8TG9hZGVyMiBjbGFzc05hbWU9XCJ3LTYgaC02IGFuaW1hdGUtc3BpbiB0ZXh0LW11dGVkLWZvcmVncm91bmRcIiAvPlxuICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgKSA6IChcbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZGl2aWRlLXkgbWF4LWgtODAgb3ZlcmZsb3cteS1hdXRvXCI+XG4gICAgICAgICAgICAgIHtBcnJheS5pc0FycmF5KHByb2Nlc3NpbmdPcmRlcnMpICYmIHByb2Nlc3NpbmdPcmRlcnMuc2xpY2UoMCwgNSkubWFwKG9yZGVyID0+IChcbiAgICAgICAgICAgICAgICA8ZGl2IGtleT17Z2V0T3JkZXJJZChvcmRlcil9IGNsYXNzTmFtZT1cInB4LTQgcHktMyBob3ZlcjpiZy1tdXRlZC81MCB0cmFuc2l0aW9uLWNvbG9yc1wiPlxuICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWJldHdlZW5cIj5cbiAgICAgICAgICAgICAgICAgICAgPGRpdj5cbiAgICAgICAgICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJmb250LW1lZGl1bVwiPntnZXRQYXRpZW50TmFtZShvcmRlcil9PC9wPlxuICAgICAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc20gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+e2dldFRlc3RDb2RlcyhvcmRlcil9PC9wPlxuICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICAgICAgPEJ1dHRvbiB2YXJpYW50PVwib3V0bGluZVwiIHNpemU9XCJzbVwiIG9uQ2xpY2s9eygpID0+IG5hdmlnYXRlKGAvbGFiL3Byb2Nlc3Npbmc/b3JkZXI9JHtnZXRPcmRlcklkKG9yZGVyKX1gKX0+XG4gICAgICAgICAgICAgICAgICAgICAgRW50ZXIgUmVzdWx0c1xuICAgICAgICAgICAgICAgICAgICA8L0J1dHRvbj5cbiAgICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICApKX1cbiAgICAgICAgICAgICAgeyghcHJvY2Vzc2luZ09yZGVycyB8fCAhQXJyYXkuaXNBcnJheShwcm9jZXNzaW5nT3JkZXJzKSB8fCBwcm9jZXNzaW5nT3JkZXJzLmxlbmd0aCA9PT0gMCkgJiYgKFxuICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwicHgtNCBweS04IHRleHQtY2VudGVyIHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPlxuICAgICAgICAgICAgICAgICAgTm8gc2FtcGxlcyBjdXJyZW50bHkgcHJvY2Vzc2luZ1xuICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICApfVxuICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgKX1cbiAgICAgICAgPC9kaXY+XG4gICAgICA8L2Rpdj5cblxuICAgICAgey8qIEJvdHRvbSBSb3cgKi99XG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImdyaWQgZ3JpZC1jb2xzLTEgbGc6Z3JpZC1jb2xzLTIgZ2FwLTZcIj5cbiAgICAgICAgey8qIE1hY2hpbmUgU3RhdHVzICovfVxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImJnLWNhcmQgYm9yZGVyIHJvdW5kZWQtbGcgcC00XCI+XG4gICAgICAgICAgPGgzIGNsYXNzTmFtZT1cImZvbnQtc2VtaWJvbGQgbWItNFwiPkFuYWx5emVyIFN0YXR1czwvaDM+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJncmlkIGdyaWQtY29scy0xIGdhcC0zXCI+XG4gICAgICAgICAgICB7bWFjaGluZXM/LnNsaWNlKDAsIDMpLm1hcChtYWNoaW5lID0+IChcbiAgICAgICAgICAgICAgPE1hY2hpbmVTdGF0dXNDYXJkIGtleT17bWFjaGluZS5pZH0gbWFjaGluZT17bWFjaGluZSBhcyBhbnl9IC8+XG4gICAgICAgICAgICApKX1cbiAgICAgICAgICAgIHsoIW1hY2hpbmVzIHx8IG1hY2hpbmVzLmxlbmd0aCA9PT0gMCkgJiYgKFxuICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LW11dGVkLWZvcmVncm91bmQgdGV4dC1jZW50ZXIgcHktNFwiPk5vIGFuYWx5emVycyBjb25maWd1cmVkPC9wPlxuICAgICAgICAgICAgKX1cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgey8qIExpdmUgQ29ubmVjdGlvbiBNb25pdG9yICovfVxuICAgICAgICA8TGl2ZUNvbm5lY3Rpb25Nb25pdG9yIC8+XG4gICAgICA8L2Rpdj5cbiAgICA8L1JvbGVMYXlvdXQ+XG4gICk7XG59XG4iXSwibmFtZXMiOlsiUm9sZUxheW91dCIsInVzZUF1dGgiLCJ1c2VQZW5kaW5nQ29sbGVjdGlvbk9yZGVycyIsInVzZVByb2Nlc3NpbmdPcmRlcnMiLCJ1c2VUb2RheU9yZGVycyIsInVzZUNyaXRpY2FsUmVzdWx0cyIsInVzZU1hY2hpbmVzIiwidXNlUmVhbHRpbWVPcmRlcnMiLCJ1c2VSZWFsdGltZVJlc3VsdHMiLCJNZXRyaWNDYXJkIiwiTWFjaGluZVN0YXR1c0NhcmQiLCJMaXZlQ29ubmVjdGlvbk1vbml0b3IiLCJCdXR0b24iLCJCYWRnZSIsImdldFBhdGllbnROYW1lIiwiZ2V0VGVzdENvZGVzIiwiZ2V0T3JkZXJJZCIsImdldE9yZGVyUHJpb3JpdHkiLCJUZXN0VHViZSIsIkZpbGVUZXh0IiwiRmxhc2tDb25pY2FsIiwiQWxlcnRUcmlhbmdsZSIsIkNoZWNrQ2lyY2xlIiwiQ3B1IiwiTG9hZGVyMiIsInVzZU5hdmlnYXRlIiwiY24iLCJMYWJEYXNoYm9hcmRQYWdlIiwicHJvZmlsZSIsIm5hdmlnYXRlIiwiZGF0YSIsInBlbmRpbmdPcmRlcnMiLCJpc0xvYWRpbmciLCJwZW5kaW5nTG9hZGluZyIsInByb2Nlc3NpbmdPcmRlcnMiLCJwcm9jZXNzaW5nTG9hZGluZyIsInRvZGF5T3JkZXJzIiwiY3JpdGljYWxSZXN1bHRzIiwibWFjaGluZXMiLCJjb21wbGV0ZWRUb2RheSIsIkFycmF5IiwiaXNBcnJheSIsImZpbHRlciIsIm8iLCJzdGF0dXMiLCJsZW5ndGgiLCJvbmxpbmVNYWNoaW5lcyIsIm0iLCJ0aXRsZSIsInN1YnRpdGxlIiwicm9sZSIsInVzZXJOYW1lIiwiZnVsbF9uYW1lIiwiZGl2IiwiY2xhc3NOYW1lIiwic2l6ZSIsIm9uQ2xpY2siLCJ2YXJpYW50IiwidmFsdWUiLCJpY29uIiwiaDMiLCJzbGljZSIsIm1hcCIsIm9yZGVyIiwicGF0aWVudE5hbWUiLCJvcmRlcklkIiwicCIsInByaW9yaXR5IiwibWFjaGluZSIsImlkIl0sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7QUFBQSxTQUFTQSxVQUFVLFFBQVEsaUNBQWlDO0FBQzVELFNBQVNDLE9BQU8sUUFBUSx3QkFBd0I7QUFDaEQsU0FBU0MsMEJBQTBCLEVBQUVDLG1CQUFtQixFQUFFQyxjQUFjLFFBQVEsb0JBQW9CO0FBQ3BHLFNBQVNDLGtCQUFrQixRQUFRLHFCQUFxQjtBQUN4RCxTQUFTQyxXQUFXLFFBQVEsc0JBQXNCO0FBQ2xELFNBQVNDLGlCQUFpQixRQUFRLDRCQUE0QjtBQUM5RCxTQUFTQyxrQkFBa0IsUUFBUSw2QkFBNkI7QUFDaEUsU0FBU0MsVUFBVSxRQUFRLG9DQUFvQztBQUMvRCxTQUFTQyxpQkFBaUIsUUFBUSwyQ0FBMkM7QUFDN0UsU0FBU0MscUJBQXFCLFFBQVEsOENBQThDO0FBQ3BGLFNBQVNDLE1BQU0sUUFBUSx5QkFBeUI7QUFDaEQsU0FBU0MsS0FBSyxRQUFRLHdCQUF3QjtBQUM5QyxTQUFTQyxjQUFjLEVBQUVDLFlB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

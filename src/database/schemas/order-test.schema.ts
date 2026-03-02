@@ -15,6 +15,12 @@ export class OrderTest extends Document {
   @Prop({ required: true })
   testName: string;
 
+  @Prop()
+  panelCode?: string;
+
+  @Prop()
+  panelName?: string;
+
   @Prop({ required: true })
   price: number;
 

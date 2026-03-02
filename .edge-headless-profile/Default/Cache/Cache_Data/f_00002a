@@ -1,0 +1,1241 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/pages/admin/TestCatalogManagement.tsx");import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+
+let prevRefreshReg;
+let prevRefreshSig;
+
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react-swc can't detect preamble. Something is wrong."
+    );
+  }
+
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+
+import __vite__cjsImport2_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=27cfabb6"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime["jsxDEV"]; const _Fragment = __vite__cjsImport2_react_jsxDevRuntime["Fragment"];
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=27cfabb6"; const useState = __vite__cjsImport3_react["useState"];
+import { RoleLayout } from "/src/components/layout/RoleLayout.tsx";
+import { useAuth } from "/src/context/AuthContext.tsx";
+import { useTestCatalog, useCreateTest, useUpdateTest, useDeleteTest } from "/src/hooks/useTestCatalog.ts";
+import { Button } from "/src/components/ui/button.tsx";
+import { Input } from "/src/components/ui/input.tsx";
+import { Label } from "/src/components/ui/label.tsx";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "/src/components/ui/select.tsx";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "/src/components/ui/dialog.tsx";
+import { Badge } from "/src/components/ui/badge.tsx";
+import { toast } from "/node_modules/.vite/deps/sonner.js?v=27cfabb6";
+import { Plus, Edit, Trash2, Search, Loader2, CheckCircle, XCircle } from "/node_modules/.vite/deps/lucide-react.js?v=27cfabb6";
+export default function TestCatalogManagement() {
+    _s();
+    const { profile } = useAuth();
+    const { data: tests, isLoading } = useTestCatalog();
+    const createTest = useCreateTest();
+    const updateTest = useUpdateTest();
+    const deleteTest = useDeleteTest();
+    const [searchTerm, setSearchTerm] = useState('');
+    const [categoryFilter, setCategoryFilter] = useState('all');
+    const [showDialog, setShowDialog] = useState(false);
+    const [editingTest, setEditingTest] = useState(null);
+    const [formData, setFormData] = useState({
+        code: '',
+        name: '',
+        category: 'other',
+        price: '',
+        turnaround_time: '60',
+        sample_type: 'blood',
+        reference_range: '',
+        unit: '',
+        is_active: true
+    });
+    const filteredTests = tests?.filter((test)=>{
+        const matchesSearch = test.name.toLowerCase().includes(searchTerm.toLowerCase()) || test.code.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesCategory = categoryFilter === 'all' || test.category === categoryFilter;
+        return matchesSearch && matchesCategory;
+    });
+    const handleAdd = ()=>{
+        setEditingTest(null);
+        setFormData({
+            code: '',
+            name: '',
+            category: 'other',
+            price: '',
+            turnaround_time: '60',
+            sample_type: 'blood',
+            reference_range: '',
+            unit: '',
+            is_active: true
+        });
+        setShowDialog(true);
+    };
+    const handleEdit = (test)=>{
+        setEditingTest(test);
+        setFormData({
+            code: test.code,
+            name: test.name,
+            category: test.category,
+            price: test.price.toString(),
+            turnaround_time: test.turnaroundTime?.toString() || '60',
+            sample_type: test.sampleType,
+            reference_range: test.referenceRange || '',
+            unit: test.unit || '',
+            is_active: test.isActive
+        });
+        setShowDialog(true);
+    };
+    const handleSave = async ()=>{
+        if (!formData.code || !formData.name || !formData.price) {
+            toast.error('Please fill in all required fields');
+            return;
+        }
+        try {
+            const testData = {
+                code: formData.code.toUpperCase(),
+                name: formData.name,
+                category: formData.category,
+                price: parseFloat(formData.price),
+                turnaroundTime: parseInt(formData.turnaround_time),
+                sampleType: formData.sample_type,
+                referenceRange: formData.reference_range || null,
+                unit: formData.unit || null,
+                isActive: formData.is_active
+            };
+            if (editingTest) {
+                await updateTest.mutateAsync({
+                    id: editingTest.id,
+                    updates: testData
+                });
+                toast.success('Test updated successfully');
+            } else {
+                await createTest.mutateAsync(testData);
+                toast.success('Test created successfully');
+            }
+            setShowDialog(false);
+        } catch (error) {
+            toast.error(error.message || 'Failed to save test');
+        }
+    };
+    const handleDelete = async (test)=>{
+        if (!confirm(`Are you sure you want to delete ${test.name}?`)) return;
+        try {
+            await deleteTest.mutateAsync(test.id);
+            toast.success('Test deleted successfully');
+        } catch (error) {
+            toast.error('Failed to delete test');
+        }
+    };
+    const handleToggleActive = async (test)=>{
+        try {
+            await updateTest.mutateAsync({
+                id: test.id,
+                updates: {
+                    isActive: !test.isActive
+                }
+            });
+            toast.success(`Test ${test.isActive ? 'deactivated' : 'activated'}`);
+        } catch (error) {
+            toast.error('Failed to update test status');
+        }
+    };
+    return /*#__PURE__*/ _jsxDEV(RoleLayout, {
+        title: "Test Catalog Management",
+        subtitle: "Manage laboratory tests and pricing",
+        role: "admin",
+        userName: profile?.full_name,
+        children: [
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "flex items-center justify-between mb-6",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "flex items-center gap-3",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "relative",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(Search, {
+                                        className: "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                        lineNumber: 147,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(Input, {
+                                        placeholder: "Search tests...",
+                                        className: "pl-10 w-80",
+                                        value: searchTerm,
+                                        onChange: (e)=>setSearchTerm(e.target.value)
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                        lineNumber: 148,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                lineNumber: 146,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV(Select, {
+                                value: categoryFilter,
+                                onValueChange: setCategoryFilter,
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(SelectTrigger, {
+                                        className: "w-48",
+                                        children: /*#__PURE__*/ _jsxDEV(SelectValue, {}, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                            lineNumber: 157,
+                                            columnNumber: 15
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                        lineNumber: 156,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(SelectContent, {
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                value: "all",
+                                                children: "All Categories"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                lineNumber: 160,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                value: "hematology",
+                                                children: "Hematology"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                lineNumber: 161,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                value: "chemistry",
+                                                children: "Chemistry"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                lineNumber: 162,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                value: "immunoassay",
+                                                children: "Immunoassay"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                lineNumber: 163,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                value: "urinalysis",
+                                                children: "Urinalysis"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                lineNumber: 164,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                value: "microbiology",
+                                                children: "Microbiology"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                lineNumber: 165,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                value: "other",
+                                                children: "Other"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                lineNumber: 166,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                        lineNumber: 159,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                lineNumber: 155,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                        lineNumber: 145,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(Button, {
+                        onClick: handleAdd,
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(Plus, {
+                                className: "w-4 h-4 mr-2"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                lineNumber: 171,
+                                columnNumber: 11
+                            }, this),
+                            "Add Test"
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                        lineNumber: 170,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                lineNumber: 144,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "grid grid-cols-4 gap-4 mb-6",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg p-4",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-sm text-muted-foreground",
+                                children: "Total Tests"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                lineNumber: 179,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-2xl font-bold",
+                                children: tests?.length || 0
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                lineNumber: 180,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                        lineNumber: 178,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg p-4",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-sm text-muted-foreground",
+                                children: "Active Tests"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                lineNumber: 183,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-2xl font-bold text-status-normal",
+                                children: tests?.filter((t)=>t.isActive).length || 0
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                lineNumber: 184,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                        lineNumber: 182,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg p-4",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-sm text-muted-foreground",
+                                children: "Inactive Tests"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                lineNumber: 189,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-2xl font-bold text-muted-foreground",
+                                children: tests?.filter((t)=>!t.isActive).length || 0
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                lineNumber: 190,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                        lineNumber: 188,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg p-4",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-sm text-muted-foreground",
+                                children: "Avg Price"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                lineNumber: 195,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-2xl font-bold",
+                                children: [
+                                    "Le ",
+                                    tests?.length ? Math.round(tests.reduce((sum, t)=>sum + Number(t.price), 0) / tests.length).toLocaleString() : 0
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                lineNumber: 196,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                        lineNumber: 194,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                lineNumber: 177,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "bg-card border rounded-lg overflow-hidden",
+                children: isLoading ? /*#__PURE__*/ _jsxDEV("div", {
+                    className: "flex items-center justify-center py-12",
+                    children: /*#__PURE__*/ _jsxDEV(Loader2, {
+                        className: "w-6 h-6 animate-spin text-muted-foreground"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                        lineNumber: 206,
+                        columnNumber: 13
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                    lineNumber: 205,
+                    columnNumber: 11
+                }, this) : /*#__PURE__*/ _jsxDEV("table", {
+                    className: "data-table",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV("thead", {
+                            children: /*#__PURE__*/ _jsxDEV("tr", {
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Code"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                        lineNumber: 212,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Name"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                        lineNumber: 213,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Category"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                        lineNumber: 214,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Sample Type"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                        lineNumber: 215,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Price"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                        lineNumber: 216,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "TAT"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                        lineNumber: 217,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Status"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                        lineNumber: 218,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Actions"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                        lineNumber: 219,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                lineNumber: 211,
+                                columnNumber: 15
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                            lineNumber: 210,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("tbody", {
+                            children: [
+                                filteredTests?.map((test)=>/*#__PURE__*/ _jsxDEV("tr", {
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                className: "font-mono font-semibold",
+                                                children: test.code
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                lineNumber: 225,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                children: /*#__PURE__*/ _jsxDEV("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV("p", {
+                                                            className: "font-medium",
+                                                            children: test.name
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                            lineNumber: 228,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        test.referenceRange && /*#__PURE__*/ _jsxDEV("p", {
+                                                            className: "text-xs text-muted-foreground",
+                                                            children: [
+                                                                "Range: ",
+                                                                test.referenceRange,
+                                                                " ",
+                                                                test.unit
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                            lineNumber: 230,
+                                                            columnNumber: 25
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                    lineNumber: 227,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                lineNumber: 226,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                children: /*#__PURE__*/ _jsxDEV(Badge, {
+                                                    variant: "outline",
+                                                    className: "capitalize",
+                                                    children: test.category
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                    lineNumber: 237,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                lineNumber: 236,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                className: "capitalize",
+                                                children: test.sampleType
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                lineNumber: 241,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                className: "font-semibold",
+                                                children: [
+                                                    "Le ",
+                                                    Number(test.price).toLocaleString()
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                lineNumber: 242,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                children: [
+                                                    test.turnaroundTime,
+                                                    " min"
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                lineNumber: 243,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                children: /*#__PURE__*/ _jsxDEV("button", {
+                                                    onClick: ()=>handleToggleActive(test),
+                                                    className: "flex items-center gap-1",
+                                                    children: test.isActive ? /*#__PURE__*/ _jsxDEV(_Fragment, {
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV(CheckCircle, {
+                                                                className: "w-4 h-4 text-status-normal"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                                lineNumber: 251,
+                                                                columnNumber: 27
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("span", {
+                                                                className: "text-sm text-status-normal",
+                                                                children: "Active"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                                lineNumber: 252,
+                                                                columnNumber: 27
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true) : /*#__PURE__*/ _jsxDEV(_Fragment, {
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV(XCircle, {
+                                                                className: "w-4 h-4 text-muted-foreground"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                                lineNumber: 256,
+                                                                columnNumber: 27
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("span", {
+                                                                className: "text-sm text-muted-foreground",
+                                                                children: "Inactive"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                                lineNumber: 257,
+                                                                columnNumber: 27
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true)
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                    lineNumber: 245,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                lineNumber: 244,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                children: /*#__PURE__*/ _jsxDEV("div", {
+                                                    className: "flex gap-1",
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV(Button, {
+                                                            variant: "ghost",
+                                                            size: "sm",
+                                                            onClick: ()=>handleEdit(test),
+                                                            children: /*#__PURE__*/ _jsxDEV(Edit, {
+                                                                className: "w-4 h-4"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                                lineNumber: 269,
+                                                                columnNumber: 25
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                            lineNumber: 264,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV(Button, {
+                                                            variant: "ghost",
+                                                            size: "sm",
+                                                            onClick: ()=>handleDelete(test),
+                                                            className: "text-status-critical hover:text-status-critical",
+                                                            children: /*#__PURE__*/ _jsxDEV(Trash2, {
+                                                                className: "w-4 h-4"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                                lineNumber: 277,
+                                                                columnNumber: 25
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                            lineNumber: 271,
+                                                            columnNumber: 23
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                    lineNumber: 263,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                lineNumber: 262,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, test.id, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                        lineNumber: 224,
+                                        columnNumber: 17
+                                    }, this)),
+                                (!filteredTests || filteredTests.length === 0) && /*#__PURE__*/ _jsxDEV("tr", {
+                                    children: /*#__PURE__*/ _jsxDEV("td", {
+                                        colSpan: 8,
+                                        className: "text-center py-12 text-muted-foreground",
+                                        children: "No tests found"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                        lineNumber: 285,
+                                        columnNumber: 19
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                    lineNumber: 284,
+                                    columnNumber: 17
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                            lineNumber: 222,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                    lineNumber: 209,
+                    columnNumber: 11
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                lineNumber: 203,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Dialog, {
+                open: showDialog,
+                onOpenChange: setShowDialog,
+                children: /*#__PURE__*/ _jsxDEV(DialogContent, {
+                    className: "max-w-2xl",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV(DialogHeader, {
+                            children: /*#__PURE__*/ _jsxDEV(DialogTitle, {
+                                children: editingTest ? 'Edit Test' : 'Add New Test'
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                lineNumber: 299,
+                                columnNumber: 13
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                            lineNumber: 298,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "grid grid-cols-2 gap-4",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "space-y-2",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV(Label, {
+                                            htmlFor: "code",
+                                            children: "Test Code *"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                            lineNumber: 304,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(Input, {
+                                            id: "code",
+                                            placeholder: "CBC",
+                                            value: formData.code,
+                                            onChange: (e)=>setFormData((prev)=>({
+                                                        ...prev,
+                                                        code: e.target.value.toUpperCase()
+                                                    })),
+                                            disabled: !!editingTest
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                            lineNumber: 305,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                    lineNumber: 303,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "space-y-2",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV(Label, {
+                                            htmlFor: "name",
+                                            children: "Test Name *"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                            lineNumber: 315,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(Input, {
+                                            id: "name",
+                                            placeholder: "Complete Blood Count",
+                                            value: formData.name,
+                                            onChange: (e)=>setFormData((prev)=>({
+                                                        ...prev,
+                                                        name: e.target.value
+                                                    }))
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                            lineNumber: 316,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                    lineNumber: 314,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "space-y-2",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV(Label, {
+                                            htmlFor: "category",
+                                            children: "Category *"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                            lineNumber: 325,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(Select, {
+                                            value: formData.category,
+                                            onValueChange: (value)=>setFormData((prev)=>({
+                                                        ...prev,
+                                                        category: value
+                                                    })),
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV(SelectTrigger, {
+                                                    id: "category",
+                                                    children: /*#__PURE__*/ _jsxDEV(SelectValue, {}, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                        lineNumber: 331,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                    lineNumber: 330,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV(SelectContent, {
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                            value: "hematology",
+                                                            children: "Hematology"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                            lineNumber: 334,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                            value: "chemistry",
+                                                            children: "Chemistry"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                            lineNumber: 335,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                            value: "immunoassay",
+                                                            children: "Immunoassay"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                            lineNumber: 336,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                            value: "urinalysis",
+                                                            children: "Urinalysis"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                            lineNumber: 337,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                            value: "microbiology",
+                                                            children: "Microbiology"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                            lineNumber: 338,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                            value: "other",
+                                                            children: "Other"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                            lineNumber: 339,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                    lineNumber: 333,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                            lineNumber: 326,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                    lineNumber: 324,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "space-y-2",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV(Label, {
+                                            htmlFor: "sample_type",
+                                            children: "Sample Type *"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                            lineNumber: 345,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(Select, {
+                                            value: formData.sample_type,
+                                            onValueChange: (value)=>setFormData((prev)=>({
+                                                        ...prev,
+                                                        sample_type: value
+                                                    })),
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV(SelectTrigger, {
+                                                    id: "sample_type",
+                                                    children: /*#__PURE__*/ _jsxDEV(SelectValue, {}, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                        lineNumber: 351,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                    lineNumber: 350,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV(SelectContent, {
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                            value: "blood",
+                                                            children: "Blood"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                            lineNumber: 354,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                            value: "urine",
+                                                            children: "Urine"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                            lineNumber: 355,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                            value: "stool",
+                                                            children: "Stool"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                            lineNumber: 356,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                            value: "swab",
+                                                            children: "Swab"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                            lineNumber: 357,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                            value: "other",
+                                                            children: "Other"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                            lineNumber: 358,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                                    lineNumber: 353,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                            lineNumber: 346,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                    lineNumber: 344,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "space-y-2",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV(Label, {
+                                            htmlFor: "price",
+                                            children: "Price (Le) *"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                            lineNumber: 364,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(Input, {
+                                            id: "price",
+                                            type: "number",
+                                            placeholder: "2500",
+                                            value: formData.price,
+                                            onChange: (e)=>setFormData((prev)=>({
+                                                        ...prev,
+                                                        price: e.target.value
+                                                    }))
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                            lineNumber: 365,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                    lineNumber: 363,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "space-y-2",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV(Label, {
+                                            htmlFor: "tat",
+                                            children: "Turnaround Time (minutes) *"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                            lineNumber: 375,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(Input, {
+                                            id: "tat",
+                                            type: "number",
+                                            placeholder: "60",
+                                            value: formData.turnaround_time,
+                                            onChange: (e)=>setFormData((prev)=>({
+                                                        ...prev,
+                                                        turnaround_time: e.target.value
+                                                    }))
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                            lineNumber: 376,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                    lineNumber: 374,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "space-y-2",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV(Label, {
+                                            htmlFor: "unit",
+                                            children: "Unit"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                            lineNumber: 386,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(Input, {
+                                            id: "unit",
+                                            placeholder: "g/dL",
+                                            value: formData.unit,
+                                            onChange: (e)=>setFormData((prev)=>({
+                                                        ...prev,
+                                                        unit: e.target.value
+                                                    }))
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                            lineNumber: 387,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                    lineNumber: 385,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "space-y-2",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV(Label, {
+                                            htmlFor: "reference_range",
+                                            children: "Reference Range"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                            lineNumber: 396,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(Input, {
+                                            id: "reference_range",
+                                            placeholder: "12.0-17.5",
+                                            value: formData.reference_range,
+                                            onChange: (e)=>setFormData((prev)=>({
+                                                        ...prev,
+                                                        reference_range: e.target.value
+                                                    }))
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                            lineNumber: 397,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                    lineNumber: 395,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "col-span-2 flex items-center gap-2",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("input", {
+                                            type: "checkbox",
+                                            id: "is_active",
+                                            checked: formData.is_active,
+                                            onChange: (e)=>setFormData((prev)=>({
+                                                        ...prev,
+                                                        is_active: e.target.checked
+                                                    })),
+                                            className: "rounded"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                            lineNumber: 406,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(Label, {
+                                            htmlFor: "is_active",
+                                            className: "cursor-pointer",
+                                            children: "Active"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                            lineNumber: 413,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                    lineNumber: 405,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                            lineNumber: 302,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV(DialogFooter, {
+                            children: [
+                                /*#__PURE__*/ _jsxDEV(Button, {
+                                    variant: "outline",
+                                    onClick: ()=>setShowDialog(false),
+                                    children: "Cancel"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                    lineNumber: 418,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV(Button, {
+                                    onClick: handleSave,
+                                    disabled: createTest.isPending || updateTest.isPending,
+                                    children: [
+                                        (createTest.isPending || updateTest.isPending) && /*#__PURE__*/ _jsxDEV(Loader2, {
+                                            className: "w-4 h-4 mr-2 animate-spin"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                            lineNumber: 426,
+                                            columnNumber: 17
+                                        }, this),
+                                        editingTest ? 'Update' : 'Create'
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                                    lineNumber: 421,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                            lineNumber: 417,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                    lineNumber: 297,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+                lineNumber: 296,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx",
+        lineNumber: 137,
+        columnNumber: 5
+    }, this);
+}
+_s(TestCatalogManagement, "/k3KVWfP0wgRV4GoC7n+UixfJuQ=", false, function() {
+    return [
+        useAuth,
+        useTestCatalog,
+        useCreateTest,
+        useUpdateTest,
+        useDeleteTest
+    ];
+});
+_c = TestCatalogManagement;
+var _c;
+$RefreshReg$(_c, "TestCatalogManagement");
+
+
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+
+
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/HP/Downloads/lab/frontend/src/pages/admin/TestCatalogManagement.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIlRlc3RDYXRhbG9nTWFuYWdlbWVudC50c3giXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgdXNlU3RhdGUgfSBmcm9tICdyZWFjdCc7XHJcbmltcG9ydCB7IFJvbGVMYXlvdXQgfSBmcm9tICdAL2NvbXBvbmVudHMvbGF5b3V0L1JvbGVMYXlvdXQnO1xyXG5pbXBvcnQgeyB1c2VBdXRoIH0gZnJvbSAnQC9jb250ZXh0L0F1dGhDb250ZXh0JztcclxuaW1wb3J0IHsgdXNlVGVzdENhdGFsb2csIHVzZUNyZWF0ZVRlc3QsIHVzZVVwZGF0ZVRlc3QsIHVzZURlbGV0ZVRlc3QgfSBmcm9tICdAL2hvb2tzL3VzZVRlc3RDYXRhbG9nJztcclxuaW1wb3J0IHsgQnV0dG9uIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL2J1dHRvbic7XHJcbmltcG9ydCB7IElucHV0IH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL2lucHV0JztcclxuaW1wb3J0IHsgTGFiZWwgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvbGFiZWwnO1xyXG5pbXBvcnQgeyBTZWxlY3QsIFNlbGVjdENvbnRlbnQsIFNlbGVjdEl0ZW0sIFNlbGVjdFRyaWdnZXIsIFNlbGVjdFZhbHVlIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL3NlbGVjdCc7XHJcbmltcG9ydCB7IERpYWxvZywgRGlhbG9nQ29udGVudCwgRGlhbG9nSGVhZGVyLCBEaWFsb2dUaXRsZSwgRGlhbG9nRm9vdGVyIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL2RpYWxvZyc7XHJcbmltcG9ydCB7IEJhZGdlIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL2JhZGdlJztcclxuaW1wb3J0IHsgdG9hc3QgfSBmcm9tICdzb25uZXInO1xyXG5pbXBvcnQgeyBQbHVzLCBFZGl0LCBUcmFzaDIsIFNlYXJjaCwgTG9hZGVyMiwgQ2hlY2tDaXJjbGUsIFhDaXJjbGUgfSBmcm9tICdsdWNpZGUtcmVhY3QnO1xyXG5pbXBvcnQgeyBjbiB9IGZyb20gJ0AvbGliL3V0aWxzJztcclxuaW1wb3J0IHR5cGUgeyBEYXRhYmFzZSB9IGZyb20gJ0AvaW50ZWdyYXRpb25zL3N1cGFiYXNlL3R5cGVzJztcclxuXHJcbnR5cGUgVGVzdENhdGVnb3J5ID0gRGF0YWJhc2VbJ3B1YmxpYyddWydFbnVtcyddWyd0ZXN0X2NhdGVnb3J5J107XHJcbnR5cGUgU2FtcGxlVHlwZSA9IERhdGFiYXNlWydwdWJsaWMnXVsnRW51bXMnXVsnc2FtcGxlX3R5cGUnXTtcclxuXHJcbmV4cG9ydCBkZWZhdWx0IGZ1bmN0aW9uIFRlc3RDYXRhbG9nTWFuYWdlbWVudCgpIHtcclxuICBjb25zdCB7IHByb2ZpbGUgfSA9IHVzZUF1dGgoKTtcclxuICBjb25zdCB7IGRhdGE6IHRlc3RzLCBpc0xvYWRpbmcgfSA9IHVzZVRlc3RDYXRhbG9nKCk7XHJcbiAgY29uc3QgY3JlYXRlVGVzdCA9IHVzZUNyZWF0ZVRlc3QoKTtcclxuICBjb25zdCB1cGRhdGVUZXN0ID0gdXNlVXBkYXRlVGVzdCgpO1xyXG4gIGNvbnN0IGRlbGV0ZVRlc3QgPSB1c2VEZWxldGVUZXN0KCk7XHJcblxyXG4gIGNvbnN0IFtzZWFyY2hUZXJtLCBzZXRTZWFyY2hUZXJtXSA9IHVzZVN0YXRlKCcnKTtcclxuICBjb25zdCBbY2F0ZWdvcnlGaWx0ZXIsIHNldENhdGVnb3J5RmlsdGVyXSA9IHVzZVN0YXRlPHN0cmluZz4oJ2FsbCcpO1xyXG4gIGNvbnN0IFtzaG93RGlhbG9nLCBzZXRTaG93RGlhbG9nXSA9IHVzZVN0YXRlKGZhbHNlKTtcclxuICBjb25zdCBbZWRpdGluZ1Rlc3QsIHNldEVkaXRpbmdUZXN0XSA9IHVzZVN0YXRlPGFueT4obnVsbCk7XHJcbiAgY29uc3QgW2Zvcm1EYXRhLCBzZXRGb3JtRGF0YV0gPSB1c2VTdGF0ZSh7XHJcbiAgICBjb2RlOiAnJyxcclxuICAgIG5hbWU6ICcnLFxyXG4gICAgY2F0ZWdvcnk6ICdvdGhlcicgYXMgVGVzdENhdGVnb3J5LFxyXG4gICAgcHJpY2U6ICcnLFxyXG4gICAgdHVybmFyb3VuZF90aW1lOiAnNjAnLFxyXG4gICAgc2FtcGxlX3R5cGU6ICdibG9vZCcgYXMgU2FtcGxlVHlwZSxcclxuICAgIHJlZmVyZW5jZV9yYW5nZTogJycsXHJcbiAgICB1bml0OiAnJyxcclxuICAgIGlzX2FjdGl2ZTogdHJ1ZVxyXG4gIH0pO1xyXG5cclxuICBjb25zdCBmaWx0ZXJlZFRlc3RzID0gdGVzdHM/LmZpbHRlcih0ZXN0ID0+IHtcclxuICAgIGNvbnN0IG1hdGNoZXNTZWFyY2ggPSB0ZXN0Lm5hbWUudG9Mb3dlckNhc2UoKS5pbmNsdWRlcyhzZWFyY2hUZXJtLnRvTG93ZXJDYXNlKCkpIHx8XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICB0ZXN0LmNvZGUudG9Mb3dlckNhc2UoKS5pbmNsdWRlcyhzZWFyY2hUZXJtLnRvTG93ZXJDYXNlKCkpO1xyXG4gICAgY29uc3QgbWF0Y2hlc0NhdGVnb3J5ID0gY2F0ZWdvcnlGaWx0ZXIgPT09ICdhbGwnIHx8IHRlc3QuY2F0ZWdvcnkgPT09IGNhdGVnb3J5RmlsdGVyO1xyXG4gICAgcmV0dXJuIG1hdGNoZXNTZWFyY2ggJiYgbWF0Y2hlc0NhdGVnb3J5O1xyXG4gIH0pO1xyXG5cclxuICBjb25zdCBoYW5kbGVBZGQgPSAoKSA9PiB7XHJcbiAgICBzZXRFZGl0aW5nVGVzdChudWxsKTtcclxuICAgIHNldEZvcm1EYXRhKHtcclxuICAgICAgY29kZTogJycsXHJcbiAgICAgIG5hbWU6ICcnLFxyXG4gICAgICBjYXRlZ29yeTogJ290aGVyJyxcclxuICAgICAgcHJpY2U6ICcnLFxyXG4gICAgICB0dXJuYXJvdW5kX3RpbWU6ICc2MCcsXHJcbiAgICAgIHNhbXBsZV90eXBlOiAnYmxvb2QnLFxyXG4gICAgICByZWZlcmVuY2VfcmFuZ2U6ICcnLFxyXG4gICAgICB1bml0OiAnJyxcclxuICAgICAgaXNfYWN0aXZlOiB0cnVlXHJcbiAgICB9KTtcclxuICAgIHNldFNob3dEaWFsb2codHJ1ZSk7XHJcbiAgfTtcclxuXHJcbiAgY29uc3QgaGFuZGxlRWRpdCA9ICh0ZXN0OiBhbnkpID0+IHtcclxuICAgIHNldEVkaXRpbmdUZXN0KHRlc3QpO1xyXG4gICAgc2V0Rm9ybURhdGEoe1xyXG4gICAgICBjb2RlOiB0ZXN0LmNvZGUsXHJcbiAgICAgIG5hbWU6IHRlc3QubmFtZSxcclxuICAgICAgY2F0ZWdvcnk6IHRlc3QuY2F0ZWdvcnksXHJcbiAgICAgIHByaWNlOiB0ZXN0LnByaWNlLnRvU3RyaW5nKCksXHJcbiAgICAgIHR1cm5hcm91bmRfdGltZTogdGVzdC50dXJuYXJvdW5kVGltZT8udG9TdHJpbmcoKSB8fCAnNjAnLFxyXG4gICAgICBzYW1wbGVfdHlwZTogdGVzdC5zYW1wbGVUeXBlLFxyXG4gICAgICByZWZlcmVuY2VfcmFuZ2U6IHRlc3QucmVmZXJlbmNlUmFuZ2UgfHwgJycsXHJcbiAgICAgIHVuaXQ6IHRlc3QudW5pdCB8fCAnJyxcclxuICAgICAgaXNfYWN0aXZlOiB0ZXN0LmlzQWN0aXZlXHJcbiAgICB9KTtcclxuICAgIHNldFNob3dEaWFsb2codHJ1ZSk7XHJcbiAgfTtcclxuXHJcbiAgY29uc3QgaGFuZGxlU2F2ZSA9IGFzeW5jICgpID0+IHtcclxuICAgIGlmICghZm9ybURhdGEuY29kZSB8fCAhZm9ybURhdGEubmFtZSB8fCAhZm9ybURhdGEucHJpY2UpIHtcclxuICAgICAgdG9hc3QuZXJyb3IoJ1BsZWFzZSBmaWxsIGluIGFsbCByZXF1aXJlZCBmaWVsZHMnKTtcclxuICAgICAgcmV0dXJuO1xyXG4gICAgfVxyXG5cclxuICAgIHRyeSB7XHJcbiAgICAgIGNvbnN0IHRlc3REYXRhID0ge1xyXG4gICAgICAgIGNvZGU6IGZvcm1EYXRhLmNvZGUudG9VcHBlckNhc2UoKSxcclxuICAgICAgICBuYW1lOiBmb3JtRGF0YS5uYW1lLFxyXG4gICAgICAgIGNhdGVnb3J5OiBmb3JtRGF0YS5jYXRlZ29yeSxcclxuICAgICAgICBwcmljZTogcGFyc2VGbG9hdChmb3JtRGF0YS5wcmljZSksXHJcbiAgICAgICAgdHVybmFyb3VuZFRpbWU6IHBhcnNlSW50KGZvcm1EYXRhLnR1cm5hcm91bmRfdGltZSksXHJcbiAgICAgICAgc2FtcGxlVHlwZTogZm9ybURhdGEuc2FtcGxlX3R5cGUsXHJcbiAgICAgICAgcmVmZXJlbmNlUmFuZ2U6IGZvcm1EYXRhLnJlZmVyZW5jZV9yYW5nZSB8fCBudWxsLFxyXG4gICAgICAgIHVuaXQ6IGZvcm1EYXRhLnVuaXQgfHwgbnVsbCxcclxuICAgICAgICBpc0FjdGl2ZTogZm9ybURhdGEuaXNfYWN0aXZlXHJcbiAgICAgIH07XHJcblxyXG4gICAgICBpZiAoZWRpdGluZ1Rlc3QpIHtcclxuICAgICAgICBhd2FpdCB1cGRhdGVUZXN0Lm11dGF0ZUFzeW5jKHsgaWQ6IGVkaXRpbmdUZXN0LmlkLCB1cGRhdGVzOiB0ZXN0RGF0YSB9KTtcclxuICAgICAgICB0b2FzdC5zdWNjZXNzKCdUZXN0IHVwZGF0ZWQgc3VjY2Vzc2Z1bGx5Jyk7XHJcbiAgICAgIH0gZWxzZSB7XHJcbiAgICAgICAgYXdhaXQgY3JlYXRlVGVzdC5tdXRhdGVBc3luYyh0ZXN0RGF0YSk7XHJcbiAgICAgICAgdG9hc3Quc3VjY2VzcygnVGVzdCBjcmVhdGVkIHN1Y2Nlc3NmdWxseScpO1xyXG4gICAgICB9XHJcbiAgICAgIHNldFNob3dEaWFsb2coZmFsc2UpO1xyXG4gICAgfSBjYXRjaCAoZXJyb3I6IGFueSkge1xyXG4gICAgICB0b2FzdC5lcnJvcihlcnJvci5tZXNzYWdlIHx8ICdGYWlsZWQgdG8gc2F2ZSB0ZXN0Jyk7XHJcbiAgICB9XHJcbiAgfTtcclxuXHJcbiAgY29uc3QgaGFuZGxlRGVsZXRlID0gYXN5bmMgKHRlc3Q6IGFueSkgPT4ge1xyXG4gICAgaWYgKCFjb25maXJtKGBBcmUgeW91IHN1cmUgeW91IHdhbnQgdG8gZGVsZXRlICR7dGVzdC5uYW1lfT9gKSkgcmV0dXJuO1xyXG5cclxuICAgIHRyeSB7XHJcbiAgICAgIGF3YWl0IGRlbGV0ZVRlc3QubXV0YXRlQXN5bmModGVzdC5pZCk7XHJcbiAgICAgIHRvYXN0LnN1Y2Nlc3MoJ1Rlc3QgZGVsZXRlZCBzdWNjZXNzZnVsbHknKTtcclxuICAgIH0gY2F0Y2ggKGVycm9yKSB7XHJcbiAgICAgIHRvYXN0LmVycm9yKCdGYWlsZWQgdG8gZGVsZXRlIHRlc3QnKTtcclxuICAgIH1cclxuICB9O1xyXG5cclxuICBjb25zdCBoYW5kbGVUb2dnbGVBY3RpdmUgPSBhc3luYyAodGVzdDogYW55KSA9PiB7XHJcbiAgICB0cnkge1xyXG4gICAgICBhd2FpdCB1cGRhdGVUZXN0Lm11dGF0ZUFzeW5jKHtcclxuICAgICAgICBpZDogdGVzdC5pZCxcclxuICAgICAgICB1cGRhdGVzOiB7IGlzQWN0aXZlOiAhdGVzdC5pc0FjdGl2ZSB9XHJcbiAgICAgIH0pO1xyXG4gICAgICB0b2FzdC5zdWNjZXNzKGBUZXN0ICR7dGVzdC5pc0FjdGl2ZSA/ICdkZWFjdGl2YXRlZCcgOiAnYWN0aXZhdGVkJ31gKTtcclxuICAgIH0gY2F0Y2ggKGVycm9yKSB7XHJcbiAgICAgIHRvYXN0LmVycm9yKCdGYWlsZWQgdG8gdXBkYXRlIHRlc3Qgc3RhdHVzJyk7XHJcbiAgICB9XHJcbiAgfTtcclxuXHJcbiAgcmV0dXJuIChcclxuICAgIDxSb2xlTGF5b3V0IFxyXG4gICAgICB0aXRsZT1cIlRlc3QgQ2F0YWxvZyBNYW5hZ2VtZW50XCIgXHJcbiAgICAgIHN1YnRpdGxlPVwiTWFuYWdlIGxhYm9yYXRvcnkgdGVzdHMgYW5kIHByaWNpbmdcIlxyXG4gICAgICByb2xlPVwiYWRtaW5cIlxyXG4gICAgICB1c2VyTmFtZT17cHJvZmlsZT8uZnVsbF9uYW1lfVxyXG4gICAgPlxyXG4gICAgICB7LyogQWN0aW9ucyBCYXIgKi99XHJcbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIganVzdGlmeS1iZXR3ZWVuIG1iLTZcIj5cclxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGdhcC0zXCI+XHJcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInJlbGF0aXZlXCI+XHJcbiAgICAgICAgICAgIDxTZWFyY2ggY2xhc3NOYW1lPVwiYWJzb2x1dGUgbGVmdC0zIHRvcC0xLzIgLXRyYW5zbGF0ZS15LTEvMiB3LTQgaC00IHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiIC8+XHJcbiAgICAgICAgICAgIDxJbnB1dFxyXG4gICAgICAgICAgICAgIHBsYWNlaG9sZGVyPVwiU2VhcmNoIHRlc3RzLi4uXCJcclxuICAgICAgICAgICAgICBjbGFzc05hbWU9XCJwbC0xMCB3LTgwXCJcclxuICAgICAgICAgICAgICB2YWx1ZT17c2VhcmNoVGVybX1cclxuICAgICAgICAgICAgICBvbkNoYW5nZT17KGUpID0+IHNldFNlYXJjaFRlcm0oZS50YXJnZXQudmFsdWUpfVxyXG4gICAgICAgICAgICAvPlxyXG4gICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICA8U2VsZWN0IHZhbHVlPXtjYXRlZ29yeUZpbHRlcn0gb25WYWx1ZUNoYW5nZT17c2V0Q2F0ZWdvcnlGaWx0ZXJ9PlxyXG4gICAgICAgICAgICA8U2VsZWN0VHJpZ2dlciBjbGFzc05hbWU9XCJ3LTQ4XCI+XHJcbiAgICAgICAgICAgICAgPFNlbGVjdFZhbHVlIC8+XHJcbiAgICAgICAgICAgIDwvU2VsZWN0VHJpZ2dlcj5cclxuICAgICAgICAgICAgPFNlbGVjdENvbnRlbnQ+XHJcbiAgICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJhbGxcIj5BbGwgQ2F0ZWdvcmllczwvU2VsZWN0SXRlbT5cclxuICAgICAgICAgICAgICA8U2VsZWN0SXRlbSB2YWx1ZT1cImhlbWF0b2xvZ3lcIj5IZW1hdG9sb2d5PC9TZWxlY3RJdGVtPlxyXG4gICAgICAgICAgICAgIDxTZWxlY3RJdGVtIHZhbHVlPVwiY2hlbWlzdHJ5XCI+Q2hlbWlzdHJ5PC9TZWxlY3RJdGVtPlxyXG4gICAgICAgICAgICAgIDxTZWxlY3RJdGVtIHZhbHVlPVwiaW1tdW5vYXNzYXlcIj5JbW11bm9hc3NheTwvU2VsZWN0SXRlbT5cclxuICAgICAgICAgICAgICA8U2VsZWN0SXRlbSB2YWx1ZT1cInVyaW5hbHlzaXNcIj5VcmluYWx5c2lzPC9TZWxlY3RJdGVtPlxyXG4gICAgICAgICAgICAgIDxTZWxlY3RJdGVtIHZhbHVlPVwibWljcm9iaW9sb2d5XCI+TWljcm9iaW9sb2d5PC9TZWxlY3RJdGVtPlxyXG4gICAgICAgICAgICAgIDxTZWxlY3RJdGVtIHZhbHVlPVwib3RoZXJcIj5PdGhlcjwvU2VsZWN0SXRlbT5cclxuICAgICAgICAgICAgPC9TZWxlY3RDb250ZW50PlxyXG4gICAgICAgICAgPC9TZWxlY3Q+XHJcbiAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgPEJ1dHRvbiBvbkNsaWNrPXtoYW5kbGVBZGR9PlxyXG4gICAgICAgICAgPFBsdXMgY2xhc3NOYW1lPVwidy00IGgtNCBtci0yXCIgLz5cclxuICAgICAgICAgIEFkZCBUZXN0XHJcbiAgICAgICAgPC9CdXR0b24+XHJcbiAgICAgIDwvZGl2PlxyXG5cclxuICAgICAgey8qIFN0YXRzICovfVxyXG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImdyaWQgZ3JpZC1jb2xzLTQgZ2FwLTQgbWItNlwiPlxyXG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiYmctY2FyZCBib3JkZXIgcm91bmRlZC1sZyBwLTRcIj5cclxuICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc20gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+VG90YWwgVGVzdHM8L3A+XHJcbiAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LTJ4bCBmb250LWJvbGRcIj57dGVzdHM/Lmxlbmd0aCB8fCAwfTwvcD5cclxuICAgICAgICA8L2Rpdj5cclxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImJnLWNhcmQgYm9yZGVyIHJvdW5kZWQtbGcgcC00XCI+XHJcbiAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LXNtIHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPkFjdGl2ZSBUZXN0czwvcD5cclxuICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtMnhsIGZvbnQtYm9sZCB0ZXh0LXN0YXR1cy1ub3JtYWxcIj5cclxuICAgICAgICAgICAge3Rlc3RzPy5maWx0ZXIodCA9PiB0LmlzQWN0aXZlKS5sZW5ndGggfHwgMH1cclxuICAgICAgICAgIDwvcD5cclxuICAgICAgICA8L2Rpdj5cclxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImJnLWNhcmQgYm9yZGVyIHJvdW5kZWQtbGcgcC00XCI+XHJcbiAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LXNtIHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPkluYWN0aXZlIFRlc3RzPC9wPlxyXG4gICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC0yeGwgZm9udC1ib2xkIHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPlxyXG4gICAgICAgICAgICB7dGVzdHM/LmZpbHRlcih0ID0+ICF0LmlzQWN0aXZlKS5sZW5ndGggfHwgMH1cclxuICAgICAgICAgIDwvcD5cclxuICAgICAgICA8L2Rpdj5cclxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImJnLWNhcmQgYm9yZGVyIHJvdW5kZWQtbGcgcC00XCI+XHJcbiAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LXNtIHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPkF2ZyBQcmljZTwvcD5cclxuICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtMnhsIGZvbnQtYm9sZFwiPlxyXG4gICAgICAgICAgICBMZSB7dGVzdHM/Lmxlbmd0aCA/IE1hdGgucm91bmQodGVzdHMucmVkdWNlKChzdW0sIHQpID0+IHN1bSArIE51bWJlcih0LnByaWNlKSwgMCkgLyB0ZXN0cy5sZW5ndGgpLnRvTG9jYWxlU3RyaW5nKCkgOiAwfVxyXG4gICAgICAgICAgPC9wPlxyXG4gICAgICAgIDwvZGl2PlxyXG4gICAgICA8L2Rpdj5cclxuXHJcbiAgICAgIHsvKiBUZXN0cyBUYWJsZSAqL31cclxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJiZy1jYXJkIGJvcmRlciByb3VuZGVkLWxnIG92ZXJmbG93LWhpZGRlblwiPlxyXG4gICAgICAgIHtpc0xvYWRpbmcgPyAoXHJcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGp1c3RpZnktY2VudGVyIHB5LTEyXCI+XHJcbiAgICAgICAgICAgIDxMb2FkZXIyIGNsYXNzTmFtZT1cInctNiBoLTYgYW5pbWF0ZS1zcGluIHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiIC8+XHJcbiAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICApIDogKFxyXG4gICAgICAgICAgPHRhYmxlIGNsYXNzTmFtZT1cImRhdGEtdGFibGVcIj5cclxuICAgICAgICAgICAgPHRoZWFkPlxyXG4gICAgICAgICAgICAgIDx0cj5cclxuICAgICAgICAgICAgICAgIDx0aD5Db2RlPC90aD5cclxuICAgICAgICAgICAgICAgIDx0aD5OYW1lPC90aD5cclxuICAgICAgICAgICAgICAgIDx0aD5DYXRlZ29yeTwvdGg+XHJcbiAgICAgICAgICAgICAgICA8dGg+U2FtcGxlIFR5cGU8L3RoPlxyXG4gICAgICAgICAgICAgICAgPHRoPlByaWNlPC90aD5cclxuICAgICAgICAgICAgICAgIDx0aD5UQVQ8L3RoPlxyXG4gICAgICAgICAgICAgICAgPHRoPlN0YXR1czwvdGg+XHJcbiAgICAgICAgICAgICAgICA8dGg+QWN0aW9uczwvdGg+XHJcbiAgICAgICAgICAgICAgPC90cj5cclxuICAgICAgICAgICAgPC90aGVhZD5cclxuICAgICAgICAgICAgPHRib2R5PlxyXG4gICAgICAgICAgICAgIHtmaWx0ZXJlZFRlc3RzPy5tYXAodGVzdCA9PiAoXHJcbiAgICAgICAgICAgICAgICA8dHIga2V5PXt0ZXN0LmlkfT5cclxuICAgICAgICAgICAgICAgICAgPHRkIGNsYXNzTmFtZT1cImZvbnQtbW9ubyBmb250LXNlbWlib2xkXCI+e3Rlc3QuY29kZX08L3RkPlxyXG4gICAgICAgICAgICAgICAgICA8dGQ+XHJcbiAgICAgICAgICAgICAgICAgICAgPGRpdj5cclxuICAgICAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cImZvbnQtbWVkaXVtXCI+e3Rlc3QubmFtZX08L3A+XHJcbiAgICAgICAgICAgICAgICAgICAgICB7dGVzdC5yZWZlcmVuY2VSYW5nZSAmJiAoXHJcbiAgICAgICAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQteHMgdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgUmFuZ2U6IHt0ZXN0LnJlZmVyZW5jZVJhbmdlfSB7dGVzdC51bml0fVxyXG4gICAgICAgICAgICAgICAgICAgICAgICA8L3A+XHJcbiAgICAgICAgICAgICAgICAgICAgICApfVxyXG4gICAgICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgICA8L3RkPlxyXG4gICAgICAgICAgICAgICAgICA8dGQ+XHJcbiAgICAgICAgICAgICAgICAgICAgPEJhZGdlIHZhcmlhbnQ9XCJvdXRsaW5lXCIgY2xhc3NOYW1lPVwiY2FwaXRhbGl6ZVwiPlxyXG4gICAgICAgICAgICAgICAgICAgICAge3Rlc3QuY2F0ZWdvcnl9XHJcbiAgICAgICAgICAgICAgICAgICAgPC9CYWRnZT5cclxuICAgICAgICAgICAgICAgICAgPC90ZD5cclxuICAgICAgICAgICAgICAgICAgPHRkIGNsYXNzTmFtZT1cImNhcGl0YWxpemVcIj57dGVzdC5zYW1wbGVUeXBlfTwvdGQ+XHJcbiAgICAgICAgICAgICAgICAgIDx0ZCBjbGFzc05hbWU9XCJmb250LXNlbWlib2xkXCI+TGUge051bWJlcih0ZXN0LnByaWNlKS50b0xvY2FsZVN0cmluZygpfTwvdGQ+XHJcbiAgICAgICAgICAgICAgICAgIDx0ZD57dGVzdC50dXJuYXJvdW5kVGltZX0gbWluPC90ZD5cclxuICAgICAgICAgICAgICAgICAgPHRkPlxyXG4gICAgICAgICAgICAgICAgICAgIDxidXR0b25cclxuICAgICAgICAgICAgICAgICAgICAgIG9uQ2xpY2s9eygpID0+IGhhbmRsZVRvZ2dsZUFjdGl2ZSh0ZXN0KX1cclxuICAgICAgICAgICAgICAgICAgICAgIGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGdhcC0xXCJcclxuICAgICAgICAgICAgICAgICAgICA+XHJcbiAgICAgICAgICAgICAgICAgICAgICB7dGVzdC5pc0FjdGl2ZSA/IChcclxuICAgICAgICAgICAgICAgICAgICAgICAgPD5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICA8Q2hlY2tDaXJjbGUgY2xhc3NOYW1lPVwidy00IGgtNCB0ZXh0LXN0YXR1cy1ub3JtYWxcIiAvPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInRleHQtc20gdGV4dC1zdGF0dXMtbm9ybWFsXCI+QWN0aXZlPC9zcGFuPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICA8Lz5cclxuICAgICAgICAgICAgICAgICAgICAgICkgOiAoXHJcbiAgICAgICAgICAgICAgICAgICAgICAgIDw+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgPFhDaXJjbGUgY2xhc3NOYW1lPVwidy00IGgtNCB0ZXh0LW11dGVkLWZvcmVncm91bmRcIiAvPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInRleHQtc20gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+SW5hY3RpdmU8L3NwYW4+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIDwvPlxyXG4gICAgICAgICAgICAgICAgICAgICAgKX1cclxuICAgICAgICAgICAgICAgICAgICA8L2J1dHRvbj5cclxuICAgICAgICAgICAgICAgICAgPC90ZD5cclxuICAgICAgICAgICAgICAgICAgPHRkPlxyXG4gICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBnYXAtMVwiPlxyXG4gICAgICAgICAgICAgICAgICAgICAgPEJ1dHRvblxyXG4gICAgICAgICAgICAgICAgICAgICAgICB2YXJpYW50PVwiZ2hvc3RcIlxyXG4gICAgICAgICAgICAgICAgICAgICAgICBzaXplPVwic21cIlxyXG4gICAgICAgICAgICAgICAgICAgICAgICBvbkNsaWNrPXsoKSA9PiBoYW5kbGVFZGl0KHRlc3QpfVxyXG4gICAgICAgICAgICAgICAgICAgICAgPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICA8RWRpdCBjbGFzc05hbWU9XCJ3LTQgaC00XCIgLz5cclxuICAgICAgICAgICAgICAgICAgICAgIDwvQnV0dG9uPlxyXG4gICAgICAgICAgICAgICAgICAgICAgPEJ1dHRvblxyXG4gICAgICAgICAgICAgICAgICAgICAgICB2YXJpYW50PVwiZ2hvc3RcIlxyXG4gICAgICAgICAgICAgICAgICAgICAgICBzaXplPVwic21cIlxyXG4gICAgICAgICAgICAgICAgICAgICAgICBvbkNsaWNrPXsoKSA9PiBoYW5kbGVEZWxldGUodGVzdCl9XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIGNsYXNzTmFtZT1cInRleHQtc3RhdHVzLWNyaXRpY2FsIGhvdmVyOnRleHQtc3RhdHVzLWNyaXRpY2FsXCJcclxuICAgICAgICAgICAgICAgICAgICAgID5cclxuICAgICAgICAgICAgICAgICAgICAgICAgPFRyYXNoMiBjbGFzc05hbWU9XCJ3LTQgaC00XCIgLz5cclxuICAgICAgICAgICAgICAgICAgICAgIDwvQnV0dG9uPlxyXG4gICAgICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgICA8L3RkPlxyXG4gICAgICAgICAgICAgICAgPC90cj5cclxuICAgICAgICAgICAgICApKX1cclxuICAgICAgICAgICAgICB7KCFmaWx0ZXJlZFRlc3RzIHx8IGZpbHRlcmVkVGVzdHMubGVuZ3RoID09PSAwKSAmJiAoXHJcbiAgICAgICAgICAgICAgICA8dHI+XHJcbiAgICAgICAgICAgICAgICAgIDx0ZCBjb2xTcGFuPXs4fSBjbGFzc05hbWU9XCJ0ZXh0LWNlbnRlciBweS0xMiB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5cclxuICAgICAgICAgICAgICAgICAgICBObyB0ZXN0cyBmb3VuZFxyXG4gICAgICAgICAgICAgICAgICA8L3RkPlxyXG4gICAgICAgICAgICAgICAgPC90cj5cclxuICAgICAgICAgICAgICApfVxyXG4gICAgICAgICAgICA8L3Rib2R5PlxyXG4gICAgICAgICAgPC90YWJsZT5cclxuICAgICAgICApfVxyXG4gICAgICA8L2Rpdj5cclxuXHJcbiAgICAgIHsvKiBBZGQvRWRpdCBEaWFsb2cgKi99XHJcbiAgICAgIDxEaWFsb2cgb3Blbj17c2hvd0RpYWxvZ30gb25PcGVuQ2hhbmdlPXtzZXRTaG93RGlhbG9nfT5cclxuICAgICAgICA8RGlhbG9nQ29udGVudCBjbGFzc05hbWU9XCJtYXgtdy0yeGxcIj5cclxuICAgICAgICAgIDxEaWFsb2dIZWFkZXI+XHJcbiAgICAgICAgICAgIDxEaWFsb2dUaXRsZT57ZWRpdGluZ1Rlc3QgPyAnRWRpdCBUZXN0JyA6ICdBZGQgTmV3IFRlc3QnfTwvRGlhbG9nVGl0bGU+XHJcbiAgICAgICAgICA8L0RpYWxvZ0hlYWRlcj5cclxuXHJcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImdyaWQgZ3JpZC1jb2xzLTIgZ2FwLTRcIj5cclxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTJcIj5cclxuICAgICAgICAgICAgICA8TGFiZWwgaHRtbEZvcj1cImNvZGVcIj5UZXN0IENvZGUgKjwvTGFiZWw+XHJcbiAgICAgICAgICAgICAgPElucHV0XHJcbiAgICAgICAgICAgICAgICBpZD1cImNvZGVcIlxyXG4gICAgICAgICAgICAgICAgcGxhY2Vob2xkZXI9XCJDQkNcIlxyXG4gICAgICAgICAgICAgICAgdmFsdWU9e2Zvcm1EYXRhLmNvZGV9XHJcbiAgICAgICAgICAgICAgICBvbkNoYW5nZT17KGUpID0+IHNldEZvcm1EYXRhKHByZXYgPT4gKHsgLi4ucHJldiwgY29kZTogZS50YXJnZXQudmFsdWUudG9VcHBlckNhc2UoKSB9KSl9XHJcbiAgICAgICAgICAgICAgICBkaXNhYmxlZD17ISFlZGl0aW5nVGVzdH1cclxuICAgICAgICAgICAgICAvPlxyXG4gICAgICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0yXCI+XHJcbiAgICAgICAgICAgICAgPExhYmVsIGh0bWxGb3I9XCJuYW1lXCI+VGVzdCBOYW1lICo8L0xhYmVsPlxyXG4gICAgICAgICAgICAgIDxJbnB1dFxyXG4gICAgICAgICAgICAgICAgaWQ9XCJuYW1lXCJcclxuICAgICAgICAgICAgICAgIHBsYWNlaG9sZGVyPVwiQ29tcGxldGUgQmxvb2QgQ291bnRcIlxyXG4gICAgICAgICAgICAgICAgdmFsdWU9e2Zvcm1EYXRhLm5hbWV9XHJcbiAgICAgICAgICAgICAgICBvbkNoYW5nZT17KGUpID0+IHNldEZvcm1EYXRhKHByZXYgPT4gKHsgLi4ucHJldiwgbmFtZTogZS50YXJnZXQudmFsdWUgfSkpfVxyXG4gICAgICAgICAgICAgIC8+XHJcbiAgICAgICAgICAgIDwvZGl2PlxyXG5cclxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTJcIj5cclxuICAgICAgICAgICAgICA8TGFiZWwgaHRtbEZvcj1cImNhdGVnb3J5XCI+Q2F0ZWdvcnkgKjwvTGFiZWw+XHJcbiAgICAgICAgICAgICAgPFNlbGVjdFxyXG4gICAgICAgICAgICAgICAgdmFsdWU9e2Zvcm1EYXRhLmNhdGVnb3J5fVxyXG4gICAgICAgICAgICAgICAgb25WYWx1ZUNoYW5nZT17KHZhbHVlKSA9PiBzZXRGb3JtRGF0YShwcmV2ID0+ICh7IC4uLnByZXYsIGNhdGVnb3J5OiB2YWx1ZSBhcyBUZXN0Q2F0ZWdvcnkgfSkpfVxyXG4gICAgICAgICAgICAgID5cclxuICAgICAgICAgICAgICAgIDxTZWxlY3RUcmlnZ2VyIGlkPVwiY2F0ZWdvcnlcIj5cclxuICAgICAgICAgICAgICAgICAgPFNlbGVjdFZhbHVlIC8+XHJcbiAgICAgICAgICAgICAgICA8L1NlbGVjdFRyaWdnZXI+XHJcbiAgICAgICAgICAgICAgICA8U2VsZWN0Q29udGVudD5cclxuICAgICAgICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJoZW1hdG9sb2d5XCI+SGVtYXRvbG9neTwvU2VsZWN0SXRlbT5cclxuICAgICAgICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJjaGVtaXN0cnlcIj5DaGVtaXN0cnk8L1NlbGVjdEl0ZW0+XHJcbiAgICAgICAgICAgICAgICAgIDxTZWxlY3RJdGVtIHZhbHVlPVwiaW1tdW5vYXNzYXlcIj5JbW11bm9hc3NheTwvU2VsZWN0SXRlbT5cclxuICAgICAgICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJ1cmluYWx5c2lzXCI+VXJpbmFseXNpczwvU2VsZWN0SXRlbT5cclxuICAgICAgICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJtaWNyb2Jpb2xvZ3lcIj5NaWNyb2Jpb2xvZ3k8L1NlbGVjdEl0ZW0+XHJcbiAgICAgICAgICAgICAgICAgIDxTZWxlY3RJdGVtIHZhbHVlPVwib3RoZXJcIj5PdGhlcjwvU2VsZWN0SXRlbT5cclxuICAgICAgICAgICAgICAgIDwvU2VsZWN0Q29udGVudD5cclxuICAgICAgICAgICAgICA8L1NlbGVjdD5cclxuICAgICAgICAgICAgPC9kaXY+XHJcblxyXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNwYWNlLXktMlwiPlxyXG4gICAgICAgICAgICAgIDxMYWJlbCBodG1sRm9yPVwic2FtcGxlX3R5cGVcIj5TYW1wbGUgVHlwZSAqPC9MYWJlbD5cclxuICAgICAgICAgICAgICA8U2VsZWN0XHJcbiAgICAgICAgICAgICAgICB2YWx1ZT17Zm9ybURhdGEuc2FtcGxlX3R5cGV9XHJcbiAgICAgICAgICAgICAgICBvblZhbHVlQ2hhbmdlPXsodmFsdWUpID0+IHNldEZvcm1EYXRhKHByZXYgPT4gKHsgLi4ucHJldiwgc2FtcGxlX3R5cGU6IHZhbHVlIGFzIFNhbXBsZVR5cGUgfSkpfVxyXG4gICAgICAgICAgICAgID5cclxuICAgICAgICAgICAgICAgIDxTZWxlY3RUcmlnZ2VyIGlkPVwic2FtcGxlX3R5cGVcIj5cclxuICAgICAgICAgICAgICAgICAgPFNlbGVjdFZhbHVlIC8+XHJcbiAgICAgICAgICAgICAgICA8L1NlbGVjdFRyaWdnZXI+XHJcbiAgICAgICAgICAgICAgICA8U2VsZWN0Q29udGVudD5cclxuICAgICAgICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJibG9vZFwiPkJsb29kPC9TZWxlY3RJdGVtPlxyXG4gICAgICAgICAgICAgICAgICA8U2VsZWN0SXRlbSB2YWx1ZT1cInVyaW5lXCI+VXJpbmU8L1NlbGVjdEl0ZW0+XHJcbiAgICAgICAgICAgICAgICAgIDxTZWxlY3RJdGVtIHZhbHVlPVwic3Rvb2xcIj5TdG9vbDwvU2VsZWN0SXRlbT5cclxuICAgICAgICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJzd2FiXCI+U3dhYjwvU2VsZWN0SXRlbT5cclxuICAgICAgICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJvdGhlclwiPk90aGVyPC9TZWxlY3RJdGVtPlxyXG4gICAgICAgICAgICAgICAgPC9TZWxlY3RDb250ZW50PlxyXG4gICAgICAgICAgICAgIDwvU2VsZWN0PlxyXG4gICAgICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0yXCI+XHJcbiAgICAgICAgICAgICAgPExhYmVsIGh0bWxGb3I9XCJwcmljZVwiPlByaWNlIChMZSkgKjwvTGFiZWw+XHJcbiAgICAgICAgICAgICAgPElucHV0XHJcbiAgICAgICAgICAgICAgICBpZD1cInByaWNlXCJcclxuICAgICAgICAgICAgICAgIHR5cGU9XCJudW1iZXJcIlxyXG4gICAgICAgICAgICAgICAgcGxhY2Vob2xkZXI9XCIyNTAwXCJcclxuICAgICAgICAgICAgICAgIHZhbHVlPXtmb3JtRGF0YS5wcmljZX1cclxuICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXsoZSkgPT4gc2V0Rm9ybURhdGEocHJldiA9PiAoeyAuLi5wcmV2LCBwcmljZTogZS50YXJnZXQudmFsdWUgfSkpfVxyXG4gICAgICAgICAgICAgIC8+XHJcbiAgICAgICAgICAgIDwvZGl2PlxyXG5cclxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTJcIj5cclxuICAgICAgICAgICAgICA8TGFiZWwgaHRtbEZvcj1cInRhdFwiPlR1cm5hcm91bmQgVGltZSAobWludXRlcykgKjwvTGFiZWw+XHJcbiAgICAgICAgICAgICAgPElucHV0XHJcbiAgICAgICAgICAgICAgICBpZD1cInRhdFwiXHJcbiAgICAgICAgICAgICAgICB0eXBlPVwibnVtYmVyXCJcclxuICAgICAgICAgICAgICAgIHBsYWNlaG9sZGVyPVwiNjBcIlxyXG4gICAgICAgICAgICAgICAgdmFsdWU9e2Zvcm1EYXRhLnR1cm5hcm91bmRfdGltZX1cclxuICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXsoZSkgPT4gc2V0Rm9ybURhdGEocHJldiA9PiAoeyAuLi5wcmV2LCB0dXJuYXJvdW5kX3RpbWU6IGUudGFyZ2V0LnZhbHVlIH0pKX1cclxuICAgICAgICAgICAgICAvPlxyXG4gICAgICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0yXCI+XHJcbiAgICAgICAgICAgICAgPExhYmVsIGh0bWxGb3I9XCJ1bml0XCI+VW5pdDwvTGFiZWw+XHJcbiAgICAgICAgICAgICAgPElucHV0XHJcbiAgICAgICAgICAgICAgICBpZD1cInVuaXRcIlxyXG4gICAgICAgICAgICAgICAgcGxhY2Vob2xkZXI9XCJnL2RMXCJcclxuICAgICAgICAgICAgICAgIHZhbHVlPXtmb3JtRGF0YS51bml0fVxyXG4gICAgICAgICAgICAgICAgb25DaGFuZ2U9eyhlKSA9PiBzZXRGb3JtRGF0YShwcmV2ID0+ICh7IC4uLnByZXYsIHVuaXQ6IGUudGFyZ2V0LnZhbHVlIH0pKX1cclxuICAgICAgICAgICAgICAvPlxyXG4gICAgICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0yXCI+XHJcbiAgICAgICAgICAgICAgPExhYmVsIGh0bWxGb3I9XCJyZWZlcmVuY2VfcmFuZ2VcIj5SZWZlcmVuY2UgUmFuZ2U8L0xhYmVsPlxyXG4gICAgICAgICAgICAgIDxJbnB1dFxyXG4gICAgICAgICAgICAgICAgaWQ9XCJyZWZlcmVuY2VfcmFuZ2VcIlxyXG4gICAgICAgICAgICAgICAgcGxhY2Vob2xkZXI9XCIxMi4wLTE3LjVcIlxyXG4gICAgICAgICAgICAgICAgdmFsdWU9e2Zvcm1EYXRhLnJlZmVyZW5jZV9yYW5nZX1cclxuICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXsoZSkgPT4gc2V0Rm9ybURhdGEocHJldiA9PiAoeyAuLi5wcmV2LCByZWZlcmVuY2VfcmFuZ2U6IGUudGFyZ2V0LnZhbHVlIH0pKX1cclxuICAgICAgICAgICAgICAvPlxyXG4gICAgICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29sLXNwYW4tMiBmbGV4IGl0ZW1zLWNlbnRlciBnYXAtMlwiPlxyXG4gICAgICAgICAgICAgIDxpbnB1dFxyXG4gICAgICAgICAgICAgICAgdHlwZT1cImNoZWNrYm94XCJcclxuICAgICAgICAgICAgICAgIGlkPVwiaXNfYWN0aXZlXCJcclxuICAgICAgICAgICAgICAgIGNoZWNrZWQ9e2Zvcm1EYXRhLmlzX2FjdGl2ZX1cclxuICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXsoZSkgPT4gc2V0Rm9ybURhdGEocHJldiA9PiAoeyAuLi5wcmV2LCBpc19hY3RpdmU6IGUudGFyZ2V0LmNoZWNrZWQgfSkpfVxyXG4gICAgICAgICAgICAgICAgY2xhc3NOYW1lPVwicm91bmRlZFwiXHJcbiAgICAgICAgICAgICAgLz5cclxuICAgICAgICAgICAgICA8TGFiZWwgaHRtbEZvcj1cImlzX2FjdGl2ZVwiIGNsYXNzTmFtZT1cImN1cnNvci1wb2ludGVyXCI+QWN0aXZlPC9MYWJlbD5cclxuICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgICA8RGlhbG9nRm9vdGVyPlxyXG4gICAgICAgICAgICA8QnV0dG9uIHZhcmlhbnQ9XCJvdXRsaW5lXCIgb25DbGljaz17KCkgPT4gc2V0U2hvd0RpYWxvZyhmYWxzZSl9PlxyXG4gICAgICAgICAgICAgIENhbmNlbFxyXG4gICAgICAgICAgICA8L0J1dHRvbj5cclxuICAgICAgICAgICAgPEJ1dHRvblxyXG4gICAgICAgICAgICAgIG9uQ2xpY2s9e2hhbmRsZVNhdmV9XHJcbiAgICAgICAgICAgICAgZGlzYWJsZWQ9e2NyZWF0ZVRlc3QuaXNQZW5kaW5nIHx8IHVwZGF0ZVRlc3QuaXNQZW5kaW5nfVxyXG4gICAgICAgICAgICA+XHJcbiAgICAgICAgICAgICAgeyhjcmVhdGVUZXN0LmlzUGVuZGluZyB8fCB1cGRhdGVUZXN0LmlzUGVuZGluZykgJiYgKFxyXG4gICAgICAgICAgICAgICAgPExvYWRlcjIgY2xhc3NOYW1lPVwidy00IGgtNCBtci0yIGFuaW1hdGUtc3BpblwiIC8+XHJcbiAgICAgICAgICAgICAgKX1cclxuICAgICAgICAgICAgICB7ZWRpdGluZ1Rlc3QgPyAnVXBkYXRlJyA6ICdDcmVhdGUnfVxyXG4gICAgICAgICAgICA8L0J1dHRvbj5cclxuICAgICAgICAgIDwvRGlhbG9nRm9vdGVyPlxyXG4gICAgICAgIDwvRGlhbG9nQ29udGVudD5cclxuICAgICAgPC9EaWFsb2c+XHJcbiAgICA8L1JvbGVMYXlvdXQ+XHJcbiAgKTtcclxufVxyXG4iXSwibmFtZXMiOlsidXNlU3RhdGUiLCJSb2xlTGF5b3V0IiwidXNlQXV0aCIsInVzZVRlc3RDYXRhbG9nIiwidXNlQ3JlYXRlVGVzdCIsInVzZVVwZGF0ZVRlc3QiLCJ1c2VEZWxldGVUZXN0IiwiQnV0dG9uIiwiSW5wdXQiLCJMYWJlbCIsIlNlbGVjdCIsIlNlbGVjdENvbnRlbnQiLCJTZWxlY3RJdGVtIiwiU2VsZWN0VHJpZ2dlciIsIlNlbGVjdFZhbHVlIiwiRGlhbG9nIiwiRGlhbG9nQ29udGVudCIsIkRpYWxvZ0hlYWRlciIsIkRpYWxvZ1RpdGxlIiwiRGlhbG9nRm9vdGVyIiwiQmFkZ2UiLCJ0b2FzdCIsIlBsdXMiLCJFZGl0IiwiVHJhc2gyIiwiU2VhcmNoIiwiTG9hZGVyMiIsIkNoZWNrQ2lyY2xlIiwiWENpcmNsZSIsIlRlc3RDYXRhbG9nTWFuYWdlbWVudCIsInByb2ZpbGUiLCJkYXRhIiwidGVzdHMiLCJpc0xvYWRpbmciLCJjcmVhdGVUZXN0IiwidXBkYXRlVGVzdCIsImRlbGV0ZVRlc3QiLCJzZWFyY2hUZXJtIiwic2V0U2VhcmNoVGVybSIsImNhdGVnb3J5RmlsdGVyIiwic2V0Q2F0ZWdvcnlGaWx0ZXIiLCJzaG93RGlhbG9nIiwic2V0U2hvd0RpYWxvZyIsImVkaXRpbmdUZXN0Iiwic2V0RWRpdGluZ1Rlc3QiLCJmb3JtRGF0YSIsInNldEZvcm1EYXRhIiwiY29kZSIsIm5hbWUiLCJjYXRlZ29yeSIsInByaWNlIiwidHVybmFyb3VuZF90aW1lIiwic2FtcGxlX3R5cGUiLCJyZWZlcmVuY2VfcmFuZ2UiLCJ1bml0IiwiaXNfYWN0aXZlIiwiZmlsdGVyZWRUZXN0cyIsImZpbHRlciIsInRlc3QiLCJtYXRjaGVzU2VhcmNoIiwidG9Mb3dlckNhc2UiLCJpbmNsdWRlcyIsIm1hdGNoZXNDYXRlZ29yeSIsImhhbmRsZUFkZCIsImhhbmRsZUVkaXQiLCJ0b1N0cmluZyIsInR1cm5hcm91bmRUaW1lIiwic2FtcGxlVHlwZSIsInJlZmVyZW5jZVJhbmdlIiwiaXNBY3RpdmUiLCJoYW5kbGVTYXZlIiwiZXJyb3IiLCJ0ZXN0RGF0YSIsInRvVXBwZXJDYXNlIiwicGFyc2VGbG9hdCIsInBhcnNlSW50IiwibXV0YXRlQXN5bmMiLCJpZCIsInVwZGF0ZXMiLCJzdWNjZXNzIiwibWVzc2FnZSIsImhhbmRsZURlbGV0ZSIsImNvbmZpcm0iLCJoYW5kbGVUb2dnbGVBY3RpdmUiLCJ0aXRsZSIsInN1YnRpdGxlIiwicm9sZSIsInVzZXJOYW1lIiwiZnVsbF9uYW1lIiwiZGl2IiwiY2xhc3NOYW1lIiwicGxhY2Vob2xkZXIiLCJ2YWx1ZSIsIm9uQ2hhbmdlIiwiZSIsInRhcmdldCIsIm9uVmFsdWVDaGFuZ2UiLCJvbkNsaWNrIiwicCIsImxlbmd0aCIsInQiLCJNYXRoIiwicm91bmQiLCJyZWR1Y2UiLCJzdW0iLCJOdW1iZXIiLCJ0b0xvY2FsZVN0cmluZyIsInRhYmxlIiwidGhlYWQiLCJ0ciIsInRoIiwidGJvZHkiLCJtYXAiLCJ0ZCIsInZhcmlhbnQiLCJidXR0b24iLCJzcGFuIiwic2l6ZSIsImNvbFNwYW4iLCJvcGVuIiwib25PcGVuQ2hhbmdlIiwiaHRtbEZvciIsInByZXYiLCJkaXNhYmxlZCIsInR5cGUiLCJpbnB1dCIsImNoZWNrZWQiLCJpc1BlbmRpbmciXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OztBQUFBLFNBQVNBLFFBQVEsUUFBUSxRQUFRO0FBQ2pDLFNBQVNDLFVBQVUsUUFBUSxpQ0FBaUM7QUFDNUQsU0FBU0MsT0FBTyxRQUFRLHdCQUF3QjtBQUNoRCxTQUFTQyxjQUFjLEVBQUVDLGFBQWEsRUFBRUMsYUFBYSxFQUFFQyxhQUFhLFFBQVEseUJBQXlCO0FBQ3JHLFNBQVNDLE1BQU0sUUFBUSx5QkFBeUI7QUFDaEQsU0FBU0MsS0FBSyxRQUFRLHdCQUF3QjtBQUM5QyxTQUFTQyxLQUFLLFFBQVEsd0JBQXdCO0FBQzlDLFNBQVNDLE1BQU0sRUFBRUMsYUFBYSxFQUFFQyxVQUFVLEVBQUVDLGFBQWEsRUFBRUMsV0FBVyxRQUFRLHlCQUF5QjtBQUN2RyxTQUFTQyxNQUFNLEVBQUVDLGFBQWEsRUFBRUMsWUFBWSxFQUFFQyxXQUFXLEVBQUVDLFlBQVksUUFBUSx5QkFBeUI7QUFDeEcsU0FBU0MsS0FBSyxRQUFRLHdCQUF3QjtBQUM5QyxTQUFTQyxLQUFLLFFBQVEsU0FBUztBQUMv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

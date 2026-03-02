@@ -13,7 +13,7 @@ import { JwtService } from '@nestjs/jwt';
 
 @WebSocketGateway({
   cors: {
-    origin: '*', // Allow all origins on LAN
+    origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
     credentials: true,
   },
   namespace: '/realtime',
@@ -56,6 +56,9 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
         message: 'Connected to real-time updates',
         clientId: client.id,
       });
+
+      // Broadcast updated client count
+      this.server.emit('clients:count', { count: this.connectedClients.size });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       this.logger.error(`Authentication failed for client ${client.id}: ${errorMessage}`);
@@ -64,9 +67,10 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
   }
 
   handleDisconnect(client: Socket) {
-    const clientInfo = this.connectedClients.get(client.id);
     this.logger.log(`Client disconnected: ${client.id}`);
     this.connectedClients.delete(client.id);
+    // Broadcast updated client count
+    this.server.emit('clients:count', { count: this.connectedClients.size });
   }
 
   // Emit to all clients
@@ -123,6 +127,33 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     this.logger.log(`Broadcasting sample collected`);
     this.emitToRole('lab_tech', 'sample:collected', sample);
     this.emitToRole('admin', 'sample:collected', sample);
+  }
+
+  // Machine events
+  notifyMachineStatusChanged(machine: any) {
+    this.logger.log(`Broadcasting machine status changed: ${machine.name} -> ${machine.status}`);
+    this.emitToAll('machine:updated', machine);
+  }
+
+  notifyMachineResultReceived(data: { machineId: string; machineName: string; resultCount: number; protocol: string }) {
+    this.logger.log(`Broadcasting machine result received from ${data.machineName}: ${data.resultCount} results`);
+    this.emitToAll('machine:result_received', data);
+  }
+
+  notifyCommunicationLog(log: any) {
+    this.logger.log(`Broadcasting new communication log`);
+    this.emitToAll('communication-log:new', log);
+  }
+
+  notifyUnmatchedResult(result: any) {
+    this.logger.log(`Broadcasting unmatched result from ${result.machineName}`);
+    this.emitToRole('lab_tech', 'result:unmatched', result);
+    this.emitToRole('admin', 'result:unmatched', result);
+  }
+
+  notifyOrderSentToMachine(data: { orderId: string; orderNumber: string; machineName: string; success: boolean }) {
+    this.logger.log(`Broadcasting order sent to machine: ${data.orderNumber} -> ${data.machineName}`);
+    this.emitToAll('order:sent_to_machine', data);
   }
 
   // Get connected clients count

@@ -25,7 +25,7 @@ export class MachineMaintenance extends Document {
   @Prop({ required: true })
   performedAt!: Date;
 
-  @Prop({ index: true })
+  @Prop()
   nextDueDate?: Date;
 
   @Prop()

@@ -9,6 +9,8 @@ import { Sample } from '../database/schemas/sample.schema';
 import { Patient, GenderEnum } from '../database/schemas/patient.schema';
 import { TestCatalog, TestCategoryEnum } from '../database/schemas/test-catalog.schema';
 import { Profile } from '../database/schemas/profile.schema';
+import { OrderTest } from '../database/schemas/order-test.schema';
+import { resolveReferenceRange } from '../common/utils/reference-range-resolver';
 import { ResultCategoryDto } from './dto/result-category.dto';
 import { ResultItemDto } from './dto/result-item.dto';
 import { LabResultReportDto } from './dto/lab-result-report.dto';
@@ -35,6 +37,8 @@ export class ReportsService {
     private testCatalogModel: Model<TestCatalog>,
     @InjectModel(Profile.name)
     private profileModel: Model<Profile>,
+    @InjectModel(OrderTest.name)
+    private orderTestModel: Model<OrderTest>,
     private configService: ConfigService,
   ) {}
 
@@ -61,19 +65,115 @@ export class ReportsService {
       throw new NotFoundException('Order not found');
     }
 
-    // Fetch verified or amended results for this order
+    // Fetch results for this order (including preliminary for immediate printing workflows)
     const results = await this.resultModel
       .find({
         orderId: new Types.ObjectId(orderId),
-        status: { $in: [ResultStatusEnum.VERIFIED, ResultStatusEnum.AMENDED] },
+        status: {
+          $in: [
+            ResultStatusEnum.PRELIMINARY,
+            ResultStatusEnum.VERIFIED,
+            ResultStatusEnum.AMENDED,
+          ],
+        },
       })
+      .sort({ resultedAt: 1, createdAt: 1, _id: 1 })
       .populate('resultedBy')
       .populate('verifiedBy')
-      .sort({ testCode: 1 })
       .exec();
 
     if (!results || results.length === 0) {
-      throw new BadRequestException('No verified results available for this order');
+      throw new BadRequestException('No results available for this order');
+    }
+
+    const orderTests = await this.orderTestModel
+      .find({ orderId: new Types.ObjectId(orderId) })
+      .sort({ createdAt: 1, _id: 1 })
+      .exec();
+
+    const orderTestsById = new Map<string, OrderTest>();
+    const orderTestsByCode = new Map<string, { index: number; orderTest: OrderTest }[]>();
+    const orderTestsByNormalizedCode = new Map<string, { index: number; orderTest: OrderTest }[]>();
+    const orderTestsByNormalizedName = new Map<string, { index: number; orderTest: OrderTest }[]>();
+    const orderTestIndexById = new Map<string, number>();
+
+    orderTests.forEach((orderTest, index) => {
+      orderTestsById.set(orderTest._id.toString(), orderTest);
+      orderTestIndexById.set(orderTest._id.toString(), index);
+      const current = orderTestsByCode.get(orderTest.testCode) || [];
+      current.push({ index, orderTest });
+      orderTestsByCode.set(orderTest.testCode, current);
+
+      const normalizedCode = this.normalizeLookupToken(orderTest.testCode);
+      if (normalizedCode) {
+        const currentNormalized = orderTestsByNormalizedCode.get(normalizedCode) || [];
+        currentNormalized.push({ index, orderTest });
+        orderTestsByNormalizedCode.set(normalizedCode, currentNormalized);
+      }
+
+      const normalizedName = this.normalizeLookupToken(orderTest.testName);
+      if (normalizedName) {
+        const currentByName = orderTestsByNormalizedName.get(normalizedName) || [];
+        currentByName.push({ index, orderTest });
+        orderTestsByNormalizedName.set(normalizedName, currentByName);
+      }
+    });
+
+    const nextOrderTestIndexByCode = new Map<string, number>();
+    const nextOrderTestIndexByNormalizedCode = new Map<string, number>();
+    const nextOrderTestIndexByNormalizedName = new Map<string, number>();
+
+    const catalogCodes = new Set<string>();
+
+    for (const result of results) {
+      if (result.testCode) {
+        const code = result.testCode.trim();
+        if (code) {
+          catalogCodes.add(code);
+          catalogCodes.add(code.toUpperCase());
+        }
+      }
+    }
+
+    for (const orderTest of orderTests) {
+      if (orderTest.testCode) {
+        const code = orderTest.testCode.trim();
+        if (code) {
+          catalogCodes.add(code);
+          catalogCodes.add(code.toUpperCase());
+        }
+      }
+    }
+
+    const orderTestCatalogIds = orderTests
+      .map((orderTest) => orderTest.testId)
+      .filter((testId): testId is Types.ObjectId => !!testId);
+
+    const testCatalogQuery: any[] = [];
+
+    if (catalogCodes.size > 0) {
+      testCatalogQuery.push({ code: { $in: Array.from(catalogCodes) } });
+    }
+
+    if (orderTestCatalogIds.length > 0) {
+      testCatalogQuery.push({ _id: { $in: orderTestCatalogIds } });
+    }
+
+    const testCatalogEntries =
+      testCatalogQuery.length > 0
+        ? await this.testCatalogModel.find({ $or: testCatalogQuery }).exec()
+        : [];
+
+    const testCatalogById = new Map<string, TestCatalog>();
+    const testCatalogByNormalizedCode = new Map<string, TestCatalog>();
+
+    for (const testCatalogEntry of testCatalogEntries) {
+      testCatalogById.set(testCatalogEntry._id.toString(), testCatalogEntry);
+
+      const normalizedCatalogCode = this.normalizeLookupToken(testCatalogEntry.code);
+      if (normalizedCatalogCode && !testCatalogByNormalizedCode.has(normalizedCatalogCode)) {
+        testCatalogByNormalizedCode.set(normalizedCatalogCode, testCatalogEntry);
+      }
     }
 
     // Get patient info
@@ -106,10 +206,87 @@ export class ReportsService {
     };
 
     // Build result items with test catalog info
-    const resultItems: (ResultItemDto & { category: TestCategoryEnum })[] = [];
+    const resultItems: (ResultItemDto & { category: TestCategoryEnum; displayOrder: number })[] = [];
     
     for (const result of results) {
-      const testInfo = await this.testCatalogModel.findOne({ code: result.testCode }).exec();
+      let orderTest: OrderTest | undefined;
+      let displayOrder = Number.MAX_SAFE_INTEGER;
+
+      if (result.orderTestId) {
+        const orderTestId = result.orderTestId.toString();
+        orderTest = orderTestsById.get(orderTestId);
+        displayOrder = orderTestIndexById.get(orderTestId) ?? Number.MAX_SAFE_INTEGER;
+      } else {
+        const matchedByCode = orderTestsByCode.get(result.testCode) || [];
+        const nextIndex = nextOrderTestIndexByCode.get(result.testCode) || 0;
+        const matched = matchedByCode[nextIndex] || matchedByCode[0];
+
+        if (matched) {
+          orderTest = matched.orderTest;
+          displayOrder = matched.index;
+          nextOrderTestIndexByCode.set(result.testCode, nextIndex + 1);
+        }
+      }
+
+      if (!orderTest) {
+        const normalizedResultCode = this.normalizeLookupToken(result.testCode);
+
+        if (normalizedResultCode) {
+          const matchedByNormalizedCode =
+            orderTestsByNormalizedCode.get(normalizedResultCode) || [];
+          const nextNormalizedCodeIndex =
+            nextOrderTestIndexByNormalizedCode.get(normalizedResultCode) || 0;
+          const matched =
+            matchedByNormalizedCode[nextNormalizedCodeIndex] || matchedByNormalizedCode[0];
+
+          if (matched) {
+            orderTest = matched.orderTest;
+            displayOrder = matched.index;
+            nextOrderTestIndexByNormalizedCode.set(
+              normalizedResultCode,
+              nextNormalizedCodeIndex + 1,
+            );
+          }
+        }
+      }
+
+      if (!orderTest) {
+        const normalizedResultName = this.normalizeLookupToken(result.testName);
+
+        if (normalizedResultName) {
+          const matchedByName = orderTestsByNormalizedName.get(normalizedResultName) || [];
+          const nextNameIndex = nextOrderTestIndexByNormalizedName.get(normalizedResultName) || 0;
+          const matched = matchedByName[nextNameIndex] || matchedByName[0];
+
+          if (matched) {
+            orderTest = matched.orderTest;
+            displayOrder = matched.index;
+            nextOrderTestIndexByNormalizedName.set(normalizedResultName, nextNameIndex + 1);
+          }
+        }
+      }
+
+      const normalizedResultCode = this.normalizeLookupToken(result.testCode);
+      const normalizedOrderTestCode = this.normalizeLookupToken(orderTest?.testCode);
+
+      const testInfoByOrderTestId = orderTest?.testId
+        ? testCatalogById.get(orderTest.testId.toString())
+        : undefined;
+      const testInfoByResultCode = normalizedResultCode
+        ? testCatalogByNormalizedCode.get(normalizedResultCode)
+        : undefined;
+      const testInfoByOrderTestCode = normalizedOrderTestCode
+        ? testCatalogByNormalizedCode.get(normalizedOrderTestCode)
+        : undefined;
+      const testInfo =
+        testInfoByOrderTestId || testInfoByResultCode || testInfoByOrderTestCode;
+
+      const testCode = orderTest?.testCode || result.testCode;
+      const testName =
+        (result.testName && result.testName.trim()) ||
+        orderTest?.testName ||
+        testInfo?.name ||
+        testCode;
       
       const resultedByProfile = result.resultedBy as any;
       const verifiedByProfile = result.verifiedBy as any;
@@ -118,24 +295,31 @@ export class ReportsService {
       const isAmended = result.status === ResultStatusEnum.AMENDED;
 
       resultItems.push({
-        testCode: result.testCode,
-        testName: result.testName,
+        testCode,
+        testName,
+        panelCode: orderTest?.panelCode,
+        panelName: orderTest?.panelName,
         value: result.value,
         unit: result.unit || testInfo?.unit,
         referenceRange: this.selectReferenceRange(
-          result.testCode,
+          testCode,
           patient.gender,
           patientAge,
-          result.referenceRange || testInfo?.referenceRange,
+          result.referenceRange,
+          testInfo?.referenceRanges,
+          testInfo?.referenceRange,
         ),
         flag: result.flag,
         resultedAt: result.resultedAt,
         comments: result.comments,
         isAmended,
         amendmentReason: result.amendmentReason,
+        displayOrder,
         category: testInfo?.category || TestCategoryEnum.OTHER,
       } as any);
     }
+
+    resultItems.sort((a, b) => a.displayOrder - b.displayOrder);
 
     // Group results by category
     const resultsByCategory = this.groupResultsByCategory(resultItems);
@@ -160,7 +344,7 @@ export class ReportsService {
       name: process.env.LAB_NAME || 'Clinical Laboratory',
       logo: process.env.LAB_LOGO_URL,
       address: process.env.LAB_ADDRESS || '123 Medical Center Drive, City, Country',
-      phone: process.env.LAB_PHONE || '+1-234-567-8900',
+      phone: process.env.LAB_PHONE || '+232-XX-XXXXXX',
       email: process.env.LAB_EMAIL || 'lab@example.com',
       website: process.env.LAB_WEBSITE,
       licenseNumber: process.env.LAB_LICENSE_NUMBER,
@@ -185,6 +369,14 @@ export class ReportsService {
     };
   }
 
+  private normalizeLookupToken(value?: string): string {
+    if (!value) {
+      return '';
+    }
+
+    return value.replace(/\s+/g, '').toUpperCase();
+  }
+
   /**
    * Select appropriate reference range based on patient demographics
    * Note: Current schema has simple referenceRange string. This function
@@ -199,11 +391,17 @@ export class ReportsService {
     testId: string,
     patientGender: GenderEnum,
     patientAge: number,
+    explicitReferenceRange?: string,
+    referenceRanges?: TestCatalog['referenceRanges'],
     referenceRange?: string,
   ): string | undefined {
-    // Current implementation returns the simple reference range
-    // This can be enhanced when demographic-specific ranges are added to the schema
-    return referenceRange;
+    return resolveReferenceRange({
+      age: patientAge,
+      gender: patientGender,
+      explicitReferenceRange,
+      referenceRanges,
+      simpleReferenceRange: referenceRange,
+    });
   }
 
   /**
@@ -212,23 +410,15 @@ export class ReportsService {
    * @returns Results grouped by category with display names
    */
   groupResultsByCategory(results: ResultItemDto[]): ResultCategoryDto[] {
-    // Define category order
-    const categoryOrder = [
-      TestCategoryEnum.CHEMISTRY,
-      TestCategoryEnum.HEMATOLOGY,
-      TestCategoryEnum.IMMUNOASSAY,
-      TestCategoryEnum.URINALYSIS,
-      TestCategoryEnum.MICROBIOLOGY,
-      TestCategoryEnum.OTHER,
-    ];
-
     // Group results by category
     const grouped = new Map<TestCategoryEnum, ResultItemDto[]>();
+    const categoryOrder: TestCategoryEnum[] = [];
     
     for (const result of results) {
       const category = (result as any).category || TestCategoryEnum.OTHER;
       if (!grouped.has(category)) {
         grouped.set(category, []);
+        categoryOrder.push(category);
       }
       grouped.get(category)!.push(result);
     }
@@ -256,12 +446,12 @@ export class ReportsService {
    */
   formatCategoryDisplayName(category: TestCategoryEnum): string {
     const displayNames: Record<TestCategoryEnum, string> = {
-      [TestCategoryEnum.CHEMISTRY]: 'Clinical Chemistry / Electrolytes',
-      [TestCategoryEnum.HEMATOLOGY]: 'Hematology',
-      [TestCategoryEnum.IMMUNOASSAY]: 'Immunoassay',
+      [TestCategoryEnum.CHEMISTRY]: 'CLINICAL CHEMISTRY',
+      [TestCategoryEnum.HEMATOLOGY]: 'HEMATOLOGY',
+      [TestCategoryEnum.IMMUNOASSAY]: 'SEROLOGY',
       [TestCategoryEnum.URINALYSIS]: 'Urinalysis',
-      [TestCategoryEnum.MICROBIOLOGY]: 'Microbiology',
-      [TestCategoryEnum.OTHER]: 'Other Tests',
+      [TestCategoryEnum.MICROBIOLOGY]: 'MICROBIOLOGY',
+      [TestCategoryEnum.OTHER]: 'OTHER TESTS',
     };
 
     return displayNames[category] || category;

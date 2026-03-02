@@ -1,0 +1,301 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/components/patients/PatientNotesPanel.tsx");import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+
+let prevRefreshReg;
+let prevRefreshSig;
+
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react-swc can't detect preamble. Something is wrong."
+    );
+  }
+
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/HP/Downloads/lab/frontend/src/components/patients/PatientNotesPanel.tsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+
+import __vite__cjsImport2_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=27cfabb6"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime["jsxDEV"];
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=27cfabb6"; const useState = __vite__cjsImport3_react["useState"];
+import { useAuth } from "/src/context/AuthContext.tsx";
+import { Button } from "/src/components/ui/button.tsx";
+import { Textarea } from "/src/components/ui/textarea.tsx";
+import { toast } from "/node_modules/.vite/deps/sonner.js?v=27cfabb6";
+import { Plus, Loader2, FileText } from "/node_modules/.vite/deps/lucide-react.js?v=27cfabb6";
+import { patientsAPI } from "/src/services/api.ts";
+import { useQuery, useMutation, useQueryClient } from "/node_modules/.vite/deps/@tanstack_react-query.js?v=27cfabb6";
+export function PatientNotesPanel({ patientId }) {
+    _s();
+    const { user, profile } = useAuth();
+    const queryClient = useQueryClient();
+    const [newNote, setNewNote] = useState('');
+    const [isAdding, setIsAdding] = useState(false);
+    // Fetch notes
+    const { data: notes, isLoading } = useQuery({
+        queryKey: [
+            'patient-notes',
+            patientId
+        ],
+        queryFn: async ()=>{
+            // Assuming the backend returns notes with patient data
+            const patient = await patientsAPI.getById(patientId);
+            return patient.notes || [];
+        }
+    });
+    // Add note mutation
+    const addNote = useMutation({
+        mutationFn: async (note)=>{
+            return await patientsAPI.addNote(patientId, note.trim());
+        },
+        onSuccess: ()=>{
+            queryClient.invalidateQueries({
+                queryKey: [
+                    'patient-notes',
+                    patientId
+                ]
+            });
+            setNewNote('');
+            setIsAdding(false);
+            toast.success('Note added successfully');
+        },
+        onError: ()=>{
+            toast.error('Failed to add note');
+        }
+    });
+    const handleAddNote = ()=>{
+        if (!newNote.trim()) {
+            toast.error('Please enter a note');
+            return;
+        }
+        addNote.mutate(newNote);
+    };
+    return /*#__PURE__*/ _jsxDEV("div", {
+        className: "space-y-4",
+        children: [
+            isAdding ? /*#__PURE__*/ _jsxDEV("div", {
+                className: "bg-card border rounded-lg p-4 space-y-3",
+                children: [
+                    /*#__PURE__*/ _jsxDEV(Textarea, {
+                        placeholder: "Enter clinical note...",
+                        value: newNote,
+                        onChange: (e)=>setNewNote(e.target.value),
+                        rows: 4,
+                        autoFocus: true
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/patients/PatientNotesPanel.tsx",
+                        lineNumber: 59,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "flex justify-end gap-2",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(Button, {
+                                variant: "outline",
+                                size: "sm",
+                                onClick: ()=>{
+                                    setIsAdding(false);
+                                    setNewNote('');
+                                },
+                                children: "Cancel"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/patients/PatientNotesPanel.tsx",
+                                lineNumber: 67,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV(Button, {
+                                size: "sm",
+                                onClick: handleAddNote,
+                                disabled: addNote.isPending || !newNote.trim(),
+                                children: [
+                                    addNote.isPending && /*#__PURE__*/ _jsxDEV(Loader2, {
+                                        className: "w-4 h-4 mr-2 animate-spin"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/patients/PatientNotesPanel.tsx",
+                                        lineNumber: 82,
+                                        columnNumber: 37
+                                    }, this),
+                                    "Save Note"
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/patients/PatientNotesPanel.tsx",
+                                lineNumber: 77,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/patients/PatientNotesPanel.tsx",
+                        lineNumber: 66,
+                        columnNumber: 11
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/patients/PatientNotesPanel.tsx",
+                lineNumber: 58,
+                columnNumber: 9
+            }, this) : /*#__PURE__*/ _jsxDEV(Button, {
+                onClick: ()=>setIsAdding(true),
+                className: "w-full",
+                children: [
+                    /*#__PURE__*/ _jsxDEV(Plus, {
+                        className: "w-4 h-4 mr-2"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/patients/PatientNotesPanel.tsx",
+                        lineNumber: 89,
+                        columnNumber: 11
+                    }, this),
+                    "Add Clinical Note"
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/patients/PatientNotesPanel.tsx",
+                lineNumber: 88,
+                columnNumber: 9
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "space-y-3",
+                children: isLoading ? /*#__PURE__*/ _jsxDEV("div", {
+                    className: "flex items-center justify-center py-8",
+                    children: /*#__PURE__*/ _jsxDEV(Loader2, {
+                        className: "w-6 h-6 animate-spin text-muted-foreground"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/patients/PatientNotesPanel.tsx",
+                        lineNumber: 98,
+                        columnNumber: 13
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/patients/PatientNotesPanel.tsx",
+                    lineNumber: 97,
+                    columnNumber: 11
+                }, this) : notes && notes.length > 0 ? notes.map((note)=>/*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg p-4",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "flex items-start justify-between mb-2",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "flex items-center gap-2",
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV(FileText, {
+                                                className: "w-4 h-4 text-muted-foreground"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/patients/PatientNotesPanel.tsx",
+                                                lineNumber: 105,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("span", {
+                                                className: "text-sm font-medium",
+                                                children: note.createdBy?.fullName || 'Unknown User'
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/patients/PatientNotesPanel.tsx",
+                                                lineNumber: 106,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/patients/PatientNotesPanel.tsx",
+                                        lineNumber: 104,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("span", {
+                                        className: "text-xs text-muted-foreground",
+                                        children: new Date(note.createdAt).toLocaleString()
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/patients/PatientNotesPanel.tsx",
+                                        lineNumber: 110,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/patients/PatientNotesPanel.tsx",
+                                lineNumber: 103,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-sm whitespace-pre-wrap",
+                                children: note.note
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/patients/PatientNotesPanel.tsx",
+                                lineNumber: 114,
+                                columnNumber: 15
+                            }, this)
+                        ]
+                    }, note.id, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/patients/PatientNotesPanel.tsx",
+                        lineNumber: 102,
+                        columnNumber: 13
+                    }, this)) : /*#__PURE__*/ _jsxDEV("div", {
+                    className: "text-center py-8 text-muted-foreground",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV(FileText, {
+                            className: "w-12 h-12 mx-auto mb-3 opacity-50"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/patients/PatientNotesPanel.tsx",
+                            lineNumber: 119,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("p", {
+                            children: "No clinical notes"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/patients/PatientNotesPanel.tsx",
+                            lineNumber: 120,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("p", {
+                            className: "text-sm",
+                            children: "Add notes to track patient information"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/patients/PatientNotesPanel.tsx",
+                            lineNumber: 121,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/patients/PatientNotesPanel.tsx",
+                    lineNumber: 118,
+                    columnNumber: 11
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/patients/PatientNotesPanel.tsx",
+                lineNumber: 95,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/patients/PatientNotesPanel.tsx",
+        lineNumber: 55,
+        columnNumber: 5
+    }, this);
+}
+_s(PatientNotesPanel, "lZ9tG2xO2HC5AYAuVrROltVqHsg=", false, function() {
+    return [
+        useAuth,
+        useQueryClient,
+        useQuery,
+        useMutation
+    ];
+});
+_c = PatientNotesPanel;
+var _c;
+$RefreshReg$(_c, "PatientNotesPanel");
+
+
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+
+
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/HP/Downloads/lab/frontend/src/components/patients/PatientNotesPanel.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/HP/Downloads/lab/frontend/src/components/patients/PatientNotesPanel.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIlBhdGllbnROb3Rlc1BhbmVsLnRzeCJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyB1c2VTdGF0ZSB9IGZyb20gJ3JlYWN0JztcclxuaW1wb3J0IHsgdXNlQXV0aCB9IGZyb20gJ0AvY29udGV4dC9BdXRoQ29udGV4dCc7XHJcbmltcG9ydCB7IEJ1dHRvbiB9IGZyb20gJ0AvY29tcG9uZW50cy91aS9idXR0b24nO1xyXG5pbXBvcnQgeyBUZXh0YXJlYSB9IGZyb20gJ0AvY29tcG9uZW50cy91aS90ZXh0YXJlYSc7XHJcbmltcG9ydCB7IHRvYXN0IH0gZnJvbSAnc29ubmVyJztcclxuaW1wb3J0IHsgUGx1cywgTG9hZGVyMiwgRmlsZVRleHQgfSBmcm9tICdsdWNpZGUtcmVhY3QnO1xyXG5pbXBvcnQgeyBwYXRpZW50c0FQSSB9IGZyb20gJ0Avc2VydmljZXMvYXBpJztcclxuaW1wb3J0IHsgdXNlUXVlcnksIHVzZU11dGF0aW9uLCB1c2VRdWVyeUNsaWVudCB9IGZyb20gJ0B0YW5zdGFjay9yZWFjdC1xdWVyeSc7XHJcblxyXG5pbnRlcmZhY2UgUGF0aWVudE5vdGVzUGFuZWxQcm9wcyB7XHJcbiAgcGF0aWVudElkOiBzdHJpbmc7XHJcbn1cclxuXHJcbmV4cG9ydCBmdW5jdGlvbiBQYXRpZW50Tm90ZXNQYW5lbCh7IHBhdGllbnRJZCB9OiBQYXRpZW50Tm90ZXNQYW5lbFByb3BzKSB7XHJcbiAgY29uc3QgeyB1c2VyLCBwcm9maWxlIH0gPSB1c2VBdXRoKCk7XHJcbiAgY29uc3QgcXVlcnlDbGllbnQgPSB1c2VRdWVyeUNsaWVudCgpO1xyXG4gIGNvbnN0IFtuZXdOb3RlLCBzZXROZXdOb3RlXSA9IHVzZVN0YXRlKCcnKTtcclxuICBjb25zdCBbaXNBZGRpbmcsIHNldElzQWRkaW5nXSA9IHVzZVN0YXRlKGZhbHNlKTtcclxuXHJcbiAgLy8gRmV0Y2ggbm90ZXNcclxuICBjb25zdCB7IGRhdGE6IG5vdGVzLCBpc0xvYWRpbmcgfSA9IHVzZVF1ZXJ5KHtcclxuICAgIHF1ZXJ5S2V5OiBbJ3BhdGllbnQtbm90ZXMnLCBwYXRpZW50SWRdLFxyXG4gICAgcXVlcnlGbjogYXN5bmMgKCkgPT4ge1xyXG4gICAgICAvLyBBc3N1bWluZyB0aGUgYmFja2VuZCByZXR1cm5zIG5vdGVzIHdpdGggcGF0aWVudCBkYXRhXHJcbiAgICAgIGNvbnN0IHBhdGllbnQgPSBhd2FpdCBwYXRpZW50c0FQSS5nZXRCeUlkKHBhdGllbnRJZCk7XHJcbiAgICAgIHJldHVybiBwYXRpZW50Lm5vdGVzIHx8IFtdO1xyXG4gICAgfVxyXG4gIH0pO1xyXG5cclxuICAvLyBBZGQgbm90ZSBtdXRhdGlvblxyXG4gIGNvbnN0IGFkZE5vdGUgPSB1c2VNdXRhdGlvbih7XHJcbiAgICBtdXRhdGlvbkZuOiBhc3luYyAobm90ZTogc3RyaW5nKSA9PiB7XHJcbiAgICAgIHJldHVybiBhd2FpdCBwYXRpZW50c0FQSS5hZGROb3RlKHBhdGllbnRJZCwgbm90ZS50cmltKCkpO1xyXG4gICAgfSxcclxuICAgIG9uU3VjY2VzczogKCkgPT4ge1xyXG4gICAgICBxdWVyeUNsaWVudC5pbnZhbGlkYXRlUXVlcmllcyh7IHF1ZXJ5S2V5OiBbJ3BhdGllbnQtbm90ZXMnLCBwYXRpZW50SWRdIH0pO1xyXG4gICAgICBzZXROZXdOb3RlKCcnKTtcclxuICAgICAgc2V0SXNBZGRpbmcoZmFsc2UpO1xyXG4gICAgICB0b2FzdC5zdWNjZXNzKCdOb3RlIGFkZGVkIHN1Y2Nlc3NmdWxseScpO1xyXG4gICAgfSxcclxuICAgIG9uRXJyb3I6ICgpID0+IHtcclxuICAgICAgdG9hc3QuZXJyb3IoJ0ZhaWxlZCB0byBhZGQgbm90ZScpO1xyXG4gICAgfVxyXG4gIH0pO1xyXG5cclxuICBjb25zdCBoYW5kbGVBZGROb3RlID0gKCkgPT4ge1xyXG4gICAgaWYgKCFuZXdOb3RlLnRyaW0oKSkge1xyXG4gICAgICB0b2FzdC5lcnJvcignUGxlYXNlIGVudGVyIGEgbm90ZScpO1xyXG4gICAgICByZXR1cm47XHJcbiAgICB9XHJcbiAgICBhZGROb3RlLm11dGF0ZShuZXdOb3RlKTtcclxuICB9O1xyXG5cclxuICByZXR1cm4gKFxyXG4gICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTRcIj5cclxuICAgICAgey8qIEFkZCBOb3RlIFNlY3Rpb24gKi99XHJcbiAgICAgIHtpc0FkZGluZyA/IChcclxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImJnLWNhcmQgYm9yZGVyIHJvdW5kZWQtbGcgcC00IHNwYWNlLXktM1wiPlxyXG4gICAgICAgICAgPFRleHRhcmVhXHJcbiAgICAgICAgICAgIHBsYWNlaG9sZGVyPVwiRW50ZXIgY2xpbmljYWwgbm90ZS4uLlwiXHJcbiAgICAgICAgICAgIHZhbHVlPXtuZXdOb3RlfVxyXG4gICAgICAgICAgICBvbkNoYW5nZT17KGUpID0+IHNldE5ld05vdGUoZS50YXJnZXQudmFsdWUpfVxyXG4gICAgICAgICAgICByb3dzPXs0fVxyXG4gICAgICAgICAgICBhdXRvRm9jdXNcclxuICAgICAgICAgIC8+XHJcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXgganVzdGlmeS1lbmQgZ2FwLTJcIj5cclxuICAgICAgICAgICAgPEJ1dHRvblxyXG4gICAgICAgICAgICAgIHZhcmlhbnQ9XCJvdXRsaW5lXCJcclxuICAgICAgICAgICAgICBzaXplPVwic21cIlxyXG4gICAgICAgICAgICAgIG9uQ2xpY2s9eygpID0+IHtcclxuICAgICAgICAgICAgICAgIHNldElzQWRkaW5nKGZhbHNlKTtcclxuICAgICAgICAgICAgICAgIHNldE5ld05vdGUoJycpO1xyXG4gICAgICAgICAgICAgIH19XHJcbiAgICAgICAgICAgID5cclxuICAgICAgICAgICAgICBDYW5jZWxcclxuICAgICAgICAgICAgPC9CdXR0b24+XHJcbiAgICAgICAgICAgIDxCdXR0b25cclxuICAgICAgICAgICAgICBzaXplPVwic21cIlxyXG4gICAgICAgICAgICAgIG9uQ2xpY2s9e2hhbmRsZUFkZE5vdGV9XHJcbiAgICAgICAgICAgICAgZGlzYWJsZWQ9e2FkZE5vdGUuaXNQZW5kaW5nIHx8ICFuZXdOb3RlLnRyaW0oKX1cclxuICAgICAgICAgICAgPlxyXG4gICAgICAgICAgICAgIHthZGROb3RlLmlzUGVuZGluZyAmJiA8TG9hZGVyMiBjbGFzc05hbWU9XCJ3LTQgaC00IG1yLTIgYW5pbWF0ZS1zcGluXCIgLz59XHJcbiAgICAgICAgICAgICAgU2F2ZSBOb3RlXHJcbiAgICAgICAgICAgIDwvQnV0dG9uPlxyXG4gICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgPC9kaXY+XHJcbiAgICAgICkgOiAoXHJcbiAgICAgICAgPEJ1dHRvbiBvbkNsaWNrPXsoKSA9PiBzZXRJc0FkZGluZyh0cnVlKX0gY2xhc3NOYW1lPVwidy1mdWxsXCI+XHJcbiAgICAgICAgICA8UGx1cyBjbGFzc05hbWU9XCJ3LTQgaC00IG1yLTJcIiAvPlxyXG4gICAgICAgICAgQWRkIENsaW5pY2FsIE5vdGVcclxuICAgICAgICA8L0J1dHRvbj5cclxuICAgICAgKX1cclxuXHJcbiAgICAgIHsvKiBOb3RlcyBMaXN0ICovfVxyXG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cInNwYWNlLXktM1wiPlxyXG4gICAgICAgIHtpc0xvYWRpbmcgPyAoXHJcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGp1c3RpZnktY2VudGVyIHB5LThcIj5cclxuICAgICAgICAgICAgPExvYWRlcjIgY2xhc3NOYW1lPVwidy02IGgtNiBhbmltYXRlLXNwaW4gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCIgLz5cclxuICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICkgOiBub3RlcyAmJiBub3Rlcy5sZW5ndGggPiAwID8gKFxyXG4gICAgICAgICAgbm90ZXMubWFwKChub3RlOiBhbnkpID0+IChcclxuICAgICAgICAgICAgPGRpdiBrZXk9e25vdGUuaWR9IGNsYXNzTmFtZT1cImJnLWNhcmQgYm9yZGVyIHJvdW5kZWQtbGcgcC00XCI+XHJcbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLXN0YXJ0IGp1c3RpZnktYmV0d2VlbiBtYi0yXCI+XHJcbiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGdhcC0yXCI+XHJcbiAgICAgICAgICAgICAgICAgIDxGaWxlVGV4dCBjbGFzc05hbWU9XCJ3LTQgaC00IHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiIC8+XHJcbiAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInRleHQtc20gZm9udC1tZWRpdW1cIj5cclxuICAgICAgICAgICAgICAgICAgICB7bm90ZS5jcmVhdGVkQnk/LmZ1bGxOYW1lIHx8ICdVbmtub3duIFVzZXInfVxyXG4gICAgICAgICAgICAgICAgICA8L3NwYW4+XHJcbiAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInRleHQteHMgdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+XHJcbiAgICAgICAgICAgICAgICAgIHtuZXcgRGF0ZShub3RlLmNyZWF0ZWRBdCkudG9Mb2NhbGVTdHJpbmcoKX1cclxuICAgICAgICAgICAgICAgIDwvc3Bhbj5cclxuICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LXNtIHdoaXRlc3BhY2UtcHJlLXdyYXBcIj57bm90ZS5ub3RlfTwvcD5cclxuICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICApKVxyXG4gICAgICAgICkgOiAoXHJcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInRleHQtY2VudGVyIHB5LTggdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+XHJcbiAgICAgICAgICAgIDxGaWxlVGV4dCBjbGFzc05hbWU9XCJ3LTEyIGgtMTIgbXgtYXV0byBtYi0zIG9wYWNpdHktNTBcIiAvPlxyXG4gICAgICAgICAgICA8cD5ObyBjbGluaWNhbCBub3RlczwvcD5cclxuICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1zbVwiPkFkZCBub3RlcyB0byB0cmFjayBwYXRpZW50IGluZm9ybWF0aW9uPC9wPlxyXG4gICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgKX1cclxuICAgICAgPC9kaXY+XHJcbiAgICA8L2Rpdj5cclxuICApO1xyXG59XHJcbiJdLCJuYW1lcyI6WyJ1c2VTdGF0ZSIsInVzZUF1dGgiLCJCdXR0b24iLCJUZXh0YXJlYSIsInRvYXN0IiwiUGx1cyIsIkxvYWRlcjIiLCJGaWxlVGV4dCIsInBhdGllbnRzQVBJIiwidXNlUXVlcnkiLCJ1c2VNdXRhdGlvbiIsInVzZVF1ZXJ5Q2xpZW50IiwiUGF0aWVudE5vdGVzUGFuZWwiLCJwYXRpZW50SWQiLCJ1c2VyIiwicHJvZmlsZSIsInF1ZXJ5Q2xpZW50IiwibmV3Tm90ZSIsInNldE5ld05vdGUiLCJpc0FkZGluZyIsInNldElzQWRkaW5nIiwiZGF0YSIsIm5vdGVzIiwiaXNMb2FkaW5nIiwicXVlcnlLZXkiLCJxdWVyeUZuIiwicGF0aWVudCIsImdldEJ5SWQiLCJhZGROb3RlIiwibXV0YXRpb25GbiIsIm5vdGUiLCJ0cmltIiwib25TdWNjZXNzIiwiaW52YWxpZGF0ZVF1ZXJpZXMiLCJzdWNjZXNzIiwib25FcnJvciIsImVycm9yIiwiaGFuZGxlQWRkTm90ZSIsIm11dGF0ZSIsImRpdiIsImNsYXNzTmFtZSIsInBsYWNlaG9sZGVyIiwidmFsdWUiLCJvbkNoYW5nZSIsImUiLCJ0YXJnZXQiLCJyb3dzIiwiYXV0b0ZvY3VzIiwidmFyaWFudCIsInNpemUiLCJvbkNsaWNrIiwiZGlzYWJsZWQiLCJpc1BlbmRpbmciLCJsZW5ndGgiLCJtYXAiLCJzcGFuIiwiY3JlYXRlZEJ5IiwiZnVsbE5hbWUiLCJEYXRlIiwiY3JlYXRlZEF0IiwidG9Mb2NhbGVTdHJpbmciLCJwIiwiaWQiXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OztBQUFBLFNBQVNBLFFBQVEsUUFBUSxRQUFRO0FBQ2pDLFNB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

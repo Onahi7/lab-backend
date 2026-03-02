@@ -1,0 +1,994 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/pages/reception/DailyReconciliation.tsx");import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+
+let prevRefreshReg;
+let prevRefreshSig;
+
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react-swc can't detect preamble. Something is wrong."
+    );
+  }
+
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+
+import __vite__cjsImport2_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=27cfabb6"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime["jsxDEV"]; const _Fragment = __vite__cjsImport2_react_jsxDevRuntime["Fragment"];
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=27cfabb6"; const useState = __vite__cjsImport3_react["useState"];
+import { RoleLayout } from "/src/components/layout/RoleLayout.tsx";
+import { useAuth } from "/src/context/AuthContext.tsx";
+import { useExpectedAmounts, useCreateReconciliation, useReconciliations } from "/src/hooks/useReconciliation.ts";
+import { Button } from "/src/components/ui/button.tsx";
+import { Input } from "/src/components/ui/input.tsx";
+import { Label } from "/src/components/ui/label.tsx";
+import { Textarea } from "/src/components/ui/textarea.tsx";
+import { Badge } from "/src/components/ui/badge.tsx";
+import { toast } from "/node_modules/.vite/deps/sonner.js?v=27cfabb6";
+import { Calculator, CheckCircle2, XCircle, Clock, AlertTriangle, Loader2 } from "/node_modules/.vite/deps/lucide-react.js?v=27cfabb6";
+import { format } from "/node_modules/.vite/deps/date-fns.js?v=27cfabb6";
+import { cn } from "/src/lib/utils.ts";
+export default function DailyReconciliation() {
+    _s();
+    const { profile } = useAuth();
+    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const [actualCash, setActualCash] = useState('');
+    const [actualCard, setActualCard] = useState('');
+    const [actualMobileMoney, setActualMobileMoney] = useState('');
+    const [notes, setNotes] = useState('');
+    const { data: expected, isLoading: loadingExpected } = useExpectedAmounts(selectedDate);
+    const { data: reconciliations } = useReconciliations('all');
+    const createReconciliation = useCreateReconciliation();
+    const actualCashNum = parseFloat(actualCash) || 0;
+    const actualCardNum = parseFloat(actualCard) || 0;
+    const actualMobileMoneyNum = parseFloat(actualMobileMoney) || 0;
+    const actualTotal = actualCashNum + actualCardNum + actualMobileMoneyNum;
+    const cashVariance = actualCashNum - (expected?.expectedCash || 0);
+    const cardVariance = actualCardNum - (expected?.expectedCard || 0);
+    const mobileMoneyVariance = actualMobileMoneyNum - (expected?.expectedMobileMoney || 0);
+    const totalVariance = actualTotal - (expected?.expectedTotal || 0);
+    const hasVariance = Math.abs(totalVariance) > 0.01;
+    const handleSubmit = async ()=>{
+        if (!actualCash || !actualCard || !actualMobileMoney) {
+            toast.error('Please enter all actual amounts');
+            return;
+        }
+        if (hasVariance && !notes) {
+            toast.error('Please provide notes explaining the variance');
+            return;
+        }
+        try {
+            await createReconciliation.mutateAsync({
+                reconciliationDate: new Date(selectedDate),
+                actualCash: actualCashNum,
+                actualCard: actualCardNum,
+                actualMobileMoney: actualMobileMoneyNum,
+                notes: notes || undefined
+            });
+            toast.success('Reconciliation submitted successfully');
+            setActualCash('');
+            setActualCard('');
+            setActualMobileMoney('');
+            setNotes('');
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to submit reconciliation');
+        }
+    };
+    const todayReconciliation = reconciliations?.find((r)=>{
+        const recDate = new Date(r.reconciliationDate).toISOString().split('T')[0];
+        return recDate === selectedDate;
+    });
+    const statusStyles = {
+        pending: 'bg-status-warning/10 text-status-warning border-status-warning/20',
+        approved: 'bg-status-normal/10 text-status-normal border-status-normal/20',
+        rejected: 'bg-status-critical/10 text-status-critical border-status-critical/20'
+    };
+    return /*#__PURE__*/ _jsxDEV(RoleLayout, {
+        title: "Daily Reconciliation",
+        subtitle: "Submit end-of-day cash reconciliation",
+        role: "receptionist",
+        userName: profile?.full_name,
+        children: /*#__PURE__*/ _jsxDEV("div", {
+            className: "grid grid-cols-1 lg:grid-cols-2 gap-6",
+            children: [
+                /*#__PURE__*/ _jsxDEV("div", {
+                    className: "space-y-6",
+                    children: /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg p-6",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("h3", {
+                                className: "font-semibold text-lg mb-4",
+                                children: "Submit Reconciliation"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                lineNumber: 106,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "space-y-4",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV(Label, {
+                                                children: "Date"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                lineNumber: 110,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(Input, {
+                                                type: "date",
+                                                value: selectedDate,
+                                                onChange: (e)=>setSelectedDate(e.target.value),
+                                                max: new Date().toISOString().split('T')[0]
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                lineNumber: 111,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                        lineNumber: 109,
+                                        columnNumber: 15
+                                    }, this),
+                                    todayReconciliation ? /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "bg-muted rounded-lg p-4",
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                className: "flex items-center gap-2 mb-2",
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV(CheckCircle2, {
+                                                        className: "w-5 h-5 text-status-normal"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                        lineNumber: 122,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("p", {
+                                                        className: "font-medium",
+                                                        children: "Reconciliation Already Submitted"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                        lineNumber: 123,
+                                                        columnNumber: 21
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                lineNumber: 121,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                className: "text-sm text-muted-foreground mb-3",
+                                                children: [
+                                                    "Submitted on ",
+                                                    format(new Date(todayReconciliation.submittedAt), 'MMM dd, yyyy HH:mm')
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                lineNumber: 125,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(Badge, {
+                                                variant: "outline",
+                                                className: cn('capitalize', statusStyles[todayReconciliation.status]),
+                                                children: todayReconciliation.status
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                lineNumber: 128,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                        lineNumber: 120,
+                                        columnNumber: 17
+                                    }, this) : loadingExpected ? /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "flex items-center justify-center py-8",
+                                        children: /*#__PURE__*/ _jsxDEV(Loader2, {
+                                            className: "w-6 h-6 animate-spin text-muted-foreground"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                            lineNumber: 137,
+                                            columnNumber: 19
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                        lineNumber: 136,
+                                        columnNumber: 17
+                                    }, this) : /*#__PURE__*/ _jsxDEV(_Fragment, {
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                className: "bg-muted rounded-lg p-4",
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV("h4", {
+                                                        className: "font-medium mb-3",
+                                                        children: "Expected Amounts (System)"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                        lineNumber: 143,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                        className: "space-y-2 text-sm",
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                                className: "flex justify-between",
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV("span", {
+                                                                        className: "text-muted-foreground",
+                                                                        children: "Cash:"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                        lineNumber: 146,
+                                                                        columnNumber: 25
+                                                                    }, this),
+                                                                    /*#__PURE__*/ _jsxDEV("span", {
+                                                                        className: "font-medium",
+                                                                        children: [
+                                                                            "Le ",
+                                                                            (expected?.expectedCash || 0).toLocaleString()
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                        lineNumber: 147,
+                                                                        columnNumber: 25
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                lineNumber: 145,
+                                                                columnNumber: 23
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                                className: "flex justify-between",
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV("span", {
+                                                                        className: "text-muted-foreground",
+                                                                        children: "Card:"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                        lineNumber: 152,
+                                                                        columnNumber: 25
+                                                                    }, this),
+                                                                    /*#__PURE__*/ _jsxDEV("span", {
+                                                                        className: "font-medium",
+                                                                        children: [
+                                                                            "Le ",
+                                                                            (expected?.expectedCard || 0).toLocaleString()
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                        lineNumber: 153,
+                                                                        columnNumber: 25
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                lineNumber: 151,
+                                                                columnNumber: 23
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                                className: "flex justify-between",
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV("span", {
+                                                                        className: "text-muted-foreground",
+                                                                        children: "Mobile Money:"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                        lineNumber: 158,
+                                                                        columnNumber: 25
+                                                                    }, this),
+                                                                    /*#__PURE__*/ _jsxDEV("span", {
+                                                                        className: "font-medium",
+                                                                        children: [
+                                                                            "Le ",
+                                                                            (expected?.expectedMobileMoney || 0).toLocaleString()
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                        lineNumber: 159,
+                                                                        columnNumber: 25
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                lineNumber: 157,
+                                                                columnNumber: 23
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                                className: "flex justify-between pt-2 border-t font-bold",
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV("span", {
+                                                                        children: "Total:"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                        lineNumber: 164,
+                                                                        columnNumber: 25
+                                                                    }, this),
+                                                                    /*#__PURE__*/ _jsxDEV("span", {
+                                                                        children: [
+                                                                            "Le ",
+                                                                            (expected?.expectedTotal || 0).toLocaleString()
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                        lineNumber: 165,
+                                                                        columnNumber: 25
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                lineNumber: 163,
+                                                                columnNumber: 23
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                        lineNumber: 144,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                        className: "mt-3 pt-3 border-t text-xs text-muted-foreground",
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                                className: "flex justify-between",
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV("span", {
+                                                                        children: "Total Orders:"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                        lineNumber: 170,
+                                                                        columnNumber: 25
+                                                                    }, this),
+                                                                    /*#__PURE__*/ _jsxDEV("span", {
+                                                                        children: expected?.totalOrders || 0
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                        lineNumber: 171,
+                                                                        columnNumber: 25
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                lineNumber: 169,
+                                                                columnNumber: 23
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                                className: "flex justify-between",
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV("span", {
+                                                                        children: "Paid Orders:"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                        lineNumber: 174,
+                                                                        columnNumber: 25
+                                                                    }, this),
+                                                                    /*#__PURE__*/ _jsxDEV("span", {
+                                                                        children: expected?.paidOrders || 0
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                        lineNumber: 175,
+                                                                        columnNumber: 25
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                lineNumber: 173,
+                                                                columnNumber: 23
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                        lineNumber: 168,
+                                                        columnNumber: 21
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                lineNumber: 142,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV("h4", {
+                                                        className: "font-medium mb-3",
+                                                        children: "Actual Amounts (Counted)"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                        lineNumber: 182,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                        className: "space-y-3",
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                                                        children: "Cash"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                        lineNumber: 185,
+                                                                        columnNumber: 25
+                                                                    }, this),
+                                                                    /*#__PURE__*/ _jsxDEV(Input, {
+                                                                        type: "number",
+                                                                        placeholder: "0.00",
+                                                                        value: actualCash,
+                                                                        onChange: (e)=>setActualCash(e.target.value),
+                                                                        min: "0",
+                                                                        step: "0.01"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                        lineNumber: 186,
+                                                                        columnNumber: 25
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                lineNumber: 184,
+                                                                columnNumber: 23
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                                                        children: "Card"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                        lineNumber: 196,
+                                                                        columnNumber: 25
+                                                                    }, this),
+                                                                    /*#__PURE__*/ _jsxDEV(Input, {
+                                                                        type: "number",
+                                                                        placeholder: "0.00",
+                                                                        value: actualCard,
+                                                                        onChange: (e)=>setActualCard(e.target.value),
+                                                                        min: "0",
+                                                                        step: "0.01"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                        lineNumber: 197,
+                                                                        columnNumber: 25
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                lineNumber: 195,
+                                                                columnNumber: 23
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                                                        children: "Mobile Money"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                        lineNumber: 207,
+                                                                        columnNumber: 25
+                                                                    }, this),
+                                                                    /*#__PURE__*/ _jsxDEV(Input, {
+                                                                        type: "number",
+                                                                        placeholder: "0.00",
+                                                                        value: actualMobileMoney,
+                                                                        onChange: (e)=>setActualMobileMoney(e.target.value),
+                                                                        min: "0",
+                                                                        step: "0.01"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                        lineNumber: 208,
+                                                                        columnNumber: 25
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                lineNumber: 206,
+                                                                columnNumber: 23
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                        lineNumber: 183,
+                                                        columnNumber: 21
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                lineNumber: 181,
+                                                columnNumber: 19
+                                            }, this),
+                                            (actualCash || actualCard || actualMobileMoney) && /*#__PURE__*/ _jsxDEV("div", {
+                                                className: cn('rounded-lg p-4', hasVariance ? 'bg-status-warning/10 border border-status-warning/20' : 'bg-status-normal/10 border border-status-normal/20'),
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                        className: "flex items-center gap-2 mb-3",
+                                                        children: hasVariance ? /*#__PURE__*/ _jsxDEV(_Fragment, {
+                                                            children: [
+                                                                /*#__PURE__*/ _jsxDEV(AlertTriangle, {
+                                                                    className: "w-5 h-5 text-status-warning"
+                                                                }, void 0, false, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                    lineNumber: 233,
+                                                                    columnNumber: 29
+                                                                }, this),
+                                                                /*#__PURE__*/ _jsxDEV("h4", {
+                                                                    className: "font-medium",
+                                                                    children: "Variance Detected"
+                                                                }, void 0, false, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                    lineNumber: 234,
+                                                                    columnNumber: 29
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true) : /*#__PURE__*/ _jsxDEV(_Fragment, {
+                                                            children: [
+                                                                /*#__PURE__*/ _jsxDEV(CheckCircle2, {
+                                                                    className: "w-5 h-5 text-status-normal"
+                                                                }, void 0, false, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                    lineNumber: 238,
+                                                                    columnNumber: 29
+                                                                }, this),
+                                                                /*#__PURE__*/ _jsxDEV("h4", {
+                                                                    className: "font-medium",
+                                                                    children: "Balanced"
+                                                                }, void 0, false, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                    lineNumber: 239,
+                                                                    columnNumber: 29
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true)
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                        lineNumber: 230,
+                                                        columnNumber: 23
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                        className: "space-y-2 text-sm",
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                                className: "flex justify-between",
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV("span", {
+                                                                        children: "Cash Variance:"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                        lineNumber: 245,
+                                                                        columnNumber: 27
+                                                                    }, this),
+                                                                    /*#__PURE__*/ _jsxDEV("span", {
+                                                                        className: cn('font-medium', cashVariance > 0 ? 'text-status-normal' : cashVariance < 0 ? 'text-status-critical' : ''),
+                                                                        children: [
+                                                                            cashVariance > 0 ? '+' : '',
+                                                                            "Le ",
+                                                                            cashVariance.toLocaleString()
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                        lineNumber: 246,
+                                                                        columnNumber: 27
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                lineNumber: 244,
+                                                                columnNumber: 25
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                                className: "flex justify-between",
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV("span", {
+                                                                        children: "Card Variance:"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                        lineNumber: 260,
+                                                                        columnNumber: 27
+                                                                    }, this),
+                                                                    /*#__PURE__*/ _jsxDEV("span", {
+                                                                        className: cn('font-medium', cardVariance > 0 ? 'text-status-normal' : cardVariance < 0 ? 'text-status-critical' : ''),
+                                                                        children: [
+                                                                            cardVariance > 0 ? '+' : '',
+                                                                            "Le ",
+                                                                            cardVariance.toLocaleString()
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                        lineNumber: 261,
+                                                                        columnNumber: 27
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                lineNumber: 259,
+                                                                columnNumber: 25
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                                className: "flex justify-between",
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV("span", {
+                                                                        children: "Mobile Money Variance:"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                        lineNumber: 275,
+                                                                        columnNumber: 27
+                                                                    }, this),
+                                                                    /*#__PURE__*/ _jsxDEV("span", {
+                                                                        className: cn('font-medium', mobileMoneyVariance > 0 ? 'text-status-normal' : mobileMoneyVariance < 0 ? 'text-status-critical' : ''),
+                                                                        children: [
+                                                                            mobileMoneyVariance > 0 ? '+' : '',
+                                                                            "Le",
+                                                                            ' ',
+                                                                            mobileMoneyVariance.toLocaleString()
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                        lineNumber: 276,
+                                                                        columnNumber: 27
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                lineNumber: 274,
+                                                                columnNumber: 25
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                                className: "flex justify-between pt-2 border-t font-bold",
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV("span", {
+                                                                        children: "Total Variance:"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                        lineNumber: 291,
+                                                                        columnNumber: 27
+                                                                    }, this),
+                                                                    /*#__PURE__*/ _jsxDEV("span", {
+                                                                        className: cn(totalVariance > 0 ? 'text-status-normal' : totalVariance < 0 ? 'text-status-critical' : ''),
+                                                                        children: [
+                                                                            totalVariance > 0 ? '+' : '',
+                                                                            "Le ",
+                                                                            totalVariance.toLocaleString()
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                        lineNumber: 292,
+                                                                        columnNumber: 27
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                lineNumber: 290,
+                                                                columnNumber: 25
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                        lineNumber: 243,
+                                                        columnNumber: 23
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                lineNumber: 222,
+                                                columnNumber: 21
+                                            }, this),
+                                            hasVariance && /*#__PURE__*/ _jsxDEV("div", {
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                                        children: [
+                                                            "Notes ",
+                                                            /*#__PURE__*/ _jsxDEV("span", {
+                                                                className: "text-status-critical",
+                                                                children: "*"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                lineNumber: 312,
+                                                                columnNumber: 31
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                        lineNumber: 311,
+                                                        columnNumber: 23
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV(Textarea, {
+                                                        placeholder: "Explain the variance (required when there's a difference)",
+                                                        value: notes,
+                                                        onChange: (e)=>setNotes(e.target.value),
+                                                        rows: 3
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                        lineNumber: 314,
+                                                        columnNumber: 23
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                lineNumber: 310,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(Button, {
+                                                onClick: handleSubmit,
+                                                disabled: createReconciliation.isPending,
+                                                className: "w-full",
+                                                size: "lg",
+                                                children: [
+                                                    createReconciliation.isPending && /*#__PURE__*/ _jsxDEV(Loader2, {
+                                                        className: "w-4 h-4 mr-2 animate-spin"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                        lineNumber: 330,
+                                                        columnNumber: 23
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV(Calculator, {
+                                                        className: "w-4 h-4 mr-2"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                        lineNumber: 332,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    "Submit Reconciliation"
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                lineNumber: 323,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                lineNumber: 108,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                        lineNumber: 105,
+                        columnNumber: 11
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                    lineNumber: 104,
+                    columnNumber: 9
+                }, this),
+                /*#__PURE__*/ _jsxDEV("div", {
+                    className: "bg-card border rounded-lg p-6",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV("h3", {
+                            className: "font-semibold text-lg mb-4",
+                            children: "Recent Reconciliations"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                            lineNumber: 343,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "space-y-3",
+                            children: [
+                                reconciliations?.slice(0, 10).map((rec)=>/*#__PURE__*/ _jsxDEV("div", {
+                                        className: "border rounded-lg p-4 hover:bg-muted/50 transition-colors",
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                className: "flex items-center justify-between mb-2",
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV("p", {
+                                                        className: "font-medium",
+                                                        children: format(new Date(rec.reconciliationDate), 'MMM dd, yyyy')
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                        lineNumber: 351,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV(Badge, {
+                                                        variant: "outline",
+                                                        className: cn('capitalize', statusStyles[rec.status]),
+                                                        children: [
+                                                            rec.status === 'pending' && /*#__PURE__*/ _jsxDEV(Clock, {
+                                                                className: "w-3 h-3 mr-1"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                lineNumber: 358,
+                                                                columnNumber: 50
+                                                            }, this),
+                                                            rec.status === 'approved' && /*#__PURE__*/ _jsxDEV(CheckCircle2, {
+                                                                className: "w-3 h-3 mr-1"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                lineNumber: 359,
+                                                                columnNumber: 51
+                                                            }, this),
+                                                            rec.status === 'rejected' && /*#__PURE__*/ _jsxDEV(XCircle, {
+                                                                className: "w-3 h-3 mr-1"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                lineNumber: 360,
+                                                                columnNumber: 51
+                                                            }, this),
+                                                            rec.status
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                        lineNumber: 354,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                lineNumber: 350,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                className: "text-sm space-y-1",
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                        className: "flex justify-between text-muted-foreground",
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV("span", {
+                                                                children: "Expected:"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                lineNumber: 366,
+                                                                columnNumber: 21
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("span", {
+                                                                children: [
+                                                                    "Le ",
+                                                                    rec.expectedTotal.toLocaleString()
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                lineNumber: 367,
+                                                                columnNumber: 21
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                        lineNumber: 365,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                        className: "flex justify-between text-muted-foreground",
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV("span", {
+                                                                children: "Actual:"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                lineNumber: 370,
+                                                                columnNumber: 21
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("span", {
+                                                                children: [
+                                                                    "Le ",
+                                                                    rec.actualTotal.toLocaleString()
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                lineNumber: 371,
+                                                                columnNumber: 21
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                        lineNumber: 369,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                        className: "flex justify-between font-medium",
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV("span", {
+                                                                children: "Variance:"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                lineNumber: 374,
+                                                                columnNumber: 21
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("span", {
+                                                                className: cn(rec.totalVariance > 0 ? 'text-status-normal' : rec.totalVariance < 0 ? 'text-status-critical' : ''),
+                                                                children: [
+                                                                    rec.totalVariance > 0 ? '+' : '',
+                                                                    "Le",
+                                                                    ' ',
+                                                                    rec.totalVariance.toLocaleString()
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                                lineNumber: 375,
+                                                                columnNumber: 21
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                        lineNumber: 373,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                lineNumber: 364,
+                                                columnNumber: 17
+                                            }, this),
+                                            rec.reviewNotes && /*#__PURE__*/ _jsxDEV("p", {
+                                                className: "text-xs text-muted-foreground mt-2 italic",
+                                                children: [
+                                                    "Admin: ",
+                                                    rec.reviewNotes
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                                lineNumber: 390,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, rec._id || rec.id, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                        lineNumber: 346,
+                                        columnNumber: 15
+                                    }, this)),
+                                (!reconciliations || reconciliations.length === 0) && /*#__PURE__*/ _jsxDEV("p", {
+                                    className: "text-center text-muted-foreground py-8",
+                                    children: "No reconciliations yet"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                                    lineNumber: 397,
+                                    columnNumber: 15
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                            lineNumber: 344,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+                    lineNumber: 342,
+                    columnNumber: 9
+                }, this)
+            ]
+        }, void 0, true, {
+            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+            lineNumber: 102,
+            columnNumber: 7
+        }, this)
+    }, void 0, false, {
+        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx",
+        lineNumber: 96,
+        columnNumber: 5
+    }, this);
+}
+_s(DailyReconciliation, "hWvunpysrkeUItJevlewjkDQe0U=", false, function() {
+    return [
+        useAuth,
+        useExpectedAmounts,
+        useReconciliations,
+        useCreateReconciliation
+    ];
+});
+_c = DailyReconciliation;
+var _c;
+$RefreshReg$(_c, "DailyReconciliation");
+
+
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+
+
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/HP/Downloads/lab/frontend/src/pages/reception/DailyReconciliation.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIkRhaWx5UmVjb25jaWxpYXRpb24udHN4Il0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IHVzZVN0YXRlLCB1c2VFZmZlY3QgfSBmcm9tICdyZWFjdCc7XHJcbmltcG9ydCB7IFJvbGVMYXlvdXQgfSBmcm9tICdAL2NvbXBvbmVudHMvbGF5b3V0L1JvbGVMYXlvdXQnO1xyXG5pbXBvcnQgeyB1c2VBdXRoIH0gZnJvbSAnQC9jb250ZXh0L0F1dGhDb250ZXh0JztcclxuaW1wb3J0IHtcclxuICB1c2VFeHBlY3RlZEFtb3VudHMsXHJcbiAgdXNlQ3JlYXRlUmVjb25jaWxpYXRpb24sXHJcbiAgdXNlUmVjb25jaWxpYXRpb25zLFxyXG59IGZyb20gJ0AvaG9va3MvdXNlUmVjb25jaWxpYXRpb24nO1xyXG5pbXBvcnQgeyBCdXR0b24gfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvYnV0dG9uJztcclxuaW1wb3J0IHsgSW5wdXQgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvaW5wdXQnO1xyXG5pbXBvcnQgeyBMYWJlbCB9IGZyb20gJ0AvY29tcG9uZW50cy91aS9sYWJlbCc7XHJcbmltcG9ydCB7IFRleHRhcmVhIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL3RleHRhcmVhJztcclxuaW1wb3J0IHsgQmFkZ2UgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvYmFkZ2UnO1xyXG5pbXBvcnQgeyB0b2FzdCB9IGZyb20gJ3Nvbm5lcic7XHJcbmltcG9ydCB7XHJcbiAgQ2FsY3VsYXRvcixcclxuICBDaGVja0NpcmNsZTIsXHJcbiAgWENpcmNsZSxcclxuICBDbG9jayxcclxuICBBbGVydFRyaWFuZ2xlLFxyXG4gIExvYWRlcjIsXHJcbn0gZnJvbSAnbHVjaWRlLXJlYWN0JztcclxuaW1wb3J0IHsgZm9ybWF0IH0gZnJvbSAnZGF0ZS1mbnMnO1xyXG5pbXBvcnQgeyBjbiB9IGZyb20gJ0AvbGliL3V0aWxzJztcclxuXHJcbmV4cG9ydCBkZWZhdWx0IGZ1bmN0aW9uIERhaWx5UmVjb25jaWxpYXRpb24oKSB7XHJcbiAgY29uc3QgeyBwcm9maWxlIH0gPSB1c2VBdXRoKCk7XHJcbiAgY29uc3QgW3NlbGVjdGVkRGF0ZSwgc2V0U2VsZWN0ZWREYXRlXSA9IHVzZVN0YXRlKFxyXG4gICAgbmV3IERhdGUoKS50b0lTT1N0cmluZygpLnNwbGl0KCdUJylbMF1cclxuICApO1xyXG4gIGNvbnN0IFthY3R1YWxDYXNoLCBzZXRBY3R1YWxDYXNoXSA9IHVzZVN0YXRlKCcnKTtcclxuICBjb25zdCBbYWN0dWFsQ2FyZCwgc2V0QWN0dWFsQ2FyZF0gPSB1c2VTdGF0ZSgnJyk7XHJcbiAgY29uc3QgW2FjdHVhbE1vYmlsZU1vbmV5LCBzZXRBY3R1YWxNb2JpbGVNb25leV0gPSB1c2VTdGF0ZSgnJyk7XHJcbiAgY29uc3QgW25vdGVzLCBzZXROb3Rlc10gPSB1c2VTdGF0ZSgnJyk7XHJcblxyXG4gIGNvbnN0IHsgZGF0YTogZXhwZWN0ZWQsIGlzTG9hZGluZzogbG9hZGluZ0V4cGVjdGVkIH0gPVxyXG4gICAgdXNlRXhwZWN0ZWRBbW91bnRzKHNlbGVjdGVkRGF0ZSk7XHJcbiAgY29uc3QgeyBkYXRhOiByZWNvbmNpbGlhdGlvbnMgfSA9IHVzZVJlY29uY2lsaWF0aW9ucygnYWxsJyk7XHJcbiAgY29uc3QgY3JlYXRlUmVjb25jaWxpYXRpb24gPSB1c2VDcmVhdGVSZWNvbmNpbGlhdGlvbigpO1xyXG5cclxuICBjb25zdCBhY3R1YWxDYXNoTnVtID0gcGFyc2VGbG9hdChhY3R1YWxDYXNoKSB8fCAwO1xyXG4gIGNvbnN0IGFjdHVhbENhcmROdW0gPSBwYXJzZUZsb2F0KGFjdHVhbENhcmQpIHx8IDA7XHJcbiAgY29uc3QgYWN0dWFsTW9iaWxlTW9uZXlOdW0gPSBwYXJzZUZsb2F0KGFjdHVhbE1vYmlsZU1vbmV5KSB8fCAwO1xyXG4gIGNvbnN0IGFjdHVhbFRvdGFsID0gYWN0dWFsQ2FzaE51bSArIGFjdHVhbENhcmROdW0gKyBhY3R1YWxNb2JpbGVNb25leU51bTtcclxuXHJcbiAgY29uc3QgY2FzaFZhcmlhbmNlID0gYWN0dWFsQ2FzaE51bSAtIChleHBlY3RlZD8uZXhwZWN0ZWRDYXNoIHx8IDApO1xyXG4gIGNvbnN0IGNhcmRWYXJpYW5jZSA9IGFjdHVhbENhcmROdW0gLSAoZXhwZWN0ZWQ/LmV4cGVjdGVkQ2FyZCB8fCAwKTtcclxuICBjb25zdCBtb2JpbGVNb25leVZhcmlhbmNlID1cclxuICAgIGFjdHVhbE1vYmlsZU1vbmV5TnVtIC0gKGV4cGVjdGVkPy5leHBlY3RlZE1vYmlsZU1vbmV5IHx8IDApO1xyXG4gIGNvbnN0IHRvdGFsVmFyaWFuY2UgPSBhY3R1YWxUb3RhbCAtIChleHBlY3RlZD8uZXhwZWN0ZWRUb3RhbCB8fCAwKTtcclxuXHJcbiAgY29uc3QgaGFzVmFyaWFuY2UgPSBNYXRoLmFicyh0b3RhbFZhcmlhbmNlKSA+IDAuMDE7XHJcblxyXG4gIGNvbnN0IGhhbmRsZVN1Ym1pdCA9IGFzeW5jICgpID0+IHtcclxuICAgIGlmICghYWN0dWFsQ2FzaCB8fCAhYWN0dWFsQ2FyZCB8fCAhYWN0dWFsTW9iaWxlTW9uZXkpIHtcclxuICAgICAgdG9hc3QuZXJyb3IoJ1BsZWFzZSBlbnRlciBhbGwgYWN0dWFsIGFtb3VudHMnKTtcclxuICAgICAgcmV0dXJuO1xyXG4gICAgfVxyXG5cclxuICAgIGlmIChoYXNWYXJpYW5jZSAmJiAhbm90ZXMpIHtcclxuICAgICAgdG9hc3QuZXJyb3IoJ1BsZWFzZSBwcm92aWRlIG5vdGVzIGV4cGxhaW5pbmcgdGhlIHZhcmlhbmNlJyk7XHJcbiAgICAgIHJldHVybjtcclxuICAgIH1cclxuXHJcbiAgICB0cnkge1xyXG4gICAgICBhd2FpdCBjcmVhdGVSZWNvbmNpbGlhdGlvbi5tdXRhdGVBc3luYyh7XHJcbiAgICAgICAgcmVjb25jaWxpYXRpb25EYXRlOiBuZXcgRGF0ZShzZWxlY3RlZERhdGUpLFxyXG4gICAgICAgIGFjdHVhbENhc2g6IGFjdHVhbENhc2hOdW0sXHJcbiAgICAgICAgYWN0dWFsQ2FyZDogYWN0dWFsQ2FyZE51bSxcclxuICAgICAgICBhY3R1YWxNb2JpbGVNb25leTogYWN0dWFsTW9iaWxlTW9uZXlOdW0sXHJcbiAgICAgICAgbm90ZXM6IG5vdGVzIHx8IHVuZGVmaW5lZCxcclxuICAgICAgfSk7XHJcblxyXG4gICAgICB0b2FzdC5zdWNjZXNzKCdSZWNvbmNpbGlhdGlvbiBzdWJtaXR0ZWQgc3VjY2Vzc2Z1bGx5Jyk7XHJcbiAgICAgIHNldEFjdHVhbENhc2goJycpO1xyXG4gICAgICBzZXRBY3R1YWxDYXJkKCcnKTtcclxuICAgICAgc2V0QWN0dWFsTW9iaWxlTW9uZXkoJycpO1xyXG4gICAgICBzZXROb3RlcygnJyk7XHJcbiAgICB9IGNhdGNoIChlcnJvcjogYW55KSB7XHJcbiAgICAgIHRvYXN0LmVycm9yKGVycm9yLnJlc3BvbnNlPy5kYXRhPy5tZXNzYWdlIHx8ICdGYWlsZWQgdG8gc3VibWl0IHJlY29uY2lsaWF0aW9uJyk7XHJcbiAgICB9XHJcbiAgfTtcclxuXHJcbiAgY29uc3QgdG9kYXlSZWNvbmNpbGlhdGlvbiA9IHJlY29uY2lsaWF0aW9ucz8uZmluZCgocjogYW55KSA9PiB7XHJcbiAgICBjb25zdCByZWNEYXRlID0gbmV3IERhdGUoci5yZWNvbmNpbGlhdGlvbkRhdGUpLnRvSVNPU3RyaW5nKCkuc3BsaXQoJ1QnKVswXTtcclxuICAgIHJldHVybiByZWNEYXRlID09PSBzZWxlY3RlZERhdGU7XHJcbiAgfSk7XHJcblxyXG4gIGNvbnN0IHN0YXR1c1N0eWxlcyA9IHtcclxuICAgIHBlbmRpbmc6ICdiZy1zdGF0dXMtd2FybmluZy8xMCB0ZXh0LXN0YXR1cy13YXJuaW5nIGJvcmRlci1zdGF0dXMtd2FybmluZy8yMCcsXHJcbiAgICBhcHByb3ZlZDogJ2JnLXN0YXR1cy1ub3JtYWwvMTAgdGV4dC1zdGF0dXMtbm9ybWFsIGJvcmRlci1zdGF0dXMtbm9ybWFsLzIwJyxcclxuICAgIHJlamVjdGVkOiAnYmctc3RhdHVzLWNyaXRpY2FsLzEwIHRleHQtc3RhdHVzLWNyaXRpY2FsIGJvcmRlci1zdGF0dXMtY3JpdGljYWwvMjAnLFxyXG4gIH07XHJcblxyXG4gIHJldHVybiAoXHJcbiAgICA8Um9sZUxheW91dFxyXG4gICAgICB0aXRsZT1cIkRhaWx5IFJlY29uY2lsaWF0aW9uXCJcclxuICAgICAgc3VidGl0bGU9XCJTdWJtaXQgZW5kLW9mLWRheSBjYXNoIHJlY29uY2lsaWF0aW9uXCJcclxuICAgICAgcm9sZT1cInJlY2VwdGlvbmlzdFwiXHJcbiAgICAgIHVzZXJOYW1lPXtwcm9maWxlPy5mdWxsX25hbWV9XHJcbiAgICA+XHJcbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZ3JpZCBncmlkLWNvbHMtMSBsZzpncmlkLWNvbHMtMiBnYXAtNlwiPlxyXG4gICAgICAgIHsvKiBSZWNvbmNpbGlhdGlvbiBGb3JtICovfVxyXG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS02XCI+XHJcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImJnLWNhcmQgYm9yZGVyIHJvdW5kZWQtbGcgcC02XCI+XHJcbiAgICAgICAgICAgIDxoMyBjbGFzc05hbWU9XCJmb250LXNlbWlib2xkIHRleHQtbGcgbWItNFwiPlN1Ym1pdCBSZWNvbmNpbGlhdGlvbjwvaDM+XHJcblxyXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNwYWNlLXktNFwiPlxyXG4gICAgICAgICAgICAgIDxkaXY+XHJcbiAgICAgICAgICAgICAgICA8TGFiZWw+RGF0ZTwvTGFiZWw+XHJcbiAgICAgICAgICAgICAgICA8SW5wdXRcclxuICAgICAgICAgICAgICAgICAgdHlwZT1cImRhdGVcIlxyXG4gICAgICAgICAgICAgICAgICB2YWx1ZT17c2VsZWN0ZWREYXRlfVxyXG4gICAgICAgICAgICAgICAgICBvbkNoYW5nZT17KGUpID0+IHNldFNlbGVjdGVkRGF0ZShlLnRhcmdldC52YWx1ZSl9XHJcbiAgICAgICAgICAgICAgICAgIG1heD17bmV3IERhdGUoKS50b0lTT1N0cmluZygpLnNwbGl0KCdUJylbMF19XHJcbiAgICAgICAgICAgICAgICAvPlxyXG4gICAgICAgICAgICAgIDwvZGl2PlxyXG5cclxuICAgICAgICAgICAgICB7dG9kYXlSZWNvbmNpbGlhdGlvbiA/IChcclxuICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiYmctbXV0ZWQgcm91bmRlZC1sZyBwLTRcIj5cclxuICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBnYXAtMiBtYi0yXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgPENoZWNrQ2lyY2xlMiBjbGFzc05hbWU9XCJ3LTUgaC01IHRleHQtc3RhdHVzLW5vcm1hbFwiIC8+XHJcbiAgICAgICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwiZm9udC1tZWRpdW1cIj5SZWNvbmNpbGlhdGlvbiBBbHJlYWR5IFN1Ym1pdHRlZDwvcD5cclxuICAgICAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc20gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kIG1iLTNcIj5cclxuICAgICAgICAgICAgICAgICAgICBTdWJtaXR0ZWQgb24ge2Zvcm1hdChuZXcgRGF0ZSh0b2RheVJlY29uY2lsaWF0aW9uLnN1Ym1pdHRlZEF0KSwgJ01NTSBkZCwgeXl5eSBISDptbScpfVxyXG4gICAgICAgICAgICAgICAgICA8L3A+XHJcbiAgICAgICAgICAgICAgICAgIDxCYWRnZVxyXG4gICAgICAgICAgICAgICAgICAgIHZhcmlhbnQ9XCJvdXRsaW5lXCJcclxuICAgICAgICAgICAgICAgICAgICBjbGFzc05hbWU9e2NuKCdjYXBpdGFsaXplJywgc3RhdHVzU3R5bGVzW3RvZGF5UmVjb25jaWxpYXRpb24uc3RhdHVzIGFzIGtleW9mIHR5cGVvZiBzdGF0dXNTdHlsZXNdKX1cclxuICAgICAgICAgICAgICAgICAgPlxyXG4gICAgICAgICAgICAgICAgICAgIHt0b2RheVJlY29uY2lsaWF0aW9uLnN0YXR1c31cclxuICAgICAgICAgICAgICAgICAgPC9CYWRnZT5cclxuICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICkgOiBsb2FkaW5nRXhwZWN0ZWQgPyAoXHJcbiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGp1c3RpZnktY2VudGVyIHB5LThcIj5cclxuICAgICAgICAgICAgICAgICAgPExvYWRlcjIgY2xhc3NOYW1lPVwidy02IGgtNiBhbmltYXRlLXNwaW4gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCIgLz5cclxuICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICkgOiAoXHJcbiAgICAgICAgICAgICAgICA8PlxyXG4gICAgICAgICAgICAgICAgICB7LyogRXhwZWN0ZWQgQW1vdW50cyAqL31cclxuICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJiZy1tdXRlZCByb3VuZGVkLWxnIHAtNFwiPlxyXG4gICAgICAgICAgICAgICAgICAgIDxoNCBjbGFzc05hbWU9XCJmb250LW1lZGl1bSBtYi0zXCI+RXhwZWN0ZWQgQW1vdW50cyAoU3lzdGVtKTwvaDQ+XHJcbiAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTIgdGV4dC1zbVwiPlxyXG4gICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGp1c3RpZnktYmV0d2VlblwiPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJ0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5DYXNoOjwvc3Bhbj5cclxuICAgICAgICAgICAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiZm9udC1tZWRpdW1cIj5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICBMZSB7KGV4cGVjdGVkPy5leHBlY3RlZENhc2ggfHwgMCkudG9Mb2NhbGVTdHJpbmcoKX1cclxuICAgICAgICAgICAgICAgICAgICAgICAgPC9zcGFuPlxyXG4gICAgICAgICAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXgganVzdGlmeS1iZXR3ZWVuXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPkNhcmQ6PC9zcGFuPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJmb250LW1lZGl1bVwiPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIExlIHsoZXhwZWN0ZWQ/LmV4cGVjdGVkQ2FyZCB8fCAwKS50b0xvY2FsZVN0cmluZygpfVxyXG4gICAgICAgICAgICAgICAgICAgICAgICA8L3NwYW4+XHJcbiAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBqdXN0aWZ5LWJldHdlZW5cIj5cclxuICAgICAgICAgICAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwidGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+TW9iaWxlIE1vbmV5Ojwvc3Bhbj5cclxuICAgICAgICAgICAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiZm9udC1tZWRpdW1cIj5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICBMZSB7KGV4cGVjdGVkPy5leHBlY3RlZE1vYmlsZU1vbmV5IHx8IDApLnRvTG9jYWxlU3RyaW5nKCl9XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIDwvc3Bhbj5cclxuICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGp1c3RpZnktYmV0d2VlbiBwdC0yIGJvcmRlci10IGZvbnQtYm9sZFwiPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICA8c3Bhbj5Ub3RhbDo8L3NwYW4+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIDxzcGFuPkxlIHsoZXhwZWN0ZWQ/LmV4cGVjdGVkVG90YWwgfHwgMCkudG9Mb2NhbGVTdHJpbmcoKX08L3NwYW4+XHJcbiAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cIm10LTMgcHQtMyBib3JkZXItdCB0ZXh0LXhzIHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPlxyXG4gICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGp1c3RpZnktYmV0d2VlblwiPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICA8c3Bhbj5Ub3RhbCBPcmRlcnM6PC9zcGFuPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICA8c3Bhbj57ZXhwZWN0ZWQ/LnRvdGFsT3JkZXJzIHx8IDB9PC9zcGFuPlxyXG4gICAgICAgICAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXgganVzdGlmeS1iZXR3ZWVuXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIDxzcGFuPlBhaWQgT3JkZXJzOjwvc3Bhbj5cclxuICAgICAgICAgICAgICAgICAgICAgICAgPHNwYW4+e2V4cGVjdGVkPy5wYWlkT3JkZXJzIHx8IDB9PC9zcGFuPlxyXG4gICAgICAgICAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAgICAgIDwvZGl2PlxyXG5cclxuICAgICAgICAgICAgICAgICAgey8qIEFjdHVhbCBBbW91bnRzICovfVxyXG4gICAgICAgICAgICAgICAgICA8ZGl2PlxyXG4gICAgICAgICAgICAgICAgICAgIDxoNCBjbGFzc05hbWU9XCJmb250LW1lZGl1bSBtYi0zXCI+QWN0dWFsIEFtb3VudHMgKENvdW50ZWQpPC9oND5cclxuICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNwYWNlLXktM1wiPlxyXG4gICAgICAgICAgICAgICAgICAgICAgPGRpdj5cclxuICAgICAgICAgICAgICAgICAgICAgICAgPExhYmVsPkNhc2g8L0xhYmVsPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICA8SW5wdXRcclxuICAgICAgICAgICAgICAgICAgICAgICAgICB0eXBlPVwibnVtYmVyXCJcclxuICAgICAgICAgICAgICAgICAgICAgICAgICBwbGFjZWhvbGRlcj1cIjAuMDBcIlxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIHZhbHVlPXthY3R1YWxDYXNofVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXsoZSkgPT4gc2V0QWN0dWFsQ2FzaChlLnRhcmdldC52YWx1ZSl9XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgbWluPVwiMFwiXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgc3RlcD1cIjAuMDFcIlxyXG4gICAgICAgICAgICAgICAgICAgICAgICAvPlxyXG4gICAgICAgICAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAgICAgICAgICA8ZGl2PlxyXG4gICAgICAgICAgICAgICAgICAgICAgICA8TGFiZWw+Q2FyZDwvTGFiZWw+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIDxJbnB1dFxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIHR5cGU9XCJudW1iZXJcIlxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIHBsYWNlaG9sZGVyPVwiMC4wMFwiXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgdmFsdWU9e2FjdHVhbENhcmR9XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgb25DaGFuZ2U9eyhlKSA9PiBzZXRBY3R1YWxDYXJkKGUudGFyZ2V0LnZhbHVlKX1cclxuICAgICAgICAgICAgICAgICAgICAgICAgICBtaW49XCIwXCJcclxuICAgICAgICAgICAgICAgICAgICAgICAgICBzdGVwPVwiMC4wMVwiXHJcbiAgICAgICAgICAgICAgICAgICAgICAgIC8+XHJcbiAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgICAgICAgIDxkaXY+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIDxMYWJlbD5Nb2JpbGUgTW9uZXk8L0xhYmVsPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICA8SW5wdXRcclxuICAgICAgICAgICAgICAgICAgICAgICAgICB0eXBlPVwibnVtYmVyXCJcclxuICAgICAgICAgICAgICAgICAgICAgICAgICBwbGFjZWhvbGRlcj1cIjAuMDBcIlxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIHZhbHVlPXthY3R1YWxNb2JpbGVNb25leX1cclxuICAgICAgICAgICAgICAgICAgICAgICAgICBvbkNoYW5nZT17KGUpID0+IHNldEFjdHVhbE1vYmlsZU1vbmV5KGUudGFyZ2V0LnZhbHVlKX1cclxuICAgICAgICAgICAgICAgICAgICAgICAgICBtaW49XCIwXCJcclxuICAgICAgICAgICAgICAgICAgICAgICAgICBzdGVwPVwiMC4wMVwiXHJcbiAgICAgICAgICAgICAgICAgICAgICAgIC8+XHJcbiAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgICAgPC9kaXY+XHJcblxyXG4gICAgICAgICAgICAgICAgICB7LyogVmFyaWFuY2UgRGlzcGxheSAqL31cclxuICAgICAgICAgICAgICAgICAgeyhhY3R1YWxDYXNoIHx8IGFjdHVhbENhcmQgfHwgYWN0dWFsTW9iaWxlTW9uZXkpICYmIChcclxuICAgICAgICAgICAgICAgICAgICA8ZGl2XHJcbiAgICAgICAgICAgICAgICAgICAgICBjbGFzc05hbWU9e2NuKFxyXG4gICAgICAgICAgICAgICAgICAgICAgICAncm91bmRlZC1sZyBwLTQnLFxyXG4gICAgICAgICAgICAgICAgICAgICAgICBoYXNWYXJpYW5jZVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgID8gJ2JnLXN0YXR1cy13YXJuaW5nLzEwIGJvcmRlciBib3JkZXItc3RhdHVzLXdhcm5pbmcvMjAnXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgOiAnYmctc3RhdHVzLW5vcm1hbC8xMCBib3JkZXIgYm9yZGVyLXN0YXR1cy1ub3JtYWwvMjAnXHJcbiAgICAgICAgICAgICAgICAgICAgICApfVxyXG4gICAgICAgICAgICAgICAgICAgID5cclxuICAgICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIgZ2FwLTIgbWItM1wiPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICB7aGFzVmFyaWFuY2UgPyAoXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgPD5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxBbGVydFRyaWFuZ2xlIGNsYXNzTmFtZT1cInctNSBoLTUgdGV4dC1zdGF0dXMtd2FybmluZ1wiIC8+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8aDQgY2xhc3NOYW1lPVwiZm9udC1tZWRpdW1cIj5WYXJpYW5jZSBEZXRlY3RlZDwvaDQ+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgPC8+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICkgOiAoXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgPD5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxDaGVja0NpcmNsZTIgY2xhc3NOYW1lPVwidy01IGgtNSB0ZXh0LXN0YXR1cy1ub3JtYWxcIiAvPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgPGg0IGNsYXNzTmFtZT1cImZvbnQtbWVkaXVtXCI+QmFsYW5jZWQ8L2g0PlxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIDwvPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICApfVxyXG4gICAgICAgICAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNwYWNlLXktMiB0ZXh0LXNtXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBqdXN0aWZ5LWJldHdlZW5cIj5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICA8c3Bhbj5DYXNoIFZhcmlhbmNlOjwvc3Bhbj5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICA8c3BhblxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgY2xhc3NOYW1lPXtjbihcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJ2ZvbnQtbWVkaXVtJyxcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY2FzaFZhcmlhbmNlID4gMFxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgID8gJ3RleHQtc3RhdHVzLW5vcm1hbCdcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA6IGNhc2hWYXJpYW5jZSA8IDBcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA/ICd0ZXh0LXN0YXR1cy1jcml0aWNhbCdcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA6ICcnXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICApfVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgID5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIHtjYXNoVmFyaWFuY2UgPiAwID8gJysnIDogJyd9TGUge2Nhc2hWYXJpYW5jZS50b0xvY2FsZVN0cmluZygpfVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIDwvc3Bhbj5cclxuICAgICAgICAgICAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBqdXN0aWZ5LWJldHdlZW5cIj5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICA8c3Bhbj5DYXJkIFZhcmlhbmNlOjwvc3Bhbj5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICA8c3BhblxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgY2xhc3NOYW1lPXtjbihcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJ2ZvbnQtbWVkaXVtJyxcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY2FyZFZhcmlhbmNlID4gMFxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgID8gJ3RleHQtc3RhdHVzLW5vcm1hbCdcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA6IGNhcmRWYXJpYW5jZSA8IDBcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA/ICd0ZXh0LXN0YXR1cy1jcml0aWNhbCdcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA6ICcnXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICApfVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgID5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIHtjYXJkVmFyaWFuY2UgPiAwID8gJysnIDogJyd9TGUge2NhcmRWYXJpYW5jZS50b0xvY2FsZVN0cmluZygpfVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIDwvc3Bhbj5cclxuICAgICAgICAgICAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBqdXN0aWZ5LWJldHdlZW5cIj5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICA8c3Bhbj5Nb2JpbGUgTW9uZXkgVmFyaWFuY2U6PC9zcGFuPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIDxzcGFuXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICBjbGFzc05hbWU9e2NuKFxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAnZm9udC1tZWRpdW0nLFxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICBtb2JpbGVNb25leVZhcmlhbmNlID4gMFxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgID8gJ3RleHQtc3RhdHVzLW5vcm1hbCdcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA6IG1vYmlsZU1vbmV5VmFyaWFuY2UgPCAwXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPyAndGV4dC1zdGF0dXMtY3JpdGljYWwnXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgOiAnJ1xyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgKX1cclxuICAgICAgICAgICAgICAgICAgICAgICAgICA+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICB7bW9iaWxlTW9uZXlWYXJpYW5jZSA+IDAgPyAnKycgOiAnJ31MZXsnICd9XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICB7bW9iaWxlTW9uZXlWYXJpYW5jZS50b0xvY2FsZVN0cmluZygpfVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIDwvc3Bhbj5cclxuICAgICAgICAgICAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBqdXN0aWZ5LWJldHdlZW4gcHQtMiBib3JkZXItdCBmb250LWJvbGRcIj5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICA8c3Bhbj5Ub3RhbCBWYXJpYW5jZTo8L3NwYW4+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgPHNwYW5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNsYXNzTmFtZT17Y24oXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRvdGFsVmFyaWFuY2UgPiAwXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPyAndGV4dC1zdGF0dXMtbm9ybWFsJ1xyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDogdG90YWxWYXJpYW5jZSA8IDBcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA/ICd0ZXh0LXN0YXR1cy1jcml0aWNhbCdcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA6ICcnXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICApfVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgID5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIHt0b3RhbFZhcmlhbmNlID4gMCA/ICcrJyA6ICcnfUxlIHt0b3RhbFZhcmlhbmNlLnRvTG9jYWxlU3RyaW5nKCl9XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgPC9zcGFuPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgICApfVxyXG5cclxuICAgICAgICAgICAgICAgICAgey8qIE5vdGVzICovfVxyXG4gICAgICAgICAgICAgICAgICB7aGFzVmFyaWFuY2UgJiYgKFxyXG4gICAgICAgICAgICAgICAgICAgIDxkaXY+XHJcbiAgICAgICAgICAgICAgICAgICAgICA8TGFiZWw+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIE5vdGVzIDxzcGFuIGNsYXNzTmFtZT1cInRleHQtc3RhdHVzLWNyaXRpY2FsXCI+Kjwvc3Bhbj5cclxuICAgICAgICAgICAgICAgICAgICAgIDwvTGFiZWw+XHJcbiAgICAgICAgICAgICAgICAgICAgICA8VGV4dGFyZWFcclxuICAgICAgICAgICAgICAgICAgICAgICAgcGxhY2Vob2xkZXI9XCJFeHBsYWluIHRoZSB2YXJpYW5jZSAocmVxdWlyZWQgd2hlbiB0aGVyZSdzIGEgZGlmZmVyZW5jZSlcIlxyXG4gICAgICAgICAgICAgICAgICAgICAgICB2YWx1ZT17bm90ZXN9XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXsoZSkgPT4gc2V0Tm90ZXMoZS50YXJnZXQudmFsdWUpfVxyXG4gICAgICAgICAgICAgICAgICAgICAgICByb3dzPXszfVxyXG4gICAgICAgICAgICAgICAgICAgICAgLz5cclxuICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgICAgKX1cclxuXHJcbiAgICAgICAgICAgICAgICAgIDxCdXR0b25cclxuICAgICAgICAgICAgICAgICAgICBvbkNsaWNrPXtoYW5kbGVTdWJtaXR9XHJcbiAgICAgICAgICAgICAgICAgICAgZGlzYWJsZWQ9e2NyZWF0ZVJlY29uY2lsaWF0aW9uLmlzUGVuZGluZ31cclxuICAgICAgICAgICAgICAgICAgICBjbGFzc05hbWU9XCJ3LWZ1bGxcIlxyXG4gICAgICAgICAgICAgICAgICAgIHNpemU9XCJsZ1wiXHJcbiAgICAgICAgICAgICAgICAgID5cclxuICAgICAgICAgICAgICAgICAgICB7Y3JlYXRlUmVjb25jaWxpYXRpb24uaXNQZW5kaW5nICYmIChcclxuICAgICAgICAgICAgICAgICAgICAgIDxMb2FkZXIyIGNsYXNzTmFtZT1cInctNCBoLTQgbXItMiBhbmltYXRlLXNwaW5cIiAvPlxyXG4gICAgICAgICAgICAgICAgICAgICl9XHJcbiAgICAgICAgICAgICAgICAgICAgPENhbGN1bGF0b3IgY2xhc3NOYW1lPVwidy00IGgtNCBtci0yXCIgLz5cclxuICAgICAgICAgICAgICAgICAgICBTdWJtaXQgUmVjb25jaWxpYXRpb25cclxuICAgICAgICAgICAgICAgICAgPC9CdXR0b24+XHJcbiAgICAgICAgICAgICAgICA8Lz5cclxuICAgICAgICAgICAgICApfVxyXG4gICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgIDwvZGl2PlxyXG5cclxuICAgICAgICB7LyogUmVjZW50IFJlY29uY2lsaWF0aW9ucyAqL31cclxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImJnLWNhcmQgYm9yZGVyIHJvdW5kZWQtbGcgcC02XCI+XHJcbiAgICAgICAgICA8aDMgY2xhc3NOYW1lPVwiZm9udC1zZW1pYm9sZCB0ZXh0LWxnIG1iLTRcIj5SZWNlbnQgUmVjb25jaWxpYXRpb25zPC9oMz5cclxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0zXCI+XHJcbiAgICAgICAgICAgIHtyZWNvbmNpbGlhdGlvbnM/LnNsaWNlKDAsIDEwKS5tYXAoKHJlYzogYW55KSA9PiAoXHJcbiAgICAgICAgICAgICAgPGRpdlxyXG4gICAgICAgICAgICAgICAga2V5PXtyZWMuX2lkIHx8IHJlYy5pZH1cclxuICAgICAgICAgICAgICAgIGNsYXNzTmFtZT1cImJvcmRlciByb3VuZGVkLWxnIHAtNCBob3ZlcjpiZy1tdXRlZC81MCB0cmFuc2l0aW9uLWNvbG9yc1wiXHJcbiAgICAgICAgICAgICAgPlxyXG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWJldHdlZW4gbWItMlwiPlxyXG4gICAgICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJmb250LW1lZGl1bVwiPlxyXG4gICAgICAgICAgICAgICAgICAgIHtmb3JtYXQobmV3IERhdGUocmVjLnJlY29uY2lsaWF0aW9uRGF0ZSksICdNTU0gZGQsIHl5eXknKX1cclxuICAgICAgICAgICAgICAgICAgPC9wPlxyXG4gICAgICAgICAgICAgICAgICA8QmFkZ2VcclxuICAgICAgICAgICAgICAgICAgICB2YXJpYW50PVwib3V0bGluZVwiXHJcbiAgICAgICAgICAgICAgICAgICAgY2xhc3NOYW1lPXtjbignY2FwaXRhbGl6ZScsIHN0YXR1c1N0eWxlc1tyZWMuc3RhdHVzIGFzIGtleW9mIHR5cGVvZiBzdGF0dXNTdHlsZXNdKX1cclxuICAgICAgICAgICAgICAgICAgPlxyXG4gICAgICAgICAgICAgICAgICAgIHtyZWMuc3RhdHVzID09PSAncGVuZGluZycgJiYgPENsb2NrIGNsYXNzTmFtZT1cInctMyBoLTMgbXItMVwiIC8+fVxyXG4gICAgICAgICAgICAgICAgICAgIHtyZWMuc3RhdHVzID09PSAnYXBwcm92ZWQnICYmIDxDaGVja0NpcmNsZTIgY2xhc3NOYW1lPVwidy0zIGgtMyBtci0xXCIgLz59XHJcbiAgICAgICAgICAgICAgICAgICAge3JlYy5zdGF0dXMgPT09ICdyZWplY3RlZCcgJiYgPFhDaXJjbGUgY2xhc3NOYW1lPVwidy0zIGgtMyBtci0xXCIgLz59XHJcbiAgICAgICAgICAgICAgICAgICAge3JlYy5zdGF0dXN9XHJcbiAgICAgICAgICAgICAgICAgIDwvQmFkZ2U+XHJcbiAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwidGV4dC1zbSBzcGFjZS15LTFcIj5cclxuICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGp1c3RpZnktYmV0d2VlbiB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5cclxuICAgICAgICAgICAgICAgICAgICA8c3Bhbj5FeHBlY3RlZDo8L3NwYW4+XHJcbiAgICAgICAgICAgICAgICAgICAgPHNwYW4+TGUge3JlYy5leHBlY3RlZFRvdGFsLnRvTG9jYWxlU3RyaW5nKCl9PC9zcGFuPlxyXG4gICAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGp1c3RpZnktYmV0d2VlbiB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5cclxuICAgICAgICAgICAgICAgICAgICA8c3Bhbj5BY3R1YWw6PC9zcGFuPlxyXG4gICAgICAgICAgICAgICAgICAgIDxzcGFuPkxlIHtyZWMuYWN0dWFsVG90YWwudG9Mb2NhbGVTdHJpbmcoKX08L3NwYW4+XHJcbiAgICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXgganVzdGlmeS1iZXR3ZWVuIGZvbnQtbWVkaXVtXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgPHNwYW4+VmFyaWFuY2U6PC9zcGFuPlxyXG4gICAgICAgICAgICAgICAgICAgIDxzcGFuXHJcbiAgICAgICAgICAgICAgICAgICAgICBjbGFzc05hbWU9e2NuKFxyXG4gICAgICAgICAgICAgICAgICAgICAgICByZWMudG90YWxWYXJpYW5jZSA+IDBcclxuICAgICAgICAgICAgICAgICAgICAgICAgICA/ICd0ZXh0LXN0YXR1cy1ub3JtYWwnXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgOiByZWMudG90YWxWYXJpYW5jZSA8IDBcclxuICAgICAgICAgICAgICAgICAgICAgICAgICA/ICd0ZXh0LXN0YXR1cy1jcml0aWNhbCdcclxuICAgICAgICAgICAgICAgICAgICAgICAgICA6ICcnXHJcbiAgICAgICAgICAgICAgICAgICAgICApfVxyXG4gICAgICAgICAgICAgICAgICAgID5cclxuICAgICAgICAgICAgICAgICAgICAgIHtyZWMudG90YWxWYXJpYW5jZSA+IDAgPyAnKycgOiAnJ31MZXsnICd9XHJcbiAgICAgICAgICAgICAgICAgICAgICB7cmVjLnRvdGFsVmFyaWFuY2UudG9Mb2NhbGVTdHJpbmcoKX1cclxuICAgICAgICAgICAgICAgICAgICA8L3NwYW4+XHJcbiAgICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAgICB7cmVjLnJldmlld05vdGVzICYmIChcclxuICAgICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC14cyB0ZXh0LW11dGVkLWZvcmVncm91bmQgbXQtMiBpdGFsaWNcIj5cclxuICAgICAgICAgICAgICAgICAgICBBZG1pbjoge3JlYy5yZXZpZXdOb3Rlc31cclxuICAgICAgICAgICAgICAgICAgPC9wPlxyXG4gICAgICAgICAgICAgICAgKX1cclxuICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgKSl9XHJcbiAgICAgICAgICAgIHsoIXJlY29uY2lsaWF0aW9ucyB8fCByZWNvbmNpbGlhdGlvbnMubGVuZ3RoID09PSAwKSAmJiAoXHJcbiAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1jZW50ZXIgdGV4dC1tdXRlZC1mb3JlZ3JvdW5kIHB5LThcIj5cclxuICAgICAgICAgICAgICAgIE5vIHJlY29uY2lsaWF0aW9ucyB5ZXRcclxuICAgICAgICAgICAgICA8L3A+XHJcbiAgICAgICAgICAgICl9XHJcbiAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICA8L2Rpdj5cclxuICAgICAgPC9kaXY+XHJcbiAgICA8L1JvbGVMYXlvdXQ+XHJcbiAgKTtcclxufVxyXG4iXSwibmFtZXMiOlsidXNlU3RhdGUiLCJSb2xlTGF5b3V0IiwidXNlQXV0aCIsInVzZUV4cGVjdGVkQW1vdW50cyIsInVzZUNyZWF0ZVJlY29uY2lsaWF0aW9uIiwidXNlUmVjb25jaWxpYXRpb25zIiwiQnV0dG9uIiwiSW5wdXQiLCJMYWJlbCIsIlRleHRhcmVhIiwiQmFkZ2UiLCJ0b2FzdCIsIkNhbGN1bGF0b3IiLCJDaGVja0NpcmNsZTIiLCJYQ2lyY2xlIiwiQ2xvY2siLCJBbGVydFRyaWFuZ2xlIiwiTG9hZGVyMiIsImZvcm1hdCIsImNuIiwiRGFpbHlSZWNvbmNpbGlhdGlvbiIsInByb2ZpbGUiLCJzZWxlY3RlZERhdGUiLCJzZXRTZWxlY3RlZERhdGUiLCJEYXRlIiwidG9JU09TdHJpbmciLCJzcGxpdCIsImFjdHVhbENhc2giLCJzZXRBY3R1YWxDYXNoIiwiYWN0dWFsQ2FyZCIsInNldEFjdHVhbENhcmQiLCJhY3R1YWxNb2JpbGVNb25leSIsInNldEFjdHVhbE1vYmlsZU1vbmV5Iiwibm90ZXMiLCJzZXROb3RlcyIsImRhdGEiLCJleHBlY3RlZCIsImlzTG9hZGluZyIsImxvYWRpbmdFeHBlY3RlZCIsInJlY29uY2lsaWF0aW9ucyIsImNyZWF0ZVJlY29uY2lsaWF0aW9uIiwiYWN0dWFsQ2FzaE51bSIsInBhcnNlRmxvYXQiLCJhY3R1YWxDYXJkTnVtIiwiYWN0dWFsTW9iaWxlTW9uZXlOdW0iLCJhY3R1YWxUb3RhbCIsImNhc2hWYXJpYW5jZSIsImV4cGVjdGVkQ2FzaCIsImNhcmRWYXJpYW5jZSIsImV4cGVjdGVkQ2FyZCIsIm1vYmlsZU1vbmV5VmFyaWFuY2UiLCJleHBlY3RlZE1vYmlsZU1vbmV5IiwidG90YWxWYXJpYW5jZSIsImV4cGVjdGVkVG90YWwiLCJoYXNWYXJpYW5jZSIsIk1hdGgiLCJhYnMiLCJoYW5kbGVTdWJtaXQiLCJlcnJvciIsIm11dGF0ZUFzeW5jIiwicmVjb25jaWxpYXRpb25EYXRlIiwidW5kZWZpbmVkIiwic3VjY2VzcyIsInJlc3BvbnNlIiwibWVzc2FnZSIsInRvZGF5UmVjb25jaWxpYXRpb24iLCJmaW5kIiwiciIsInJlY0RhdGUiLCJzdGF0dXNTdHlsZXMiLCJwZW5kaW5nIiwiYXBwcm92ZWQiLCJyZWplY3RlZCIsInRpdGxlIiwic3VidGl0bGUiLCJyb2xlIiwidXNlck5hbWUiLCJmdWxsX25hbWUiLCJkaXYiLCJjbGFzc05hbWUiLCJoMyIsInR5cGUiLCJ2YWx1ZSIsIm9uQ2hhbmdlIiwiZSIsInRhcmdldCIsIm1heCIsInAiLCJzdWJtaXR0ZWRBdCIsInZhcmlhbnQiLCJzdGF0dXMiLCJoNCIsInNwYW4iLCJ0b0xvY2FsZVN0cmluZyIsInRvdGFsT3JkZXJzIiwicGFpZE9yZGVycyIsInBsYWNlaG9sZGVyIiwibWluIiwic3RlcCIsInJvd3MiLCJvbkNsaWNrIiwiZGlzYWJsZWQiLCJpc1BlbmRpbmciLCJzaXplIiwic2xpY2UiLCJtYXAiLCJyZWMiLCJyZXZpZXdOb3RlcyIsIl9pZCIsImlkIiwibGVuZ3RoIl0sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7QUFBQSxTQUFTQSxRQUFRLFFBQW1CLFFBQVE7QUFDNUMs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

@@ -23,6 +23,8 @@ export class Hl7Controller {
   ) {}
 
   @Post('receive')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH)
   async receiveMessage(
     @Body() body: { message: string; machineId: string; protocol?: string },
   ) {
@@ -86,7 +88,6 @@ export class Hl7Controller {
   async getLogById(@Param('id') id: string) {
     return this.hl7Service.getCommunicationLogById(id);
   }
-}
 
   @Get('unmatched-results')
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -123,3 +124,34 @@ export class Hl7Controller {
 
     return { success: true, message: 'Result rejected' };
   }
+
+  @Post('send-order')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH)
+  async sendOrderToMachine(
+    @Body() body: { orderId: string; machineId: string },
+  ) {
+    const { orderId, machineId } = body;
+
+    if (!orderId || !machineId) {
+      throw new BadRequestException('orderId and machineId are required');
+    }
+
+    return this.hl7Service.sendOrderToMachine(orderId, machineId);
+  }
+
+  @Post('restart-listener/:machineId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRoleEnum.ADMIN)
+  async restartListener(@Param('machineId') machineId: string) {
+    await this.tcpListenerService.restartListener(machineId);
+    return { success: true, message: 'TCP listener restarted' };
+  }
+
+  @Get('listener-status')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH)
+  async getListenerStatus() {
+    return this.tcpListenerService.getListenerStatus();
+  }
+}

@@ -28,6 +28,14 @@ export class OrderTestDto {
   @IsNumber()
   @Min(0)
   price: number;
+
+  @IsOptional()
+  @IsString()
+  panelCode?: string;
+
+  @IsOptional()
+  @IsString()
+  panelName?: string;
 }
 
 export class CreateOrderDto {
@@ -55,6 +63,11 @@ export class CreateOrderDto {
   @IsOptional()
   @IsEnum(PaymentMethodEnum)
   paymentMethod?: PaymentMethodEnum;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  initialPaymentAmount?: number;
 
   @IsOptional()
   @IsString()

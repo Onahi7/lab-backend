@@ -99,7 +99,7 @@ export class UsersController {
     @Body('role') role: UserRoleEnum,
     @Request() req: any,
   ) {
-    const requestingUserId = req.user.sub; // JWT payload contains user ID in 'sub' field
+    const requestingUserId = req.user.userId;
     return this.usersService.assignRole(userId, role, requestingUserId);
   }
 
@@ -115,7 +115,7 @@ export class UsersController {
     @Param('role') role: UserRoleEnum,
     @Request() req: any,
   ) {
-    const requestingUserId = req.user.sub; // JWT payload contains user ID in 'sub' field
+    const requestingUserId = req.user.userId;
     return this.usersService.removeRole(userId, role, requestingUserId);
   }
 }

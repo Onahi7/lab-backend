@@ -1,0 +1,669 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/pages/lab/QCDataEntry.tsx");import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+
+let prevRefreshReg;
+let prevRefreshSig;
+
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react-swc can't detect preamble. Something is wrong."
+    );
+  }
+
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+
+import __vite__cjsImport2_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=27cfabb6"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime["jsxDEV"];
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=27cfabb6"; const useState = __vite__cjsImport3_react["useState"];
+import { RoleLayout } from "/src/components/layout/RoleLayout.tsx";
+import { useAuth } from "/src/context/AuthContext.tsx";
+import { useMachines } from "/src/hooks/useMachines.ts";
+import { Button } from "/src/components/ui/button.tsx";
+import { Input } from "/src/components/ui/input.tsx";
+import { Label } from "/src/components/ui/label.tsx";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "/src/components/ui/select.tsx";
+import { Badge } from "/src/components/ui/badge.tsx";
+import { toast } from "/node_modules/.vite/deps/sonner.js?v=27cfabb6";
+import { Save, Loader2, CheckCircle, XCircle } from "/node_modules/.vite/deps/lucide-react.js?v=27cfabb6";
+import { qcAPI } from "/src/services/api.ts";
+import { useQuery, useMutation, useQueryClient } from "/node_modules/.vite/deps/@tanstack_react-query.js?v=27cfabb6";
+export default function QCDataEntry() {
+    _s();
+    const { profile, user } = useAuth();
+    const { data: machines } = useMachines();
+    const queryClient = useQueryClient();
+    const [selectedMachine, setSelectedMachine] = useState('');
+    const [testCode, setTestCode] = useState('');
+    const [level, setLevel] = useState('level_1');
+    const [value, setValue] = useState('');
+    const [lotNumber, setLotNumber] = useState('');
+    // Fetch QC samples
+    const { data: qcSamples } = useQuery({
+        queryKey: [
+            'qc-samples',
+            selectedMachine
+        ],
+        queryFn: async ()=>{
+            const params = selectedMachine ? {
+                machineId: selectedMachine
+            } : {};
+            return await qcAPI.getSamples(params);
+        }
+    });
+    // Fetch recent QC results
+    const { data: recentResults } = useQuery({
+        queryKey: [
+            'qc-results',
+            selectedMachine
+        ],
+        queryFn: async ()=>{
+            return await qcAPI.getResults({
+                limit: 20
+            });
+        }
+    });
+    // Add QC result
+    const addResult = useMutation({
+        mutationFn: async ()=>{
+            if (!selectedMachine || !testCode || !value) {
+                throw new Error('Please fill all required fields');
+            }
+            // Find or create QC sample
+            let qcSample = qcSamples?.find((s)=>s.machineId === selectedMachine && s.testCode === testCode && s.level === level);
+            if (!qcSample) {
+                qcSample = await qcAPI.createSample({
+                    machineId: selectedMachine,
+                    testCode,
+                    level,
+                    lotNumber: lotNumber || undefined
+                });
+            }
+            // Add result
+            await qcAPI.createResult({
+                qcSampleId: qcSample.id,
+                value: parseFloat(value),
+                testedBy: user?.id
+            });
+        },
+        onSuccess: ()=>{
+            queryClient.invalidateQueries({
+                queryKey: [
+                    'qc-results'
+                ]
+            });
+            queryClient.invalidateQueries({
+                queryKey: [
+                    'qc-samples'
+                ]
+            });
+            setValue('');
+            toast.success('QC result recorded');
+        },
+        onError: (error)=>{
+            toast.error(error.message || 'Failed to record QC result');
+        }
+    });
+    return /*#__PURE__*/ _jsxDEV(RoleLayout, {
+        title: "Quality Control Data Entry",
+        subtitle: "Record and monitor QC results",
+        role: "lab-tech",
+        userName: profile?.full_name,
+        children: /*#__PURE__*/ _jsxDEV("div", {
+            className: "grid grid-cols-1 lg:grid-cols-3 gap-6",
+            children: [
+                /*#__PURE__*/ _jsxDEV("div", {
+                    className: "lg:col-span-1",
+                    children: /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg p-6 space-y-4",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("h3", {
+                                className: "font-semibold",
+                                children: "Enter QC Result"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                lineNumber: 95,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "space-y-2",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                        children: "Machine *"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                        lineNumber: 98,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(Select, {
+                                        value: selectedMachine,
+                                        onValueChange: setSelectedMachine,
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV(SelectTrigger, {
+                                                children: /*#__PURE__*/ _jsxDEV(SelectValue, {
+                                                    placeholder: "Select machine"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                    lineNumber: 101,
+                                                    columnNumber: 19
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                lineNumber: 100,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(SelectContent, {
+                                                children: machines?.map((machine)=>/*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                        value: machine.id,
+                                                        children: machine.name
+                                                    }, machine.id, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                        lineNumber: 105,
+                                                        columnNumber: 21
+                                                    }, this))
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                lineNumber: 103,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                        lineNumber: 99,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                lineNumber: 97,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "space-y-2",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                        children: "Test Code *"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                        lineNumber: 114,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(Input, {
+                                        placeholder: "CBC",
+                                        value: testCode,
+                                        onChange: (e)=>setTestCode(e.target.value.toUpperCase())
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                        lineNumber: 115,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                lineNumber: 113,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "space-y-2",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                        children: "QC Level *"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                        lineNumber: 123,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(Select, {
+                                        value: level,
+                                        onValueChange: (v)=>setLevel(v),
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV(SelectTrigger, {
+                                                children: /*#__PURE__*/ _jsxDEV(SelectValue, {}, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                    lineNumber: 126,
+                                                    columnNumber: 19
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                lineNumber: 125,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(SelectContent, {
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                        value: "level_1",
+                                                        children: "Level 1 (Low)"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                        lineNumber: 129,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                        value: "level_2",
+                                                        children: "Level 2 (Normal)"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                        lineNumber: 130,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                        value: "level_3",
+                                                        children: "Level 3 (High)"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                        lineNumber: 131,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                lineNumber: 128,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                        lineNumber: 124,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                lineNumber: 122,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "space-y-2",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                        children: "Value *"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                        lineNumber: 137,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(Input, {
+                                        type: "number",
+                                        step: "0.01",
+                                        placeholder: "12.5",
+                                        value: value,
+                                        onChange: (e)=>setValue(e.target.value)
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                        lineNumber: 138,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                lineNumber: 136,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "space-y-2",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                        children: "Lot Number"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                        lineNumber: 148,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(Input, {
+                                        placeholder: "LOT123",
+                                        value: lotNumber,
+                                        onChange: (e)=>setLotNumber(e.target.value)
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                        lineNumber: 149,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                lineNumber: 147,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV(Button, {
+                                className: "w-full",
+                                onClick: ()=>addResult.mutate(),
+                                disabled: addResult.isPending || !selectedMachine || !testCode || !value,
+                                children: [
+                                    addResult.isPending && /*#__PURE__*/ _jsxDEV(Loader2, {
+                                        className: "w-4 h-4 mr-2 animate-spin"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                        lineNumber: 161,
+                                        columnNumber: 39
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(Save, {
+                                        className: "w-4 h-4 mr-2"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                        lineNumber: 162,
+                                        columnNumber: 15
+                                    }, this),
+                                    "Record Result"
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                lineNumber: 156,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                        lineNumber: 94,
+                        columnNumber: 11
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                    lineNumber: 93,
+                    columnNumber: 9
+                }, this),
+                /*#__PURE__*/ _jsxDEV("div", {
+                    className: "lg:col-span-2",
+                    children: /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "px-4 py-3 border-b",
+                                children: /*#__PURE__*/ _jsxDEV("h3", {
+                                    className: "font-semibold",
+                                    children: "Recent QC Results"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                    lineNumber: 172,
+                                    columnNumber: 15
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                lineNumber: 171,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "overflow-x-auto",
+                                children: /*#__PURE__*/ _jsxDEV("table", {
+                                    className: "data-table",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("thead", {
+                                            children: /*#__PURE__*/ _jsxDEV("tr", {
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV("th", {
+                                                        children: "Time"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                        lineNumber: 178,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("th", {
+                                                        children: "Machine"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                        lineNumber: 179,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("th", {
+                                                        children: "Test"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                        lineNumber: 180,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("th", {
+                                                        children: "Level"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                        lineNumber: 181,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("th", {
+                                                        children: "Value"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                        lineNumber: 182,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("th", {
+                                                        children: "Status"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                        lineNumber: 183,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("th", {
+                                                        children: "Tested By"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                        lineNumber: 184,
+                                                        columnNumber: 21
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                lineNumber: 177,
+                                                columnNumber: 19
+                                            }, this)
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                            lineNumber: 176,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("tbody", {
+                                            children: [
+                                                recentResults?.map((result)=>{
+                                                    const machine = machines?.find((m)=>m.id === result.qcSample?.machineId);
+                                                    return /*#__PURE__*/ _jsxDEV("tr", {
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                                className: "text-sm",
+                                                                children: new Date(result.testedAt).toLocaleTimeString()
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                                lineNumber: 192,
+                                                                columnNumber: 25
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                                children: machine?.name || 'Unknown'
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                                lineNumber: 195,
+                                                                columnNumber: 25
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                                className: "font-mono",
+                                                                children: result.qcSample?.testCode
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                                lineNumber: 196,
+                                                                columnNumber: 25
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                                children: /*#__PURE__*/ _jsxDEV(Badge, {
+                                                                    variant: "outline",
+                                                                    children: result.qcSample?.level?.replace('_', ' ')
+                                                                }, void 0, false, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                                    lineNumber: 198,
+                                                                    columnNumber: 27
+                                                                }, this)
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                                lineNumber: 197,
+                                                                columnNumber: 25
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                                className: "font-mono font-semibold",
+                                                                children: result.value
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                                lineNumber: 202,
+                                                                columnNumber: 25
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                                children: result.isInRange === null ? /*#__PURE__*/ _jsxDEV(Badge, {
+                                                                    variant: "outline",
+                                                                    children: "No Target"
+                                                                }, void 0, false, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                                    lineNumber: 205,
+                                                                    columnNumber: 29
+                                                                }, this) : result.isInRange ? /*#__PURE__*/ _jsxDEV("div", {
+                                                                    className: "flex items-center gap-1 text-status-normal",
+                                                                    children: [
+                                                                        /*#__PURE__*/ _jsxDEV(CheckCircle, {
+                                                                            className: "w-4 h-4"
+                                                                        }, void 0, false, {
+                                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                                            lineNumber: 208,
+                                                                            columnNumber: 31
+                                                                        }, this),
+                                                                        /*#__PURE__*/ _jsxDEV("span", {
+                                                                            className: "text-sm",
+                                                                            children: "In Range"
+                                                                        }, void 0, false, {
+                                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                                            lineNumber: 209,
+                                                                            columnNumber: 31
+                                                                        }, this)
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                                    lineNumber: 207,
+                                                                    columnNumber: 29
+                                                                }, this) : /*#__PURE__*/ _jsxDEV("div", {
+                                                                    className: "flex items-center gap-1 text-status-critical",
+                                                                    children: [
+                                                                        /*#__PURE__*/ _jsxDEV(XCircle, {
+                                                                            className: "w-4 h-4"
+                                                                        }, void 0, false, {
+                                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                                            lineNumber: 213,
+                                                                            columnNumber: 31
+                                                                        }, this),
+                                                                        /*#__PURE__*/ _jsxDEV("span", {
+                                                                            className: "text-sm",
+                                                                            children: "Out of Range"
+                                                                        }, void 0, false, {
+                                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                                            lineNumber: 214,
+                                                                            columnNumber: 31
+                                                                        }, this)
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                                    lineNumber: 212,
+                                                                    columnNumber: 29
+                                                                }, this)
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                                lineNumber: 203,
+                                                                columnNumber: 25
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                                className: "text-sm text-muted-foreground",
+                                                                children: result.testedBy || 'System'
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                                lineNumber: 218,
+                                                                columnNumber: 25
+                                                            }, this)
+                                                        ]
+                                                    }, result.id, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                        lineNumber: 191,
+                                                        columnNumber: 23
+                                                    }, this);
+                                                }),
+                                                (!recentResults || recentResults.length === 0) && /*#__PURE__*/ _jsxDEV("tr", {
+                                                    children: /*#__PURE__*/ _jsxDEV("td", {
+                                                        colSpan: 7,
+                                                        className: "text-center py-8 text-muted-foreground",
+                                                        children: "No QC results recorded"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                        lineNumber: 226,
+                                                        columnNumber: 23
+                                                    }, this)
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                                    lineNumber: 225,
+                                                    columnNumber: 21
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                            lineNumber: 187,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                    lineNumber: 175,
+                                    columnNumber: 15
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                                lineNumber: 174,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                        lineNumber: 170,
+                        columnNumber: 11
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+                    lineNumber: 169,
+                    columnNumber: 9
+                }, this)
+            ]
+        }, void 0, true, {
+            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+            lineNumber: 91,
+            columnNumber: 7
+        }, this)
+    }, void 0, false, {
+        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx",
+        lineNumber: 85,
+        columnNumber: 5
+    }, this);
+}
+_s(QCDataEntry, "/d5ZoM6cGRVzLtRo/dyosUhnMrA=", false, function() {
+    return [
+        useAuth,
+        useMachines,
+        useQueryClient,
+        useQuery,
+        useQuery,
+        useMutation
+    ];
+});
+_c = QCDataEntry;
+var _c;
+$RefreshReg$(_c, "QCDataEntry");
+
+
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+
+
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/HP/Downloads/lab/frontend/src/pages/lab/QCDataEntry.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIlFDRGF0YUVudHJ5LnRzeCJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyB1c2VTdGF0ZSB9IGZyb20gJ3JlYWN0JztcclxuaW1wb3J0IHsgUm9sZUxheW91dCB9IGZyb20gJ0AvY29tcG9uZW50cy9sYXlvdXQvUm9sZUxheW91dCc7XHJcbmltcG9ydCB7IHVzZUF1dGggfSBmcm9tICdAL2NvbnRleHQvQXV0aENvbnRleHQnO1xyXG5pbXBvcnQgeyB1c2VNYWNoaW5lcyB9IGZyb20gJ0AvaG9va3MvdXNlTWFjaGluZXMnO1xyXG5pbXBvcnQgeyBCdXR0b24gfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvYnV0dG9uJztcclxuaW1wb3J0IHsgSW5wdXQgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvaW5wdXQnO1xyXG5pbXBvcnQgeyBMYWJlbCB9IGZyb20gJ0AvY29tcG9uZW50cy91aS9sYWJlbCc7XHJcbmltcG9ydCB7IFNlbGVjdCwgU2VsZWN0Q29udGVudCwgU2VsZWN0SXRlbSwgU2VsZWN0VHJpZ2dlciwgU2VsZWN0VmFsdWUgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvc2VsZWN0JztcclxuaW1wb3J0IHsgQmFkZ2UgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvYmFkZ2UnO1xyXG5pbXBvcnQgeyB0b2FzdCB9IGZyb20gJ3Nvbm5lcic7XHJcbmltcG9ydCB7IFBsdXMsIFNhdmUsIFRyZW5kaW5nVXAsIEFsZXJ0VHJpYW5nbGUsIExvYWRlcjIsIENoZWNrQ2lyY2xlLCBYQ2lyY2xlIH0gZnJvbSAnbHVjaWRlLXJlYWN0JztcclxuaW1wb3J0IHsgcWNBUEkgfSBmcm9tICdAL3NlcnZpY2VzL2FwaSc7XHJcbmltcG9ydCB7IHVzZVF1ZXJ5LCB1c2VNdXRhdGlvbiwgdXNlUXVlcnlDbGllbnQgfSBmcm9tICdAdGFuc3RhY2svcmVhY3QtcXVlcnknO1xyXG5cclxuZXhwb3J0IGRlZmF1bHQgZnVuY3Rpb24gUUNEYXRhRW50cnkoKSB7XHJcbiAgY29uc3QgeyBwcm9maWxlLCB1c2VyIH0gPSB1c2VBdXRoKCk7XHJcbiAgY29uc3QgeyBkYXRhOiBtYWNoaW5lcyB9ID0gdXNlTWFjaGluZXMoKTtcclxuICBjb25zdCBxdWVyeUNsaWVudCA9IHVzZVF1ZXJ5Q2xpZW50KCk7XHJcblxyXG4gIGNvbnN0IFtzZWxlY3RlZE1hY2hpbmUsIHNldFNlbGVjdGVkTWFjaGluZV0gPSB1c2VTdGF0ZSgnJyk7XHJcbiAgY29uc3QgW3Rlc3RDb2RlLCBzZXRUZXN0Q29kZV0gPSB1c2VTdGF0ZSgnJyk7XHJcbiAgY29uc3QgW2xldmVsLCBzZXRMZXZlbF0gPSB1c2VTdGF0ZTwnbGV2ZWxfMScgfCAnbGV2ZWxfMicgfCAnbGV2ZWxfMyc+KCdsZXZlbF8xJyk7XHJcbiAgY29uc3QgW3ZhbHVlLCBzZXRWYWx1ZV0gPSB1c2VTdGF0ZSgnJyk7XHJcbiAgY29uc3QgW2xvdE51bWJlciwgc2V0TG90TnVtYmVyXSA9IHVzZVN0YXRlKCcnKTtcclxuXHJcbiAgLy8gRmV0Y2ggUUMgc2FtcGxlc1xyXG4gIGNvbnN0IHsgZGF0YTogcWNTYW1wbGVzIH0gPSB1c2VRdWVyeSh7XHJcbiAgICBxdWVyeUtleTogWydxYy1zYW1wbGVzJywgc2VsZWN0ZWRNYWNoaW5lXSxcclxuICAgIHF1ZXJ5Rm46IGFzeW5jICgpID0+IHtcclxuICAgICAgY29uc3QgcGFyYW1zID0gc2VsZWN0ZWRNYWNoaW5lID8geyBtYWNoaW5lSWQ6IHNlbGVjdGVkTWFjaGluZSB9IDoge307XHJcbiAgICAgIHJldHVybiBhd2FpdCBxY0FQSS5nZXRTYW1wbGVzKHBhcmFtcyk7XHJcbiAgICB9XHJcbiAgfSk7XHJcblxyXG4gIC8vIEZldGNoIHJlY2VudCBRQyByZXN1bHRzXHJcbiAgY29uc3QgeyBkYXRhOiByZWNlbnRSZXN1bHRzIH0gPSB1c2VRdWVyeSh7XHJcbiAgICBxdWVyeUtleTogWydxYy1yZXN1bHRzJywgc2VsZWN0ZWRNYWNoaW5lXSxcclxuICAgIHF1ZXJ5Rm46IGFzeW5jICgpID0+IHtcclxuICAgICAgcmV0dXJuIGF3YWl0IHFjQVBJLmdldFJlc3VsdHMoeyBsaW1pdDogMjAgfSk7XHJcbiAgICB9XHJcbiAgfSk7XHJcblxyXG4gIC8vIEFkZCBRQyByZXN1bHRcclxuICBjb25zdCBhZGRSZXN1bHQgPSB1c2VNdXRhdGlvbih7XHJcbiAgICBtdXRhdGlvbkZuOiBhc3luYyAoKSA9PiB7XHJcbiAgICAgIGlmICghc2VsZWN0ZWRNYWNoaW5lIHx8ICF0ZXN0Q29kZSB8fCAhdmFsdWUpIHtcclxuICAgICAgICB0aHJvdyBuZXcgRXJyb3IoJ1BsZWFzZSBmaWxsIGFsbCByZXF1aXJlZCBmaWVsZHMnKTtcclxuICAgICAgfVxyXG5cclxuICAgICAgLy8gRmluZCBvciBjcmVhdGUgUUMgc2FtcGxlXHJcbiAgICAgIGxldCBxY1NhbXBsZSA9IHFjU2FtcGxlcz8uZmluZCgoczogYW55KSA9PiBcclxuICAgICAgICBzLm1hY2hpbmVJZCA9PT0gc2VsZWN0ZWRNYWNoaW5lICYmIFxyXG4gICAgICAgIHMudGVzdENvZGUgPT09IHRlc3RDb2RlICYmIFxyXG4gICAgICAgIHMubGV2ZWwgPT09IGxldmVsXHJcbiAgICAgICk7XHJcblxyXG4gICAgICBpZiAoIXFjU2FtcGxlKSB7XHJcbiAgICAgICAgcWNTYW1wbGUgPSBhd2FpdCBxY0FQSS5jcmVhdGVTYW1wbGUoe1xyXG4gICAgICAgICAgbWFjaGluZUlkOiBzZWxlY3RlZE1hY2hpbmUsXHJcbiAgICAgICAgICB0ZXN0Q29kZSxcclxuICAgICAgICAgIGxldmVsLFxyXG4gICAgICAgICAgbG90TnVtYmVyOiBsb3ROdW1iZXIgfHwgdW5kZWZpbmVkXHJcbiAgICAgICAgfSk7XHJcbiAgICAgIH1cclxuXHJcbiAgICAgIC8vIEFkZCByZXN1bHRcclxuICAgICAgYXdhaXQgcWNBUEkuY3JlYXRlUmVzdWx0KHtcclxuICAgICAgICBxY1NhbXBsZUlkOiBxY1NhbXBsZS5pZCxcclxuICAgICAgICB2YWx1ZTogcGFyc2VGbG9hdCh2YWx1ZSksXHJcbiAgICAgICAgdGVzdGVkQnk6IHVzZXI/LmlkXHJcbiAgICAgIH0pO1xyXG4gICAgfSxcclxuICAgIG9uU3VjY2VzczogKCkgPT4ge1xyXG4gICAgICBxdWVyeUNsaWVudC5pbnZhbGlkYXRlUXVlcmllcyh7IHF1ZXJ5S2V5OiBbJ3FjLXJlc3VsdHMnXSB9KTtcclxuICAgICAgcXVlcnlDbGllbnQuaW52YWxpZGF0ZVF1ZXJpZXMoeyBxdWVyeUtleTogWydxYy1zYW1wbGVzJ10gfSk7XHJcbiAgICAgIHNldFZhbHVlKCcnKTtcclxuICAgICAgdG9hc3Quc3VjY2VzcygnUUMgcmVzdWx0IHJlY29yZGVkJyk7XHJcbiAgICB9LFxyXG4gICAgb25FcnJvcjogKGVycm9yOiBhbnkpID0+IHtcclxuICAgICAgdG9hc3QuZXJyb3IoZXJyb3IubWVzc2FnZSB8fCAnRmFpbGVkIHRvIHJlY29yZCBRQyByZXN1bHQnKTtcclxuICAgIH1cclxuICB9KTtcclxuXHJcbiAgcmV0dXJuIChcclxuICAgIDxSb2xlTGF5b3V0IFxyXG4gICAgICB0aXRsZT1cIlF1YWxpdHkgQ29udHJvbCBEYXRhIEVudHJ5XCIgXHJcbiAgICAgIHN1YnRpdGxlPVwiUmVjb3JkIGFuZCBtb25pdG9yIFFDIHJlc3VsdHNcIlxyXG4gICAgICByb2xlPVwibGFiLXRlY2hcIlxyXG4gICAgICB1c2VyTmFtZT17cHJvZmlsZT8uZnVsbF9uYW1lfVxyXG4gICAgPlxyXG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImdyaWQgZ3JpZC1jb2xzLTEgbGc6Z3JpZC1jb2xzLTMgZ2FwLTZcIj5cclxuICAgICAgICB7LyogRW50cnkgRm9ybSAqL31cclxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImxnOmNvbC1zcGFuLTFcIj5cclxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiYmctY2FyZCBib3JkZXIgcm91bmRlZC1sZyBwLTYgc3BhY2UteS00XCI+XHJcbiAgICAgICAgICAgIDxoMyBjbGFzc05hbWU9XCJmb250LXNlbWlib2xkXCI+RW50ZXIgUUMgUmVzdWx0PC9oMz5cclxuXHJcbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0yXCI+XHJcbiAgICAgICAgICAgICAgPExhYmVsPk1hY2hpbmUgKjwvTGFiZWw+XHJcbiAgICAgICAgICAgICAgPFNlbGVjdCB2YWx1ZT17c2VsZWN0ZWRNYWNoaW5lfSBvblZhbHVlQ2hhbmdlPXtzZXRTZWxlY3RlZE1hY2hpbmV9PlxyXG4gICAgICAgICAgICAgICAgPFNlbGVjdFRyaWdnZXI+XHJcbiAgICAgICAgICAgICAgICAgIDxTZWxlY3RWYWx1ZSBwbGFjZWhvbGRlcj1cIlNlbGVjdCBtYWNoaW5lXCIgLz5cclxuICAgICAgICAgICAgICAgIDwvU2VsZWN0VHJpZ2dlcj5cclxuICAgICAgICAgICAgICAgIDxTZWxlY3RDb250ZW50PlxyXG4gICAgICAgICAgICAgICAgICB7bWFjaGluZXM/Lm1hcChtYWNoaW5lID0+IChcclxuICAgICAgICAgICAgICAgICAgICA8U2VsZWN0SXRlbSBrZXk9e21hY2hpbmUuaWR9IHZhbHVlPXttYWNoaW5lLmlkfT5cclxuICAgICAgICAgICAgICAgICAgICAgIHttYWNoaW5lLm5hbWV9XHJcbiAgICAgICAgICAgICAgICAgICAgPC9TZWxlY3RJdGVtPlxyXG4gICAgICAgICAgICAgICAgICApKX1cclxuICAgICAgICAgICAgICAgIDwvU2VsZWN0Q29udGVudD5cclxuICAgICAgICAgICAgICA8L1NlbGVjdD5cclxuICAgICAgICAgICAgPC9kaXY+XHJcblxyXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNwYWNlLXktMlwiPlxyXG4gICAgICAgICAgICAgIDxMYWJlbD5UZXN0IENvZGUgKjwvTGFiZWw+XHJcbiAgICAgICAgICAgICAgPElucHV0XHJcbiAgICAgICAgICAgICAgICBwbGFjZWhvbGRlcj1cIkNCQ1wiXHJcbiAgICAgICAgICAgICAgICB2YWx1ZT17dGVzdENvZGV9XHJcbiAgICAgICAgICAgICAgICBvbkNoYW5nZT17KGUpID0+IHNldFRlc3RDb2RlKGUudGFyZ2V0LnZhbHVlLnRvVXBwZXJDYXNlKCkpfVxyXG4gICAgICAgICAgICAgIC8+XHJcbiAgICAgICAgICAgIDwvZGl2PlxyXG5cclxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTJcIj5cclxuICAgICAgICAgICAgICA8TGFiZWw+UUMgTGV2ZWwgKjwvTGFiZWw+XHJcbiAgICAgICAgICAgICAgPFNlbGVjdCB2YWx1ZT17bGV2ZWx9IG9uVmFsdWVDaGFuZ2U9eyh2OiBhbnkpID0+IHNldExldmVsKHYpfT5cclxuICAgICAgICAgICAgICAgIDxTZWxlY3RUcmlnZ2VyPlxyXG4gICAgICAgICAgICAgICAgICA8U2VsZWN0VmFsdWUgLz5cclxuICAgICAgICAgICAgICAgIDwvU2VsZWN0VHJpZ2dlcj5cclxuICAgICAgICAgICAgICAgIDxTZWxlY3RDb250ZW50PlxyXG4gICAgICAgICAgICAgICAgICA8U2VsZWN0SXRlbSB2YWx1ZT1cImxldmVsXzFcIj5MZXZlbCAxIChMb3cpPC9TZWxlY3RJdGVtPlxyXG4gICAgICAgICAgICAgICAgICA8U2VsZWN0SXRlbSB2YWx1ZT1cImxldmVsXzJcIj5MZXZlbCAyIChOb3JtYWwpPC9TZWxlY3RJdGVtPlxyXG4gICAgICAgICAgICAgICAgICA8U2VsZWN0SXRlbSB2YWx1ZT1cImxldmVsXzNcIj5MZXZlbCAzIChIaWdoKTwvU2VsZWN0SXRlbT5cclxuICAgICAgICAgICAgICAgIDwvU2VsZWN0Q29udGVudD5cclxuICAgICAgICAgICAgICA8L1NlbGVjdD5cclxuICAgICAgICAgICAgPC9kaXY+XHJcblxyXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNwYWNlLXktMlwiPlxyXG4gICAgICAgICAgICAgIDxMYWJlbD5WYWx1ZSAqPC9MYWJlbD5cclxuICAgICAgICAgICAgICA8SW5wdXRcclxuICAgICAgICAgICAgICAgIHR5cGU9XCJudW1iZXJcIlxyXG4gICAgICAgICAgICAgICAgc3RlcD1cIjAuMDFcIlxyXG4gICAgICAgICAgICAgICAgcGxhY2Vob2xkZXI9XCIxMi41XCJcclxuICAgICAgICAgICAgICAgIHZhbHVlPXt2YWx1ZX1cclxuICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXsoZSkgPT4gc2V0VmFsdWUoZS50YXJnZXQudmFsdWUpfVxyXG4gICAgICAgICAgICAgIC8+XHJcbiAgICAgICAgICAgIDwvZGl2PlxyXG5cclxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTJcIj5cclxuICAgICAgICAgICAgICA8TGFiZWw+TG90IE51bWJlcjwvTGFiZWw+XHJcbiAgICAgICAgICAgICAgPElucHV0XHJcbiAgICAgICAgICAgICAgICBwbGFjZWhvbGRlcj1cIkxPVDEyM1wiXHJcbiAgICAgICAgICAgICAgICB2YWx1ZT17bG90TnVtYmVyfVxyXG4gICAgICAgICAgICAgICAgb25DaGFuZ2U9eyhlKSA9PiBzZXRMb3ROdW1iZXIoZS50YXJnZXQudmFsdWUpfVxyXG4gICAgICAgICAgICAgIC8+XHJcbiAgICAgICAgICAgIDwvZGl2PlxyXG5cclxuICAgICAgICAgICAgPEJ1dHRvblxyXG4gICAgICAgICAgICAgIGNsYXNzTmFtZT1cInctZnVsbFwiXHJcbiAgICAgICAgICAgICAgb25DbGljaz17KCkgPT4gYWRkUmVzdWx0Lm11dGF0ZSgpfVxyXG4gICAgICAgICAgICAgIGRpc2FibGVkPXthZGRSZXN1bHQuaXNQZW5kaW5nIHx8ICFzZWxlY3RlZE1hY2hpbmUgfHwgIXRlc3RDb2RlIHx8ICF2YWx1ZX1cclxuICAgICAgICAgICAgPlxyXG4gICAgICAgICAgICAgIHthZGRSZXN1bHQuaXNQZW5kaW5nICYmIDxMb2FkZXIyIGNsYXNzTmFtZT1cInctNCBoLTQgbXItMiBhbmltYXRlLXNwaW5cIiAvPn1cclxuICAgICAgICAgICAgICA8U2F2ZSBjbGFzc05hbWU9XCJ3LTQgaC00IG1yLTJcIiAvPlxyXG4gICAgICAgICAgICAgIFJlY29yZCBSZXN1bHRcclxuICAgICAgICAgICAgPC9CdXR0b24+XHJcbiAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgey8qIFJlY2VudCBSZXN1bHRzICovfVxyXG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwibGc6Y29sLXNwYW4tMlwiPlxyXG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJiZy1jYXJkIGJvcmRlciByb3VuZGVkLWxnXCI+XHJcbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwicHgtNCBweS0zIGJvcmRlci1iXCI+XHJcbiAgICAgICAgICAgICAgPGgzIGNsYXNzTmFtZT1cImZvbnQtc2VtaWJvbGRcIj5SZWNlbnQgUUMgUmVzdWx0czwvaDM+XHJcbiAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cIm92ZXJmbG93LXgtYXV0b1wiPlxyXG4gICAgICAgICAgICAgIDx0YWJsZSBjbGFzc05hbWU9XCJkYXRhLXRhYmxlXCI+XHJcbiAgICAgICAgICAgICAgICA8dGhlYWQ+XHJcbiAgICAgICAgICAgICAgICAgIDx0cj5cclxuICAgICAgICAgICAgICAgICAgICA8dGg+VGltZTwvdGg+XHJcbiAgICAgICAgICAgICAgICAgICAgPHRoPk1hY2hpbmU8L3RoPlxyXG4gICAgICAgICAgICAgICAgICAgIDx0aD5UZXN0PC90aD5cclxuICAgICAgICAgICAgICAgICAgICA8dGg+TGV2ZWw8L3RoPlxyXG4gICAgICAgICAgICAgICAgICAgIDx0aD5WYWx1ZTwvdGg+XHJcbiAgICAgICAgICAgICAgICAgICAgPHRoPlN0YXR1czwvdGg+XHJcbiAgICAgICAgICAgICAgICAgICAgPHRoPlRlc3RlZCBCeTwvdGg+XHJcbiAgICAgICAgICAgICAgICAgIDwvdHI+XHJcbiAgICAgICAgICAgICAgICA8L3RoZWFkPlxyXG4gICAgICAgICAgICAgICAgPHRib2R5PlxyXG4gICAgICAgICAgICAgICAgICB7cmVjZW50UmVzdWx0cz8ubWFwKChyZXN1bHQ6IGFueSkgPT4ge1xyXG4gICAgICAgICAgICAgICAgICAgIGNvbnN0IG1hY2hpbmUgPSBtYWNoaW5lcz8uZmluZCgobTogYW55KSA9PiBtLmlkID09PSByZXN1bHQucWNTYW1wbGU/Lm1hY2hpbmVJZCk7XHJcbiAgICAgICAgICAgICAgICAgICAgcmV0dXJuIChcclxuICAgICAgICAgICAgICAgICAgICAgIDx0ciBrZXk9e3Jlc3VsdC5pZH0+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIDx0ZCBjbGFzc05hbWU9XCJ0ZXh0LXNtXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAge25ldyBEYXRlKHJlc3VsdC50ZXN0ZWRBdCkudG9Mb2NhbGVUaW1lU3RyaW5nKCl9XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIDwvdGQ+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIDx0ZD57bWFjaGluZT8ubmFtZSB8fCAnVW5rbm93bid9PC90ZD5cclxuICAgICAgICAgICAgICAgICAgICAgICAgPHRkIGNsYXNzTmFtZT1cImZvbnQtbW9ub1wiPntyZXN1bHQucWNTYW1wbGU/LnRlc3RDb2RlfTwvdGQ+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIDx0ZD5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICA8QmFkZ2UgdmFyaWFudD1cIm91dGxpbmVcIj5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIHtyZXN1bHQucWNTYW1wbGU/LmxldmVsPy5yZXBsYWNlKCdfJywgJyAnKX1cclxuICAgICAgICAgICAgICAgICAgICAgICAgICA8L0JhZGdlPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICA8L3RkPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICA8dGQgY2xhc3NOYW1lPVwiZm9udC1tb25vIGZvbnQtc2VtaWJvbGRcIj57cmVzdWx0LnZhbHVlfTwvdGQ+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIDx0ZD5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICB7cmVzdWx0LmlzSW5SYW5nZSA9PT0gbnVsbCA/IChcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxCYWRnZSB2YXJpYW50PVwib3V0bGluZVwiPk5vIFRhcmdldDwvQmFkZ2U+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgKSA6IHJlc3VsdC5pc0luUmFuZ2UgPyAoXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGdhcC0xIHRleHQtc3RhdHVzLW5vcm1hbFwiPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8Q2hlY2tDaXJjbGUgY2xhc3NOYW1lPVwidy00IGgtNFwiIC8+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInRleHQtc21cIj5JbiBSYW5nZTwvc3Bhbj5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICkgOiAoXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGdhcC0xIHRleHQtc3RhdHVzLWNyaXRpY2FsXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxYQ2lyY2xlIGNsYXNzTmFtZT1cInctNCBoLTRcIiAvPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJ0ZXh0LXNtXCI+T3V0IG9mIFJhbmdlPC9zcGFuPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgKX1cclxuICAgICAgICAgICAgICAgICAgICAgICAgPC90ZD5cclxuICAgICAgICAgICAgICAgICAgICAgICAgPHRkIGNsYXNzTmFtZT1cInRleHQtc20gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAge3Jlc3VsdC50ZXN0ZWRCeSB8fCAnU3lzdGVtJ31cclxuICAgICAgICAgICAgICAgICAgICAgICAgPC90ZD5cclxuICAgICAgICAgICAgICAgICAgICAgIDwvdHI+XHJcbiAgICAgICAgICAgICAgICAgICAgKTtcclxuICAgICAgICAgICAgICAgICAgfSl9XHJcbiAgICAgICAgICAgICAgICAgIHsoIXJlY2VudFJlc3VsdHMgfHwgcmVjZW50UmVzdWx0cy5sZW5ndGggPT09IDApICYmIChcclxuICAgICAgICAgICAgICAgICAgICA8dHI+XHJcbiAgICAgICAgICAgICAgICAgICAgICA8dGQgY29sU3Bhbj17N30gY2xhc3NOYW1lPVwidGV4dC1jZW50ZXIgcHktOCB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5cclxuICAgICAgICAgICAgICAgICAgICAgICAgTm8gUUMgcmVzdWx0cyByZWNvcmRlZFxyXG4gICAgICAgICAgICAgICAgICAgICAgPC90ZD5cclxuICAgICAgICAgICAgICAgICAgICA8L3RyPlxyXG4gICAgICAgICAgICAgICAgICApfVxyXG4gICAgICAgICAgICAgICAgPC90Ym9keT5cclxuICAgICAgICAgICAgICA8L3RhYmxlPlxyXG4gICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgIDwvZGl2PlxyXG4gICAgICA8L2Rpdj5cclxuICAgIDwvUm9sZUxheW91dD5cclxuICApO1xyXG59Il0sIm5hbWVzIjpbInVzZVN0YXRlIiwiUm9sZUxheW91dCIsInVzZUF1dGgiLCJ1c2VNYWNoaW5lcyIsIkJ1dHRvbiIsIklucHV0IiwiTGFiZWwiLCJTZWxlY3QiLCJTZWxlY3RDb250ZW50IiwiU2VsZWN0SXRlbSIsIlNlbGVjdFRyaWdnZXIiLCJTZWxlY3RWYWx1ZSIsIkJhZGdlIiwidG9hc3QiLCJTYXZlIiwiTG9hZGVyMiIsIkNoZWNrQ2lyY2xlIiwiWENpcmNsZSIsInFjQVBJIiwidXNlUXVlcnkiLCJ1c2VNdXRhdGlvbiIsInVzZVF1ZXJ5Q2xpZW50IiwiUUNEYXRhRW50cnkiLCJwcm9maWxlIiwidXNlciIsImRhdGEiLCJtYWNoaW5lcyIsInF1ZXJ5Q2xpZW50Iiwic2VsZWN0ZWRNYWNoaW5lIiwic2V0U2VsZWN0ZWRNYWNoaW5lIiwidGVzdENvZGUiLCJzZXRUZXN0Q29kZSIsImxldmVsIiwic2V0TGV2ZWwiLCJ2YWx1ZSIsInNldFZhbHVlIiwibG90TnVtYmVyIiwic2V0TG90TnVtYmVyIiwicWNTYW1wbGVzIiwicXVlcnlLZXkiLCJxdWVyeUZuIiwicGFyYW1zIiwibWFjaGluZUlkIiwiZ2V0U2FtcGxlcyIsInJlY2VudFJlc3VsdHMiLCJnZXRSZXN1bHRzIiwibGltaXQiLCJhZGRSZXN1bHQiLCJtdXRhdGlvbkZuIiwiRXJyb3IiLCJxY1NhbXBsZSIsImZpbmQiLCJzIiwiY3JlYXRlU2FtcGxlIiwidW5kZWZpbmVkIiwiY3JlYXRlUmVzdWx0IiwicWNTYW1wbGVJZCIsImlkIiwicGFyc2VGbG9hdCIsInRlc3RlZEJ5Iiwib25TdWNjZXNzIiwiaW52YWxpZGF0ZVF1ZXJpZXMiLCJzdWNjZXNzIiwib25FcnJvciIsImVycm9yIiwibWVzc2FnZSIsInRpdGxlIiwic3VidGl0bGUiLCJyb2xlIiwidXNlck5hbWUiLCJmdWxsX25hbWUiLCJkaXYiLCJjbGFzc05hbWUiLCJoMyIsIm9uVmFsdWVDaGFuZ2UiLCJwbGFjZWhvbGRlciIsIm1hcCIsIm1hY2hpbmUiLCJuYW1lIiwib25DaGFuZ2UiLCJlIiwidGFyZ2V0IiwidG9VcHBlckNhc2UiLCJ2IiwidHlwZSIsInN0ZXAiLCJvbkNsaWNrIiwibXV0YXRlIiwiZGlzYWJsZWQiLCJpc1BlbmRpbmciLCJ0YWJsZSIsInRoZWFkIiwidHIiLCJ0aCIsInRib2R5IiwicmVzdWx0IiwibSIsInRkIiwiRGF0ZSIsInRlc3RlZEF0IiwidG9Mb2NhbGVUaW1lU3RyaW5nIiwidmFyaWFudCIsInJlcGxhY2UiLCJpc0luUmFuZ2UiLCJzcGFuIiwibGVuZ3RoIiwiY29sU3BhbiJdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7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

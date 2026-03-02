@@ -1,0 +1,1091 @@
+﻿
+> hobour-diagnostics-backend@1.0.0 check:ranges C:\Users\HP\Downloads\lab\backend
+> ts-node -r tsconfig-paths/register src/database/check-test-ranges.ts
+
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:17 [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:17 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +105ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:17 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:17 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPassportModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:17 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMulterModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:18 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigHostModule dependencies initialized[39m[38;5;3m +7ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:18 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mThrottlerModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:18 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +4ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:18 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:18 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:18 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +40ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:18 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:18 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mRealtimeModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:18 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:26 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseCoreModule dependencies initialized[39m[38;5;3m +8945ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:26 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseModule dependencies initialized[39m[38;5;3m +4ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:26 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:26 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:26 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:26 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:26 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:26 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:26 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:26 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:26 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:26 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:26 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:26 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:27 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMongooseModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:27 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mDatabaseModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:27 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mUsersModule dependencies initialized[39m[38;5;3m +18ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:27 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTestCatalogModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:27 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mMachinesModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:27 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mQcModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:27 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAuditModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:27 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mReportsModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:27 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mReconciliationModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:27 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPatientsModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:27 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mOrdersModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:27 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mSamplesModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:27 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mResultsModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:27 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mReportTemplatesModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:27 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mHl7Module dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:27 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAuthModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 21508  - [39m27/02/2026, 13:43:29 [32m    LOG[39m [38;5;3m[TcpListenerService] [39m[32mStarted 0 TCP listeners[39m
+
+====================================================================================================
+TEST COMPONENTS, RANGES & AGE/GENDER LOGIC VALIDATION
+====================================================================================================
+
+­ƒôè Found 6 panels in database
+
+====================================================================================================
+­ƒö¼ PANEL: RFT - Renal Function Test
+   Price: Ôéª390 | Active: Ô£ô
+   Components: 7 tests
+====================================================================================================
+
+   1. UREA - Urea
+      Ôö£ÔöÇ Price: Ôéª80 | Active: Ô£ô
+      Ôö£ÔöÇ Category: chemistry
+      Ôö£ÔöÇ Sample: blood | TAT: 120min
+      Ôö£ÔöÇ Unit: mg/dL
+      ÔööÔöÇ Reference Ranges: 3 range(s)
+         Ôö£ÔöÇ Age Groups: 3 (Child, Adult, Elderly)
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. Child [Age: 0-18 years]
+               Range: 5-18 mg/dL
+            2. Adult [Age: 18-65 years]
+               Range: 7-20 mg/dL
+            3. Elderly [Age: 65 years]
+               Range: 8-23 mg/dL
+
+   2. CREAT - Creatinine
+      Ôö£ÔöÇ Price: Ôéª90 | Active: Ô£ô
+      Ôö£ÔöÇ Category: chemistry
+      Ôö£ÔöÇ Sample: blood | TAT: 120min
+      Ôö£ÔöÇ Unit: mg/dL
+      ÔööÔöÇ Reference Ranges: 7 range(s)
+         Ôö£ÔöÇ Age Groups: 7 (Infant (0-1 year), Child (1-12 years), Adolescent (12-18 years), Adult Male, Adult Female, Elderly Male, Elderly Female)
+         Ôö£ÔöÇ Genders: all, M, F
+         Ôö£ÔöÇ Ô£ô Has critical value thresholds
+         ÔööÔöÇ Detailed Ranges:
+            1. Infant (0-1 year) [Age: 0-1 years]
+               Range: 0.2-0.4 mg/dL
+            2. Child (1-12 years) [Age: 1-12 years]
+               Range: 0.3-0.7 mg/dL
+            3. Adolescent (12-18 years) [Age: 12-18 years]
+               Range: 0.5-1.0 mg/dL
+            4. Adult Male [Age: 18-65 years] (Male)
+               Range: 0.7-1.3 mg/dL
+               Critical: High >5.0
+            5. Adult Female [Age: 18-65 years] (Female)
+               Range: 0.6-1.1 mg/dL
+               Critical: High >5.0
+            6. Elderly Male [Age: 65 years] (Male)
+               Range: 0.8-1.3 mg/dL
+            7. Elderly Female [Age: 65 years] (Female)
+               Range: 0.6-1.2 mg/dL
+
+   3. NA - Sodium
+      Ôö£ÔöÇ Price: Ôéª35 | Active: Ô£ô
+      Ôö£ÔöÇ Category: chemistry
+      Ôö£ÔöÇ Sample: blood | TAT: 120min
+      Ôö£ÔöÇ Unit: mmol/L
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (All ages)
+         Ôö£ÔöÇ Genders: all
+         Ôö£ÔöÇ Ô£ô Has critical value thresholds
+         ÔööÔöÇ Detailed Ranges:
+            1. All ages [Age: 0 years]
+               Range: 136-145 mmol/L
+               Critical: Low <120, High >160
+
+   4. K - Potassium
+      Ôö£ÔöÇ Price: Ôéª35 | Active: Ô£ô
+      Ôö£ÔöÇ Category: chemistry
+      Ôö£ÔöÇ Sample: blood | TAT: 120min
+      Ôö£ÔöÇ Unit: mmol/L
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (All ages)
+         Ôö£ÔöÇ Genders: all
+         Ôö£ÔöÇ Ô£ô Has critical value thresholds
+         ÔööÔöÇ Detailed Ranges:
+            1. All ages [Age: 0 years]
+               Range: 3.5-5.1 mmol/L
+               Critical: Low <2.5, High >6.5
+
+   5. CL - Chloride
+      Ôö£ÔöÇ Price: Ôéª35 | Active: Ô£ô
+      Ôö£ÔöÇ Category: chemistry
+      Ôö£ÔöÇ Sample: blood | TAT: 120min
+      Ôö£ÔöÇ Unit: mmol/L
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (All ages)
+         Ôö£ÔöÇ Genders: all
+         Ôö£ÔöÇ Ô£ô Has critical value thresholds
+         ÔööÔöÇ Detailed Ranges:
+            1. All ages [Age: 0 years]
+               Range: 98-107 mmol/L
+               Critical: Low <80, High >115
+
+   6. HCO3 - Bicarbonate
+      Ôö£ÔöÇ Price: Ôéª35 | Active: Ô£ô
+      Ôö£ÔöÇ Category: chemistry
+      Ôö£ÔöÇ Sample: blood | TAT: 120min
+      Ôö£ÔöÇ Unit: mmol/L
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (All ages)
+         Ôö£ÔöÇ Genders: all
+         Ôö£ÔöÇ Ô£ô Has critical value thresholds
+         ÔööÔöÇ Detailed Ranges:
+            1. All ages [Age: 0 years]
+               Range: 22-29 mmol/L
+               Critical: Low <15, High >40
+
+   7. UA - Uric Acid
+      Ôö£ÔöÇ Price: Ôéª80 | Active: Ô£ô
+      Ôö£ÔöÇ Category: chemistry
+      Ôö£ÔöÇ Sample: blood | TAT: 120min
+      Ôö£ÔöÇ Unit: mg/dL
+      ÔööÔöÇ Reference Ranges: 4 range(s)
+         Ôö£ÔöÇ Age Groups: 4 (Child, Adult Male, Adult Female (premenopausal), Adult Female (postmenopausal))
+         Ôö£ÔöÇ Genders: all, M, F
+         ÔööÔöÇ Detailed Ranges:
+            1. Child [Age: 0-18 years]
+               Range: 2.0-5.5 mg/dL
+            2. Adult Male [Age: 18 years] (Male)
+               Range: 3.5-7.2 mg/dL
+            3. Adult Female (premenopausal) [Age: 18-50 years] (Female)
+               Range: 2.6-6.0 mg/dL
+            4. Adult Female (postmenopausal) [Age: 50 years] (Female)
+               Range: 3.5-7.2 mg/dL
+
+
+====================================================================================================
+­ƒö¼ PANEL: LFT - Liver Function Test
+   Price: Ôéª320 | Active: Ô£ô
+   Components: 8 tests
+====================================================================================================
+
+   1. ALT - Alanine Aminotransferase
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: chemistry
+      Ôö£ÔöÇ Sample: blood | TAT: 120min
+      Ôö£ÔöÇ Unit: U/L
+      ÔööÔöÇ Reference Ranges: 3 range(s)
+         Ôö£ÔöÇ Age Groups: 3 (Adult Male, Adult Female, Elderly)
+         Ôö£ÔöÇ Genders: M, F, all
+         ÔööÔöÇ Detailed Ranges:
+            1. Adult Male [Age: 18-65 years] (Male)
+               Range: 7-56 U/L
+            2. Adult Female [Age: 18-65 years] (Female)
+               Range: 7-45 U/L
+            3. Elderly [Age: 65 years]
+               Range: 7-50 U/L
+
+   2. AST - Aspartate Aminotransferase
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: chemistry
+      Ôö£ÔöÇ Sample: blood | TAT: 120min
+      Ôö£ÔöÇ Unit: U/L
+      ÔööÔöÇ Reference Ranges: 3 range(s)
+         Ôö£ÔöÇ Age Groups: 3 (Adult Male, Adult Female, Elderly)
+         Ôö£ÔöÇ Genders: M, F, all
+         ÔööÔöÇ Detailed Ranges:
+            1. Adult Male [Age: 18-65 years] (Male)
+               Range: 10-40 U/L
+            2. Adult Female [Age: 18-65 years] (Female)
+               Range: 10-35 U/L
+            3. Elderly [Age: 65 years]
+               Range: 10-40 U/L
+
+   3. ALP - Alkaline Phosphatase
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: chemistry
+      Ôö£ÔöÇ Sample: blood | TAT: 120min
+      Ôö£ÔöÇ Unit: U/L
+      ÔööÔöÇ Reference Ranges: 12 range(s)
+         Ôö£ÔöÇ Age Groups: 10 (Newborn, 1 month - 1 year, 1-3 years, 4-6 years, 7-9 years, 10-12 years, 13-15 years, 16-18 years, Adult, Elderly)
+         Ôö£ÔöÇ Genders: all, M, F
+         ÔööÔöÇ Detailed Ranges:
+            1. Newborn [Age: 0-0.08 years]
+               Range: 75-400 U/L
+            2. 1 month - 1 year [Age: 0.08-1 years]
+               Range: 82-383 U/L
+            3. 1-3 years [Age: 1-3 years]
+               Range: 104-345 U/L
+            4. 4-6 years [Age: 4-6 years]
+               Range: 93-309 U/L
+            5. 7-9 years [Age: 7-9 years]
+               Range: 69-325 U/L
+            6. 10-12 years [Age: 10-12 years]
+               Range: 42-362 U/L
+            7. 13-15 years [Age: 13-15 years] (Male)
+               Range: 74-390 U/L
+            8. 13-15 years [Age: 13-15 years] (Female)
+               Range: 50-162 U/L
+            9. 16-18 years [Age: 16-18 years] (Male)
+               Range: 52-171 U/L
+            10. 16-18 years [Age: 16-18 years] (Female)
+               Range: 47-119 U/L
+            11. Adult [Age: 18-65 years]
+               Range: 44-147 U/L
+            12. Elderly [Age: 65 years]
+               Range: 44-147 U/L
+
+   4. ALB - Albumin
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: chemistry
+      Ôö£ÔöÇ Sample: blood | TAT: 120min
+      Ôö£ÔöÇ Unit: g/dL
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (All ages)
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. All ages [Age: 0 years]
+               Range: 3.5-5.5 g/dL
+
+   5. TBIL - Total Bilirubin
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: chemistry
+      Ôö£ÔöÇ Sample: blood | TAT: 120min
+      Ôö£ÔöÇ Unit: mg/dL
+      ÔööÔöÇ Reference Ranges: 4 range(s)
+         Ôö£ÔöÇ Age Groups: 4 (Newborn (0-24 hours), Newborn (3-5 days), Child (6 days - 18 years), Adult)
+         Ôö£ÔöÇ Genders: all
+         Ôö£ÔöÇ Ô£ô Has critical value thresholds
+         ÔööÔöÇ Detailed Ranges:
+            1. Newborn (0-24 hours) [Age: 0-0.003 years]
+               Range: 1.0-12.0 mg/dL
+               Critical: High >15.0
+            2. Newborn (3-5 days) [Age: 0.008-0.014 years]
+               Range: 1.5-12.0 mg/dL
+               Critical: High >15.0
+            3. Child (6 days - 18 years) [Age: 0.016-18 years]
+               Range: 0.3-1.2 mg/dL
+            4. Adult [Age: 18 years]
+               Range: 0.3-1.2 mg/dL
+               Critical: High >15.0
+
+   6. DBIL - Direct Bilirubin
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: chemistry
+      Ôö£ÔöÇ Sample: blood | TAT: 120min
+      Ôö£ÔöÇ Unit: mg/dL
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (All ages)
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. All ages [Age: 0 years]
+               Range: 0.0-0.3 mg/dL
+
+   7. GGT - Gamma-Glutamyl Transferase
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: chemistry
+      Ôö£ÔöÇ Sample: blood | TAT: 120min
+      Ôö£ÔöÇ Unit: U/L
+      ÔööÔöÇ Reference Ranges: 2 range(s)
+         Ôö£ÔöÇ Age Groups: 2 (Adult Male, Adult Female)
+         Ôö£ÔöÇ Genders: M, F
+         ÔööÔöÇ Detailed Ranges:
+            1. Adult Male [Age: 18 years] (Male)
+               Range: 8-61 U/L
+            2. Adult Female [Age: 18 years] (Female)
+               Range: 5-36 U/L
+
+   8. TP - Total Protein
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: chemistry
+      Ôö£ÔöÇ Sample: blood | TAT: 120min
+      Ôö£ÔöÇ Unit: g/dL
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (All ages)
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. All ages [Age: 0 years]
+               Range: 6.0-8.3 g/dL
+
+
+====================================================================================================
+­ƒö¼ PANEL: FBC - Full Blood Count
+   Price: Ôéª150 | Active: Ô£ô
+   Components: 13 tests
+====================================================================================================
+
+   1. HB - Hemoglobin
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: hematology
+      Ôö£ÔöÇ Sample: blood | TAT: 60min
+      Ôö£ÔöÇ Unit: g/dL
+      ÔööÔöÇ Reference Ranges: 14 range(s)
+         Ôö£ÔöÇ Age Groups: 11 (Newborn (0-2 weeks), 2 weeks - 1 month, 1-2 months, 2-6 months, 6 months - 2 years, 2-6 years, 6-12 years, 12-18 years, Adult (18-65 years), Elderly (>65 years), Pregnancy)
+         Ôö£ÔöÇ Genders: all, M, F
+         Ôö£ÔöÇ Ô£ô Has pregnancy-specific ranges
+         Ôö£ÔöÇ Ô£ô Has critical value thresholds
+         ÔööÔöÇ Detailed Ranges:
+            1. Newborn (0-2 weeks) [Age: 0-0.04 years]
+               Range: 14.5-22.5 g/dL
+               Critical: Low <7.0, High >20.0
+            2. 2 weeks - 1 month [Age: 0.04-0.08 years]
+               Range: 12.0-20.0 g/dL
+            3. 1-2 months [Age: 0.08-0.17 years]
+               Range: 10.0-18.0 g/dL
+            4. 2-6 months [Age: 0.17-0.5 years]
+               Range: 9.5-14.0 g/dL
+            5. 6 months - 2 years [Age: 0.5-2 years]
+               Range: 10.5-13.5 g/dL
+            6. 2-6 years [Age: 2-6 years]
+               Range: 11.5-13.5 g/dL
+            7. 6-12 years [Age: 6-12 years]
+               Range: 11.5-15.5 g/dL
+            8. 12-18 years [Age: 12-18 years] (Male)
+               Range: 13.0-16.0 g/dL
+            9. 12-18 years [Age: 12-18 years] (Female)
+               Range: 12.0-16.0 g/dL
+            10. Adult (18-65 years) [Age: 18-65 years] (Male)
+               Range: 13.5-18.0 g/dL
+               Critical: Low <7.0, High >20.0
+            11. Adult (18-65 years) [Age: 18-65 years] (Female)
+               Range: 12.0-16.0 g/dL
+               Critical: Low <7.0, High >20.0
+            12. Elderly (>65 years) [Age: 65 years] (Male)
+               Range: 12.0-17.0 g/dL
+            13. Elderly (>65 years) [Age: 65 years] (Female)
+               Range: 11.0-15.0 g/dL
+            14. Pregnancy (Female) [PREGNANCY]
+               Range: 11.0-14.0 g/dL
+
+   2. HCT - Hematocrit
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: hematology
+      Ôö£ÔöÇ Sample: blood | TAT: 60min
+      Ôö£ÔöÇ Unit: %
+      ÔööÔöÇ Reference Ranges: 11 range(s)
+         Ôö£ÔöÇ Age Groups: 8 (Newborn, 1 month, 6 months - 2 years, 2-6 years, 6-12 years, 12-18 years, Adult (18-65 years), Elderly (>65 years))
+         Ôö£ÔöÇ Genders: all, M, F
+         Ôö£ÔöÇ Ô£ô Has critical value thresholds
+         ÔööÔöÇ Detailed Ranges:
+            1. Newborn [Age: 0-0.08 years]
+               Range: 44-64 %
+               Critical: Low <20, High >60
+            2. 1 month [Age: 0.08-0.17 years]
+               Range: 31-55 %
+            3. 6 months - 2 years [Age: 0.5-2 years]
+               Range: 33-39 %
+            4. 2-6 years [Age: 2-6 years]
+               Range: 34-40 %
+            5. 6-12 years [Age: 6-12 years]
+               Range: 35-45 %
+            6. 12-18 years [Age: 12-18 years] (Male)
+               Range: 37-49 %
+            7. 12-18 years [Age: 12-18 years] (Female)
+               Range: 36-46 %
+            8. Adult (18-65 years) [Age: 18-65 years] (Male)
+               Range: 40-54 %
+               Critical: Low <20, High >60
+            9. Adult (18-65 years) [Age: 18-65 years] (Female)
+               Range: 36-48 %
+               Critical: Low <20, High >60
+            10. Elderly (>65 years) [Age: 65 years] (Male)
+               Range: 37-51 %
+            11. Elderly (>65 years) [Age: 65 years] (Female)
+               Range: 34-46 %
+
+   3. RBC - Red Blood Cell Count
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: hematology
+      Ôö£ÔöÇ Sample: blood | TAT: 60min
+      Ôö£ÔöÇ Unit: x10ÔüÂ/┬ÁL
+      ÔööÔöÇ Reference Ranges: 11 range(s)
+         Ôö£ÔöÇ Age Groups: 8 (Newborn, 1-3 months, 6 months - 2 years, 2-6 years, 6-12 years, 12-18 years, Adult (18-65 years), Elderly (>65 years))
+         Ôö£ÔöÇ Genders: all, M, F
+         ÔööÔöÇ Detailed Ranges:
+            1. Newborn [Age: 0-0.08 years]
+               Range: 4.1-6.1 x10ÔüÂ/┬ÁL
+            2. 1-3 months [Age: 0.08-0.25 years]
+               Range: 3.2-4.8 x10ÔüÂ/┬ÁL
+            3. 6 months - 2 years [Age: 0.5-2 years]
+               Range: 3.7-5.3 x10ÔüÂ/┬ÁL
+            4. 2-6 years [Age: 2-6 years]
+               Range: 3.9-5.3 x10ÔüÂ/┬ÁL
+            5. 6-12 years [Age: 6-12 years]
+               Range: 4.0-5.2 x10ÔüÂ/┬ÁL
+            6. 12-18 years [Age: 12-18 years] (Male)
+               Range: 4.5-5.3 x10ÔüÂ/┬ÁL
+            7. 12-18 years [Age: 12-18 years] (Female)
+               Range: 4.1-5.1 x10ÔüÂ/┬ÁL
+            8. Adult (18-65 years) [Age: 18-65 years] (Male)
+               Range: 4.5-5.9 x10ÔüÂ/┬ÁL
+            9. Adult (18-65 years) [Age: 18-65 years] (Female)
+               Range: 4.1-5.1 x10ÔüÂ/┬ÁL
+            10. Elderly (>65 years) [Age: 65 years] (Male)
+               Range: 4.0-5.5 x10ÔüÂ/┬ÁL
+            11. Elderly (>65 years) [Age: 65 years] (Female)
+               Range: 3.8-5.0 x10ÔüÂ/┬ÁL
+
+   4. WBC - White Blood Cell Count
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: hematology
+      Ôö£ÔöÇ Sample: blood | TAT: 60min
+      Ôö£ÔöÇ Unit: x10┬│/┬ÁL
+      ÔööÔöÇ Reference Ranges: 9 range(s)
+         Ôö£ÔöÇ Age Groups: 9 (Newborn (0-2 weeks), 2 weeks - 1 month, 1-6 months, 6 months - 2 years, 2-6 years, 6-12 years, 12-18 years, Adult (18-65 years), Elderly (>65 years))
+         Ôö£ÔöÇ Genders: all
+         Ôö£ÔöÇ Ô£ô Has critical value thresholds
+         ÔööÔöÇ Detailed Ranges:
+            1. Newborn (0-2 weeks) [Age: 0-0.04 years]
+               Range: 9.0-30.0 x10┬│/┬ÁL
+               Critical: Low <2.0, High >30.0
+            2. 2 weeks - 1 month [Age: 0.04-0.08 years]
+               Range: 5.0-21.0 x10┬│/┬ÁL
+            3. 1-6 months [Age: 0.08-0.5 years]
+               Range: 6.0-17.5 x10┬│/┬ÁL
+            4. 6 months - 2 years [Age: 0.5-2 years]
+               Range: 6.0-17.0 x10┬│/┬ÁL
+            5. 2-6 years [Age: 2-6 years]
+               Range: 5.0-15.5 x10┬│/┬ÁL
+            6. 6-12 years [Age: 6-12 years]
+               Range: 4.5-13.5 x10┬│/┬ÁL
+            7. 12-18 years [Age: 12-18 years]
+               Range: 4.5-13.0 x10┬│/┬ÁL
+            8. Adult (18-65 years) [Age: 18-65 years]
+               Range: 4.0-11.0 x10┬│/┬ÁL
+               Critical: Low <2.0, High >30.0
+            9. Elderly (>65 years) [Age: 65 years]
+               Range: 3.5-10.5 x10┬│/┬ÁL
+
+   5. PLT - Platelet Count
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: hematology
+      Ôö£ÔöÇ Sample: blood | TAT: 60min
+      Ôö£ÔöÇ Unit: x10┬│/┬ÁL
+      ÔööÔöÇ Reference Ranges: 4 range(s)
+         Ôö£ÔöÇ Age Groups: 4 (Newborn, Infant, Child, Adult)
+         Ôö£ÔöÇ Genders: all
+         Ôö£ÔöÇ Ô£ô Has critical value thresholds
+         ÔööÔöÇ Detailed Ranges:
+            1. Newborn [Age: 0-0.08 years]
+               Range: 150-450 x10┬│/┬ÁL
+               Critical: Low <50, High >1000
+            2. Infant [Age: 0.08-2 years]
+               Range: 200-450 x10┬│/┬ÁL
+               Critical: Low <50, High >1000
+            3. Child [Age: 2-18 years]
+               Range: 150-450 x10┬│/┬ÁL
+               Critical: Low <50, High >1000
+            4. Adult [Age: 18 years]
+               Range: 150-400 x10┬│/┬ÁL
+               Critical: Low <50, High >1000
+
+   6. MCV - Mean Corpuscular Volume
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: hematology
+      Ôö£ÔöÇ Sample: blood | TAT: 60min
+      Ôö£ÔöÇ Unit: fL
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (All ages)
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. All ages [Age: 0 years]
+               Range: 80-100 fL
+
+   7. MCH - Mean Corpuscular Hemoglobin
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: hematology
+      Ôö£ÔöÇ Sample: blood | TAT: 60min
+      Ôö£ÔöÇ Unit: pg
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (All ages)
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. All ages [Age: 0 years]
+               Range: 27-32 pg
+
+   8. MCHC - Mean Corpuscular Hemoglobin Concentration
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: hematology
+      Ôö£ÔöÇ Sample: blood | TAT: 60min
+      Ôö£ÔöÇ Unit: g/dL
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (All ages)
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. All ages [Age: 0 years]
+               Range: 32-36 g/dL
+
+   9. NEUT - Neutrophils
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: hematology
+      Ôö£ÔöÇ Sample: blood | TAT: 60min
+      Ôö£ÔöÇ Unit: %
+      ÔööÔöÇ Reference Ranges: 9 range(s)
+         Ôö£ÔöÇ Age Groups: 9 (Newborn (0-2 weeks), 2 weeks - 1 month, 1-6 months, 6 months - 2 years, 2-6 years, 6-12 years, 12-18 years, Adult, Adult (absolute))
+         Ôö£ÔöÇ Genders: all
+         Ôö£ÔöÇ Ô£ô Has critical value thresholds
+         ÔööÔöÇ Detailed Ranges:
+            1. Newborn (0-2 weeks) [Age: 0-0.04 years]
+               Range: 40-80 %
+            2. 2 weeks - 1 month [Age: 0.04-0.08 years]
+               Range: 30-60 %
+            3. 1-6 months [Age: 0.08-0.5 years]
+               Range: 20-40 %
+            4. 6 months - 2 years [Age: 0.5-2 years]
+               Range: 25-45 %
+            5. 2-6 years [Age: 2-6 years]
+               Range: 30-55 %
+            6. 6-12 years [Age: 6-12 years]
+               Range: 35-65 %
+            7. 12-18 years [Age: 12-18 years]
+               Range: 40-70 %
+            8. Adult [Age: 18 years]
+               Range: 40-70 %
+            9. Adult (absolute) [Age: 18 years]
+               Range: 2.0-7.5 x10┬│/┬ÁL
+               Critical: Low <1.0
+
+   10. LYMPH - Lymphocytes
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: hematology
+      Ôö£ÔöÇ Sample: blood | TAT: 60min
+      Ôö£ÔöÇ Unit: %
+      ÔööÔöÇ Reference Ranges: 9 range(s)
+         Ôö£ÔöÇ Age Groups: 9 (Newborn (0-2 weeks), 2 weeks - 1 month, 1-6 months, 6 months - 2 years, 2-6 years, 6-12 years, 12-18 years, Adult, Adult (absolute))
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. Newborn (0-2 weeks) [Age: 0-0.04 years]
+               Range: 20-50 %
+            2. 2 weeks - 1 month [Age: 0.04-0.08 years]
+               Range: 35-65 %
+            3. 1-6 months [Age: 0.08-0.5 years]
+               Range: 50-70 %
+            4. 6 months - 2 years [Age: 0.5-2 years]
+               Range: 45-75 %
+            5. 2-6 years [Age: 2-6 years]
+               Range: 35-60 %
+            6. 6-12 years [Age: 6-12 years]
+               Range: 25-50 %
+            7. 12-18 years [Age: 12-18 years]
+               Range: 20-45 %
+            8. Adult [Age: 18 years]
+               Range: 20-40 %
+            9. Adult (absolute) [Age: 18 years]
+               Range: 1.0-4.0 x10┬│/┬ÁL
+
+   11. MONO - Monocytes
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: hematology
+      Ôö£ÔöÇ Sample: blood | TAT: 60min
+      Ôö£ÔöÇ Unit: %
+      ÔööÔöÇ Reference Ranges: 9 range(s)
+         Ôö£ÔöÇ Age Groups: 9 (Newborn (0-2 weeks), 2 weeks - 1 month, 1-6 months, 6 months - 2 years, 2-6 years, 6-12 years, 12-18 years, Adult, Adult (absolute))
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. Newborn (0-2 weeks) [Age: 0-0.04 years]
+               Range: 3-10 %
+            2. 2 weeks - 1 month [Age: 0.04-0.08 years]
+               Range: 3-10 %
+            3. 1-6 months [Age: 0.08-0.5 years]
+               Range: 3-10 %
+            4. 6 months - 2 years [Age: 0.5-2 years]
+               Range: 3-10 %
+            5. 2-6 years [Age: 2-6 years]
+               Range: 2-10 %
+            6. 6-12 years [Age: 6-12 years]
+               Range: 2-10 %
+            7. 12-18 years [Age: 12-18 years]
+               Range: 2-10 %
+            8. Adult [Age: 18 years]
+               Range: 2-10 %
+            9. Adult (absolute) [Age: 18 years]
+               Range: 0.2-1.0 x10┬│/┬ÁL
+
+   12. EOS - Eosinophils
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: hematology
+      Ôö£ÔöÇ Sample: blood | TAT: 60min
+      Ôö£ÔöÇ Unit: %
+      ÔööÔöÇ Reference Ranges: 9 range(s)
+         Ôö£ÔöÇ Age Groups: 9 (Newborn (0-2 weeks), 2 weeks - 1 month, 1-6 months, 6 months - 2 years, 2-6 years, 6-12 years, 12-18 years, Adult, Adult (absolute))
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. Newborn (0-2 weeks) [Age: 0-0.04 years]
+               Range: 0-4 %
+            2. 2 weeks - 1 month [Age: 0.04-0.08 years]
+               Range: 0-4 %
+            3. 1-6 months [Age: 0.08-0.5 years]
+               Range: 0-5 %
+            4. 6 months - 2 years [Age: 0.5-2 years]
+               Range: 0-5 %
+            5. 2-6 years [Age: 2-6 years]
+               Range: 0-6 %
+            6. 6-12 years [Age: 6-12 years]
+               Range: 0-6 %
+            7. 12-18 years [Age: 12-18 years]
+               Range: 0-6 %
+            8. Adult [Age: 18 years]
+               Range: 1-6 %
+            9. Adult (absolute) [Age: 18 years]
+               Range: 0.0-0.5 x10┬│/┬ÁL
+
+   13. BASO - Basophils
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: hematology
+      Ôö£ÔöÇ Sample: blood | TAT: 60min
+      Ôö£ÔöÇ Unit: %
+      ÔööÔöÇ Reference Ranges: 9 range(s)
+         Ôö£ÔöÇ Age Groups: 9 (Newborn (0-2 weeks), 2 weeks - 1 month, 1-6 months, 6 months - 2 years, 2-6 years, 6-12 years, 12-18 years, Adult, Adult (absolute))
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. Newborn (0-2 weeks) [Age: 0-0.04 years]
+               Range: 0-1 %
+            2. 2 weeks - 1 month [Age: 0.04-0.08 years]
+               Range: 0-1 %
+            3. 1-6 months [Age: 0.08-0.5 years]
+               Range: 0-1 %
+            4. 6 months - 2 years [Age: 0.5-2 years]
+               Range: 0-1 %
+            5. 2-6 years [Age: 2-6 years]
+               Range: 0-1 %
+            6. 6-12 years [Age: 6-12 years]
+               Range: 0-1 %
+            7. 12-18 years [Age: 12-18 years]
+               Range: 0-2 %
+            8. Adult [Age: 18 years]
+               Range: 0-2 %
+            9. Adult (absolute) [Age: 18 years]
+               Range: 0.0-0.2 x10┬│/┬ÁL
+
+
+====================================================================================================
+­ƒö¼ PANEL: URINE - Urinalysis
+   Price: Ôéª90 | Active: Ô£ô
+   Components: 18 tests
+====================================================================================================
+
+   1. URINE-COLOR - Urine Color
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: urinalysis
+      Ôö£ÔöÇ Sample: urine | TAT: 60min
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (Normal)
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. Normal [Age: 0 years]
+               Range: Yellow to Amber qualitative
+
+   2. URINE-CLARITY - Urine Clarity
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: urinalysis
+      Ôö£ÔöÇ Sample: urine | TAT: 60min
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (Normal)
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. Normal [Age: 0 years]
+               Range: Clear qualitative
+
+   3. URINE-PH - Urine pH
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: urinalysis
+      Ôö£ÔöÇ Sample: urine | TAT: 60min
+      Ôö£ÔöÇ Unit: pH
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (Normal)
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. Normal [Age: 0 years]
+               Range: 4.5-8.0 pH
+
+   4. URINE-SG - Urine Specific Gravity
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: urinalysis
+      Ôö£ÔöÇ Sample: urine | TAT: 60min
+      Ôö£ÔöÇ Unit: SG
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (Normal)
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. Normal [Age: 0 years]
+               Range: 1.005-1.030 SG
+
+   5. URINE-PROTEIN - Urine Protein (Dipstick)
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: urinalysis
+      Ôö£ÔöÇ Sample: urine | TAT: 60min
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (Normal)
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. Normal [Age: 0 years]
+               Range: Negative qualitative
+
+   6. URINE-GLUCOSE - Urine Glucose
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: urinalysis
+      Ôö£ÔöÇ Sample: urine | TAT: 60min
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (Normal)
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. Normal [Age: 0 years]
+               Range: Negative qualitative
+
+   7. URINE-KETONES - Urine Ketones
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: urinalysis
+      Ôö£ÔöÇ Sample: urine | TAT: 60min
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (Normal)
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. Normal [Age: 0 years]
+               Range: Negative qualitative
+
+   8. URINE-BLOOD - Urine Blood
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: urinalysis
+      Ôö£ÔöÇ Sample: urine | TAT: 60min
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (Normal)
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. Normal [Age: 0 years]
+               Range: Negative qualitative
+
+   9. URINE-BILI - Urine Bilirubin
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: urinalysis
+      Ôö£ÔöÇ Sample: urine | TAT: 60min
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (Normal)
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. Normal [Age: 0 years]
+               Range: Negative qualitative
+
+   10. URINE-URO - Urine Urobilinogen
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: urinalysis
+      Ôö£ÔöÇ Sample: urine | TAT: 60min
+      Ôö£ÔöÇ Unit: mg/dL
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (Normal)
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. Normal [Age: 0 years]
+               Range: 0.1-1.0 mg/dL
+
+   11. URINE-NITRITE - Urine Nitrite
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: urinalysis
+      Ôö£ÔöÇ Sample: urine | TAT: 60min
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (Normal)
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. Normal [Age: 0 years]
+               Range: Negative qualitative
+
+   12. URINE-LE - Urine Leukocyte Esterase
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: urinalysis
+      Ôö£ÔöÇ Sample: urine | TAT: 60min
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (Normal)
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. Normal [Age: 0 years]
+               Range: Negative qualitative
+
+   13. URINE-RBC - Urine RBC
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: urinalysis
+      Ôö£ÔöÇ Sample: urine | TAT: 60min
+      Ôö£ÔöÇ Unit: /HPF
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (Normal)
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. Normal [Age: 0 years]
+               Range: 0-3 /HPF
+
+   14. URINE-WBC - Urine WBC
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: urinalysis
+      Ôö£ÔöÇ Sample: urine | TAT: 60min
+      Ôö£ÔöÇ Unit: /HPF
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (Normal)
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. Normal [Age: 0 years]
+               Range: 0-5 /HPF
+
+   15. URINE-EPI - Urine Epithelial Cells
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: urinalysis
+      Ôö£ÔöÇ Sample: urine | TAT: 60min
+      Ôö£ÔöÇ Unit: /HPF
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (Normal)
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. Normal [Age: 0 years]
+               Range: Few qualitative
+
+   16. URINE-CASTS - Urine Casts
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: urinalysis
+      Ôö£ÔöÇ Sample: urine | TAT: 60min
+      Ôö£ÔöÇ Unit: /LPF
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (Normal)
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. Normal [Age: 0 years]
+               Range: 0-2 hyaline /LPF
+
+   17. URINE-CRYSTALS - Urine Crystals
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: urinalysis
+      Ôö£ÔöÇ Sample: urine | TAT: 60min
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (Normal)
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. Normal [Age: 0 years]
+               Range: None or Few qualitative
+
+   18. URINE-BACTERIA - Urine Bacteria
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: urinalysis
+      Ôö£ÔöÇ Sample: urine | TAT: 60min
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (Normal)
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. Normal [Age: 0 years]
+               Range: None qualitative
+
+
+====================================================================================================
+­ƒö¼ PANEL: ELEC - Electrolyte Panel
+   Price: Ôéª140 | Active: Ô£ô
+   Components: 4 tests
+====================================================================================================
+
+   1. NA - Sodium
+      Ôö£ÔöÇ Price: Ôéª35 | Active: Ô£ô
+      Ôö£ÔöÇ Category: chemistry
+      Ôö£ÔöÇ Sample: blood | TAT: 120min
+      Ôö£ÔöÇ Unit: mmol/L
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (All ages)
+         Ôö£ÔöÇ Genders: all
+         Ôö£ÔöÇ Ô£ô Has critical value thresholds
+         ÔööÔöÇ Detailed Ranges:
+            1. All ages [Age: 0 years]
+               Range: 136-145 mmol/L
+               Critical: Low <120, High >160
+
+   2. K - Potassium
+      Ôö£ÔöÇ Price: Ôéª35 | Active: Ô£ô
+      Ôö£ÔöÇ Category: chemistry
+      Ôö£ÔöÇ Sample: blood | TAT: 120min
+      Ôö£ÔöÇ Unit: mmol/L
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (All ages)
+         Ôö£ÔöÇ Genders: all
+         Ôö£ÔöÇ Ô£ô Has critical value thresholds
+         ÔööÔöÇ Detailed Ranges:
+            1. All ages [Age: 0 years]
+               Range: 3.5-5.1 mmol/L
+               Critical: Low <2.5, High >6.5
+
+   3. CL - Chloride
+      Ôö£ÔöÇ Price: Ôéª35 | Active: Ô£ô
+      Ôö£ÔöÇ Category: chemistry
+      Ôö£ÔöÇ Sample: blood | TAT: 120min
+      Ôö£ÔöÇ Unit: mmol/L
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (All ages)
+         Ôö£ÔöÇ Genders: all
+         Ôö£ÔöÇ Ô£ô Has critical value thresholds
+         ÔööÔöÇ Detailed Ranges:
+            1. All ages [Age: 0 years]
+               Range: 98-107 mmol/L
+               Critical: Low <80, High >115
+
+   4. HCO3 - Bicarbonate
+      Ôö£ÔöÇ Price: Ôéª35 | Active: Ô£ô
+      Ôö£ÔöÇ Category: chemistry
+      Ôö£ÔöÇ Sample: blood | TAT: 120min
+      Ôö£ÔöÇ Unit: mmol/L
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (All ages)
+         Ôö£ÔöÇ Genders: all
+         Ôö£ÔöÇ Ô£ô Has critical value thresholds
+         ÔööÔöÇ Detailed Ranges:
+            1. All ages [Age: 0 years]
+               Range: 22-29 mmol/L
+               Critical: Low <15, High >40
+
+
+====================================================================================================
+­ƒö¼ PANEL: LIPID - Lipid Profile
+   Price: Ôéª660 | Active: Ô£ô
+   Components: 5 tests
+====================================================================================================
+
+   1. CHOL - Total Cholesterol
+      Ôö£ÔöÇ Price: Ôéª80 | Active: Ô£ô
+      Ôö£ÔöÇ Category: chemistry
+      Ôö£ÔöÇ Sample: blood | TAT: 120min
+      Ôö£ÔöÇ Unit: mg/dL
+      ÔööÔöÇ Reference Ranges: 3 range(s)
+         Ôö£ÔöÇ Age Groups: 3 (Desirable, Borderline High, High)
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. Desirable [Age: 18 years]
+               Range: <200 mg/dL
+            2. Borderline High [Age: 18 years]
+               Range: 200-239 mg/dL
+            3. High [Age: 18 years]
+               Range: ÔëÑ240 mg/dL
+
+   2. TG - Triglycerides
+      Ôö£ÔöÇ Price: Ôéª80 | Active: Ô£ô
+      Ôö£ÔöÇ Category: chemistry
+      Ôö£ÔöÇ Sample: blood | TAT: 120min
+      Ôö£ÔöÇ Unit: mg/dL
+      ÔööÔöÇ Reference Ranges: 3 range(s)
+         Ôö£ÔöÇ Age Groups: 3 (Desirable, Borderline High, High)
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. Desirable [Age: 18 years]
+               Range: <150 mg/dL
+            2. Borderline High [Age: 18 years]
+               Range: 150-199 mg/dL
+            3. High [Age: 18 years]
+               Range: ÔëÑ200 mg/dL
+
+   3. HDL - HDL Cholesterol
+      Ôö£ÔöÇ Price: Ôéª200 | Active: Ô£ô
+      Ôö£ÔöÇ Category: chemistry
+      Ôö£ÔöÇ Sample: blood | TAT: 120min
+      Ôö£ÔöÇ Unit: mg/dL
+      ÔööÔöÇ Reference Ranges: 2 range(s)
+         Ôö£ÔöÇ Age Groups: 2 (Male (Optimal), Female (Optimal))
+         Ôö£ÔöÇ Genders: M, F
+         ÔööÔöÇ Detailed Ranges:
+            1. Male (Optimal) [Age: 18 years] (Male)
+               Range: >40 mg/dL
+            2. Female (Optimal) [Age: 18 years] (Female)
+               Range: >50 mg/dL
+
+   4. LDL - LDL Cholesterol
+      Ôö£ÔöÇ Price: Ôéª150 | Active: Ô£ô
+      Ôö£ÔöÇ Category: chemistry
+      Ôö£ÔöÇ Sample: blood | TAT: 120min
+      Ôö£ÔöÇ Unit: mg/dL
+      ÔööÔöÇ Reference Ranges: 4 range(s)
+         Ôö£ÔöÇ Age Groups: 4 (Optimal, Near Optimal, Borderline High, High)
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. Optimal [Age: 18 years]
+               Range: <100 mg/dL
+            2. Near Optimal [Age: 18 years]
+               Range: 100-129 mg/dL
+            3. Borderline High [Age: 18 years]
+               Range: 130-159 mg/dL
+            4. High [Age: 18 years]
+               Range: ÔëÑ160 mg/dL
+
+   5. VLDL - VLDL Cholesterol
+      Ôö£ÔöÇ Price: Ôéª0 | Active: Ô£ù
+      Ôö£ÔöÇ Category: chemistry
+      Ôö£ÔöÇ Sample: blood | TAT: 120min
+      Ôö£ÔöÇ Unit: mg/dL
+      ÔööÔöÇ Reference Ranges: 1 range(s)
+         Ôö£ÔöÇ Age Groups: 1 (All ages)
+         Ôö£ÔöÇ Genders: all
+         ÔööÔöÇ Detailed Ranges:
+            1. All ages [Age: 0 years]
+               Range: <30 mg/dL
+
+
+====================================================================================================
+VALIDATION SUMMARY
+====================================================================================================
+
+Ô£ô Total panel components: 55
+Ô£ô All components found in catalog
+ÔÜá´©Å  Inactive components: 40
+Ô£ô All components have reference ranges
+
+====================================================================================================
+AGE/GENDER LOGIC EXAMPLES
+====================================================================================================
+
+­ƒôï Example: HB - Hemoglobin
+   Unit: g/dL
+
+   Scenario: Newborn (3 days old)
+   Age: 0.01 years, Gender: M
+   Ô£ô Matched Range: Newborn (0-2 weeks)
+     Reference: 14.5-22.5 g/dL
+     Critical: Low <7.0, High >20.0
+
+   Scenario: 5-year-old girl
+   Age: 5 years, Gender: F
+   Ô£ô Matched Range: 2-6 years
+     Reference: 11.5-13.5 g/dL
+
+   Scenario: 15-year-old boy
+   Age: 15 years, Gender: M
+   Ô£ô Matched Range: 12-18 years
+     Reference: 13.0-16.0 g/dL
+
+   Scenario: 25-year-old woman
+   Age: 25 years, Gender: F
+   Ô£ô Matched Range: Adult (18-65 years)
+     Reference: 12.0-16.0 g/dL
+     Critical: Low <7.0, High >20.0
+
+   Scenario: 25-year-old pregnant woman
+   Age: 25 years, Gender: F, Pregnant
+   Ô£ô Matched Range: Pregnancy
+     Reference: 11.0-14.0 g/dL
+
+   Scenario: 45-year-old man
+   Age: 45 years, Gender: M
+   Ô£ô Matched Range: Adult (18-65 years)
+     Reference: 13.5-18.0 g/dL
+     Critical: Low <7.0, High >20.0
+
+   Scenario: 70-year-old woman
+   Age: 70 years, Gender: F
+   Ô£ô Matched Range: Elderly (>65 years)
+     Reference: 11.0-15.0 g/dL
+
+====================================================================================================
+END OF VALIDATION
+====================================================================================================
+

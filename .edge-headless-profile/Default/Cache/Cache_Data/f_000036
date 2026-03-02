@@ -1,0 +1,710 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/pages/lab/EnterManualResults.tsx");import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+
+let prevRefreshReg;
+let prevRefreshSig;
+
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react-swc can't detect preamble. Something is wrong."
+    );
+  }
+
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+
+import __vite__cjsImport2_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=27cfabb6"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime["jsxDEV"];
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=27cfabb6"; const useState = __vite__cjsImport3_react["useState"];
+import { RoleLayout } from "/src/components/layout/RoleLayout.tsx";
+import { useAuth } from "/src/context/AuthContext.tsx";
+import { useProcessingOrders } from "/src/hooks/useOrders.ts";
+import { useCreateResult } from "/src/hooks/useResults.ts";
+import { useActiveTests } from "/src/hooks/useTestCatalog.ts";
+import { Button } from "/src/components/ui/button.tsx";
+import { Input } from "/src/components/ui/input.tsx";
+import { Label } from "/src/components/ui/label.tsx";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "/src/components/ui/select.tsx";
+import { Textarea } from "/src/components/ui/textarea.tsx";
+import { Badge } from "/src/components/ui/badge.tsx";
+import { toast } from "/node_modules/.vite/deps/sonner.js?v=27cfabb6";
+import { Save, AlertTriangle, Loader2 } from "/node_modules/.vite/deps/lucide-react.js?v=27cfabb6";
+import { cn } from "/src/lib/utils.ts";
+import { getPatientName, getOrderNumber } from "/src/utils/orderHelpers.ts";
+export default function EnterManualResults() {
+    _s();
+    const { profile, user } = useAuth();
+    const { data: processingOrders, isLoading } = useProcessingOrders();
+    const createResult = useCreateResult();
+    const { data: testCatalog } = useActiveTests();
+    const [selectedOrder, setSelectedOrder] = useState(null);
+    const [results, setResults] = useState({});
+    const handleResultChange = (testId, field, value)=>{
+        setResults((prev)=>({
+                ...prev,
+                [testId]: {
+                    ...prev[testId],
+                    [field]: value
+                }
+            }));
+    };
+    const calculateFlag = (value, refRange)=>{
+        if (!refRange) return 'normal';
+        const match = refRange.match(/(\d+\.?\d*)\s*-\s*(\d+\.?\d*)/);
+        if (!match) return 'normal';
+        const [, min, max] = match;
+        const minVal = parseFloat(min);
+        const maxVal = parseFloat(max);
+        if (value < minVal * 0.5) return 'critical_low';
+        if (value < minVal) return 'low';
+        if (value > maxVal * 1.5) return 'critical_high';
+        if (value > maxVal) return 'high';
+        return 'normal';
+    };
+    const handleSaveResults = async ()=>{
+        if (!selectedOrder) return;
+        const resultsToSave = selectedOrder.order_tests.filter((test)=>{
+            const uniqueTestId = test.id || test._id;
+            return results[uniqueTestId]?.value;
+        }).map((test)=>{
+            const uniqueTestId = test.id || test._id;
+            const testCode = test.testCode || test.test_code;
+            const testInfo = testCatalog?.find((t)=>t.code === testCode);
+            const value = parseFloat(results[uniqueTestId].value);
+            const refRange = testInfo?.referenceRange;
+            const flag = !isNaN(value) && refRange ? calculateFlag(value, refRange) : results[uniqueTestId].flag || 'normal';
+            return {
+                orderId: selectedOrder.id,
+                orderTestId: uniqueTestId,
+                testCode: test.test_code || test.testCode,
+                testName: test.test_name || test.testName,
+                value: results[uniqueTestId].value,
+                unit: results[uniqueTestId].unit || testInfo?.unit || '',
+                referenceRange: refRange || '',
+                flag,
+                comments: results[uniqueTestId].comments || undefined
+            };
+        });
+        if (resultsToSave.length === 0) {
+            toast.error('Please enter at least one result');
+            return;
+        }
+        try {
+            for (const result of resultsToSave){
+                await createResult.mutateAsync(result);
+            }
+            toast.success(`${resultsToSave.length} result(s) saved successfully`);
+            setResults({});
+            setSelectedOrder(null);
+        } catch (error) {
+            toast.error('Failed to save results');
+        }
+    };
+    const hasCriticalResults = selectedOrder?.order_tests.some((test)=>{
+        const uniqueTestId = test.id || test._id;
+        const flag = results[uniqueTestId]?.flag;
+        return flag === 'critical_low' || flag === 'critical_high';
+    });
+    return /*#__PURE__*/ _jsxDEV(RoleLayout, {
+        title: "Enter Manual Results",
+        subtitle: "Manual result entry for tests",
+        role: "lab-tech",
+        userName: profile?.full_name,
+        children: /*#__PURE__*/ _jsxDEV("div", {
+            className: "grid grid-cols-1 lg:grid-cols-3 gap-6",
+            children: [
+                /*#__PURE__*/ _jsxDEV("div", {
+                    className: "lg:col-span-1",
+                    children: /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "px-4 py-3 border-b",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("h3", {
+                                        className: "font-semibold",
+                                        children: "Processing Orders"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                        lineNumber: 127,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("p", {
+                                        className: "text-sm text-muted-foreground",
+                                        children: [
+                                            processingOrders?.length || 0,
+                                            " orders"
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                        lineNumber: 128,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                lineNumber: 126,
+                                columnNumber: 13
+                            }, this),
+                            isLoading ? /*#__PURE__*/ _jsxDEV("div", {
+                                className: "flex items-center justify-center py-12",
+                                children: /*#__PURE__*/ _jsxDEV(Loader2, {
+                                    className: "w-6 h-6 animate-spin text-muted-foreground"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                    lineNumber: 133,
+                                    columnNumber: 17
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                lineNumber: 132,
+                                columnNumber: 15
+                            }, this) : /*#__PURE__*/ _jsxDEV("div", {
+                                className: "divide-y max-h-[600px] overflow-y-auto",
+                                children: [
+                                    processingOrders?.map((order)=>/*#__PURE__*/ _jsxDEV("button", {
+                                            className: cn('w-full px-4 py-3 text-left hover:bg-muted/50 transition-colors', selectedOrder?.id === order.id && 'bg-primary/5 border-l-4 border-primary'),
+                                            onClick: ()=>setSelectedOrder(order),
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("div", {
+                                                    className: "flex items-start justify-between mb-1",
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV("p", {
+                                                            className: "font-semibold",
+                                                            children: getPatientName(order)
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                            lineNumber: 147,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV(Badge, {
+                                                            variant: "outline",
+                                                            className: "text-xs",
+                                                            children: order.priority?.toUpperCase() || 'ROUTINE'
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                            lineNumber: 150,
+                                                            columnNumber: 23
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                    lineNumber: 146,
+                                                    columnNumber: 21
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("p", {
+                                                    className: "text-sm text-muted-foreground mb-1",
+                                                    children: order.orderNumber || order.order_number || 'Unknown Order'
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                    lineNumber: 154,
+                                                    columnNumber: 21
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("p", {
+                                                    className: "text-xs text-muted-foreground",
+                                                    children: [
+                                                        (order.tests || order.order_tests || []).length,
+                                                        " test(s)"
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                    lineNumber: 155,
+                                                    columnNumber: 21
+                                                }, this)
+                                            ]
+                                        }, order.id, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                            lineNumber: 138,
+                                            columnNumber: 19
+                                        }, this)),
+                                    (!processingOrders || processingOrders.length === 0) && /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "px-4 py-12 text-center text-muted-foreground",
+                                        children: /*#__PURE__*/ _jsxDEV("p", {
+                                            children: "No orders in processing"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                            lineNumber: 162,
+                                            columnNumber: 21
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                        lineNumber: 161,
+                                        columnNumber: 19
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                lineNumber: 136,
+                                columnNumber: 15
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                        lineNumber: 125,
+                        columnNumber: 11
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                    lineNumber: 124,
+                    columnNumber: 9
+                }, this),
+                /*#__PURE__*/ _jsxDEV("div", {
+                    className: "lg:col-span-2",
+                    children: selectedOrder ? /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg p-6",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "mb-6",
+                                children: /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "flex items-center justify-between mb-4",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("h3", {
+                                                    className: "text-lg font-semibold",
+                                                    children: getPatientName(selectedOrder)
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                    lineNumber: 177,
+                                                    columnNumber: 21
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("p", {
+                                                    className: "text-sm text-muted-foreground",
+                                                    children: getOrderNumber(selectedOrder)
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                    lineNumber: 180,
+                                                    columnNumber: 21
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                            lineNumber: 176,
+                                            columnNumber: 19
+                                        }, this),
+                                        hasCriticalResults && /*#__PURE__*/ _jsxDEV(Badge, {
+                                            variant: "destructive",
+                                            className: "gap-1",
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV(AlertTriangle, {
+                                                    className: "w-3 h-3"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                    lineNumber: 184,
+                                                    columnNumber: 23
+                                                }, this),
+                                                "Critical Results"
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                            lineNumber: 183,
+                                            columnNumber: 21
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                    lineNumber: 175,
+                                    columnNumber: 17
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                lineNumber: 174,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "space-y-6",
+                                children: selectedOrder.order_tests.map((test)=>{
+                                    const uniqueTestId = test.id || test._id || `${test.testId || test.test_id}-${Math.random()}`;
+                                    const testCode = test.testCode || test.test_code;
+                                    // Find test info by CODE, not by ID
+                                    const testInfo = testCatalog?.find((t)=>t.code === testCode);
+                                    const resultData = results[uniqueTestId] || {
+                                        value: '',
+                                        unit: testInfo?.unit || '',
+                                        flag: 'normal',
+                                        comments: ''
+                                    };
+                                    const isCritical = resultData.flag === 'critical_low' || resultData.flag === 'critical_high';
+                                    return /*#__PURE__*/ _jsxDEV("div", {
+                                        className: cn('p-4 border rounded-lg', isCritical && 'border-status-critical bg-status-critical/5'),
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                className: "flex items-center justify-between mb-3",
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV("h4", {
+                                                                className: "font-semibold",
+                                                                children: test.testCode || test.test_code || 'Unknown Test'
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                                lineNumber: 212,
+                                                                columnNumber: 27
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                                className: "text-sm text-muted-foreground",
+                                                                children: test.testName || test.test_name || 'No description'
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                                lineNumber: 213,
+                                                                columnNumber: 27
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                        lineNumber: 211,
+                                                        columnNumber: 25
+                                                    }, this),
+                                                    testInfo?.referenceRange && /*#__PURE__*/ _jsxDEV("div", {
+                                                        className: "text-right",
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                                className: "text-xs text-muted-foreground",
+                                                                children: "Reference Range"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                                lineNumber: 217,
+                                                                columnNumber: 29
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                                className: "text-sm font-medium",
+                                                                children: [
+                                                                    testInfo.referenceRange,
+                                                                    " ",
+                                                                    testInfo.unit
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                                lineNumber: 218,
+                                                                columnNumber: 29
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                        lineNumber: 216,
+                                                        columnNumber: 27
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                lineNumber: 210,
+                                                columnNumber: 23
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                className: "grid grid-cols-3 gap-3",
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                        className: "space-y-2",
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV(Label, {
+                                                                htmlFor: `value-${uniqueTestId}`,
+                                                                children: "Value *"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                                lineNumber: 227,
+                                                                columnNumber: 27
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV(Input, {
+                                                                id: `value-${uniqueTestId}`,
+                                                                type: "text",
+                                                                placeholder: "Enter value",
+                                                                value: resultData.value,
+                                                                onChange: (e)=>{
+                                                                    handleResultChange(uniqueTestId, 'value', e.target.value);
+                                                                    // Auto-calculate flag if numeric
+                                                                    const numValue = parseFloat(e.target.value);
+                                                                    const refRange = testInfo?.referenceRange;
+                                                                    if (!isNaN(numValue) && refRange) {
+                                                                        const flag = calculateFlag(numValue, refRange);
+                                                                        handleResultChange(uniqueTestId, 'flag', flag);
+                                                                    }
+                                                                },
+                                                                className: cn(isCritical && 'border-status-critical')
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                                lineNumber: 228,
+                                                                columnNumber: 27
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                        lineNumber: 226,
+                                                        columnNumber: 25
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                        className: "space-y-2",
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV(Label, {
+                                                                htmlFor: `unit-${uniqueTestId}`,
+                                                                children: "Unit"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                                lineNumber: 248,
+                                                                columnNumber: 27
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV(Input, {
+                                                                id: `unit-${uniqueTestId}`,
+                                                                placeholder: "Unit",
+                                                                value: resultData.unit,
+                                                                onChange: (e)=>handleResultChange(uniqueTestId, 'unit', e.target.value)
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                                lineNumber: 249,
+                                                                columnNumber: 27
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                        lineNumber: 247,
+                                                        columnNumber: 25
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                        className: "space-y-2",
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV(Label, {
+                                                                htmlFor: `flag-${uniqueTestId}`,
+                                                                children: "Flag"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                                lineNumber: 258,
+                                                                columnNumber: 27
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV(Select, {
+                                                                value: resultData.flag,
+                                                                onValueChange: (value)=>handleResultChange(uniqueTestId, 'flag', value),
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV(SelectTrigger, {
+                                                                        id: `flag-${uniqueTestId}`,
+                                                                        children: /*#__PURE__*/ _jsxDEV(SelectValue, {}, void 0, false, {
+                                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                                            lineNumber: 264,
+                                                                            columnNumber: 31
+                                                                        }, this)
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                                        lineNumber: 263,
+                                                                        columnNumber: 29
+                                                                    }, this),
+                                                                    /*#__PURE__*/ _jsxDEV(SelectContent, {
+                                                                        children: [
+                                                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                                                value: "normal",
+                                                                                children: "Normal"
+                                                                            }, void 0, false, {
+                                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                                                lineNumber: 267,
+                                                                                columnNumber: 31
+                                                                            }, this),
+                                                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                                                value: "low",
+                                                                                children: "Low"
+                                                                            }, void 0, false, {
+                                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                                                lineNumber: 268,
+                                                                                columnNumber: 31
+                                                                            }, this),
+                                                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                                                value: "high",
+                                                                                children: "High"
+                                                                            }, void 0, false, {
+                                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                                                lineNumber: 269,
+                                                                                columnNumber: 31
+                                                                            }, this),
+                                                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                                                value: "critical_low",
+                                                                                children: "Critical Low"
+                                                                            }, void 0, false, {
+                                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                                                lineNumber: 270,
+                                                                                columnNumber: 31
+                                                                            }, this),
+                                                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                                                value: "critical_high",
+                                                                                children: "Critical High"
+                                                                            }, void 0, false, {
+                                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                                                lineNumber: 271,
+                                                                                columnNumber: 31
+                                                                            }, this)
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                                        lineNumber: 266,
+                                                                        columnNumber: 29
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                                lineNumber: 259,
+                                                                columnNumber: 27
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                        lineNumber: 257,
+                                                        columnNumber: 25
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                lineNumber: 225,
+                                                columnNumber: 23
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                className: "mt-3 space-y-2",
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                                        htmlFor: `comments-${uniqueTestId}`,
+                                                        children: "Comments"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                        lineNumber: 278,
+                                                        columnNumber: 25
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV(Textarea, {
+                                                        id: `comments-${uniqueTestId}`,
+                                                        placeholder: "Add any comments or notes...",
+                                                        value: resultData.comments,
+                                                        onChange: (e)=>handleResultChange(uniqueTestId, 'comments', e.target.value),
+                                                        rows: 2
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                        lineNumber: 279,
+                                                        columnNumber: 25
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                lineNumber: 277,
+                                                columnNumber: 23
+                                            }, this)
+                                        ]
+                                    }, uniqueTestId, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                        lineNumber: 203,
+                                        columnNumber: 21
+                                    }, this);
+                                })
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                lineNumber: 191,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "flex justify-end gap-3 mt-6 pt-6 border-t",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(Button, {
+                                        variant: "outline",
+                                        onClick: ()=>{
+                                            setSelectedOrder(null);
+                                            setResults({});
+                                        },
+                                        children: "Cancel"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                        lineNumber: 293,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(Button, {
+                                        onClick: handleSaveResults,
+                                        disabled: createResult.isPending,
+                                        children: [
+                                            createResult.isPending && /*#__PURE__*/ _jsxDEV(Loader2, {
+                                                className: "w-4 h-4 mr-2 animate-spin"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                lineNumber: 306,
+                                                columnNumber: 46
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(Save, {
+                                                className: "w-4 h-4 mr-2"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                                lineNumber: 307,
+                                                columnNumber: 19
+                                            }, this),
+                                            "Save Results"
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                        lineNumber: 302,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                                lineNumber: 292,
+                                columnNumber: 15
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                        lineNumber: 173,
+                        columnNumber: 13
+                    }, this) : /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg p-12 text-center text-muted-foreground",
+                        children: /*#__PURE__*/ _jsxDEV("p", {
+                            children: "Select an order to enter results"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                            lineNumber: 314,
+                            columnNumber: 15
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                        lineNumber: 313,
+                        columnNumber: 13
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+                    lineNumber: 171,
+                    columnNumber: 9
+                }, this)
+            ]
+        }, void 0, true, {
+            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+            lineNumber: 122,
+            columnNumber: 7
+        }, this)
+    }, void 0, false, {
+        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx",
+        lineNumber: 116,
+        columnNumber: 5
+    }, this);
+}
+_s(EnterManualResults, "nL+jYpS1UG8lic4gmrQ/B/Fih8g=", false, function() {
+    return [
+        useAuth,
+        useProcessingOrders,
+        useCreateResult,
+        useActiveTests
+    ];
+});
+_c = EnterManualResults;
+var _c;
+$RefreshReg$(_c, "EnterManualResults");
+
+
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+
+
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EnterManualResults.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIkVudGVyTWFudWFsUmVzdWx0cy50c3giXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgdXNlU3RhdGUgfSBmcm9tICdyZWFjdCc7XHJcbmltcG9ydCB7IFJvbGVMYXlvdXQgfSBmcm9tICdAL2NvbXBvbmVudHMvbGF5b3V0L1JvbGVMYXlvdXQnO1xyXG5pbXBvcnQgeyB1c2VBdXRoIH0gZnJvbSAnQC9jb250ZXh0L0F1dGhDb250ZXh0JztcclxuaW1wb3J0IHsgdXNlUHJvY2Vzc2luZ09yZGVycyB9IGZyb20gJ0AvaG9va3MvdXNlT3JkZXJzJztcclxuaW1wb3J0IHsgdXNlQ3JlYXRlUmVzdWx0IH0gZnJvbSAnQC9ob29rcy91c2VSZXN1bHRzJztcclxuaW1wb3J0IHsgdXNlQWN0aXZlVGVzdHMgfSBmcm9tICdAL2hvb2tzL3VzZVRlc3RDYXRhbG9nJztcclxuaW1wb3J0IHsgQnV0dG9uIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL2J1dHRvbic7XHJcbmltcG9ydCB7IElucHV0IH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL2lucHV0JztcclxuaW1wb3J0IHsgTGFiZWwgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvbGFiZWwnO1xyXG5pbXBvcnQgeyBTZWxlY3QsIFNlbGVjdENvbnRlbnQsIFNlbGVjdEl0ZW0sIFNlbGVjdFRyaWdnZXIsIFNlbGVjdFZhbHVlIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL3NlbGVjdCc7XHJcbmltcG9ydCB7IFRleHRhcmVhIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL3RleHRhcmVhJztcclxuaW1wb3J0IHsgQmFkZ2UgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvYmFkZ2UnO1xyXG5pbXBvcnQgeyB0b2FzdCB9IGZyb20gJ3Nvbm5lcic7XHJcbmltcG9ydCB7IFNhdmUsIEFsZXJ0VHJpYW5nbGUsIExvYWRlcjIgfSBmcm9tICdsdWNpZGUtcmVhY3QnO1xyXG5pbXBvcnQgeyBjbiB9IGZyb20gJ0AvbGliL3V0aWxzJztcclxuaW1wb3J0IHsgZ2V0UGF0aWVudE5hbWUsIGdldE9yZGVyTnVtYmVyIH0gZnJvbSAnQC91dGlscy9vcmRlckhlbHBlcnMnO1xyXG5pbXBvcnQgdHlwZSB7IE9yZGVyV2l0aERldGFpbHMgfSBmcm9tICdAL2hvb2tzL3VzZU9yZGVycyc7XHJcblxyXG5leHBvcnQgZGVmYXVsdCBmdW5jdGlvbiBFbnRlck1hbnVhbFJlc3VsdHMoKSB7XHJcbiAgY29uc3QgeyBwcm9maWxlLCB1c2VyIH0gPSB1c2VBdXRoKCk7XHJcbiAgY29uc3QgeyBkYXRhOiBwcm9jZXNzaW5nT3JkZXJzLCBpc0xvYWRpbmcgfSA9IHVzZVByb2Nlc3NpbmdPcmRlcnMoKTtcclxuICBjb25zdCBjcmVhdGVSZXN1bHQgPSB1c2VDcmVhdGVSZXN1bHQoKTtcclxuICBjb25zdCB7IGRhdGE6IHRlc3RDYXRhbG9nIH0gPSB1c2VBY3RpdmVUZXN0cygpO1xyXG5cclxuICBjb25zdCBbc2VsZWN0ZWRPcmRlciwgc2V0U2VsZWN0ZWRPcmRlcl0gPSB1c2VTdGF0ZTxPcmRlcldpdGhEZXRhaWxzIHwgbnVsbD4obnVsbCk7XHJcbiAgY29uc3QgW3Jlc3VsdHMsIHNldFJlc3VsdHNdID0gdXNlU3RhdGU8UmVjb3JkPHN0cmluZywge1xyXG4gICAgdmFsdWU6IHN0cmluZztcclxuICAgIHVuaXQ6IHN0cmluZztcclxuICAgIGZsYWc6ICdub3JtYWwnIHwgJ2xvdycgfCAnaGlnaCcgfCAnY3JpdGljYWxfbG93JyB8ICdjcml0aWNhbF9oaWdoJztcclxuICAgIGNvbW1lbnRzOiBzdHJpbmc7XHJcbiAgfT4+KHt9KTtcclxuXHJcbiAgY29uc3QgaGFuZGxlUmVzdWx0Q2hhbmdlID0gKHRlc3RJZDogc3RyaW5nLCBmaWVsZDogc3RyaW5nLCB2YWx1ZTogc3RyaW5nKSA9PiB7XHJcbiAgICBzZXRSZXN1bHRzKHByZXYgPT4gKHtcclxuICAgICAgLi4ucHJldixcclxuICAgICAgW3Rlc3RJZF06IHtcclxuICAgICAgICAuLi5wcmV2W3Rlc3RJZF0sXHJcbiAgICAgICAgW2ZpZWxkXTogdmFsdWVcclxuICAgICAgfVxyXG4gICAgfSkpO1xyXG4gIH07XHJcblxyXG4gIGNvbnN0IGNhbGN1bGF0ZUZsYWcgPSAodmFsdWU6IG51bWJlciwgcmVmUmFuZ2U6IHN0cmluZyk6ICdub3JtYWwnIHwgJ2xvdycgfCAnaGlnaCcgfCAnY3JpdGljYWxfbG93JyB8ICdjcml0aWNhbF9oaWdoJyA9PiB7XHJcbiAgICBpZiAoIXJlZlJhbmdlKSByZXR1cm4gJ25vcm1hbCc7XHJcbiAgICBcclxuICAgIGNvbnN0IG1hdGNoID0gcmVmUmFuZ2UubWF0Y2goLyhcXGQrXFwuP1xcZCopXFxzKi1cXHMqKFxcZCtcXC4/XFxkKikvKTtcclxuICAgIGlmICghbWF0Y2gpIHJldHVybiAnbm9ybWFsJztcclxuICAgIFxyXG4gICAgY29uc3QgWywgbWluLCBtYXhdID0gbWF0Y2g7XHJcbiAgICBjb25zdCBtaW5WYWwgPSBwYXJzZUZsb2F0KG1pbik7XHJcbiAgICBjb25zdCBtYXhWYWwgPSBwYXJzZUZsb2F0KG1heCk7XHJcbiAgICBcclxuICAgIGlmICh2YWx1ZSA8IG1pblZhbCAqIDAuNSkgcmV0dXJuICdjcml0aWNhbF9sb3cnO1xyXG4gICAgaWYgKHZhbHVlIDwgbWluVmFsKSByZXR1cm4gJ2xvdyc7XHJcbiAgICBpZiAodmFsdWUgPiBtYXhWYWwgKiAxLjUpIHJldHVybiAnY3JpdGljYWxfaGlnaCc7XHJcbiAgICBpZiAodmFsdWUgPiBtYXhWYWwpIHJldHVybiAnaGlnaCc7XHJcbiAgICByZXR1cm4gJ25vcm1hbCc7XHJcbiAgfTtcclxuXHJcbiAgY29uc3QgaGFuZGxlU2F2ZVJlc3VsdHMgPSBhc3luYyAoKSA9PiB7XHJcbiAgICBpZiAoIXNlbGVjdGVkT3JkZXIpIHJldHVybjtcclxuXHJcbiAgICBjb25zdCByZXN1bHRzVG9TYXZlID0gc2VsZWN0ZWRPcmRlci5vcmRlcl90ZXN0c1xyXG4gICAgICAuZmlsdGVyKHRlc3QgPT4ge1xyXG4gICAgICAgIGNvbnN0IHVuaXF1ZVRlc3RJZCA9IHRlc3QuaWQgfHwgdGVzdC5faWQ7XHJcbiAgICAgICAgcmV0dXJuIHJlc3VsdHNbdW5pcXVlVGVzdElkXT8udmFsdWU7XHJcbiAgICAgIH0pXHJcbiAgICAgIC5tYXAodGVzdCA9PiB7XHJcbiAgICAgICAgY29uc3QgdW5pcXVlVGVzdElkID0gdGVzdC5pZCB8fCB0ZXN0Ll9pZDtcclxuICAgICAgICBjb25zdCB0ZXN0Q29kZSA9IHRlc3QudGVzdENvZGUgfHwgdGVzdC50ZXN0X2NvZGU7XHJcbiAgICAgICAgY29uc3QgdGVzdEluZm8gPSB0ZXN0Q2F0YWxvZz8uZmluZCh0ID0+IHQuY29kZSA9PT0gdGVzdENvZGUpO1xyXG4gICAgICAgIGNvbnN0IHZhbHVlID0gcGFyc2VGbG9hdChyZXN1bHRzW3VuaXF1ZVRlc3RJZF0udmFsdWUpO1xyXG4gICAgICAgIGNvbnN0IHJlZlJhbmdlID0gdGVzdEluZm8/LnJlZmVyZW5jZVJhbmdlO1xyXG4gICAgICAgIGNvbnN0IGZsYWcgPSAhaXNOYU4odmFsdWUpICYmIHJlZlJhbmdlXHJcbiAgICAgICAgICA/IGNhbGN1bGF0ZUZsYWcodmFsdWUsIHJlZlJhbmdlKVxyXG4gICAgICAgICAgOiByZXN1bHRzW3VuaXF1ZVRlc3RJZF0uZmxhZyB8fCAnbm9ybWFsJztcclxuXHJcbiAgICAgICAgcmV0dXJuIHtcclxuICAgICAgICAgIG9yZGVySWQ6IHNlbGVjdGVkT3JkZXIuaWQsXHJcbiAgICAgICAgICBvcmRlclRlc3RJZDogdW5pcXVlVGVzdElkLFxyXG4gICAgICAgICAgdGVzdENvZGU6IHRlc3QudGVzdF9jb2RlIHx8IHRlc3QudGVzdENvZGUsXHJcbiAgICAgICAgICB0ZXN0TmFtZTogdGVzdC50ZXN0X25hbWUgfHwgdGVzdC50ZXN0TmFtZSxcclxuICAgICAgICAgIHZhbHVlOiByZXN1bHRzW3VuaXF1ZVRlc3RJZF0udmFsdWUsXHJcbiAgICAgICAgICB1bml0OiByZXN1bHRzW3VuaXF1ZVRlc3RJZF0udW5pdCB8fCB0ZXN0SW5mbz8udW5pdCB8fCAnJyxcclxuICAgICAgICAgIHJlZmVyZW5jZVJhbmdlOiByZWZSYW5nZSB8fCAnJyxcclxuICAgICAgICAgIGZsYWcsXHJcbiAgICAgICAgICBjb21tZW50czogcmVzdWx0c1t1bmlxdWVUZXN0SWRdLmNvbW1lbnRzIHx8IHVuZGVmaW5lZCxcclxuICAgICAgICB9O1xyXG4gICAgICB9KTtcclxuXHJcbiAgICBpZiAocmVzdWx0c1RvU2F2ZS5sZW5ndGggPT09IDApIHtcclxuICAgICAgdG9hc3QuZXJyb3IoJ1BsZWFzZSBlbnRlciBhdCBsZWFzdCBvbmUgcmVzdWx0Jyk7XHJcbiAgICAgIHJldHVybjtcclxuICAgIH1cclxuXHJcbiAgICB0cnkge1xyXG4gICAgICBmb3IgKGNvbnN0IHJlc3VsdCBvZiByZXN1bHRzVG9TYXZlKSB7XHJcbiAgICAgICAgYXdhaXQgY3JlYXRlUmVzdWx0Lm11dGF0ZUFzeW5jKHJlc3VsdCk7XHJcbiAgICAgIH1cclxuICAgICAgXHJcbiAgICAgIHRvYXN0LnN1Y2Nlc3MoYCR7cmVzdWx0c1RvU2F2ZS5sZW5ndGh9IHJlc3VsdChzKSBzYXZlZCBzdWNjZXNzZnVsbHlgKTtcclxuICAgICAgc2V0UmVzdWx0cyh7fSk7XHJcbiAgICAgIHNldFNlbGVjdGVkT3JkZXIobnVsbCk7XHJcbiAgICB9IGNhdGNoIChlcnJvcikge1xyXG4gICAgICB0b2FzdC5lcnJvcignRmFpbGVkIHRvIHNhdmUgcmVzdWx0cycpO1xyXG4gICAgfVxyXG4gIH07XHJcblxyXG4gIGNvbnN0IGhhc0NyaXRpY2FsUmVzdWx0cyA9IHNlbGVjdGVkT3JkZXI/Lm9yZGVyX3Rlc3RzLnNvbWUodGVzdCA9PiB7XHJcbiAgICBjb25zdCB1bmlxdWVUZXN0SWQgPSB0ZXN0LmlkIHx8IHRlc3QuX2lkO1xyXG4gICAgY29uc3QgZmxhZyA9IHJlc3VsdHNbdW5pcXVlVGVzdElkXT8uZmxhZztcclxuICAgIHJldHVybiBmbGFnID09PSAnY3JpdGljYWxfbG93JyB8fCBmbGFnID09PSAnY3JpdGljYWxfaGlnaCc7XHJcbiAgfSk7XHJcblxyXG4gIHJldHVybiAoXHJcbiAgICA8Um9sZUxheW91dCBcclxuICAgICAgdGl0bGU9XCJFbnRlciBNYW51YWwgUmVzdWx0c1wiIFxyXG4gICAgICBzdWJ0aXRsZT1cIk1hbnVhbCByZXN1bHQgZW50cnkgZm9yIHRlc3RzXCJcclxuICAgICAgcm9sZT1cImxhYi10ZWNoXCJcclxuICAgICAgdXNlck5hbWU9e3Byb2ZpbGU/LmZ1bGxfbmFtZX1cclxuICAgID5cclxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJncmlkIGdyaWQtY29scy0xIGxnOmdyaWQtY29scy0zIGdhcC02XCI+XHJcbiAgICAgICAgey8qIE9yZGVycyBMaXN0ICovfVxyXG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwibGc6Y29sLXNwYW4tMVwiPlxyXG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJiZy1jYXJkIGJvcmRlciByb3VuZGVkLWxnXCI+XHJcbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwicHgtNCBweS0zIGJvcmRlci1iXCI+XHJcbiAgICAgICAgICAgICAgPGgzIGNsYXNzTmFtZT1cImZvbnQtc2VtaWJvbGRcIj5Qcm9jZXNzaW5nIE9yZGVyczwvaDM+XHJcbiAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1zbSB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj57cHJvY2Vzc2luZ09yZGVycz8ubGVuZ3RoIHx8IDB9IG9yZGVyczwvcD5cclxuICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgIFxyXG4gICAgICAgICAgICB7aXNMb2FkaW5nID8gKFxyXG4gICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIganVzdGlmeS1jZW50ZXIgcHktMTJcIj5cclxuICAgICAgICAgICAgICAgIDxMb2FkZXIyIGNsYXNzTmFtZT1cInctNiBoLTYgYW5pbWF0ZS1zcGluIHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiIC8+XHJcbiAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICkgOiAoXHJcbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJkaXZpZGUteSBtYXgtaC1bNjAwcHhdIG92ZXJmbG93LXktYXV0b1wiPlxyXG4gICAgICAgICAgICAgICAge3Byb2Nlc3NpbmdPcmRlcnM/Lm1hcChvcmRlciA9PiAoXHJcbiAgICAgICAgICAgICAgICAgIDxidXR0b25cclxuICAgICAgICAgICAgICAgICAgICBrZXk9e29yZGVyLmlkfVxyXG4gICAgICAgICAgICAgICAgICAgIGNsYXNzTmFtZT17Y24oXHJcbiAgICAgICAgICAgICAgICAgICAgICAndy1mdWxsIHB4LTQgcHktMyB0ZXh0LWxlZnQgaG92ZXI6YmctbXV0ZWQvNTAgdHJhbnNpdGlvbi1jb2xvcnMnLFxyXG4gICAgICAgICAgICAgICAgICAgICAgc2VsZWN0ZWRPcmRlcj8uaWQgPT09IG9yZGVyLmlkICYmICdiZy1wcmltYXJ5LzUgYm9yZGVyLWwtNCBib3JkZXItcHJpbWFyeSdcclxuICAgICAgICAgICAgICAgICAgICApfVxyXG4gICAgICAgICAgICAgICAgICAgIG9uQ2xpY2s9eygpID0+IHNldFNlbGVjdGVkT3JkZXIob3JkZXIpfVxyXG4gICAgICAgICAgICAgICAgICA+XHJcbiAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLXN0YXJ0IGp1c3RpZnktYmV0d2VlbiBtYi0xXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJmb250LXNlbWlib2xkXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIHtnZXRQYXRpZW50TmFtZShvcmRlcil9XHJcbiAgICAgICAgICAgICAgICAgICAgICA8L3A+XHJcbiAgICAgICAgICAgICAgICAgICAgICA8QmFkZ2UgdmFyaWFudD1cIm91dGxpbmVcIiBjbGFzc05hbWU9XCJ0ZXh0LXhzXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIHtvcmRlci5wcmlvcml0eT8udG9VcHBlckNhc2UoKSB8fCAnUk9VVElORSd9XHJcbiAgICAgICAgICAgICAgICAgICAgICA8L0JhZGdlPlxyXG4gICAgICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc20gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kIG1iLTFcIj57b3JkZXIub3JkZXJOdW1iZXIgfHwgb3JkZXIub3JkZXJfbnVtYmVyIHx8ICdVbmtub3duIE9yZGVyJ308L3A+XHJcbiAgICAgICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC14cyB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5cclxuICAgICAgICAgICAgICAgICAgICAgIHsob3JkZXIudGVzdHMgfHwgb3JkZXIub3JkZXJfdGVzdHMgfHwgW10pLmxlbmd0aH0gdGVzdChzKVxyXG4gICAgICAgICAgICAgICAgICAgIDwvcD5cclxuICAgICAgICAgICAgICAgICAgPC9idXR0b24+XHJcbiAgICAgICAgICAgICAgICApKX1cclxuICAgICAgICAgICAgICAgIHsoIXByb2Nlc3NpbmdPcmRlcnMgfHwgcHJvY2Vzc2luZ09yZGVycy5sZW5ndGggPT09IDApICYmIChcclxuICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJweC00IHB5LTEyIHRleHQtY2VudGVyIHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPlxyXG4gICAgICAgICAgICAgICAgICAgIDxwPk5vIG9yZGVycyBpbiBwcm9jZXNzaW5nPC9wPlxyXG4gICAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgICl9XHJcbiAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICl9XHJcbiAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgey8qIFJlc3VsdCBFbnRyeSBGb3JtICovfVxyXG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwibGc6Y29sLXNwYW4tMlwiPlxyXG4gICAgICAgICAge3NlbGVjdGVkT3JkZXIgPyAoXHJcbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiYmctY2FyZCBib3JkZXIgcm91bmRlZC1sZyBwLTZcIj5cclxuICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cIm1iLTZcIj5cclxuICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIganVzdGlmeS1iZXR3ZWVuIG1iLTRcIj5cclxuICAgICAgICAgICAgICAgICAgPGRpdj5cclxuICAgICAgICAgICAgICAgICAgICA8aDMgY2xhc3NOYW1lPVwidGV4dC1sZyBmb250LXNlbWlib2xkXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgICB7Z2V0UGF0aWVudE5hbWUoc2VsZWN0ZWRPcmRlcil9XHJcbiAgICAgICAgICAgICAgICAgICAgPC9oMz5cclxuICAgICAgICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LXNtIHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPntnZXRPcmRlck51bWJlcihzZWxlY3RlZE9yZGVyKX08L3A+XHJcbiAgICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgICB7aGFzQ3JpdGljYWxSZXN1bHRzICYmIChcclxuICAgICAgICAgICAgICAgICAgICA8QmFkZ2UgdmFyaWFudD1cImRlc3RydWN0aXZlXCIgY2xhc3NOYW1lPVwiZ2FwLTFcIj5cclxuICAgICAgICAgICAgICAgICAgICAgIDxBbGVydFRyaWFuZ2xlIGNsYXNzTmFtZT1cInctMyBoLTNcIiAvPlxyXG4gICAgICAgICAgICAgICAgICAgICAgQ3JpdGljYWwgUmVzdWx0c1xyXG4gICAgICAgICAgICAgICAgICAgIDwvQmFkZ2U+XHJcbiAgICAgICAgICAgICAgICAgICl9XHJcbiAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTZcIj5cclxuICAgICAgICAgICAgICAgIHtzZWxlY3RlZE9yZGVyLm9yZGVyX3Rlc3RzLm1hcCh0ZXN0ID0+IHtcclxuICAgICAgICAgICAgICAgICAgY29uc3QgdW5pcXVlVGVzdElkID0gdGVzdC5pZCB8fCB0ZXN0Ll9pZCB8fCBgJHt0ZXN0LnRlc3RJZCB8fCB0ZXN0LnRlc3RfaWR9LSR7TWF0aC5yYW5kb20oKX1gO1xyXG4gICAgICAgICAgICAgICAgICBjb25zdCB0ZXN0Q29kZSA9IHRlc3QudGVzdENvZGUgfHwgdGVzdC50ZXN0X2NvZGU7XHJcbiAgICAgICAgICAgICAgICAgIFxyXG4gICAgICAgICAgICAgICAgICAvLyBGaW5kIHRlc3QgaW5mbyBieSBDT0RFLCBub3QgYnkgSURcclxuICAgICAgICAgICAgICAgICAgY29uc3QgdGVzdEluZm8gPSB0ZXN0Q2F0YWxvZz8uZmluZCh0ID0+IHQuY29kZSA9PT0gdGVzdENvZGUpO1xyXG4gICAgICAgICAgICAgICAgICBcclxuICAgICAgICAgICAgICAgICAgY29uc3QgcmVzdWx0RGF0YSA9IHJlc3VsdHNbdW5pcXVlVGVzdElkXSB8fCB7IHZhbHVlOiAnJywgdW5pdDogdGVzdEluZm8/LnVuaXQgfHwgJycsIGZsYWc6ICdub3JtYWwnLCBjb21tZW50czogJycgfTtcclxuICAgICAgICAgICAgICAgICAgY29uc3QgaXNDcml0aWNhbCA9IHJlc3VsdERhdGEuZmxhZyA9PT0gJ2NyaXRpY2FsX2xvdycgfHwgcmVzdWx0RGF0YS5mbGFnID09PSAnY3JpdGljYWxfaGlnaCc7XHJcblxyXG4gICAgICAgICAgICAgICAgICByZXR1cm4gKFxyXG4gICAgICAgICAgICAgICAgICAgIDxkaXYgXHJcbiAgICAgICAgICAgICAgICAgICAgICBrZXk9e3VuaXF1ZVRlc3RJZH0gXHJcbiAgICAgICAgICAgICAgICAgICAgICBjbGFzc05hbWU9e2NuKFxyXG4gICAgICAgICAgICAgICAgICAgICAgICAncC00IGJvcmRlciByb3VuZGVkLWxnJyxcclxuICAgICAgICAgICAgICAgICAgICAgICAgaXNDcml0aWNhbCAmJiAnYm9yZGVyLXN0YXR1cy1jcml0aWNhbCBiZy1zdGF0dXMtY3JpdGljYWwvNSdcclxuICAgICAgICAgICAgICAgICAgICAgICl9XHJcbiAgICAgICAgICAgICAgICAgICAgPlxyXG4gICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWJldHdlZW4gbWItM1wiPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICA8ZGl2PlxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIDxoNCBjbGFzc05hbWU9XCJmb250LXNlbWlib2xkXCI+e3Rlc3QudGVzdENvZGUgfHwgdGVzdC50ZXN0X2NvZGUgfHwgJ1Vua25vd24gVGVzdCd9PC9oND5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LXNtIHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPnt0ZXN0LnRlc3ROYW1lIHx8IHRlc3QudGVzdF9uYW1lIHx8ICdObyBkZXNjcmlwdGlvbid9PC9wPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgICAgICAgICAge3Rlc3RJbmZvPy5yZWZlcmVuY2VSYW5nZSAmJiAoXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJ0ZXh0LXJpZ2h0XCI+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LXhzIHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPlJlZmVyZW5jZSBSYW5nZTwvcD5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc20gZm9udC1tZWRpdW1cIj5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAge3Rlc3RJbmZvLnJlZmVyZW5jZVJhbmdlfSB7dGVzdEluZm8udW5pdH1cclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvcD5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgICAgICAgICAgKX1cclxuICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PlxyXG5cclxuICAgICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZ3JpZCBncmlkLWNvbHMtMyBnYXAtM1wiPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNwYWNlLXktMlwiPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIDxMYWJlbCBodG1sRm9yPXtgdmFsdWUtJHt1bmlxdWVUZXN0SWR9YH0+VmFsdWUgKjwvTGFiZWw+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgPElucHV0XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICBpZD17YHZhbHVlLSR7dW5pcXVlVGVzdElkfWB9XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICB0eXBlPVwidGV4dFwiXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICBwbGFjZWhvbGRlcj1cIkVudGVyIHZhbHVlXCJcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIHZhbHVlPXtyZXN1bHREYXRhLnZhbHVlfVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgb25DaGFuZ2U9eyhlKSA9PiB7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGhhbmRsZVJlc3VsdENoYW5nZSh1bmlxdWVUZXN0SWQsICd2YWx1ZScsIGUudGFyZ2V0LnZhbHVlKTtcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgLy8gQXV0by1jYWxjdWxhdGUgZmxhZyBpZiBudW1lcmljXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNvbnN0IG51bVZhbHVlID0gcGFyc2VGbG9hdChlLnRhcmdldC52YWx1ZSk7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNvbnN0IHJlZlJhbmdlID0gdGVzdEluZm8/LnJlZmVyZW5jZVJhbmdlO1xyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICBpZiAoIWlzTmFOKG51bVZhbHVlKSAmJiByZWZSYW5nZSkge1xyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNvbnN0IGZsYWcgPSBjYWxjdWxhdGVGbGFnKG51bVZhbHVlLCByZWZSYW5nZSk7XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaGFuZGxlUmVzdWx0Q2hhbmdlKHVuaXF1ZVRlc3RJZCwgJ2ZsYWcnLCBmbGFnKTtcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgfX1cclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNsYXNzTmFtZT17Y24oaXNDcml0aWNhbCAmJiAnYm9yZGVyLXN0YXR1cy1jcml0aWNhbCcpfVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIC8+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PlxyXG5cclxuICAgICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTJcIj5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICA8TGFiZWwgaHRtbEZvcj17YHVuaXQtJHt1bmlxdWVUZXN0SWR9YH0+VW5pdDwvTGFiZWw+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgPElucHV0XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICBpZD17YHVuaXQtJHt1bmlxdWVUZXN0SWR9YH1cclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIHBsYWNlaG9sZGVyPVwiVW5pdFwiXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICB2YWx1ZT17cmVzdWx0RGF0YS51bml0fVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgb25DaGFuZ2U9eyhlKSA9PiBoYW5kbGVSZXN1bHRDaGFuZ2UodW5pcXVlVGVzdElkLCAndW5pdCcsIGUudGFyZ2V0LnZhbHVlKX1cclxuICAgICAgICAgICAgICAgICAgICAgICAgICAvPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0yXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgPExhYmVsIGh0bWxGb3I9e2BmbGFnLSR7dW5pcXVlVGVzdElkfWB9PkZsYWc8L0xhYmVsPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIDxTZWxlY3QgXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICB2YWx1ZT17cmVzdWx0RGF0YS5mbGFnfVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgb25WYWx1ZUNoYW5nZT17KHZhbHVlKSA9PiBoYW5kbGVSZXN1bHRDaGFuZ2UodW5pcXVlVGVzdElkLCAnZmxhZycsIHZhbHVlKX1cclxuICAgICAgICAgICAgICAgICAgICAgICAgICA+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8U2VsZWN0VHJpZ2dlciBpZD17YGZsYWctJHt1bmlxdWVUZXN0SWR9YH0+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxTZWxlY3RWYWx1ZSAvPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgPC9TZWxlY3RUcmlnZ2VyPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgPFNlbGVjdENvbnRlbnQ+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxTZWxlY3RJdGVtIHZhbHVlPVwibm9ybWFsXCI+Tm9ybWFsPC9TZWxlY3RJdGVtPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8U2VsZWN0SXRlbSB2YWx1ZT1cImxvd1wiPkxvdzwvU2VsZWN0SXRlbT5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJoaWdoXCI+SGlnaDwvU2VsZWN0SXRlbT5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJjcml0aWNhbF9sb3dcIj5Dcml0aWNhbCBMb3c8L1NlbGVjdEl0ZW0+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxTZWxlY3RJdGVtIHZhbHVlPVwiY3JpdGljYWxfaGlnaFwiPkNyaXRpY2FsIEhpZ2g8L1NlbGVjdEl0ZW0+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L1NlbGVjdENvbnRlbnQ+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgPC9TZWxlY3Q+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgICAgICAgPC9kaXY+XHJcblxyXG4gICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJtdC0zIHNwYWNlLXktMlwiPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICA8TGFiZWwgaHRtbEZvcj17YGNvbW1lbnRzLSR7dW5pcXVlVGVzdElkfWB9PkNvbW1lbnRzPC9MYWJlbD5cclxuICAgICAgICAgICAgICAgICAgICAgICAgPFRleHRhcmVhXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgaWQ9e2Bjb21tZW50cy0ke3VuaXF1ZVRlc3RJZH1gfVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIHBsYWNlaG9sZGVyPVwiQWRkIGFueSBjb21tZW50cyBvciBub3Rlcy4uLlwiXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgdmFsdWU9e3Jlc3VsdERhdGEuY29tbWVudHN9XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgb25DaGFuZ2U9eyhlKSA9PiBoYW5kbGVSZXN1bHRDaGFuZ2UodW5pcXVlVGVzdElkLCAnY29tbWVudHMnLCBlLnRhcmdldC52YWx1ZSl9XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgcm93cz17Mn1cclxuICAgICAgICAgICAgICAgICAgICAgICAgLz5cclxuICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgICApO1xyXG4gICAgICAgICAgICAgICAgfSl9XHJcbiAgICAgICAgICAgICAgPC9kaXY+XHJcblxyXG4gICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBqdXN0aWZ5LWVuZCBnYXAtMyBtdC02IHB0LTYgYm9yZGVyLXRcIj5cclxuICAgICAgICAgICAgICAgIDxCdXR0b24gXHJcbiAgICAgICAgICAgICAgICAgIHZhcmlhbnQ9XCJvdXRsaW5lXCIgXHJcbiAgICAgICAgICAgICAgICAgIG9uQ2xpY2s9eygpID0+IHtcclxuICAgICAgICAgICAgICAgICAgICBzZXRTZWxlY3RlZE9yZGVyKG51bGwpO1xyXG4gICAgICAgICAgICAgICAgICAgIHNldFJlc3VsdHMoe30pO1xyXG4gICAgICAgICAgICAgICAgICB9fVxyXG4gICAgICAgICAgICAgICAgPlxyXG4gICAgICAgICAgICAgICAgICBDYW5jZWxcclxuICAgICAgICAgICAgICAgIDwvQnV0dG9uPlxyXG4gICAgICAgICAgICAgICAgPEJ1dHRvbiBcclxuICAgICAgICAgICAgICAgICAgb25DbGljaz17aGFuZGxlU2F2ZVJlc3VsdHN9XHJcbiAgICAgICAgICAgICAgICAgIGRpc2FibGVkPXtjcmVhdGVSZXN1bHQuaXNQZW5kaW5nfVxyXG4gICAgICAgICAgICAgICAgPlxyXG4gICAgICAgICAgICAgICAgICB7Y3JlYXRlUmVzdWx0LmlzUGVuZGluZyAmJiA8TG9hZGVyMiBjbGFzc05hbWU9XCJ3LTQgaC00IG1yLTIgYW5pbWF0ZS1zcGluXCIgLz59XHJcbiAgICAgICAgICAgICAgICAgIDxTYXZlIGNsYXNzTmFtZT1cInctNCBoLTQgbXItMlwiIC8+XHJcbiAgICAgICAgICAgICAgICAgIFNhdmUgUmVzdWx0c1xyXG4gICAgICAgICAgICAgICAgPC9CdXR0b24+XHJcbiAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgKSA6IChcclxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJiZy1jYXJkIGJvcmRlciByb3VuZGVkLWxnIHAtMTIgdGV4dC1jZW50ZXIgdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+XHJcbiAgICAgICAgICAgICAgPHA+U2VsZWN0IGFuIG9yZGVyIHRvIGVudGVyIHJlc3VsdHM8L3A+XHJcbiAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgKX1cclxuICAgICAgICA8L2Rpdj5cclxuICAgICAgPC9kaXY+XHJcbiAgICA8L1JvbGVMYXlvdXQ+XHJcbiAgKTtcclxufVxyXG4iXSwibmFtZXMiOlsidXNlU3RhdGUiLCJSb2xlTGF5b3V0IiwidXNlQXV0aCIsInVzZVByb2Nlc3NpbmdPcmRlcnMiLCJ1c2VDcmVhdGVSZXN1bHQiLCJ1c2VBY3RpdmVUZXN0cyIsIkJ1dHRvbiIsIklucHV0IiwiTGFiZWwiLCJTZWxlY3QiLCJTZWxlY3RDb250ZW50IiwiU2VsZWN0SXRlbSIsIlNlbGVjdFRyaWdnZXIiLCJTZWxlY3RWYWx1ZSIsIlRleHRhcmVhIiwiQmFkZ2UiLCJ0b2FzdCIsIlNhdmUiLCJBbGVydFRyaWFuZ2xlIiwiTG9hZGVyMiIsImNuIiwiZ2V0UGF0aWVudE5hbWUiLCJnZXRPcmRlck51bWJlciIsIkVudGVyTWFudWFsUmVzdWx0cyIsInByb2ZpbGUiLCJ1c2VyIiwiZGF0YSIsInByb2Nlc3NpbmdPcmRlcnMiLCJpc0xvYWRpbmciLCJjcmVhdGVSZXN1bHQiLCJ0ZXN0Q2F0YWxvZyIsInNlbGVjdGVkT3JkZXIiLCJzZXRTZWxlY3RlZE9yZGVyIiwicmVzdWx0cyIsInNldFJlc3VsdHMiLCJoYW5kbGVSZXN1bHRDaGFuZ2UiLCJ0ZXN0SWQiLCJmaWVsZCIsInZhbHVlIiwicHJldiIsImNhbGN1bGF0ZUZsYWciLCJyZWZSYW5nZSIsIm1hdGNoIiwibWluIiwibWF4IiwibWluVmFsIiwicGFyc2VGbG9hdCIsIm1heFZhbCIsImhhbmRsZVNhdmVSZXN1bHRzIiwicmVzdWx0c1RvU2F2ZSIsIm9yZGVyX3Rlc3RzIiwiZmlsdGVyIiwidGVzdCIsInVuaXF1ZVRlc3RJZCIsImlkIiwiX2lkIiwibWFwIiwidGVzdENvZGUiLCJ0ZXN0X2NvZGUiLCJ0ZXN0SW5mbyIsImZpbmQiLCJ0IiwiY29kZSIsInJlZmVyZW5jZVJhbmdlIiwiZmxhZyIsImlzTmFOIiwib3JkZXJJZCIsIm9yZGVyVGVzdElkIiwidGVzdE5hbWUiLCJ0ZXN0X25hbWUiLCJ1bml0IiwiY29tbWVudHMiLCJ1bmRlZmluZWQiLCJsZW5ndGgiLCJlcnJvciIsInJlc3VsdCIsIm11dGF0ZUFzeW5jIiwic3VjY2VzcyIsImhhc0NyaXRpY2FsUmVzdWx0cyIsInNvbWUiLCJ0aXRsZSIsInN1YnRpdGxlIiwicm9sZSIsInVzZXJOYW1lIiwiZnVsbF9uYW1lIiwiZGl2IiwiY2xhc3NOYW1lIiwiaDMiLCJwIiwib3JkZXIiLCJidXR0b24iLCJvbkNsaWNrIiwidmFyaWFudCIsInByaW9yaXR5IiwidG9VcHBlckNhc2UiLCJvcmRlck51bWJlciIsIm9yZGVyX251bWJlciIsInRlc3RzIiwidGVzdF9pZCIsIk1hdGgiLCJyYW5kb20iLCJyZXN1bHREYXRhIiwiaXNDcml0aWNhbCIsImg0IiwiaHRtbEZvciIsInR5cGUiLCJwbGFjZWhvbGRlciIsIm9uQ2hhbmdlIiwiZSIsInRhcmdldCIsIm51bVZhbHVlIiwib25WYWx1ZUNoYW5nZSIsInJvd3MiLCJkaXNhYmxlZCIsImlzUGVuZGluZyJdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O0FBQUEsU0FBU0EsUUFBUSxRQUFRLFFBQVE7QUFDakMsU0FBU0MsVUFBVSxRQUFRLGlDQUFpQztBQUM1RCxTQUFTQyxPQUFPLFFBQVEsd0JBQXdCO0FBQ2hELFNBQVNDLG1CQUFtQixRQUFR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

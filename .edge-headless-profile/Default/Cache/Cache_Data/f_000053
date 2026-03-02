@@ -1,0 +1,415 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/components/layout/RoleSidebar.tsx");import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+
+let prevRefreshReg;
+let prevRefreshSig;
+
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react-swc can't detect preamble. Something is wrong."
+    );
+  }
+
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/HP/Downloads/lab/frontend/src/components/layout/RoleSidebar.tsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+
+import __vite__cjsImport2_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=27cfabb6"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime["jsxDEV"];
+var _s = $RefreshSig$();
+import { useLocation, useNavigate } from "/node_modules/.vite/deps/react-router-dom.js?v=27cfabb6";
+import { NavLink } from "/node_modules/.vite/deps/react-router-dom.js?v=27cfabb6";
+import { LayoutDashboard, Users, ClipboardList, FileText, Cpu, Settings, FlaskConical, UserPlus, CreditCard, TestTube, FileCheck, BarChart3, Shield, LogOut, Calculator, FileEdit } from "/node_modules/.vite/deps/lucide-react.js?v=27cfabb6";
+import { cn } from "/src/lib/utils.ts";
+import { useAuth } from "/src/context/AuthContext.tsx";
+import { Button } from "/src/components/ui/button.tsx";
+const roleNavItems = {
+    admin: [
+        {
+            to: '/admin',
+            icon: LayoutDashboard,
+            label: 'Dashboard'
+        },
+        {
+            to: '/admin/users',
+            icon: Shield,
+            label: 'User Management'
+        },
+        {
+            to: '/admin/reports',
+            icon: BarChart3,
+            label: 'Reports'
+        },
+        {
+            to: '/admin/reconciliation',
+            icon: Calculator,
+            label: 'Reconciliation'
+        },
+        {
+            to: '/admin/payments',
+            icon: CreditCard,
+            label: 'Payments'
+        },
+        {
+            to: '/admin/report-template',
+            icon: FileEdit,
+            label: 'Report Template'
+        },
+        {
+            to: '/admin/test-catalog',
+            icon: FlaskConical,
+            label: 'Test Catalog'
+        },
+        {
+            to: '/admin/patients',
+            icon: Users,
+            label: 'All Patients'
+        },
+        {
+            to: '/admin/orders',
+            icon: ClipboardList,
+            label: 'All Orders'
+        },
+        {
+            to: '/admin/results',
+            icon: FileText,
+            label: 'All Results'
+        },
+        {
+            to: '/admin/machines',
+            icon: Cpu,
+            label: 'Machines'
+        },
+        {
+            to: '/admin/settings',
+            icon: Settings,
+            label: 'Settings'
+        }
+    ],
+    receptionist: [
+        {
+            to: '/reception',
+            icon: LayoutDashboard,
+            label: 'Dashboard'
+        },
+        {
+            to: '/reception/register',
+            icon: UserPlus,
+            label: 'Register Patient'
+        },
+        {
+            to: '/reception/patients',
+            icon: Users,
+            label: 'Patients'
+        },
+        {
+            to: '/reception/new-order',
+            icon: ClipboardList,
+            label: 'New Order'
+        },
+        {
+            to: '/reception/orders',
+            icon: FileText,
+            label: 'Orders'
+        },
+        {
+            to: '/reception/payments',
+            icon: CreditCard,
+            label: 'Payments'
+        },
+        {
+            to: '/reception/reconciliation',
+            icon: Calculator,
+            label: 'Reconciliation'
+        },
+        {
+            to: '/reception/enter-results',
+            icon: FlaskConical,
+            label: 'Quick Entry'
+        },
+        {
+            to: '/reception/results',
+            icon: FileCheck,
+            label: 'View Results'
+        }
+    ],
+    'lab-tech': [
+        {
+            to: '/lab',
+            icon: LayoutDashboard,
+            label: 'Dashboard'
+        },
+        {
+            to: '/lab/match-results',
+            icon: FlaskConical,
+            label: 'Match Results'
+        },
+        {
+            to: '/lab/pending',
+            icon: ClipboardList,
+            label: 'Pending Samples'
+        },
+        {
+            to: '/lab/collect',
+            icon: TestTube,
+            label: 'Collect Samples'
+        },
+        {
+            to: '/lab/processing',
+            icon: FlaskConical,
+            label: 'Processing'
+        },
+        {
+            to: '/lab/results',
+            icon: FileText,
+            label: 'Enter Results'
+        },
+        {
+            to: '/lab/patients',
+            icon: Users,
+            label: 'Patients'
+        },
+        {
+            to: '/lab/machines',
+            icon: Cpu,
+            label: 'Machines'
+        }
+    ]
+};
+const roleLabels = {
+    admin: 'Administrator',
+    receptionist: 'Reception',
+    'lab-tech': 'Laboratory'
+};
+export function RoleSidebar({ role, userName }) {
+    _s();
+    const location = useLocation();
+    const navigate = useNavigate();
+    const { signOut } = useAuth();
+    const navItems = roleNavItems[role];
+    const handleLogout = async ()=>{
+        await signOut();
+        navigate('/login');
+    };
+    return /*#__PURE__*/ _jsxDEV("aside", {
+        className: "w-64 bg-sidebar text-sidebar-foreground flex flex-col h-screen fixed left-0 top-0",
+        children: [
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "p-6 border-b border-sidebar-border",
+                children: /*#__PURE__*/ _jsxDEV("div", {
+                    className: "flex items-center gap-3",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "w-10 h-10 rounded-lg bg-sidebar-primary flex items-center justify-center",
+                            children: /*#__PURE__*/ _jsxDEV(FlaskConical, {
+                                className: "w-6 h-6 text-sidebar-primary-foreground"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/layout/RoleSidebar.tsx",
+                                lineNumber: 99,
+                                columnNumber: 13
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/layout/RoleSidebar.tsx",
+                            lineNumber: 98,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("h1", {
+                                    className: "font-bold text-lg",
+                                    children: "LabConnect"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/layout/RoleSidebar.tsx",
+                                    lineNumber: 102,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("p", {
+                                    className: "text-xs text-sidebar-foreground/60",
+                                    children: [
+                                        roleLabels[role],
+                                        " Portal"
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/layout/RoleSidebar.tsx",
+                                    lineNumber: 103,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/layout/RoleSidebar.tsx",
+                            lineNumber: 101,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/layout/RoleSidebar.tsx",
+                    lineNumber: 97,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/layout/RoleSidebar.tsx",
+                lineNumber: 96,
+                columnNumber: 7
+            }, this),
+            userName && /*#__PURE__*/ _jsxDEV("div", {
+                className: "px-6 py-3 border-b border-sidebar-border bg-sidebar-accent/30",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("p", {
+                        className: "text-xs text-sidebar-foreground/60",
+                        children: "Logged in as"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/layout/RoleSidebar.tsx",
+                        lineNumber: 111,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("p", {
+                        className: "font-medium text-sm",
+                        children: userName
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/layout/RoleSidebar.tsx",
+                        lineNumber: 112,
+                        columnNumber: 11
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/layout/RoleSidebar.tsx",
+                lineNumber: 110,
+                columnNumber: 9
+            }, this),
+            /*#__PURE__*/ _jsxDEV("nav", {
+                className: "flex-1 p-4 space-y-1 overflow-y-auto",
+                children: navItems.map(({ to, icon: Icon, label })=>{
+                    const isActive = location.pathname === to;
+                    return /*#__PURE__*/ _jsxDEV(NavLink, {
+                        to: to,
+                        className: cn('flex items-center gap-3 px-4 py-3 rounded-lg transition-colors', isActive ? 'bg-sidebar-primary text-sidebar-primary-foreground' : 'hover:bg-sidebar-accent text-sidebar-foreground'),
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(Icon, {
+                                className: "w-5 h-5"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/layout/RoleSidebar.tsx",
+                                lineNumber: 131,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: "font-medium",
+                                children: label
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/layout/RoleSidebar.tsx",
+                                lineNumber: 132,
+                                columnNumber: 15
+                            }, this)
+                        ]
+                    }, to, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/layout/RoleSidebar.tsx",
+                        lineNumber: 121,
+                        columnNumber: 13
+                    }, this);
+                })
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/layout/RoleSidebar.tsx",
+                lineNumber: 117,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "p-4 border-t border-sidebar-border",
+                children: /*#__PURE__*/ _jsxDEV(Button, {
+                    onClick: handleLogout,
+                    variant: "ghost",
+                    className: "w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV(LogOut, {
+                            className: "w-5 h-5"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/layout/RoleSidebar.tsx",
+                            lineNumber: 145,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("span", {
+                            className: "font-medium",
+                            children: "Logout"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/layout/RoleSidebar.tsx",
+                            lineNumber: 146,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/layout/RoleSidebar.tsx",
+                    lineNumber: 140,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/layout/RoleSidebar.tsx",
+                lineNumber: 139,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "p-4 border-t border-sidebar-border",
+                children: /*#__PURE__*/ _jsxDEV("div", {
+                    className: "text-xs text-sidebar-foreground/50",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV("p", {
+                            children: "Version 1.0.0"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/layout/RoleSidebar.tsx",
+                            lineNumber: 153,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("p", {
+                            children: "HL7 • ASTM • FHIR Compatible"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/layout/RoleSidebar.tsx",
+                            lineNumber: 154,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/layout/RoleSidebar.tsx",
+                    lineNumber: 152,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/layout/RoleSidebar.tsx",
+                lineNumber: 151,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/layout/RoleSidebar.tsx",
+        lineNumber: 94,
+        columnNumber: 5
+    }, this);
+}
+_s(RoleSidebar, "brA9E6JNaGwc4/j3WE6zkW4f15s=", false, function() {
+    return [
+        useLocation,
+        useNavigate,
+        useAuth
+    ];
+});
+_c = RoleSidebar;
+var _c;
+$RefreshReg$(_c, "RoleSidebar");
+
+
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+
+
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/HP/Downloads/lab/frontend/src/components/layout/RoleSidebar.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/HP/Downloads/lab/frontend/src/components/layout/RoleSidebar.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIlJvbGVTaWRlYmFyLnRzeCJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyB1c2VMb2NhdGlvbiwgdXNlTmF2aWdhdGUgfSBmcm9tICdyZWFjdC1yb3V0ZXItZG9tJztcbmltcG9ydCB7IE5hdkxpbmsgfSBmcm9tICdyZWFjdC1yb3V0ZXItZG9tJztcbmltcG9ydCB7IFxuICBMYXlvdXREYXNoYm9hcmQsIFxuICBVc2VycywgXG4gIENsaXBib2FyZExpc3QsIFxuICBGaWxlVGV4dCwgXG4gIENwdSwgXG4gIFNldHRpbmdzLFxuICBGbGFza0NvbmljYWwsXG4gIFVzZXJQbHVzLFxuICBDcmVkaXRDYXJkLFxuICBUZXN0VHViZSxcbiAgRmlsZUNoZWNrLFxuICBCYXJDaGFydDMsXG4gIFNoaWVsZCxcbiAgTHVjaWRlSWNvbixcbiAgTG9nT3V0LFxuICBDYWxjdWxhdG9yLFxuICBGaWxlRWRpdFxufSBmcm9tICdsdWNpZGUtcmVhY3QnO1xuaW1wb3J0IHsgY24gfSBmcm9tICdAL2xpYi91dGlscyc7XG5pbXBvcnQgeyBVc2VyUm9sZSB9IGZyb20gJ0AvdHlwZXMvbGlzJztcbmltcG9ydCB7IHVzZUF1dGggfSBmcm9tICdAL2NvbnRleHQvQXV0aENvbnRleHQnO1xuaW1wb3J0IHsgQnV0dG9uIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL2J1dHRvbic7XG5cbmludGVyZmFjZSBOYXZJdGVtIHtcbiAgdG86IHN0cmluZztcbiAgaWNvbjogTHVjaWRlSWNvbjtcbiAgbGFiZWw6IHN0cmluZztcbn1cblxuY29uc3Qgcm9sZU5hdkl0ZW1zOiBSZWNvcmQ8VXNlclJvbGUsIE5hdkl0ZW1bXT4gPSB7XG4gIGFkbWluOiBbXG4gICAgeyB0bzogJy9hZG1pbicsIGljb246IExheW91dERhc2hib2FyZCwgbGFiZWw6ICdEYXNoYm9hcmQnIH0sXG4gICAgeyB0bzogJy9hZG1pbi91c2VycycsIGljb246IFNoaWVsZCwgbGFiZWw6ICdVc2VyIE1hbmFnZW1lbnQnIH0sXG4gICAgeyB0bzogJy9hZG1pbi9yZXBvcnRzJywgaWNvbjogQmFyQ2hhcnQzLCBsYWJlbDogJ1JlcG9ydHMnIH0sXG4gICAgeyB0bzogJy9hZG1pbi9yZWNvbmNpbGlhdGlvbicsIGljb246IENhbGN1bGF0b3IsIGxhYmVsOiAnUmVjb25jaWxpYXRpb24nIH0sXG4gICAgeyB0bzogJy9hZG1pbi9wYXltZW50cycsIGljb246IENyZWRpdENhcmQsIGxhYmVsOiAnUGF5bWVudHMnIH0sXG4gICAgeyB0bzogJy9hZG1pbi9yZXBvcnQtdGVtcGxhdGUnLCBpY29uOiBGaWxlRWRpdCwgbGFiZWw6ICdSZXBvcnQgVGVtcGxhdGUnIH0sXG4gICAgeyB0bzogJy9hZG1pbi90ZXN0LWNhdGFsb2cnLCBpY29uOiBGbGFza0NvbmljYWwsIGxhYmVsOiAnVGVzdCBDYXRhbG9nJyB9LFxuICAgIHsgdG86ICcvYWRtaW4vcGF0aWVudHMnLCBpY29uOiBVc2VycywgbGFiZWw6ICdBbGwgUGF0aWVudHMnIH0sXG4gICAgeyB0bzogJy9hZG1pbi9vcmRlcnMnLCBpY29uOiBDbGlwYm9hcmRMaXN0LCBsYWJlbDogJ0FsbCBPcmRlcnMnIH0sXG4gICAgeyB0bzogJy9hZG1pbi9yZXN1bHRzJywgaWNvbjogRmlsZVRleHQsIGxhYmVsOiAnQWxsIFJlc3VsdHMnIH0sXG4gICAgeyB0bzogJy9hZG1pbi9tYWNoaW5lcycsIGljb246IENwdSwgbGFiZWw6ICdNYWNoaW5lcycgfSxcbiAgICB7IHRvOiAnL2FkbWluL3NldHRpbmdzJywgaWNvbjogU2V0dGluZ3MsIGxhYmVsOiAnU2V0dGluZ3MnIH0sXG4gIF0sXG4gIHJlY2VwdGlvbmlzdDogW1xuICAgIHsgdG86ICcvcmVjZXB0aW9uJywgaWNvbjogTGF5b3V0RGFzaGJvYXJkLCBsYWJlbDogJ0Rhc2hib2FyZCcgfSxcbiAgICB7IHRvOiAnL3JlY2VwdGlvbi9yZWdpc3RlcicsIGljb246IFVzZXJQbHVzLCBsYWJlbDogJ1JlZ2lzdGVyIFBhdGllbnQnIH0sXG4gICAgeyB0bzogJy9yZWNlcHRpb24vcGF0aWVudHMnLCBpY29uOiBVc2VycywgbGFiZWw6ICdQYXRpZW50cycgfSxcbiAgICB7IHRvOiAnL3JlY2VwdGlvbi9uZXctb3JkZXInLCBpY29uOiBDbGlwYm9hcmRMaXN0LCBsYWJlbDogJ05ldyBPcmRlcicgfSxcbiAgICB7IHRvOiAnL3JlY2VwdGlvbi9vcmRlcnMnLCBpY29uOiBGaWxlVGV4dCwgbGFiZWw6ICdPcmRlcnMnIH0sXG4gICAgeyB0bzogJy9yZWNlcHRpb24vcGF5bWVudHMnLCBpY29uOiBDcmVkaXRDYXJkLCBsYWJlbDogJ1BheW1lbnRzJyB9LFxuICAgIHsgdG86ICcvcmVjZXB0aW9uL3JlY29uY2lsaWF0aW9uJywgaWNvbjogQ2FsY3VsYXRvciwgbGFiZWw6ICdSZWNvbmNpbGlhdGlvbicgfSxcbiAgICB7IHRvOiAnL3JlY2VwdGlvbi9lbnRlci1yZXN1bHRzJywgaWNvbjogRmxhc2tDb25pY2FsLCBsYWJlbDogJ1F1aWNrIEVudHJ5JyB9LFxuICAgIHsgdG86ICcvcmVjZXB0aW9uL3Jlc3VsdHMnLCBpY29uOiBGaWxlQ2hlY2ssIGxhYmVsOiAnVmlldyBSZXN1bHRzJyB9LFxuICBdLFxuICAnbGFiLXRlY2gnOiBbXG4gICAgeyB0bzogJy9sYWInLCBpY29uOiBMYXlvdXREYXNoYm9hcmQsIGxhYmVsOiAnRGFzaGJvYXJkJyB9LFxuICAgIHsgdG86ICcvbGFiL21hdGNoLXJlc3VsdHMnLCBpY29uOiBGbGFza0NvbmljYWwsIGxhYmVsOiAnTWF0Y2ggUmVzdWx0cycgfSxcbiAgICB7IHRvOiAnL2xhYi9wZW5kaW5nJywgaWNvbjogQ2xpcGJvYXJkTGlzdCwgbGFiZWw6ICdQZW5kaW5nIFNhbXBsZXMnIH0sXG4gICAgeyB0bzogJy9sYWIvY29sbGVjdCcsIGljb246IFRlc3RUdWJlLCBsYWJlbDogJ0NvbGxlY3QgU2FtcGxlcycgfSxcbiAgICB7IHRvOiAnL2xhYi9wcm9jZXNzaW5nJywgaWNvbjogRmxhc2tDb25pY2FsLCBsYWJlbDogJ1Byb2Nlc3NpbmcnIH0sXG4gICAgeyB0bzogJy9sYWIvcmVzdWx0cycsIGljb246IEZpbGVUZXh0LCBsYWJlbDogJ0VudGVyIFJlc3VsdHMnIH0sXG4gICAgeyB0bzogJy9sYWIvcGF0aWVudHMnLCBpY29uOiBVc2VycywgbGFiZWw6ICdQYXRpZW50cycgfSxcbiAgICB7IHRvOiAnL2xhYi9tYWNoaW5lcycsIGljb246IENwdSwgbGFiZWw6ICdNYWNoaW5lcycgfSxcbiAgXSxcbn07XG5cbmNvbnN0IHJvbGVMYWJlbHM6IFJlY29yZDxVc2VyUm9sZSwgc3RyaW5nPiA9IHtcbiAgYWRtaW46ICdBZG1pbmlzdHJhdG9yJyxcbiAgcmVjZXB0aW9uaXN0OiAnUmVjZXB0aW9uJyxcbiAgJ2xhYi10ZWNoJzogJ0xhYm9yYXRvcnknLFxufTtcblxuaW50ZXJmYWNlIFJvbGVTaWRlYmFyUHJvcHMge1xuICByb2xlOiBVc2VyUm9sZTtcbiAgdXNlck5hbWU/OiBzdHJpbmc7XG59XG5cbmV4cG9ydCBmdW5jdGlvbiBSb2xlU2lkZWJhcih7IHJvbGUsIHVzZXJOYW1lIH06IFJvbGVTaWRlYmFyUHJvcHMpIHtcbiAgY29uc3QgbG9jYXRpb24gPSB1c2VMb2NhdGlvbigpO1xuICBjb25zdCBuYXZpZ2F0ZSA9IHVzZU5hdmlnYXRlKCk7XG4gIGNvbnN0IHsgc2lnbk91dCB9ID0gdXNlQXV0aCgpO1xuICBjb25zdCBuYXZJdGVtcyA9IHJvbGVOYXZJdGVtc1tyb2xlXTtcblxuICBjb25zdCBoYW5kbGVMb2dvdXQgPSBhc3luYyAoKSA9PiB7XG4gICAgYXdhaXQgc2lnbk91dCgpO1xuICAgIG5hdmlnYXRlKCcvbG9naW4nKTtcbiAgfTtcblxuICByZXR1cm4gKFxuICAgIDxhc2lkZSBjbGFzc05hbWU9XCJ3LTY0IGJnLXNpZGViYXIgdGV4dC1zaWRlYmFyLWZvcmVncm91bmQgZmxleCBmbGV4LWNvbCBoLXNjcmVlbiBmaXhlZCBsZWZ0LTAgdG9wLTBcIj5cbiAgICAgIHsvKiBMb2dvICovfVxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJwLTYgYm9yZGVyLWIgYm9yZGVyLXNpZGViYXItYm9yZGVyXCI+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIgZ2FwLTNcIj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInctMTAgaC0xMCByb3VuZGVkLWxnIGJnLXNpZGViYXItcHJpbWFyeSBmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWNlbnRlclwiPlxuICAgICAgICAgICAgPEZsYXNrQ29uaWNhbCBjbGFzc05hbWU9XCJ3LTYgaC02IHRleHQtc2lkZWJhci1wcmltYXJ5LWZvcmVncm91bmRcIiAvPlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDxkaXY+XG4gICAgICAgICAgICA8aDEgY2xhc3NOYW1lPVwiZm9udC1ib2xkIHRleHQtbGdcIj5MYWJDb25uZWN0PC9oMT5cbiAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQteHMgdGV4dC1zaWRlYmFyLWZvcmVncm91bmQvNjBcIj57cm9sZUxhYmVsc1tyb2xlXX0gUG9ydGFsPC9wPlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICA8L2Rpdj5cbiAgICAgIDwvZGl2PlxuXG4gICAgICB7LyogVXNlciBJbmZvICovfVxuICAgICAge3VzZXJOYW1lICYmIChcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJweC02IHB5LTMgYm9yZGVyLWIgYm9yZGVyLXNpZGViYXItYm9yZGVyIGJnLXNpZGViYXItYWNjZW50LzMwXCI+XG4gICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC14cyB0ZXh0LXNpZGViYXItZm9yZWdyb3VuZC82MFwiPkxvZ2dlZCBpbiBhczwvcD5cbiAgICAgICAgICA8cCBjbGFzc05hbWU9XCJmb250LW1lZGl1bSB0ZXh0LXNtXCI+e3VzZXJOYW1lfTwvcD5cbiAgICAgICAgPC9kaXY+XG4gICAgICApfVxuXG4gICAgICB7LyogTmF2aWdhdGlvbiAqL31cbiAgICAgIDxuYXYgY2xhc3NOYW1lPVwiZmxleC0xIHAtNCBzcGFjZS15LTEgb3ZlcmZsb3cteS1hdXRvXCI+XG4gICAgICAgIHtuYXZJdGVtcy5tYXAoKHsgdG8sIGljb246IEljb24sIGxhYmVsIH0pID0+IHtcbiAgICAgICAgICBjb25zdCBpc0FjdGl2ZSA9IGxvY2F0aW9uLnBhdGhuYW1lID09PSB0bztcbiAgICAgICAgICByZXR1cm4gKFxuICAgICAgICAgICAgPE5hdkxpbmtcbiAgICAgICAgICAgICAga2V5PXt0b31cbiAgICAgICAgICAgICAgdG89e3RvfVxuICAgICAgICAgICAgICBjbGFzc05hbWU9e2NuKFxuICAgICAgICAgICAgICAgICdmbGV4IGl0ZW1zLWNlbnRlciBnYXAtMyBweC00IHB5LTMgcm91bmRlZC1sZyB0cmFuc2l0aW9uLWNvbG9ycycsXG4gICAgICAgICAgICAgICAgaXNBY3RpdmUgXG4gICAgICAgICAgICAgICAgICA/ICdiZy1zaWRlYmFyLXByaW1hcnkgdGV4dC1zaWRlYmFyLXByaW1hcnktZm9yZWdyb3VuZCcgXG4gICAgICAgICAgICAgICAgICA6ICdob3ZlcjpiZy1zaWRlYmFyLWFjY2VudCB0ZXh0LXNpZGViYXItZm9yZWdyb3VuZCdcbiAgICAgICAgICAgICAgKX1cbiAgICAgICAgICAgID5cbiAgICAgICAgICAgICAgPEljb24gY2xhc3NOYW1lPVwidy01IGgtNVwiIC8+XG4gICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImZvbnQtbWVkaXVtXCI+e2xhYmVsfTwvc3Bhbj5cbiAgICAgICAgICAgIDwvTmF2TGluaz5cbiAgICAgICAgICApO1xuICAgICAgICB9KX1cbiAgICAgIDwvbmF2PlxuXG4gICAgICB7LyogTG9nb3V0IEJ1dHRvbiAqL31cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwicC00IGJvcmRlci10IGJvcmRlci1zaWRlYmFyLWJvcmRlclwiPlxuICAgICAgICA8QnV0dG9uXG4gICAgICAgICAgb25DbGljaz17aGFuZGxlTG9nb3V0fVxuICAgICAgICAgIHZhcmlhbnQ9XCJnaG9zdFwiXG4gICAgICAgICAgY2xhc3NOYW1lPVwidy1mdWxsIGp1c3RpZnktc3RhcnQgZ2FwLTMgdGV4dC1zaWRlYmFyLWZvcmVncm91bmQgaG92ZXI6Ymctc2lkZWJhci1hY2NlbnRcIlxuICAgICAgICA+XG4gICAgICAgICAgPExvZ091dCBjbGFzc05hbWU9XCJ3LTUgaC01XCIgLz5cbiAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJmb250LW1lZGl1bVwiPkxvZ291dDwvc3Bhbj5cbiAgICAgICAgPC9CdXR0b24+XG4gICAgICA8L2Rpdj5cblxuICAgICAgey8qIEZvb3RlciAqL31cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwicC00IGJvcmRlci10IGJvcmRlci1zaWRlYmFyLWJvcmRlclwiPlxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInRleHQteHMgdGV4dC1zaWRlYmFyLWZvcmVncm91bmQvNTBcIj5cbiAgICAgICAgICA8cD5WZXJzaW9uIDEuMC4wPC9wPlxuICAgICAgICAgIDxwPkhMNyDigKIgQVNUTSDigKIgRkhJUiBDb21wYXRpYmxlPC9wPlxuICAgICAgICA8L2Rpdj5cbiAgICAgIDwvZGl2PlxuICAgIDwvYXNpZGU+XG4gICk7XG59XG4iXSwibmFtZXMiOlsidXNlTG9jYXRpb24iLCJ1c2VOYXZpZ2F0ZSIsIk5hdkxpbmsiLCJMYXlvdXREYXNoYm9hcmQiLCJVc2VycyIsIkNsaXBib2FyZExpc3QiLCJGaWxlVGV4dCIsIkNwdSIsIlNldHRpbmdzIiwiRmxhc2tDb25pY2FsIiwiVXNlclBsdXMiLCJDcmVkaXRDYXJkIiwiVGVzdFR1YmUiLCJGaWxlQ2hlY2siLCJCYXJDaGFydDMiLCJTaGllbGQiLCJMb2dPdXQiLCJDYWxjdWxhdG9yIiwiRmlsZUVkaXQiLCJjbiIsInVzZUF1dGgiLCJCdXR0b24iLCJyb2xlTmF2SXRlbXMiLCJhZG1pbiIsInRvIiwiaWNvbiIsImxhYmVsIiwicmVjZXB0aW9uaXN0Iiwicm9sZUxhYmVscyIsIlJvbGVTaWRlYmFyIiwicm9sZSIsInVzZXJOYW1lIiwibG9jYXRpb24iLCJuYXZpZ2F0ZSIsInNpZ25PdXQiLCJuYXZJdGVtcyIsImhhbmRsZUxvZ291dCIsImFzaWRlIiwiY2xhc3NOYW1lIiwiZGl2IiwiaDEiLCJwIiwibmF2IiwibWFwIiwiSWNvbiIsImlzQWN0aXZlIiwicGF0aG5hbWUiLCJzcGFuIiwib25DbGljayIsInZhcmlhbnQiXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OztBQUFBLFNBQVNBLFdBQVcsRUFBRUMsV0FBVyxRQUFRLG1CQUFtQjtBQUM1RCxTQUFTQyxPQUFPLFFBQVEsbUJBQW1CO0FBQzNDLFNBQ0VDLGVBQWUsRUFDZkMsS0FBSyxFQUNMQyxhQUFhLEVBQ2JDLFFBQVEsRUFDUkMsR0FBRyxFQUNIQyxRQUFRLEVBQ1JDLFlBQVksRUFDWkMsUUFBUSxFQUNSQyxVQUFVLEVBQ1ZDLFFBQVEsRUFDUkMsU0FBUyxFQUNUQyxTQUFTLEVBQ1RDLE1BQU0sRUFFTkMsTUFBTSxFQUNOQyxVQUFVLEVBQ1ZDLFFBQVEsUUFDSCxlQUFlO0FBQ3RCLFNBQVNDLEVBQUUsUUFBUSxjQUFjO0FBRWpDLFNBQVNDLE9BQU8sUUFBUSx3QkFBd0I7QUFDaEQsU0FBU0MsTUFBTSxRQUFRLHlCQUF5QjtBQVFoRCxNQUFNQyxlQUE0QztJQUNoREMsT0FBTztRQUNMO1lBQUVDLElBQUk7WUFBVUMsTUFBTXRCO1lBQWlCdUIsT0FBTztRQUFZO1FBQzFEO1lBQUVGLElBQUk7WUFBZ0JDLE1BQU1WO1lBQVFXLE9BQU87UUFBa0I7UUFDN0Q7WUFBRUYsSUFBSTtZQUFrQkMsTUFBTVg7WUFBV1ksT0FBTztRQUFVO1FBQzFEO1lBQUVGLElBQUk7WUFBeUJDLE1BQU1SO1lBQVlTLE9BQU87UUFBaUI7UUFDekU7WUFBRUYsSUFBSTtZQUFtQkMsTUFBTWQ7WUFBWWUsT0FBTztRQUFXO1FBQzdEO1lBQUVGLElBQUk7WUFBMEJDLE1BQU1QO1lBQVVRLE9BQU87UUFBa0I7UUFDekU7WUFBRUYsSUFBSTtZQUF1QkMsTUFBTWhCO1lBQWNpQixPQUFPO1FBQWU7UUFDdkU7WUFBRUYsSUFBSTtZQUFtQkMsTUFB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

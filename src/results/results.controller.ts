@@ -34,7 +34,8 @@ export class ResultsController {
   @Roles(UserRoleEnum.LAB_TECH, UserRoleEnum.RECEPTIONIST, UserRoleEnum.ADMIN)
   create(@Body() createResultDto: CreateResultDto, @Request() req: any) {
     const userId = req.user?.userId;
-    return this.resultsService.create(createResultDto, userId);
+    const userRoles = req.user?.roles || [];
+    return this.resultsService.create(createResultDto, userId, userRoles);
   }
 
   /**

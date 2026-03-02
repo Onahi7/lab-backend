@@ -1,0 +1,1257 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/pages/lab/EditableResultReport.tsx");import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+
+let prevRefreshReg;
+let prevRefreshSig;
+
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react-swc can't detect preamble. Something is wrong."
+    );
+  }
+
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+
+import __vite__cjsImport2_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=27cfabb6"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime["jsxDEV"]; const _Fragment = __vite__cjsImport2_react_jsxDevRuntime["Fragment"];
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=27cfabb6"; const useState = __vite__cjsImport3_react["useState"]; const useRef = __vite__cjsImport3_react["useRef"];
+import { Button } from "/src/components/ui/button.tsx";
+import { Input } from "/src/components/ui/input.tsx";
+import { Textarea } from "/src/components/ui/textarea.tsx";
+import { Printer, Save, Edit2, X } from "/node_modules/.vite/deps/lucide-react.js?v=27cfabb6";
+import { cn } from "/src/lib/utils.ts";
+export default function EditableResultReport() {
+    _s();
+    const printRef = useRef(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [patientInfo, setPatientInfo] = useState({
+        name: 'Zainab Kargbo',
+        age: '9 years',
+        gender: 'Female',
+        idNumber: 'LAB-20250131-001',
+        doctor: 'Dr Vincent',
+        collectedDate: '31/01/26',
+        receivedDate: '31/01/26',
+        reportedDate: '31/01/26'
+    });
+    const [testSections, setTestSections] = useState([
+        {
+            title: 'CLINICAL CHEMISTRY',
+            tests: [
+                {
+                    id: '1',
+                    testCode: 'K',
+                    testName: 'Potassium',
+                    value: '14.27',
+                    referenceRange: '3.5 - 5.2',
+                    unit: 'mmol/L',
+                    flag: 'critical_high'
+                },
+                {
+                    id: '2',
+                    testCode: 'Na',
+                    testName: 'Sodium',
+                    value: '141.6',
+                    referenceRange: '136 - 145',
+                    unit: 'mmol/L',
+                    flag: 'normal'
+                },
+                {
+                    id: '3',
+                    testCode: 'Cl',
+                    testName: 'Chloride',
+                    value: '110.2',
+                    referenceRange: '96 - 108',
+                    unit: 'mmol/L',
+                    flag: 'high'
+                },
+                {
+                    id: '4',
+                    testCode: 'iCa',
+                    testName: 'Ionized Calcium',
+                    value: '0.23',
+                    referenceRange: '1.05 - 1.35',
+                    unit: 'mmol/L',
+                    flag: 'critical_low'
+                },
+                {
+                    id: '5',
+                    testCode: 'nCa',
+                    testName: 'Normalized Calcium',
+                    value: '0.16',
+                    referenceRange: '1.05 - 1.35',
+                    unit: 'mmol/L',
+                    flag: 'critical_low'
+                },
+                {
+                    id: '6',
+                    testCode: 'TCa',
+                    testName: 'Total Calcium',
+                    value: '0.32',
+                    referenceRange: '2.08 - 2.60',
+                    unit: 'mmol/L',
+                    flag: 'critical_low'
+                },
+                {
+                    id: '7',
+                    testCode: 'TCO2',
+                    testName: 'Total CO2',
+                    value: '5.85',
+                    referenceRange: '22.0 - 30.0',
+                    unit: 'mmol/L',
+                    flag: 'critical_low'
+                },
+                {
+                    id: '8',
+                    testCode: 'pH',
+                    testName: 'pH',
+                    value: '6.70',
+                    referenceRange: '',
+                    unit: '',
+                    flag: 'critical_low'
+                }
+            ]
+        },
+        {
+            title: 'SEROLOGY',
+            tests: [
+                {
+                    id: '9',
+                    testCode: 'HBsAg',
+                    testName: 'Hepatitis B',
+                    value: 'Non-reactive',
+                    referenceRange: '',
+                    unit: '',
+                    flag: 'normal'
+                },
+                {
+                    id: '10',
+                    testCode: 'HCV',
+                    testName: 'Hepatitis C',
+                    value: 'Non-reactive',
+                    referenceRange: '',
+                    unit: '',
+                    flag: 'normal'
+                },
+                {
+                    id: '11',
+                    testCode: 'VDRL',
+                    testName: 'Syphilis',
+                    value: 'Non-reactive',
+                    referenceRange: '',
+                    unit: '',
+                    flag: 'normal'
+                }
+            ]
+        },
+        {
+            title: 'HEAMATOLOGY',
+            tests: [
+                {
+                    id: '12',
+                    testCode: 'SCS',
+                    testName: 'Sickle Cell Screening',
+                    value: '',
+                    referenceRange: '',
+                    unit: '',
+                    flag: 'normal'
+                },
+                {
+                    id: '13',
+                    testCode: 'Genotype',
+                    testName: 'Genotype',
+                    value: 'AA',
+                    referenceRange: '',
+                    unit: '',
+                    flag: 'normal'
+                }
+            ]
+        }
+    ]);
+    const [verifiedBy, setVerifiedBy] = useState('');
+    const [disclaimer, setDisclaimer] = useState('All tests conducted using calibrated, automated analyzers with high accuracy and precision. For detailed interpretation kindly consult your healthcare provider.');
+    const handlePrint = ()=>{
+        setIsEditing(false);
+        setTimeout(()=>{
+            window.print();
+        }, 100);
+    };
+    const handleSave = ()=>{
+        setIsEditing(false);
+    };
+    const updateTestValue = (sectionIndex, testId, field, value)=>{
+        setTestSections((prev)=>{
+            const newSections = [
+                ...prev
+            ];
+            const test = newSections[sectionIndex].tests.find((t)=>t.id === testId);
+            if (test) {
+                test[field] = value;
+            }
+            return newSections;
+        });
+    };
+    const getValueColor = (flag)=>{
+        switch(flag){
+            case 'critical_high':
+            case 'critical_low':
+                return 'text-red-600 font-bold';
+            case 'high':
+            case 'low':
+                return 'text-blue-600';
+            default:
+                return 'text-gray-900';
+        }
+    };
+    return /*#__PURE__*/ _jsxDEV("div", {
+        className: "min-h-screen bg-gray-50 p-4 md:p-8",
+        children: [
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "max-w-5xl mx-auto mb-4 flex justify-end gap-2 print:hidden",
+                children: !isEditing ? /*#__PURE__*/ _jsxDEV(_Fragment, {
+                    children: [
+                        /*#__PURE__*/ _jsxDEV(Button, {
+                            variant: "outline",
+                            onClick: ()=>setIsEditing(true),
+                            children: [
+                                /*#__PURE__*/ _jsxDEV(Edit2, {
+                                    className: "w-4 h-4 mr-2"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                    lineNumber: 129,
+                                    columnNumber: 15
+                                }, this),
+                                "Edit Report"
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                            lineNumber: 128,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV(Button, {
+                            onClick: handlePrint,
+                            children: [
+                                /*#__PURE__*/ _jsxDEV(Printer, {
+                                    className: "w-4 h-4 mr-2"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                    lineNumber: 133,
+                                    columnNumber: 15
+                                }, this),
+                                "Print Report"
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                            lineNumber: 132,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true) : /*#__PURE__*/ _jsxDEV(_Fragment, {
+                    children: [
+                        /*#__PURE__*/ _jsxDEV(Button, {
+                            variant: "outline",
+                            onClick: ()=>setIsEditing(false),
+                            children: [
+                                /*#__PURE__*/ _jsxDEV(X, {
+                                    className: "w-4 h-4 mr-2"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                    lineNumber: 140,
+                                    columnNumber: 15
+                                }, this),
+                                "Cancel"
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                            lineNumber: 139,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV(Button, {
+                            onClick: handleSave,
+                            children: [
+                                /*#__PURE__*/ _jsxDEV(Save, {
+                                    className: "w-4 h-4 mr-2"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                    lineNumber: 144,
+                                    columnNumber: 15
+                                }, this),
+                                "Save Changes"
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                            lineNumber: 143,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                lineNumber: 125,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                ref: printRef,
+                className: "max-w-5xl mx-auto bg-white shadow-lg print:shadow-none",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "border-b-4 border-blue-600 pb-4 px-8 pt-8",
+                        children: /*#__PURE__*/ _jsxDEV("div", {
+                            className: "flex items-start justify-between",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "flex items-center gap-4",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            className: "w-16 h-16 bg-gradient-to-br from-blue-500 to-green-500 rounded-lg flex items-center justify-center",
+                                            children: /*#__PURE__*/ _jsxDEV("svg", {
+                                                className: "w-10 h-10 text-white",
+                                                fill: "none",
+                                                stroke: "currentColor",
+                                                viewBox: "0 0 24 24",
+                                                children: /*#__PURE__*/ _jsxDEV("path", {
+                                                    strokeLinecap: "round",
+                                                    strokeLinejoin: "round",
+                                                    strokeWidth: 2,
+                                                    d: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                    lineNumber: 160,
+                                                    columnNumber: 19
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                lineNumber: 159,
+                                                columnNumber: 17
+                                            }, this)
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                            lineNumber: 158,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("h1", {
+                                                    className: "text-2xl font-bold text-gray-900",
+                                                    children: "HARBOUR"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                    lineNumber: 164,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("p", {
+                                                    className: "text-lg text-gray-700",
+                                                    children: "Medical Diagnostic"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                    lineNumber: 165,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("p", {
+                                                    className: "text-xs text-gray-500 italic",
+                                                    children: "Motto: Automated Precision..."
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                    lineNumber: 166,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                            lineNumber: 163,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                    lineNumber: 157,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "text-right text-sm text-gray-600",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("p", {
+                                            className: "font-semibold",
+                                            children: "075 766461, 031-551811"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                            lineNumber: 172,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("p", {
+                                            children: "ogbenecarefarmsig@gmail.com"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                            lineNumber: 173,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("p", {
+                                            children: "114 Fourah Bay Road, Freetown, Sierra Leone"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                            lineNumber: 174,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                    lineNumber: 171,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                            lineNumber: 155,
+                            columnNumber: 11
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                        lineNumber: 154,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "px-8 py-6 border-b",
+                        children: /*#__PURE__*/ _jsxDEV("div", {
+                            className: "grid grid-cols-3 gap-8",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("h3", {
+                                            className: "font-bold text-gray-700 mb-3 uppercase text-sm",
+                                            children: "Patient"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                            lineNumber: 184,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            className: "space-y-2",
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV("label", {
+                                                            className: "text-xs text-gray-500 uppercase",
+                                                            children: "Name:"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                            lineNumber: 187,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        isEditing ? /*#__PURE__*/ _jsxDEV(Input, {
+                                                            value: patientInfo.name,
+                                                            onChange: (e)=>setPatientInfo({
+                                                                    ...patientInfo,
+                                                                    name: e.target.value
+                                                                }),
+                                                            className: "mt-1"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                            lineNumber: 189,
+                                                            columnNumber: 21
+                                                        }, this) : /*#__PURE__*/ _jsxDEV("p", {
+                                                            className: "font-semibold",
+                                                            children: patientInfo.name
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                            lineNumber: 195,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                    lineNumber: 186,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV("label", {
+                                                            className: "text-xs text-gray-500 uppercase",
+                                                            children: "Age:"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                            lineNumber: 199,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        isEditing ? /*#__PURE__*/ _jsxDEV(Input, {
+                                                            value: patientInfo.age,
+                                                            onChange: (e)=>setPatientInfo({
+                                                                    ...patientInfo,
+                                                                    age: e.target.value
+                                                                }),
+                                                            className: "mt-1"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                            lineNumber: 201,
+                                                            columnNumber: 21
+                                                        }, this) : /*#__PURE__*/ _jsxDEV("p", {
+                                                            className: "font-semibold",
+                                                            children: patientInfo.age
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                            lineNumber: 207,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                    lineNumber: 198,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV("label", {
+                                                            className: "text-xs text-gray-500 uppercase",
+                                                            children: "Gender:"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                            lineNumber: 211,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        isEditing ? /*#__PURE__*/ _jsxDEV(Input, {
+                                                            value: patientInfo.gender,
+                                                            onChange: (e)=>setPatientInfo({
+                                                                    ...patientInfo,
+                                                                    gender: e.target.value
+                                                                }),
+                                                            className: "mt-1"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                            lineNumber: 213,
+                                                            columnNumber: 21
+                                                        }, this) : /*#__PURE__*/ _jsxDEV("p", {
+                                                            className: "font-semibold",
+                                                            children: patientInfo.gender
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                            lineNumber: 219,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                    lineNumber: 210,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV("label", {
+                                                            className: "text-xs text-gray-500 uppercase",
+                                                            children: "ID Number:"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                            lineNumber: 223,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        isEditing ? /*#__PURE__*/ _jsxDEV(Input, {
+                                                            value: patientInfo.idNumber,
+                                                            onChange: (e)=>setPatientInfo({
+                                                                    ...patientInfo,
+                                                                    idNumber: e.target.value
+                                                                }),
+                                                            className: "mt-1"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                            lineNumber: 225,
+                                                            columnNumber: 21
+                                                        }, this) : /*#__PURE__*/ _jsxDEV("p", {
+                                                            className: "font-semibold",
+                                                            children: patientInfo.idNumber
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                            lineNumber: 231,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                    lineNumber: 222,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                            lineNumber: 185,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                    lineNumber: 183,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("h3", {
+                                            className: "font-bold text-gray-700 mb-3 uppercase text-sm",
+                                            children: "Doctor"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                            lineNumber: 239,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            className: "space-y-2",
+                                            children: /*#__PURE__*/ _jsxDEV("div", {
+                                                children: isEditing ? /*#__PURE__*/ _jsxDEV(Input, {
+                                                    value: patientInfo.doctor,
+                                                    onChange: (e)=>setPatientInfo({
+                                                            ...patientInfo,
+                                                            doctor: e.target.value
+                                                        }),
+                                                    className: "mt-1"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                    lineNumber: 243,
+                                                    columnNumber: 21
+                                                }, this) : /*#__PURE__*/ _jsxDEV("p", {
+                                                    className: "font-semibold",
+                                                    children: patientInfo.doctor
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                    lineNumber: 249,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                lineNumber: 241,
+                                                columnNumber: 17
+                                            }, this)
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                            lineNumber: 240,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                    lineNumber: 238,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("h3", {
+                                            className: "font-bold text-gray-700 mb-3 uppercase text-sm",
+                                            children: "Copies To"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                            lineNumber: 257,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            className: "space-y-2",
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("div", {
+                                                    children: isEditing ? /*#__PURE__*/ _jsxDEV(Input, {
+                                                        value: patientInfo.doctor,
+                                                        className: "mt-1",
+                                                        placeholder: "Copy recipient"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                        lineNumber: 261,
+                                                        columnNumber: 21
+                                                    }, this) : /*#__PURE__*/ _jsxDEV("p", {
+                                                        className: "font-semibold",
+                                                        children: patientInfo.doctor
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                        lineNumber: 267,
+                                                        columnNumber: 21
+                                                    }, this)
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                    lineNumber: 259,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("div", {
+                                                    className: "text-sm space-y-1 mt-4",
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV("div", {
+                                                            className: "flex justify-between",
+                                                            children: [
+                                                                /*#__PURE__*/ _jsxDEV("span", {
+                                                                    className: "text-gray-500",
+                                                                    children: "COLLECTED:"
+                                                                }, void 0, false, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                                    lineNumber: 272,
+                                                                    columnNumber: 21
+                                                                }, this),
+                                                                isEditing ? /*#__PURE__*/ _jsxDEV(Input, {
+                                                                    value: patientInfo.collectedDate,
+                                                                    onChange: (e)=>setPatientInfo({
+                                                                            ...patientInfo,
+                                                                            collectedDate: e.target.value
+                                                                        }),
+                                                                    className: "w-32 h-7 text-sm"
+                                                                }, void 0, false, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                                    lineNumber: 274,
+                                                                    columnNumber: 23
+                                                                }, this) : /*#__PURE__*/ _jsxDEV("span", {
+                                                                    className: "font-semibold",
+                                                                    children: patientInfo.collectedDate
+                                                                }, void 0, false, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                                    lineNumber: 280,
+                                                                    columnNumber: 23
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                            lineNumber: 271,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("div", {
+                                                            className: "flex justify-between",
+                                                            children: [
+                                                                /*#__PURE__*/ _jsxDEV("span", {
+                                                                    className: "text-gray-500",
+                                                                    children: "RECEIVED:"
+                                                                }, void 0, false, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                                    lineNumber: 284,
+                                                                    columnNumber: 21
+                                                                }, this),
+                                                                isEditing ? /*#__PURE__*/ _jsxDEV(Input, {
+                                                                    value: patientInfo.receivedDate,
+                                                                    onChange: (e)=>setPatientInfo({
+                                                                            ...patientInfo,
+                                                                            receivedDate: e.target.value
+                                                                        }),
+                                                                    className: "w-32 h-7 text-sm"
+                                                                }, void 0, false, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                                    lineNumber: 286,
+                                                                    columnNumber: 23
+                                                                }, this) : /*#__PURE__*/ _jsxDEV("span", {
+                                                                    className: "font-semibold",
+                                                                    children: patientInfo.receivedDate
+                                                                }, void 0, false, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                                    lineNumber: 292,
+                                                                    columnNumber: 23
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                            lineNumber: 283,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("div", {
+                                                            className: "flex justify-between",
+                                                            children: [
+                                                                /*#__PURE__*/ _jsxDEV("span", {
+                                                                    className: "text-gray-500",
+                                                                    children: "PRINTED:"
+                                                                }, void 0, false, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                                    lineNumber: 296,
+                                                                    columnNumber: 21
+                                                                }, this),
+                                                                isEditing ? /*#__PURE__*/ _jsxDEV(Input, {
+                                                                    value: patientInfo.reportedDate,
+                                                                    onChange: (e)=>setPatientInfo({
+                                                                            ...patientInfo,
+                                                                            reportedDate: e.target.value
+                                                                        }),
+                                                                    className: "w-32 h-7 text-sm"
+                                                                }, void 0, false, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                                    lineNumber: 298,
+                                                                    columnNumber: 23
+                                                                }, this) : /*#__PURE__*/ _jsxDEV("span", {
+                                                                    className: "font-semibold",
+                                                                    children: patientInfo.reportedDate
+                                                                }, void 0, false, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                                    lineNumber: 304,
+                                                                    columnNumber: 23
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                            lineNumber: 295,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                    lineNumber: 270,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                            lineNumber: 258,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                    lineNumber: 256,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                            lineNumber: 181,
+                            columnNumber: 11
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                        lineNumber: 180,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "px-8 py-6",
+                        children: testSections.map((section, sectionIndex)=>/*#__PURE__*/ _jsxDEV("div", {
+                                className: "mb-8",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "bg-gradient-to-r from-blue-50 to-green-50 px-4 py-2 mb-4",
+                                        children: /*#__PURE__*/ _jsxDEV("h2", {
+                                            className: "text-lg font-bold text-gray-800",
+                                            children: section.title
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                            lineNumber: 318,
+                                            columnNumber: 17
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                        lineNumber: 317,
+                                        columnNumber: 15
+                                    }, this),
+                                    section.title === 'CLINICAL CHEMISTRY' && /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "mb-6",
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("h3", {
+                                                className: "font-semibold text-gray-700 mb-3",
+                                                children: "ELECTROLYTE"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                lineNumber: 324,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("table", {
+                                                className: "w-full border-collapse",
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV("thead", {
+                                                        children: /*#__PURE__*/ _jsxDEV("tr", {
+                                                            className: "border-b-2 border-gray-300",
+                                                            children: [
+                                                                /*#__PURE__*/ _jsxDEV("th", {
+                                                                    className: "text-left py-2 text-sm font-semibold text-gray-700"
+                                                                }, void 0, false, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                                    lineNumber: 328,
+                                                                    columnNumber: 25
+                                                                }, this),
+                                                                /*#__PURE__*/ _jsxDEV("th", {
+                                                                    className: "text-right py-2 text-sm font-semibold text-gray-700",
+                                                                    children: "RESULT"
+                                                                }, void 0, false, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                                    lineNumber: 329,
+                                                                    columnNumber: 25
+                                                                }, this),
+                                                                /*#__PURE__*/ _jsxDEV("th", {
+                                                                    className: "text-right py-2 text-sm font-semibold text-gray-700",
+                                                                    children: "RANGES"
+                                                                }, void 0, false, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                                    lineNumber: 330,
+                                                                    columnNumber: 25
+                                                                }, this),
+                                                                /*#__PURE__*/ _jsxDEV("th", {
+                                                                    className: "text-right py-2 text-sm font-semibold text-gray-700",
+                                                                    children: "UNIT"
+                                                                }, void 0, false, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                                    lineNumber: 331,
+                                                                    columnNumber: 25
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                            lineNumber: 327,
+                                                            columnNumber: 23
+                                                        }, this)
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                        lineNumber: 326,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("tbody", {
+                                                        children: section.tests.map((test)=>/*#__PURE__*/ _jsxDEV("tr", {
+                                                                className: "border-b border-gray-200 hover:bg-gray-50",
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV("td", {
+                                                                        className: "py-2",
+                                                                        children: /*#__PURE__*/ _jsxDEV("span", {
+                                                                            className: "font-semibold text-gray-900",
+                                                                            children: test.testCode
+                                                                        }, void 0, false, {
+                                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                                            lineNumber: 338,
+                                                                            columnNumber: 29
+                                                                        }, this)
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                                        lineNumber: 337,
+                                                                        columnNumber: 27
+                                                                    }, this),
+                                                                    /*#__PURE__*/ _jsxDEV("td", {
+                                                                        className: "text-right py-2",
+                                                                        children: isEditing ? /*#__PURE__*/ _jsxDEV(Input, {
+                                                                            value: test.value,
+                                                                            onChange: (e)=>updateTestValue(sectionIndex, test.id, 'value', e.target.value),
+                                                                            className: cn('w-24 h-8 text-right', getValueColor(test.flag))
+                                                                        }, void 0, false, {
+                                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                                            lineNumber: 342,
+                                                                            columnNumber: 31
+                                                                        }, this) : /*#__PURE__*/ _jsxDEV("span", {
+                                                                            className: cn('font-bold', getValueColor(test.flag)),
+                                                                            children: test.value
+                                                                        }, void 0, false, {
+                                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                                            lineNumber: 348,
+                                                                            columnNumber: 31
+                                                                        }, this)
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                                        lineNumber: 340,
+                                                                        columnNumber: 27
+                                                                    }, this),
+                                                                    /*#__PURE__*/ _jsxDEV("td", {
+                                                                        className: "text-right py-2 text-gray-600",
+                                                                        children: isEditing ? /*#__PURE__*/ _jsxDEV(Input, {
+                                                                            value: test.referenceRange,
+                                                                            onChange: (e)=>updateTestValue(sectionIndex, test.id, 'referenceRange', e.target.value),
+                                                                            className: "w-32 h-8 text-right"
+                                                                        }, void 0, false, {
+                                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                                            lineNumber: 355,
+                                                                            columnNumber: 31
+                                                                        }, this) : test.referenceRange
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                                        lineNumber: 353,
+                                                                        columnNumber: 27
+                                                                    }, this),
+                                                                    /*#__PURE__*/ _jsxDEV("td", {
+                                                                        className: "text-right py-2 text-gray-600",
+                                                                        children: isEditing ? /*#__PURE__*/ _jsxDEV(Input, {
+                                                                            value: test.unit,
+                                                                            onChange: (e)=>updateTestValue(sectionIndex, test.id, 'unit', e.target.value),
+                                                                            className: "w-24 h-8 text-right"
+                                                                        }, void 0, false, {
+                                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                                            lineNumber: 366,
+                                                                            columnNumber: 31
+                                                                        }, this) : test.unit
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                                        lineNumber: 364,
+                                                                        columnNumber: 27
+                                                                    }, this)
+                                                                ]
+                                                            }, test.id, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                                lineNumber: 336,
+                                                                columnNumber: 25
+                                                            }, this))
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                        lineNumber: 334,
+                                                        columnNumber: 21
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                lineNumber: 325,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                        lineNumber: 323,
+                                        columnNumber: 17
+                                    }, this),
+                                    section.title === 'SEROLOGY' && /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "space-y-3",
+                                        children: section.tests.map((test)=>/*#__PURE__*/ _jsxDEV("div", {
+                                                className: "flex justify-between items-center py-2 border-b border-gray-200",
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV("span", {
+                                                        className: "font-semibold text-gray-900",
+                                                        children: test.testName
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                        lineNumber: 387,
+                                                        columnNumber: 23
+                                                    }, this),
+                                                    isEditing ? /*#__PURE__*/ _jsxDEV(Input, {
+                                                        value: test.value,
+                                                        onChange: (e)=>updateTestValue(sectionIndex, test.id, 'value', e.target.value),
+                                                        className: "w-48 h-8"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                        lineNumber: 389,
+                                                        columnNumber: 25
+                                                    }, this) : /*#__PURE__*/ _jsxDEV("span", {
+                                                        className: "font-semibold text-gray-900",
+                                                        children: test.value
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                        lineNumber: 395,
+                                                        columnNumber: 25
+                                                    }, this)
+                                                ]
+                                            }, test.id, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                lineNumber: 386,
+                                                columnNumber: 21
+                                            }, this))
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                        lineNumber: 384,
+                                        columnNumber: 17
+                                    }, this),
+                                    section.title === 'HEAMATOLOGY' && /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "space-y-3",
+                                        children: section.tests.map((test)=>/*#__PURE__*/ _jsxDEV("div", {
+                                                className: "flex justify-between items-center py-2 border-b border-gray-200",
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV("span", {
+                                                        className: "font-semibold text-gray-900",
+                                                        children: test.testName
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                        lineNumber: 407,
+                                                        columnNumber: 23
+                                                    }, this),
+                                                    isEditing ? /*#__PURE__*/ _jsxDEV(Input, {
+                                                        value: test.value,
+                                                        onChange: (e)=>updateTestValue(sectionIndex, test.id, 'value', e.target.value),
+                                                        className: "w-48 h-8"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                        lineNumber: 409,
+                                                        columnNumber: 25
+                                                    }, this) : /*#__PURE__*/ _jsxDEV("span", {
+                                                        className: "font-semibold text-gray-900",
+                                                        children: test.value
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                        lineNumber: 415,
+                                                        columnNumber: 25
+                                                    }, this)
+                                                ]
+                                            }, test.id, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                                lineNumber: 406,
+                                                columnNumber: 21
+                                            }, this))
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                        lineNumber: 404,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, section.title, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                lineNumber: 316,
+                                columnNumber: 13
+                            }, this))
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                        lineNumber: 314,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "px-8 py-6 border-t",
+                        children: /*#__PURE__*/ _jsxDEV("div", {
+                            className: "mb-4",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("label", {
+                                    className: "text-sm text-gray-600",
+                                    children: "Verified By:"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                    lineNumber: 428,
+                                    columnNumber: 13
+                                }, this),
+                                isEditing ? /*#__PURE__*/ _jsxDEV(Input, {
+                                    value: verifiedBy,
+                                    onChange: (e)=>setVerifiedBy(e.target.value),
+                                    className: "mt-1 max-w-md",
+                                    placeholder: "Enter verifier name"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                    lineNumber: 430,
+                                    columnNumber: 15
+                                }, this) : /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "mt-2 border-b border-gray-400 w-64 h-8"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                    lineNumber: 437,
+                                    columnNumber: 15
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                            lineNumber: 427,
+                            columnNumber: 11
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                        lineNumber: 426,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-gradient-to-r from-blue-600 to-green-600 px-8 py-6 text-white",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "mb-4",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("h4", {
+                                        className: "font-semibold mb-2",
+                                        children: "Disclaimer"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                        lineNumber: 445,
+                                        columnNumber: 13
+                                    }, this),
+                                    isEditing ? /*#__PURE__*/ _jsxDEV(Textarea, {
+                                        value: disclaimer,
+                                        onChange: (e)=>setDisclaimer(e.target.value),
+                                        className: "bg-white text-gray-900",
+                                        rows: 3
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                        lineNumber: 447,
+                                        columnNumber: 15
+                                    }, this) : /*#__PURE__*/ _jsxDEV("p", {
+                                        className: "text-sm",
+                                        children: disclaimer
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                        lineNumber: 454,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                lineNumber: 444,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "text-right border-t border-white/30 pt-4",
+                                children: /*#__PURE__*/ _jsxDEV("p", {
+                                    className: "text-sm font-semibold",
+                                    children: "Signature & Stamp"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                    lineNumber: 459,
+                                    columnNumber: 13
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                lineNumber: 458,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "mt-6 text-center text-sm",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("p", {
+                                        className: "font-semibold",
+                                        children: "OPEN 24/7 | ONSITE & ONLINE ACCESS |"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                        lineNumber: 463,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("p", {
+                                        className: "font-semibold",
+                                        children: "TRUSTED BY CLINICS & HOSPITALS"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                        lineNumber: 464,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                                lineNumber: 462,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                        lineNumber: 443,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                lineNumber: 152,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("style", {
+                children: `
+        @media print {
+          body {
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
+          }
+          .print\\:hidden {
+            display: none !important;
+          }
+          .print\\:shadow-none {
+            box-shadow: none !important;
+          }
+        }
+      `
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+                lineNumber: 470,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx",
+        lineNumber: 123,
+        columnNumber: 5
+    }, this);
+}
+_s(EditableResultReport, "5v619g4+XhXQWoUiKQ8Y1/peD1Y=");
+_c = EditableResultReport;
+var _c;
+$RefreshReg$(_c, "EditableResultReport");
+
+
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+
+
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/HP/Downloads/lab/frontend/src/pages/lab/EditableResultReport.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIkVkaXRhYmxlUmVzdWx0UmVwb3J0LnRzeCJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyB1c2VTdGF0ZSwgdXNlUmVmIH0gZnJvbSAncmVhY3QnO1xyXG5pbXBvcnQgeyBCdXR0b24gfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvYnV0dG9uJztcclxuaW1wb3J0IHsgSW5wdXQgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvaW5wdXQnO1xyXG5pbXBvcnQgeyBUZXh0YXJlYSB9IGZyb20gJ0AvY29tcG9uZW50cy91aS90ZXh0YXJlYSc7XHJcbmltcG9ydCB7IENhcmQgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvY2FyZCc7XHJcbmltcG9ydCB7IEJhZGdlIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL2JhZGdlJztcclxuaW1wb3J0IHsgUHJpbnRlciwgU2F2ZSwgRWRpdDIsIFggfSBmcm9tICdsdWNpZGUtcmVhY3QnO1xyXG5pbXBvcnQgeyBjbiB9IGZyb20gJ0AvbGliL3V0aWxzJztcclxuXHJcbmludGVyZmFjZSBUZXN0UmVzdWx0IHtcclxuICBpZDogc3RyaW5nO1xyXG4gIHRlc3RDb2RlOiBzdHJpbmc7XHJcbiAgdGVzdE5hbWU6IHN0cmluZztcclxuICB2YWx1ZTogc3RyaW5nO1xyXG4gIHJlZmVyZW5jZVJhbmdlOiBzdHJpbmc7XHJcbiAgdW5pdDogc3RyaW5nO1xyXG4gIGZsYWc6ICdub3JtYWwnIHwgJ2xvdycgfCAnaGlnaCcgfCAnY3JpdGljYWxfbG93JyB8ICdjcml0aWNhbF9oaWdoJztcclxufVxyXG5cclxuaW50ZXJmYWNlIFRlc3RTZWN0aW9uIHtcclxuICB0aXRsZTogc3RyaW5nO1xyXG4gIHRlc3RzOiBUZXN0UmVzdWx0W107XHJcbn1cclxuXHJcbmludGVyZmFjZSBQYXRpZW50SW5mbyB7XHJcbiAgbmFtZTogc3RyaW5nO1xyXG4gIGFnZTogc3RyaW5nO1xyXG4gIGdlbmRlcjogc3RyaW5nO1xyXG4gIGlkTnVtYmVyOiBzdHJpbmc7XHJcbiAgZG9jdG9yOiBzdHJpbmc7XHJcbiAgY29sbGVjdGVkRGF0ZTogc3RyaW5nO1xyXG4gIHJlY2VpdmVkRGF0ZTogc3RyaW5nO1xyXG4gIHJlcG9ydGVkRGF0ZTogc3RyaW5nO1xyXG59XHJcblxyXG5leHBvcnQgZGVmYXVsdCBmdW5jdGlvbiBFZGl0YWJsZVJlc3VsdFJlcG9ydCgpIHtcclxuICBjb25zdCBwcmludFJlZiA9IHVzZVJlZjxIVE1MRGl2RWxlbWVudD4obnVsbCk7XHJcbiAgY29uc3QgW2lzRWRpdGluZywgc2V0SXNFZGl0aW5nXSA9IHVzZVN0YXRlKGZhbHNlKTtcclxuICBcclxuICBjb25zdCBbcGF0aWVudEluZm8sIHNldFBhdGllbnRJbmZvXSA9IHVzZVN0YXRlPFBhdGllbnRJbmZvPih7XHJcbiAgICBuYW1lOiAnWmFpbmFiIEthcmdibycsXHJcbiAgICBhZ2U6ICc5IHllYXJzJyxcclxuICAgIGdlbmRlcjogJ0ZlbWFsZScsXHJcbiAgICBpZE51bWJlcjogJ0xBQi0yMDI1MDEzMS0wMDEnLFxyXG4gICAgZG9jdG9yOiAnRHIgVmluY2VudCcsXHJcbiAgICBjb2xsZWN0ZWREYXRlOiAnMzEvMDEvMjYnLFxyXG4gICAgcmVjZWl2ZWREYXRlOiAnMzEvMDEvMjYnLFxyXG4gICAgcmVwb3J0ZWREYXRlOiAnMzEvMDEvMjYnLFxyXG4gIH0pO1xyXG5cclxuICBjb25zdCBbdGVzdFNlY3Rpb25zLCBzZXRUZXN0U2VjdGlvbnNdID0gdXNlU3RhdGU8VGVzdFNlY3Rpb25bXT4oW1xyXG4gICAge1xyXG4gICAgICB0aXRsZTogJ0NMSU5JQ0FMIENIRU1JU1RSWScsXHJcbiAgICAgIHRlc3RzOiBbXHJcbiAgICAgICAgeyBpZDogJzEnLCB0ZXN0Q29kZTogJ0snLCB0ZXN0TmFtZTogJ1BvdGFzc2l1bScsIHZhbHVlOiAnMTQuMjcnLCByZWZlcmVuY2VSYW5nZTogJzMuNSAtIDUuMicsIHVuaXQ6ICdtbW9sL0wnLCBmbGFnOiAnY3JpdGljYWxfaGlnaCcgfSxcclxuICAgICAgICB7IGlkOiAnMicsIHRlc3RDb2RlOiAnTmEnLCB0ZXN0TmFtZTogJ1NvZGl1bScsIHZhbHVlOiAnMTQxLjYnLCByZWZlcmVuY2VSYW5nZTogJzEzNiAtIDE0NScsIHVuaXQ6ICdtbW9sL0wnLCBmbGFnOiAnbm9ybWFsJyB9LFxyXG4gICAgICAgIHsgaWQ6ICczJywgdGVzdENvZGU6ICdDbCcsIHRlc3ROYW1lOiAnQ2hsb3JpZGUnLCB2YWx1ZTogJzExMC4yJywgcmVmZXJlbmNlUmFuZ2U6ICc5NiAtIDEwOCcsIHVuaXQ6ICdtbW9sL0wnLCBmbGFnOiAnaGlnaCcgfSxcclxuICAgICAgICB7IGlkOiAnNCcsIHRlc3RDb2RlOiAnaUNhJywgdGVzdE5hbWU6ICdJb25pemVkIENhbGNpdW0nLCB2YWx1ZTogJzAuMjMnLCByZWZlcmVuY2VSYW5nZTogJzEuMDUgLSAxLjM1JywgdW5pdDogJ21tb2wvTCcsIGZsYWc6ICdjcml0aWNhbF9sb3cnIH0sXHJcbiAgICAgICAgeyBpZDogJzUnLCB0ZXN0Q29kZTogJ25DYScsIHRlc3ROYW1lOiAnTm9ybWFsaXplZCBDYWxjaXVtJywgdmFsdWU6ICcwLjE2JywgcmVmZXJlbmNlUmFuZ2U6ICcxLjA1IC0gMS4zNScsIHVuaXQ6ICdtbW9sL0wnLCBmbGFnOiAnY3JpdGljYWxfbG93JyB9LFxyXG4gICAgICAgIHsgaWQ6ICc2JywgdGVzdENvZGU6ICdUQ2EnLCB0ZXN0TmFtZTogJ1RvdGFsIENhbGNpdW0nLCB2YWx1ZTogJzAuMzInLCByZWZlcmVuY2VSYW5nZTogJzIuMDggLSAyLjYwJywgdW5pdDogJ21tb2wvTCcsIGZsYWc6ICdjcml0aWNhbF9sb3cnIH0sXHJcbiAgICAgICAgeyBpZDogJzcnLCB0ZXN0Q29kZTogJ1RDTzInLCB0ZXN0TmFtZTogJ1RvdGFsIENPMicsIHZhbHVlOiAnNS44NScsIHJlZmVyZW5jZVJhbmdlOiAnMjIuMCAtIDMwLjAnLCB1bml0OiAnbW1vbC9MJywgZmxhZzogJ2NyaXRpY2FsX2xvdycgfSxcclxuICAgICAgICB7IGlkOiAnOCcsIHRlc3RDb2RlOiAncEgnLCB0ZXN0TmFtZTogJ3BIJywgdmFsdWU6ICc2LjcwJywgcmVmZXJlbmNlUmFuZ2U6ICcnLCB1bml0OiAnJywgZmxhZzogJ2NyaXRpY2FsX2xvdycgfSxcclxuICAgICAgXSxcclxuICAgIH0sXHJcbiAgICB7XHJcbiAgICAgIHRpdGxlOiAnU0VST0xPR1knLFxyXG4gICAgICB0ZXN0czogW1xyXG4gICAgICAgIHsgaWQ6ICc5JywgdGVzdENvZGU6ICdIQnNBZycsIHRlc3ROYW1lOiAnSGVwYXRpdGlzIEInLCB2YWx1ZTogJ05vbi1yZWFjdGl2ZScsIHJlZmVyZW5jZVJhbmdlOiAnJywgdW5pdDogJycsIGZsYWc6ICdub3JtYWwnIH0sXHJcbiAgICAgICAgeyBpZDogJzEwJywgdGVzdENvZGU6ICdIQ1YnLCB0ZXN0TmFtZTogJ0hlcGF0aXRpcyBDJywgdmFsdWU6ICdOb24tcmVhY3RpdmUnLCByZWZlcmVuY2VSYW5nZTogJycsIHVuaXQ6ICcnLCBmbGFnOiAnbm9ybWFsJyB9LFxyXG4gICAgICAgIHsgaWQ6ICcxMScsIHRlc3RDb2RlOiAnVkRSTCcsIHRlc3ROYW1lOiAnU3lwaGlsaXMnLCB2YWx1ZTogJ05vbi1yZWFjdGl2ZScsIHJlZmVyZW5jZVJhbmdlOiAnJywgdW5pdDogJycsIGZsYWc6ICdub3JtYWwnIH0sXHJcbiAgICAgIF0sXHJcbiAgICB9LFxyXG4gICAge1xyXG4gICAgICB0aXRsZTogJ0hFQU1BVE9MT0dZJyxcclxuICAgICAgdGVzdHM6IFtcclxuICAgICAgICB7IGlkOiAnMTInLCB0ZXN0Q29kZTogJ1NDUycsIHRlc3ROYW1lOiAnU2lja2xlIENlbGwgU2NyZWVuaW5nJywgdmFsdWU6ICcnLCByZWZlcmVuY2VSYW5nZTogJycsIHVuaXQ6ICcnLCBmbGFnOiAnbm9ybWFsJyB9LFxyXG4gICAgICAgIHsgaWQ6ICcxMycsIHRlc3RDb2RlOiAnR2Vub3R5cGUnLCB0ZXN0TmFtZTogJ0dlbm90eXBlJywgdmFsdWU6ICdBQScsIHJlZmVyZW5jZVJhbmdlOiAnJywgdW5pdDogJycsIGZsYWc6ICdub3JtYWwnIH0sXHJcbiAgICAgIF0sXHJcbiAgICB9LFxyXG4gIF0pO1xyXG5cclxuICBjb25zdCBbdmVyaWZpZWRCeSwgc2V0VmVyaWZpZWRCeV0gPSB1c2VTdGF0ZSgnJyk7XHJcbiAgY29uc3QgW2Rpc2NsYWltZXIsIHNldERpc2NsYWltZXJdID0gdXNlU3RhdGUoXHJcbiAgICAnQWxsIHRlc3RzIGNvbmR1Y3RlZCB1c2luZyBjYWxpYnJhdGVkLCBhdXRvbWF0ZWQgYW5hbHl6ZXJzIHdpdGggaGlnaCBhY2N1cmFjeSBhbmQgcHJlY2lzaW9uLiBGb3IgZGV0YWlsZWQgaW50ZXJwcmV0YXRpb24ga2luZGx5IGNvbnN1bHQgeW91ciBoZWFsdGhjYXJlIHByb3ZpZGVyLidcclxuICApO1xyXG5cclxuICBjb25zdCBoYW5kbGVQcmludCA9ICgpID0+IHtcclxuICAgIHNldElzRWRpdGluZyhmYWxzZSk7XHJcbiAgICBzZXRUaW1lb3V0KCgpID0+IHtcclxuICAgICAgd2luZG93LnByaW50KCk7XHJcbiAgICB9LCAxMDApO1xyXG4gIH07XHJcblxyXG4gIGNvbnN0IGhhbmRsZVNhdmUgPSAoKSA9PiB7XHJcbiAgICBzZXRJc0VkaXRpbmcoZmFsc2UpO1xyXG4gIH07XHJcblxyXG4gIGNvbnN0IHVwZGF0ZVRlc3RWYWx1ZSA9IChzZWN0aW9uSW5kZXg6IG51bWJlciwgdGVzdElkOiBzdHJpbmcsIGZpZWxkOiBrZXlvZiBUZXN0UmVzdWx0LCB2YWx1ZTogc3RyaW5nKSA9PiB7XHJcbiAgICBzZXRUZXN0U2VjdGlvbnMocHJldiA9PiB7XHJcbiAgICAgIGNvbnN0IG5ld1NlY3Rpb25zID0gWy4uLnByZXZdO1xyXG4gICAgICBjb25zdCB0ZXN0ID0gbmV3U2VjdGlvbnNbc2VjdGlvbkluZGV4XS50ZXN0cy5maW5kKHQgPT4gdC5pZCA9PT0gdGVzdElkKTtcclxuICAgICAgaWYgKHRlc3QpIHtcclxuICAgICAgICAodGVzdCBhcyBhbnkpW2ZpZWxkXSA9IHZhbHVlO1xyXG4gICAgICB9XHJcbiAgICAgIHJldHVybiBuZXdTZWN0aW9ucztcclxuICAgIH0pO1xyXG4gIH07XHJcblxyXG4gIGNvbnN0IGdldFZhbHVlQ29sb3IgPSAoZmxhZzogVGVzdFJlc3VsdFsnZmxhZyddKSA9PiB7XHJcbiAgICBzd2l0Y2ggKGZsYWcpIHtcclxuICAgICAgY2FzZSAnY3JpdGljYWxfaGlnaCc6XHJcbiAgICAgIGNhc2UgJ2NyaXRpY2FsX2xvdyc6XHJcbiAgICAgICAgcmV0dXJuICd0ZXh0LXJlZC02MDAgZm9udC1ib2xkJztcclxuICAgICAgY2FzZSAnaGlnaCc6XHJcbiAgICAgIGNhc2UgJ2xvdyc6XHJcbiAgICAgICAgcmV0dXJuICd0ZXh0LWJsdWUtNjAwJztcclxuICAgICAgZGVmYXVsdDpcclxuICAgICAgICByZXR1cm4gJ3RleHQtZ3JheS05MDAnO1xyXG4gICAgfVxyXG4gIH07XHJcblxyXG4gIHJldHVybiAoXHJcbiAgICA8ZGl2IGNsYXNzTmFtZT1cIm1pbi1oLXNjcmVlbiBiZy1ncmF5LTUwIHAtNCBtZDpwLThcIj5cclxuICAgICAgey8qIEFjdGlvbiBCdXR0b25zICovfVxyXG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cIm1heC13LTV4bCBteC1hdXRvIG1iLTQgZmxleCBqdXN0aWZ5LWVuZCBnYXAtMiBwcmludDpoaWRkZW5cIj5cclxuICAgICAgICB7IWlzRWRpdGluZyA/IChcclxuICAgICAgICAgIDw+XHJcbiAgICAgICAgICAgIDxCdXR0b24gdmFyaWFudD1cIm91dGxpbmVcIiBvbkNsaWNrPXsoKSA9PiBzZXRJc0VkaXRpbmcodHJ1ZSl9PlxyXG4gICAgICAgICAgICAgIDxFZGl0MiBjbGFzc05hbWU9XCJ3LTQgaC00IG1yLTJcIiAvPlxyXG4gICAgICAgICAgICAgIEVkaXQgUmVwb3J0XHJcbiAgICAgICAgICAgIDwvQnV0dG9uPlxyXG4gICAgICAgICAgICA8QnV0dG9uIG9uQ2xpY2s9e2hhbmRsZVByaW50fT5cclxuICAgICAgICAgICAgICA8UHJpbnRlciBjbGFzc05hbWU9XCJ3LTQgaC00IG1yLTJcIiAvPlxyXG4gICAgICAgICAgICAgIFByaW50IFJlcG9ydFxyXG4gICAgICAgICAgICA8L0J1dHRvbj5cclxuICAgICAgICAgIDwvPlxyXG4gICAgICAgICkgOiAoXHJcbiAgICAgICAgICA8PlxyXG4gICAgICAgICAgICA8QnV0dG9uIHZhcmlhbnQ9XCJvdXRsaW5lXCIgb25DbGljaz17KCkgPT4gc2V0SXNFZGl0aW5nKGZhbHNlKX0+XHJcbiAgICAgICAgICAgICAgPFggY2xhc3NOYW1lPVwidy00IGgtNCBtci0yXCIgLz5cclxuICAgICAgICAgICAgICBDYW5jZWxcclxuICAgICAgICAgICAgPC9CdXR0b24+XHJcbiAgICAgICAgICAgIDxCdXR0b24gb25DbGljaz17aGFuZGxlU2F2ZX0+XHJcbiAgICAgICAgICAgICAgPFNhdmUgY2xhc3NOYW1lPVwidy00IGgtNCBtci0yXCIgLz5cclxuICAgICAgICAgICAgICBTYXZlIENoYW5nZXNcclxuICAgICAgICAgICAgPC9CdXR0b24+XHJcbiAgICAgICAgICA8Lz5cclxuICAgICAgICApfVxyXG4gICAgICA8L2Rpdj5cclxuXHJcbiAgICAgIHsvKiBSZXBvcnQgQ29udGFpbmVyICovfVxyXG4gICAgICA8ZGl2IHJlZj17cHJpbnRSZWZ9IGNsYXNzTmFtZT1cIm1heC13LTV4bCBteC1hdXRvIGJnLXdoaXRlIHNoYWRvdy1sZyBwcmludDpzaGFkb3ctbm9uZVwiPlxyXG4gICAgICAgIHsvKiBIZWFkZXIgd2l0aCBMb2dvIGFuZCBDb21wYW55IEluZm8gKi99XHJcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJib3JkZXItYi00IGJvcmRlci1ibHVlLTYwMCBwYi00IHB4LTggcHQtOFwiPlxyXG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLXN0YXJ0IGp1c3RpZnktYmV0d2VlblwiPlxyXG4gICAgICAgICAgICB7LyogTG9nbyBhbmQgQ29tcGFueSBOYW1lICovfVxyXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGdhcC00XCI+XHJcbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJ3LTE2IGgtMTYgYmctZ3JhZGllbnQtdG8tYnIgZnJvbS1ibHVlLTUwMCB0by1ncmVlbi01MDAgcm91bmRlZC1sZyBmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWNlbnRlclwiPlxyXG4gICAgICAgICAgICAgICAgPHN2ZyBjbGFzc05hbWU9XCJ3LTEwIGgtMTAgdGV4dC13aGl0ZVwiIGZpbGw9XCJub25lXCIgc3Ryb2tlPVwiY3VycmVudENvbG9yXCIgdmlld0JveD1cIjAgMCAyNCAyNFwiPlxyXG4gICAgICAgICAgICAgICAgICA8cGF0aCBzdHJva2VMaW5lY2FwPVwicm91bmRcIiBzdHJva2VMaW5lam9pbj1cInJvdW5kXCIgc3Ryb2tlV2lkdGg9ezJ9IGQ9XCJNOSAxMmwyIDIgNC00bTYgMmE5IDkgMCAxMS0xOCAwIDkgOSAwIDAxMTggMHpcIiAvPlxyXG4gICAgICAgICAgICAgICAgPC9zdmc+XHJcbiAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAgPGRpdj5cclxuICAgICAgICAgICAgICAgIDxoMSBjbGFzc05hbWU9XCJ0ZXh0LTJ4bCBmb250LWJvbGQgdGV4dC1ncmF5LTkwMFwiPkhBUkJPVVI8L2gxPlxyXG4gICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1sZyB0ZXh0LWdyYXktNzAwXCI+TWVkaWNhbCBEaWFnbm9zdGljPC9wPlxyXG4gICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC14cyB0ZXh0LWdyYXktNTAwIGl0YWxpY1wiPk1vdHRvOiBBdXRvbWF0ZWQgUHJlY2lzaW9uLi4uPC9wPlxyXG4gICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgXHJcbiAgICAgICAgICAgIHsvKiBDb250YWN0IEluZm8gKi99XHJcbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwidGV4dC1yaWdodCB0ZXh0LXNtIHRleHQtZ3JheS02MDBcIj5cclxuICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJmb250LXNlbWlib2xkXCI+MDc1IDc2NjQ2MSwgMDMxLTU1MTgxMTwvcD5cclxuICAgICAgICAgICAgICA8cD5vZ2JlbmVjYXJlZmFybXNpZ0BnbWFpbC5jb208L3A+XHJcbiAgICAgICAgICAgICAgPHA+MTE0IEZvdXJhaCBCYXkgUm9hZCwgRnJlZXRvd24sIFNpZXJyYSBMZW9uZTwvcD5cclxuICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgey8qIFBhdGllbnQgYW5kIERvY3RvciBJbmZvICovfVxyXG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwicHgtOCBweS02IGJvcmRlci1iXCI+XHJcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImdyaWQgZ3JpZC1jb2xzLTMgZ2FwLThcIj5cclxuICAgICAgICAgICAgey8qIFBhdGllbnQgU2VjdGlvbiAqL31cclxuICAgICAgICAgICAgPGRpdj5cclxuICAgICAgICAgICAgICA8aDMgY2xhc3NOYW1lPVwiZm9udC1ib2xkIHRleHQtZ3JheS03MDAgbWItMyB1cHBlcmNhc2UgdGV4dC1zbVwiPlBhdGllbnQ8L2gzPlxyXG4gICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0yXCI+XHJcbiAgICAgICAgICAgICAgICA8ZGl2PlxyXG4gICAgICAgICAgICAgICAgICA8bGFiZWwgY2xhc3NOYW1lPVwidGV4dC14cyB0ZXh0LWdyYXktNTAwIHVwcGVyY2FzZVwiPk5hbWU6PC9sYWJlbD5cclxuICAgICAgICAgICAgICAgICAge2lzRWRpdGluZyA/IChcclxuICAgICAgICAgICAgICAgICAgICA8SW5wdXRcclxuICAgICAgICAgICAgICAgICAgICAgIHZhbHVlPXtwYXRpZW50SW5mby5uYW1lfVxyXG4gICAgICAgICAgICAgICAgICAgICAgb25DaGFuZ2U9e2UgPT4gc2V0UGF0aWVudEluZm8oeyAuLi5wYXRpZW50SW5mbywgbmFtZTogZS50YXJnZXQudmFsdWUgfSl9XHJcbiAgICAgICAgICAgICAgICAgICAgICBjbGFzc05hbWU9XCJtdC0xXCJcclxuICAgICAgICAgICAgICAgICAgICAvPlxyXG4gICAgICAgICAgICAgICAgICApIDogKFxyXG4gICAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cImZvbnQtc2VtaWJvbGRcIj57cGF0aWVudEluZm8ubmFtZX08L3A+XHJcbiAgICAgICAgICAgICAgICAgICl9XHJcbiAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgIDxkaXY+XHJcbiAgICAgICAgICAgICAgICAgIDxsYWJlbCBjbGFzc05hbWU9XCJ0ZXh0LXhzIHRleHQtZ3JheS01MDAgdXBwZXJjYXNlXCI+QWdlOjwvbGFiZWw+XHJcbiAgICAgICAgICAgICAgICAgIHtpc0VkaXRpbmcgPyAoXHJcbiAgICAgICAgICAgICAgICAgICAgPElucHV0XHJcbiAgICAgICAgICAgICAgICAgICAgICB2YWx1ZT17cGF0aWVudEluZm8uYWdlfVxyXG4gICAgICAgICAgICAgICAgICAgICAgb25DaGFuZ2U9e2UgPT4gc2V0UGF0aWVudEluZm8oeyAuLi5wYXRpZW50SW5mbywgYWdlOiBlLnRhcmdldC52YWx1ZSB9KX1cclxuICAgICAgICAgICAgICAgICAgICAgIGNsYXNzTmFtZT1cIm10LTFcIlxyXG4gICAgICAgICAgICAgICAgICAgIC8+XHJcbiAgICAgICAgICAgICAgICAgICkgOiAoXHJcbiAgICAgICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwiZm9udC1zZW1pYm9sZFwiPntwYXRpZW50SW5mby5hZ2V9PC9wPlxyXG4gICAgICAgICAgICAgICAgICApfVxyXG4gICAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAgICA8ZGl2PlxyXG4gICAgICAgICAgICAgICAgICA8bGFiZWwgY2xhc3NOYW1lPVwidGV4dC14cyB0ZXh0LWdyYXktNTAwIHVwcGVyY2FzZVwiPkdlbmRlcjo8L2xhYmVsPlxyXG4gICAgICAgICAgICAgICAgICB7aXNFZGl0aW5nID8gKFxyXG4gICAgICAgICAgICAgICAgICAgIDxJbnB1dFxyXG4gICAgICAgICAgICAgICAgICAgICAgdmFsdWU9e3BhdGllbnRJbmZvLmdlbmRlcn1cclxuICAgICAgICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXtlID0+IHNldFBhdGllbnRJbmZvKHsgLi4ucGF0aWVudEluZm8sIGdlbmRlcjogZS50YXJnZXQudmFsdWUgfSl9XHJcbiAgICAgICAgICAgICAgICAgICAgICBjbGFzc05hbWU9XCJtdC0xXCJcclxuICAgICAgICAgICAgICAgICAgICAvPlxyXG4gICAgICAgICAgICAgICAgICApIDogKFxyXG4gICAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cImZvbnQtc2VtaWJvbGRcIj57cGF0aWVudEluZm8uZ2VuZGVyfTwvcD5cclxuICAgICAgICAgICAgICAgICAgKX1cclxuICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgPGRpdj5cclxuICAgICAgICAgICAgICAgICAgPGxhYmVsIGNsYXNzTmFtZT1cInRleHQteHMgdGV4dC1ncmF5LTUwMCB1cHBlcmNhc2VcIj5JRCBOdW1iZXI6PC9sYWJlbD5cclxuICAgICAgICAgICAgICAgICAge2lzRWRpdGluZyA/IChcclxuICAgICAgICAgICAgICAgICAgICA8SW5wdXRcclxuICAgICAgICAgICAgICAgICAgICAgIHZhbHVlPXtwYXRpZW50SW5mby5pZE51bWJlcn1cclxuICAgICAgICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXtlID0+IHNldFBhdGllbnRJbmZvKHsgLi4ucGF0aWVudEluZm8sIGlkTnVtYmVyOiBlLnRhcmdldC52YWx1ZSB9KX1cclxuICAgICAgICAgICAgICAgICAgICAgIGNsYXNzTmFtZT1cIm10LTFcIlxyXG4gICAgICAgICAgICAgICAgICAgIC8+XHJcbiAgICAgICAgICAgICAgICAgICkgOiAoXHJcbiAgICAgICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwiZm9udC1zZW1pYm9sZFwiPntwYXRpZW50SW5mby5pZE51bWJlcn08L3A+XHJcbiAgICAgICAgICAgICAgICAgICl9XHJcbiAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgPC9kaXY+XHJcblxyXG4gICAgICAgICAgICB7LyogRG9jdG9yIFNlY3Rpb24gKi99XHJcbiAgICAgICAgICAgIDxkaXY+XHJcbiAgICAgICAgICAgICAgPGgzIGNsYXNzTmFtZT1cImZvbnQtYm9sZCB0ZXh0LWdyYXktNzAwIG1iLTMgdXBwZXJjYXNlIHRleHQtc21cIj5Eb2N0b3I8L2gzPlxyXG4gICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0yXCI+XHJcbiAgICAgICAgICAgICAgICA8ZGl2PlxyXG4gICAgICAgICAgICAgICAgICB7aXNFZGl0aW5nID8gKFxyXG4gICAgICAgICAgICAgICAgICAgIDxJbnB1dFxyXG4gICAgICAgICAgICAgICAgICAgICAgdmFsdWU9e3BhdGllbnRJbmZvLmRvY3Rvcn1cclxuICAgICAgICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXtlID0+IHNldFBhdGllbnRJbmZvKHsgLi4ucGF0aWVudEluZm8sIGRvY3RvcjogZS50YXJnZXQudmFsdWUgfSl9XHJcbiAgICAgICAgICAgICAgICAgICAgICBjbGFzc05hbWU9XCJtdC0xXCJcclxuICAgICAgICAgICAgICAgICAgICAvPlxyXG4gICAgICAgICAgICAgICAgICApIDogKFxyXG4gICAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cImZvbnQtc2VtaWJvbGRcIj57cGF0aWVudEluZm8uZG9jdG9yfTwvcD5cclxuICAgICAgICAgICAgICAgICAgKX1cclxuICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgICAgIHsvKiBDb3BpZXMgVG8gU2VjdGlvbiAqL31cclxuICAgICAgICAgICAgPGRpdj5cclxuICAgICAgICAgICAgICA8aDMgY2xhc3NOYW1lPVwiZm9udC1ib2xkIHRleHQtZ3JheS03MDAgbWItMyB1cHBlcmNhc2UgdGV4dC1zbVwiPkNvcGllcyBUbzwvaDM+XHJcbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTJcIj5cclxuICAgICAgICAgICAgICAgIDxkaXY+XHJcbiAgICAgICAgICAgICAgICAgIHtpc0VkaXRpbmcgPyAoXHJcbiAgICAgICAgICAgICAgICAgICAgPElucHV0XHJcbiAgICAgICAgICAgICAgICAgICAgICB2YWx1ZT17cGF0aWVudEluZm8uZG9jdG9yfVxyXG4gICAgICAgICAgICAgICAgICAgICAgY2xhc3NOYW1lPVwibXQtMVwiXHJcbiAgICAgICAgICAgICAgICAgICAgICBwbGFjZWhvbGRlcj1cIkNvcHkgcmVjaXBpZW50XCJcclxuICAgICAgICAgICAgICAgICAgICAvPlxyXG4gICAgICAgICAgICAgICAgICApIDogKFxyXG4gICAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cImZvbnQtc2VtaWJvbGRcIj57cGF0aWVudEluZm8uZG9jdG9yfTwvcD5cclxuICAgICAgICAgICAgICAgICAgKX1cclxuICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJ0ZXh0LXNtIHNwYWNlLXktMSBtdC00XCI+XHJcbiAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBqdXN0aWZ5LWJldHdlZW5cIj5cclxuICAgICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJ0ZXh0LWdyYXktNTAwXCI+Q09MTEVDVEVEOjwvc3Bhbj5cclxuICAgICAgICAgICAgICAgICAgICB7aXNFZGl0aW5nID8gKFxyXG4gICAgICAgICAgICAgICAgICAgICAgPElucHV0XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIHZhbHVlPXtwYXRpZW50SW5mby5jb2xsZWN0ZWREYXRlfVxyXG4gICAgICAgICAgICAgICAgICAgICAgICBvbkNoYW5nZT17ZSA9PiBzZXRQYXRpZW50SW5mbyh7IC4uLnBhdGllbnRJbmZvLCBjb2xsZWN0ZWREYXRlOiBlLnRhcmdldC52YWx1ZSB9KX1cclxuICAgICAgICAgICAgICAgICAgICAgICAgY2xhc3NOYW1lPVwidy0zMiBoLTcgdGV4dC1zbVwiXHJcbiAgICAgICAgICAgICAgICAgICAgICAvPlxyXG4gICAgICAgICAgICAgICAgICAgICkgOiAoXHJcbiAgICAgICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJmb250LXNlbWlib2xkXCI+e3BhdGllbnRJbmZvLmNvbGxlY3RlZERhdGV9PC9zcGFuPlxyXG4gICAgICAgICAgICAgICAgICAgICl9XHJcbiAgICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXgganVzdGlmeS1iZXR3ZWVuXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwidGV4dC1ncmF5LTUwMFwiPlJFQ0VJVkVEOjwvc3Bhbj5cclxuICAgICAgICAgICAgICAgICAgICB7aXNFZGl0aW5nID8gKFxyXG4gICAgICAgICAgICAgICAgICAgICAgPElucHV0XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIHZhbHVlPXtwYXRpZW50SW5mby5yZWNlaXZlZERhdGV9XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXtlID0+IHNldFBhdGllbnRJbmZvKHsgLi4ucGF0aWVudEluZm8sIHJlY2VpdmVkRGF0ZTogZS50YXJnZXQudmFsdWUgfSl9XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIGNsYXNzTmFtZT1cInctMzIgaC03IHRleHQtc21cIlxyXG4gICAgICAgICAgICAgICAgICAgICAgLz5cclxuICAgICAgICAgICAgICAgICAgICApIDogKFxyXG4gICAgICAgICAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiZm9udC1zZW1pYm9sZFwiPntwYXRpZW50SW5mby5yZWNlaXZlZERhdGV9PC9zcGFuPlxyXG4gICAgICAgICAgICAgICAgICAgICl9XHJcbiAgICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXgganVzdGlmeS1iZXR3ZWVuXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwidGV4dC1ncmF5LTUwMFwiPlBSSU5URUQ6PC9zcGFuPlxyXG4gICAgICAgICAgICAgICAgICAgIHtpc0VkaXRpbmcgPyAoXHJcbiAgICAgICAgICAgICAgICAgICAgICA8SW5wdXRcclxuICAgICAgICAgICAgICAgICAgICAgICAgdmFsdWU9e3BhdGllbnRJbmZvLnJlcG9ydGVkRGF0ZX1cclxuICAgICAgICAgICAgICAgICAgICAgICAgb25DaGFuZ2U9e2UgPT4gc2V0UGF0aWVudEluZm8oeyAuLi5wYXRpZW50SW5mbywgcmVwb3J0ZWREYXRlOiBlLnRhcmdldC52YWx1ZSB9KX1cclxuICAgICAgICAgICAgICAgICAgICAgICAgY2xhc3NOYW1lPVwidy0zMiBoLTcgdGV4dC1zbVwiXHJcbiAgICAgICAgICAgICAgICAgICAgICAvPlxyXG4gICAgICAgICAgICAgICAgICAgICkgOiAoXHJcbiAgICAgICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJmb250LXNlbWlib2xkXCI+e3BhdGllbnRJbmZvLnJlcG9ydGVkRGF0ZX08L3NwYW4+XHJcbiAgICAgICAgICAgICAgICAgICAgKX1cclxuICAgICAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgey8qIFRlc3QgUmVzdWx0cyBTZWN0aW9ucyAqL31cclxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInB4LTggcHktNlwiPlxyXG4gICAgICAgICAge3Rlc3RTZWN0aW9ucy5tYXAoKHNlY3Rpb24sIHNlY3Rpb25JbmRleCkgPT4gKFxyXG4gICAgICAgICAgICA8ZGl2IGtleT17c2VjdGlvbi50aXRsZX0gY2xhc3NOYW1lPVwibWItOFwiPlxyXG4gICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiYmctZ3JhZGllbnQtdG8tciBmcm9tLWJsdWUtNTAgdG8tZ3JlZW4tNTAgcHgtNCBweS0yIG1iLTRcIj5cclxuICAgICAgICAgICAgICAgIDxoMiBjbGFzc05hbWU9XCJ0ZXh0LWxnIGZvbnQtYm9sZCB0ZXh0LWdyYXktODAwXCI+e3NlY3Rpb24udGl0bGV9PC9oMj5cclxuICAgICAgICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgICAgICAgey8qIEVsZWN0cm9seXRlIFRhYmxlICovfVxyXG4gICAgICAgICAgICAgIHtzZWN0aW9uLnRpdGxlID09PSAnQ0xJTklDQUwgQ0hFTUlTVFJZJyAmJiAoXHJcbiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cIm1iLTZcIj5cclxuICAgICAgICAgICAgICAgICAgPGgzIGNsYXNzTmFtZT1cImZvbnQtc2VtaWJvbGQgdGV4dC1ncmF5LTcwMCBtYi0zXCI+RUxFQ1RST0xZVEU8L2gzPlxyXG4gICAgICAgICAgICAgICAgICA8dGFibGUgY2xhc3NOYW1lPVwidy1mdWxsIGJvcmRlci1jb2xsYXBzZVwiPlxyXG4gICAgICAgICAgICAgICAgICAgIDx0aGVhZD5cclxuICAgICAgICAgICAgICAgICAgICAgIDx0ciBjbGFzc05hbWU9XCJib3JkZXItYi0yIGJvcmRlci1ncmF5LTMwMFwiPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICA8dGggY2xhc3NOYW1lPVwidGV4dC1sZWZ0IHB5LTIgdGV4dC1zbSBmb250LXNlbWlib2xkIHRleHQtZ3JheS03MDBcIj48L3RoPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICA8dGggY2xhc3NOYW1lPVwidGV4dC1yaWdodCBweS0yIHRleHQtc20gZm9udC1zZW1pYm9sZCB0ZXh0LWdyYXktNzAwXCI+UkVTVUxUPC90aD5cclxuICAgICAgICAgICAgICAgICAgICAgICAgPHRoIGNsYXNzTmFtZT1cInRleHQtcmlnaHQgcHktMiB0ZXh0LXNtIGZvbnQtc2VtaWJvbGQgdGV4dC1ncmF5LTcwMFwiPlJBTkdFUzwvdGg+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIDx0aCBjbGFzc05hbWU9XCJ0ZXh0LXJpZ2h0IHB5LTIgdGV4dC1zbSBmb250LXNlbWlib2xkIHRleHQtZ3JheS03MDBcIj5VTklUPC90aD5cclxuICAgICAgICAgICAgICAgICAgICAgIDwvdHI+XHJcbiAgICAgICAgICAgICAgICAgICAgPC90aGVhZD5cclxuICAgICAgICAgICAgICAgICAgICA8dGJvZHk+XHJcbiAgICAgICAgICAgICAgICAgICAgICB7c2VjdGlvbi50ZXN0cy5tYXAodGVzdCA9PiAoXHJcbiAgICAgICAgICAgICAgICAgICAgICAgIDx0ciBrZXk9e3Rlc3QuaWR9IGNsYXNzTmFtZT1cImJvcmRlci1iIGJvcmRlci1ncmF5LTIwMCBob3ZlcjpiZy1ncmF5LTUwXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgPHRkIGNsYXNzTmFtZT1cInB5LTJcIj5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImZvbnQtc2VtaWJvbGQgdGV4dC1ncmF5LTkwMFwiPnt0ZXN0LnRlc3RDb2RlfTwvc3Bhbj5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICA8L3RkPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIDx0ZCBjbGFzc05hbWU9XCJ0ZXh0LXJpZ2h0IHB5LTJcIj5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIHtpc0VkaXRpbmcgPyAoXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxJbnB1dFxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHZhbHVlPXt0ZXN0LnZhbHVlfVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXtlID0+IHVwZGF0ZVRlc3RWYWx1ZShzZWN0aW9uSW5kZXgsIHRlc3QuaWQsICd2YWx1ZScsIGUudGFyZ2V0LnZhbHVlKX1cclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjbGFzc05hbWU9e2NuKCd3LTI0IGgtOCB0ZXh0LXJpZ2h0JywgZ2V0VmFsdWVDb2xvcih0ZXN0LmZsYWcpKX1cclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgLz5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICkgOiAoXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT17Y24oJ2ZvbnQtYm9sZCcsIGdldFZhbHVlQ29sb3IodGVzdC5mbGFnKSl9PlxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHt0ZXN0LnZhbHVlfVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L3NwYW4+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICApfVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIDwvdGQ+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgPHRkIGNsYXNzTmFtZT1cInRleHQtcmlnaHQgcHktMiB0ZXh0LWdyYXktNjAwXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICB7aXNFZGl0aW5nID8gKFxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8SW5wdXRcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB2YWx1ZT17dGVzdC5yZWZlcmVuY2VSYW5nZX1cclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBvbkNoYW5nZT17ZSA9PiB1cGRhdGVUZXN0VmFsdWUoc2VjdGlvbkluZGV4LCB0ZXN0LmlkLCAncmVmZXJlbmNlUmFuZ2UnLCBlLnRhcmdldC52YWx1ZSl9XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY2xhc3NOYW1lPVwidy0zMiBoLTggdGV4dC1yaWdodFwiXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC8+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICApIDogKFxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0ZXN0LnJlZmVyZW5jZVJhbmdlXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICApfVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIDwvdGQ+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgPHRkIGNsYXNzTmFtZT1cInRleHQtcmlnaHQgcHktMiB0ZXh0LWdyYXktNjAwXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICB7aXNFZGl0aW5nID8gKFxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8SW5wdXRcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB2YWx1ZT17dGVzdC51bml0fVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXtlID0+IHVwZGF0ZVRlc3RWYWx1ZShzZWN0aW9uSW5kZXgsIHRlc3QuaWQsICd1bml0JywgZS50YXJnZXQudmFsdWUpfVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNsYXNzTmFtZT1cInctMjQgaC04IHRleHQtcmlnaHRcIlxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAvPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgKSA6IChcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdGVzdC51bml0XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICApfVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIDwvdGQ+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIDwvdHI+XHJcbiAgICAgICAgICAgICAgICAgICAgICApKX1cclxuICAgICAgICAgICAgICAgICAgICA8L3Rib2R5PlxyXG4gICAgICAgICAgICAgICAgICA8L3RhYmxlPlxyXG4gICAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAgKX1cclxuXHJcbiAgICAgICAgICAgICAgey8qIFNlcm9sb2d5IFJlc3VsdHMgKi99XHJcbiAgICAgICAgICAgICAge3NlY3Rpb24udGl0bGUgPT09ICdTRVJPTE9HWScgJiYgKFxyXG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTNcIj5cclxuICAgICAgICAgICAgICAgICAge3NlY3Rpb24udGVzdHMubWFwKHRlc3QgPT4gKFxyXG4gICAgICAgICAgICAgICAgICAgIDxkaXYga2V5PXt0ZXN0LmlkfSBjbGFzc05hbWU9XCJmbGV4IGp1c3RpZnktYmV0d2VlbiBpdGVtcy1jZW50ZXIgcHktMiBib3JkZXItYiBib3JkZXItZ3JheS0yMDBcIj5cclxuICAgICAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImZvbnQtc2VtaWJvbGQgdGV4dC1ncmF5LTkwMFwiPnt0ZXN0LnRlc3ROYW1lfTwvc3Bhbj5cclxuICAgICAgICAgICAgICAgICAgICAgIHtpc0VkaXRpbmcgPyAoXHJcbiAgICAgICAgICAgICAgICAgICAgICAgIDxJbnB1dFxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIHZhbHVlPXt0ZXN0LnZhbHVlfVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXtlID0+IHVwZGF0ZVRlc3RWYWx1ZShzZWN0aW9uSW5kZXgsIHRlc3QuaWQsICd2YWx1ZScsIGUudGFyZ2V0LnZhbHVlKX1cclxuICAgICAgICAgICAgICAgICAgICAgICAgICBjbGFzc05hbWU9XCJ3LTQ4IGgtOFwiXHJcbiAgICAgICAgICAgICAgICAgICAgICAgIC8+XHJcbiAgICAgICAgICAgICAgICAgICAgICApIDogKFxyXG4gICAgICAgICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJmb250LXNlbWlib2xkIHRleHQtZ3JheS05MDBcIj57dGVzdC52YWx1ZX08L3NwYW4+XHJcbiAgICAgICAgICAgICAgICAgICAgICApfVxyXG4gICAgICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgICApKX1cclxuICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICl9XHJcblxyXG4gICAgICAgICAgICAgIHsvKiBIZW1hdG9sb2d5IFJlc3VsdHMgKi99XHJcbiAgICAgICAgICAgICAge3NlY3Rpb24udGl0bGUgPT09ICdIRUFNQVRPTE9HWScgJiYgKFxyXG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTNcIj5cclxuICAgICAgICAgICAgICAgICAge3NlY3Rpb24udGVzdHMubWFwKHRlc3QgPT4gKFxyXG4gICAgICAgICAgICAgICAgICAgIDxkaXYga2V5PXt0ZXN0LmlkfSBjbGFzc05hbWU9XCJmbGV4IGp1c3RpZnktYmV0d2VlbiBpdGVtcy1jZW50ZXIgcHktMiBib3JkZXItYiBib3JkZXItZ3JheS0yMDBcIj5cclxuICAgICAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImZvbnQtc2VtaWJvbGQgdGV4dC1ncmF5LTkwMFwiPnt0ZXN0LnRlc3ROYW1lfTwvc3Bhbj5cclxuICAgICAgICAgICAgICAgICAgICAgIHtpc0VkaXRpbmcgPyAoXHJcbiAgICAgICAgICAgICAgICAgICAgICAgIDxJbnB1dFxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIHZhbHVlPXt0ZXN0LnZhbHVlfVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXtlID0+IHVwZGF0ZVRlc3RWYWx1ZShzZWN0aW9uSW5kZXgsIHRlc3QuaWQsICd2YWx1ZScsIGUudGFyZ2V0LnZhbHVlKX1cclxuICAgICAgICAgICAgICAgICAgICAgICAgICBjbGFzc05hbWU9XCJ3LTQ4IGgtOFwiXHJcbiAgICAgICAgICAgICAgICAgICAgICAgIC8+XHJcbiAgICAgICAgICAgICAgICAgICAgICApIDogKFxyXG4gICAgICAgICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJmb250LXNlbWlib2xkIHRleHQtZ3JheS05MDBcIj57dGVzdC52YWx1ZX08L3NwYW4+XHJcbiAgICAgICAgICAgICAgICAgICAgICApfVxyXG4gICAgICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgICApKX1cclxuICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICl9XHJcbiAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgKSl9XHJcbiAgICAgICAgPC9kaXY+XHJcblxyXG4gICAgICAgIHsvKiBWZXJpZmljYXRpb24gU2VjdGlvbiAqL31cclxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInB4LTggcHktNiBib3JkZXItdFwiPlxyXG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJtYi00XCI+XHJcbiAgICAgICAgICAgIDxsYWJlbCBjbGFzc05hbWU9XCJ0ZXh0LXNtIHRleHQtZ3JheS02MDBcIj5WZXJpZmllZCBCeTo8L2xhYmVsPlxyXG4gICAgICAgICAgICB7aXNFZGl0aW5nID8gKFxyXG4gICAgICAgICAgICAgIDxJbnB1dFxyXG4gICAgICAgICAgICAgICAgdmFsdWU9e3ZlcmlmaWVkQnl9XHJcbiAgICAgICAgICAgICAgICBvbkNoYW5nZT17ZSA9PiBzZXRWZXJpZmllZEJ5KGUudGFyZ2V0LnZhbHVlKX1cclxuICAgICAgICAgICAgICAgIGNsYXNzTmFtZT1cIm10LTEgbWF4LXctbWRcIlxyXG4gICAgICAgICAgICAgICAgcGxhY2Vob2xkZXI9XCJFbnRlciB2ZXJpZmllciBuYW1lXCJcclxuICAgICAgICAgICAgICAvPlxyXG4gICAgICAgICAgICApIDogKFxyXG4gICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwibXQtMiBib3JkZXItYiBib3JkZXItZ3JheS00MDAgdy02NCBoLThcIj48L2Rpdj5cclxuICAgICAgICAgICAgKX1cclxuICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgIDwvZGl2PlxyXG5cclxuICAgICAgICB7LyogRm9vdGVyIHdpdGggRGlzY2xhaW1lciAqL31cclxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImJnLWdyYWRpZW50LXRvLXIgZnJvbS1ibHVlLTYwMCB0by1ncmVlbi02MDAgcHgtOCBweS02IHRleHQtd2hpdGVcIj5cclxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwibWItNFwiPlxyXG4gICAgICAgICAgICA8aDQgY2xhc3NOYW1lPVwiZm9udC1zZW1pYm9sZCBtYi0yXCI+RGlzY2xhaW1lcjwvaDQ+XHJcbiAgICAgICAgICAgIHtpc0VkaXRpbmcgPyAoXHJcbiAgICAgICAgICAgICAgPFRleHRhcmVhXHJcbiAgICAgICAgICAgICAgICB2YWx1ZT17ZGlzY2xhaW1lcn1cclxuICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXtlID0+IHNldERpc2NsYWltZXIoZS50YXJnZXQudmFsdWUpfVxyXG4gICAgICAgICAgICAgICAgY2xhc3NOYW1lPVwiYmctd2hpdGUgdGV4dC1ncmF5LTkwMFwiXHJcbiAgICAgICAgICAgICAgICByb3dzPXszfVxyXG4gICAgICAgICAgICAgIC8+XHJcbiAgICAgICAgICAgICkgOiAoXHJcbiAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1zbVwiPntkaXNjbGFpbWVyfTwvcD5cclxuICAgICAgICAgICAgKX1cclxuICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgXHJcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInRleHQtcmlnaHQgYm9yZGVyLXQgYm9yZGVyLXdoaXRlLzMwIHB0LTRcIj5cclxuICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1zbSBmb250LXNlbWlib2xkXCI+U2lnbmF0dXJlICYgU3RhbXA8L3A+XHJcbiAgICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cIm10LTYgdGV4dC1jZW50ZXIgdGV4dC1zbVwiPlxyXG4gICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJmb250LXNlbWlib2xkXCI+T1BFTiAyNC83IHwgT05TSVRFICYgT05MSU5FIEFDQ0VTUyB8PC9wPlxyXG4gICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJmb250LXNlbWlib2xkXCI+VFJVU1RFRCBCWSBDTElOSUNTICYgSE9TUElUQUxTPC9wPlxyXG4gICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgPC9kaXY+XHJcbiAgICAgIDwvZGl2PlxyXG5cclxuICAgICAgey8qIFByaW50IFN0eWxlcyAqL31cclxuICAgICAgPHN0eWxlPntgXHJcbiAgICAgICAgQG1lZGlhIHByaW50IHtcclxuICAgICAgICAgIGJvZHkge1xyXG4gICAgICAgICAgICBwcmludC1jb2xvci1hZGp1c3Q6IGV4YWN0O1xyXG4gICAgICAgICAgICAtd2Via2l0LXByaW50LWNvbG9yLWFkanVzdDogZXhhY3Q7XHJcbiAgICAgICAgICB9XHJcbiAgICAgICAgICAucHJpbnRcXFxcOmhpZGRlbiB7XHJcbiAgICAgICAgICAgIGRpc3BsYXk6IG5vbmUgIWltcG9ydGFudDtcclxuICAgICAgICAgIH1cclxuICAgICAgICAgIC5wcmludFxcXFw6c2hhZG93LW5vbmUge1xyXG4gICAgICAgICAgICBib3gtc2hhZG93OiBub25lICFpbXBvcnRhbnQ7XHJcbiAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG4gICAgICBgfTwvc3R5bGU+XHJcbiAgICA8L2Rpdj5cclxuICApO1xyXG59XHJcbiJdLCJuYW1lcyI6WyJ1c2VTdGF0ZSIsInVzZVJlZiIsIkJ1dHRvbiIsIklucHV0IiwiVGV4dGFyZWEiLCJQcmludGVyIiwiU2F2ZSIsIkVkaXQyIiwiWCIsImNuIiwiRWRpdGFibGVSZXN1bHRSZXBvcnQiLCJwcmludFJlZiIsImlzRWRpdGluZyIsInNldElzRWRpdGluZyIsInBhdGllbnRJbmZvIiwic2V0UGF0aWVudEluZm8iLCJuYW1lIiwiYWdlIiwiZ2VuZGVyIiwiaWROdW1iZXIiLCJkb2N0b3IiLCJjb2xsZWN0ZWREYXRlIiwicmVjZWl2ZWREYXRlIiwicmVwb3J0ZWREYXRlIiwidGVzdFNlY3Rpb25zIiwic2V0VGVzdFNlY3Rpb25zIiwidGl0bGUiLCJ0ZXN0cyIsImlkIiwidGVzdENvZGUiLCJ0ZXN0TmFtZSIsInZhbHVlIiwicmVmZXJlbmNlUmFuZ2UiLCJ1bml0IiwiZmxhZyIsInZlcmlmaWVkQnkiLCJzZXRWZXJpZmllZEJ5IiwiZGlzY2xhaW1lciIsInNldERpc2NsYWltZXIiLCJoYW5kbGVQcmludCIsInNldFRpbWVvdXQiLCJ3aW5kb3ciLCJwcmludCIsImhhbmRsZVNhdmUiLCJ1cGRhdGVUZXN0VmFsdWUiLCJzZWN0aW9uSW5kZXgiLCJ0ZXN0SWQiLCJmaWVsZCIsInByZXYiLCJuZXdTZWN0aW9ucyIsInRlc3QiLCJmaW5kIiwidCIsImdldFZhbHVlQ29sb3IiLCJkaXYiLCJjbGFzc05hbWUiLCJ2YXJpYW50Iiwib25DbGljayIsInJlZiIsInN2ZyIsImZpbGwiLCJzdHJva2UiLCJ2aWV3Qm94IiwicGF0aCIsInN0cm9rZUxpbmVjYXAiLCJzdHJva2VMaW5lam9pbiIsInN0cm9rZVdpZHRoIiwiZCIsImgxIiwicCIsImgzIiwibGFiZWwiLCJvbkNoYW5nZSIsImUiLCJ0YXJnZXQiLCJwbGFjZWhvbGRlciIsInNwYW4iLCJtYXAiLCJzZWN0aW9uIiwiaDIiLCJ0YWJsZSIsInRoZWFkIiwidHIiLCJ0aCIsInRib2R5IiwidGQiLCJoNCIsInJvd3MiLCJzdHlsZSJdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7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LFFBQVE7Ozs7OztvREFDM0RsQiwwQkFDQyxRQUFDVDt3REFDQzRCLE9BQU9tQixLQUFLbkIsS0FBSzt3REFDakJ5QyxVQUFVQyxDQUFBQSxJQUFLN0IsZ0JBQWdCQyxjQUFjSyxLQUFLdEIsRUFBRSxFQUFFLFNBQVM2QyxFQUFFQyxNQUFNLENBQUMzQyxLQUFLO3dEQUM3RXdCLFdBQVU7Ozs7OzZFQUdaLFFBQUNxQjt3REFBS3JCLFdBQVU7a0VBQStCTCxLQUFLbkIsS0FBSzs7Ozs7OzsrQ0FUbkRtQixLQUFLdEIsRUFBRTs7Ozs7Ozs7Ozs7K0JBMUZma0QsUUFBUXBELEtBQUs7Ozs7Ozs7Ozs7a0NBOEczQixRQUFDNEI7d0JBQUlDLFdBQVU7a0NBQ2IsY0FBQSxRQUFDRDs0QkFBSUMsV0FBVTs7OENBQ2IsUUFBQ2dCO29DQUFNaEIsV0FBVTs4Q0FBd0I7Ozs7OztnQ0FDeEMzQywwQkFDQyxRQUFDVDtvQ0FDQzRCLE9BQU9JO29DQUNQcUMsVUFBVUMsQ0FBQUEsSUFBS3JDLGNBQWNxQyxFQUFFQyxNQUFNLENBQUMzQyxLQUFLO29DQUMzQ3dCLFdBQVU7b0NBQ1ZvQixhQUFZOzs7Ozt5REFHZCxRQUFDckI7b0NBQUlDLFdBQVU7Ozs7Ozs7Ozs7Ozs7Ozs7O2tDQU1yQixRQUFDRDt3QkFBSUMsV0FBVTs7MENBQ2IsUUFBQ0Q7Z0NBQUlDLFdBQVU7O2tEQUNiLFFBQUMrQjt3Q0FBRy9CLFdBQVU7a0RBQXFCOzs7Ozs7b0NBQ2xDM0MsMEJBQ0MsUUFBQ1I7d0NBQ0MyQixPQUFPTTt3Q0FDUG1DLFVBQVVDLENBQUFBLElBQUtuQyxjQUFjbUMsRUFBRUMsTUFBTSxDQUFDM0MsS0FBSzt3Q0FDM0N3QixXQUFVO3dDQUNWZ0MsTUFBTTs7Ozs7NkRBR1IsUUFBQ2xCO3dDQUFFZCxXQUFVO2tEQUFXbEI7Ozs7Ozs7Ozs7OzswQ0FJNUIsUUFBQ2lCO2dDQUFJQyxXQUFVOzBDQUNiLGNBQUEsUUFBQ2M7b0NBQUVkLFdBQVU7OENBQXdCOzs7Ozs7Ozs7OzswQ0FHdkMsUUFBQ0Q7Z0NBQUlDLFdBQVU7O2tEQUNiLFFBQUNjO3dDQUFFZCxXQUFVO2tEQUFnQjs7Ozs7O2tEQUM3QixRQUFDYzt3Q0FBRWQsV0FBVTtrREFBZ0I7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OzswQkFNbkMsUUFBQ2lDOzBCQUFPLENBQUM7Ozs7Ozs7Ozs7Ozs7TUFhVCxDQUFDOzs7Ozs7Ozs7Ozs7QUFHUDtHQWxjd0I5RTtLQUFBQSJ9

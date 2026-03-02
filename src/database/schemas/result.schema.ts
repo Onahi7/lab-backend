@@ -41,7 +41,6 @@ export class Result extends Document {
   @Prop({
     required: true,
     enum: Object.values(ResultFlagEnum),
-    index: true,
   })
   flag: ResultFlagEnum;
 
@@ -49,7 +48,6 @@ export class Result extends Document {
     required: true,
     enum: Object.values(ResultStatusEnum),
     default: ResultStatusEnum.PRELIMINARY,
-    index: true,
   })
   status: ResultStatusEnum;
 

@@ -1,0 +1,907 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/pages/admin/CommunicationLogs.tsx");import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+
+let prevRefreshReg;
+let prevRefreshSig;
+
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react-swc can't detect preamble. Something is wrong."
+    );
+  }
+
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+
+import __vite__cjsImport2_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=27cfabb6"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime["jsxDEV"];
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=27cfabb6"; const useState = __vite__cjsImport3_react["useState"];
+import { RoleLayout } from "/src/components/layout/RoleLayout.tsx";
+import { useAuth } from "/src/context/AuthContext.tsx";
+import { useCommunicationLogs, useRealtimeCommunicationLogs } from "/src/hooks/useCommunicationLogs.ts";
+import { useMachines } from "/src/hooks/useMachines.ts";
+import { Button } from "/src/components/ui/button.tsx";
+import { Badge } from "/src/components/ui/badge.tsx";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "/src/components/ui/select.tsx";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "/src/components/ui/dialog.tsx";
+import { RefreshCw, Eye, Radio, Loader2, CheckCircle, XCircle, AlertCircle } from "/node_modules/.vite/deps/lucide-react.js?v=27cfabb6";
+import { cn } from "/src/lib/utils.ts";
+export default function CommunicationLogs() {
+    _s();
+    const { profile } = useAuth();
+    const [selectedMachine, setSelectedMachine] = useState('all');
+    const { data: machines } = useMachines();
+    const { data: logs, isLoading, refetch } = useCommunicationLogs(selectedMachine === 'all' ? undefined : selectedMachine, 100);
+    const { logs: realtimeLogs, isConnected } = useRealtimeCommunicationLogs(selectedMachine === 'all' ? undefined : selectedMachine);
+    const [selectedLog, setSelectedLog] = useState(null);
+    const [showDetailDialog, setShowDetailDialog] = useState(false);
+    const displayLogs = realtimeLogs.length > 0 ? realtimeLogs : logs;
+    const getStatusIcon = (status)=>{
+        switch(status){
+            case 'processed':
+                return /*#__PURE__*/ _jsxDEV(CheckCircle, {
+                    className: "w-4 h-4 text-status-normal"
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                    lineNumber: 33,
+                    columnNumber: 16
+                }, this);
+            case 'error':
+                return /*#__PURE__*/ _jsxDEV(XCircle, {
+                    className: "w-4 h-4 text-status-critical"
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                    lineNumber: 35,
+                    columnNumber: 16
+                }, this);
+            default:
+                return /*#__PURE__*/ _jsxDEV(AlertCircle, {
+                    className: "w-4 h-4 text-status-warning"
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                    lineNumber: 37,
+                    columnNumber: 16
+                }, this);
+        }
+    };
+    const getStatusColor = (status)=>{
+        switch(status){
+            case 'processed':
+                return 'bg-status-normal/10 text-status-normal border-status-normal/20';
+            case 'error':
+                return 'bg-status-critical/10 text-status-critical border-status-critical/20';
+            default:
+                return 'bg-status-warning/10 text-status-warning border-status-warning/20';
+        }
+    };
+    const handleViewDetails = (log)=>{
+        setSelectedLog(log);
+        setShowDetailDialog(true);
+    };
+    return /*#__PURE__*/ _jsxDEV(RoleLayout, {
+        title: "Communication Logs",
+        subtitle: "Analyzer message history and monitoring",
+        role: "admin",
+        userName: profile?.full_name,
+        children: [
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "flex items-center justify-between mb-6",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "flex items-center gap-3",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(Select, {
+                                value: selectedMachine,
+                                onValueChange: setSelectedMachine,
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(SelectTrigger, {
+                                        className: "w-64",
+                                        children: /*#__PURE__*/ _jsxDEV(SelectValue, {}, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                            lineNumber: 69,
+                                            columnNumber: 15
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                        lineNumber: 68,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(SelectContent, {
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                value: "all",
+                                                children: "All Machines"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                lineNumber: 72,
+                                                columnNumber: 15
+                                            }, this),
+                                            machines?.map((machine)=>/*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                    value: machine.id,
+                                                    children: machine.name
+                                                }, machine.id, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                    lineNumber: 74,
+                                                    columnNumber: 17
+                                                }, this))
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                        lineNumber: 71,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                lineNumber: 67,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "flex items-center gap-2 px-3 py-2 bg-card border rounded-lg",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(Radio, {
+                                        className: cn('w-4 h-4', isConnected ? 'text-status-normal animate-pulse' : 'text-muted-foreground')
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                        lineNumber: 81,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("span", {
+                                        className: "text-sm",
+                                        children: isConnected ? 'Live' : 'Offline'
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                        lineNumber: 82,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                lineNumber: 80,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                        lineNumber: 66,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(Button, {
+                        variant: "outline",
+                        onClick: ()=>refetch(),
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(RefreshCw, {
+                                className: "w-4 h-4 mr-2"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                lineNumber: 86,
+                                columnNumber: 11
+                            }, this),
+                            "Refresh"
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                        lineNumber: 85,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                lineNumber: 65,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "grid grid-cols-4 gap-4 mb-6",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg p-4",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-sm text-muted-foreground",
+                                children: "Total Messages"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                lineNumber: 94,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-2xl font-bold",
+                                children: displayLogs?.length || 0
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                lineNumber: 95,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                        lineNumber: 93,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg p-4",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-sm text-muted-foreground",
+                                children: "Processed"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                lineNumber: 98,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-2xl font-bold text-status-normal",
+                                children: displayLogs?.filter((l)=>l.status === 'processed').length || 0
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                lineNumber: 99,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                        lineNumber: 97,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg p-4",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-sm text-muted-foreground",
+                                children: "Errors"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                lineNumber: 104,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-2xl font-bold text-status-critical",
+                                children: displayLogs?.filter((l)=>l.status === 'error').length || 0
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                lineNumber: 105,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                        lineNumber: 103,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg p-4",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-sm text-muted-foreground",
+                                children: "Avg Processing Time"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                lineNumber: 110,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-2xl font-bold",
+                                children: [
+                                    displayLogs?.length ? Math.round(displayLogs.reduce((sum, l)=>sum + (l.processing_time_ms || 0), 0) / displayLogs.length) : 0,
+                                    "ms"
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                lineNumber: 111,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                        lineNumber: 109,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                lineNumber: 92,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "bg-card border rounded-lg overflow-hidden",
+                children: isLoading ? /*#__PURE__*/ _jsxDEV("div", {
+                    className: "flex items-center justify-center py-12",
+                    children: /*#__PURE__*/ _jsxDEV(Loader2, {
+                        className: "w-6 h-6 animate-spin text-muted-foreground"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                        lineNumber: 123,
+                        columnNumber: 13
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                    lineNumber: 122,
+                    columnNumber: 11
+                }, this) : /*#__PURE__*/ _jsxDEV("table", {
+                    className: "data-table",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV("thead", {
+                            children: /*#__PURE__*/ _jsxDEV("tr", {
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Time"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                        lineNumber: 129,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Machine"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                        lineNumber: 130,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Direction"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                        lineNumber: 131,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Protocol"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                        lineNumber: 132,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Message Type"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                        lineNumber: 133,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Status"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                        lineNumber: 134,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Results"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                        lineNumber: 135,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Processing Time"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                        lineNumber: 136,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Actions"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                        lineNumber: 137,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                lineNumber: 128,
+                                columnNumber: 15
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                            lineNumber: 127,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("tbody", {
+                            children: [
+                                displayLogs?.map((log)=>{
+                                    const machine = machines?.find((m)=>m.id === log.machine_id);
+                                    return /*#__PURE__*/ _jsxDEV("tr", {
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                className: "text-sm",
+                                                children: [
+                                                    new Date(log.created_at).toLocaleTimeString(),
+                                                    /*#__PURE__*/ _jsxDEV("br", {}, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                        lineNumber: 147,
+                                                        columnNumber: 23
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("span", {
+                                                        className: "text-xs text-muted-foreground",
+                                                        children: new Date(log.created_at).toLocaleDateString()
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                        lineNumber: 148,
+                                                        columnNumber: 23
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                lineNumber: 145,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                children: /*#__PURE__*/ _jsxDEV("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV("p", {
+                                                            className: "font-medium",
+                                                            children: machine?.name || 'Unknown'
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                            lineNumber: 154,
+                                                            columnNumber: 25
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("p", {
+                                                            className: "text-xs text-muted-foreground",
+                                                            children: machine?.model
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                            lineNumber: 155,
+                                                            columnNumber: 25
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                    lineNumber: 153,
+                                                    columnNumber: 23
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                lineNumber: 152,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                children: /*#__PURE__*/ _jsxDEV(Badge, {
+                                                    variant: "outline",
+                                                    className: log.direction === 'inbound' ? 'bg-blue-50' : 'bg-green-50',
+                                                    children: log.direction
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                    lineNumber: 159,
+                                                    columnNumber: 23
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                lineNumber: 158,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                className: "font-mono text-sm",
+                                                children: log.protocol
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                lineNumber: 163,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                className: "font-mono text-sm",
+                                                children: log.message_type || '-'
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                lineNumber: 164,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                children: /*#__PURE__*/ _jsxDEV("div", {
+                                                    className: "flex items-center gap-2",
+                                                    children: [
+                                                        getStatusIcon(log.status),
+                                                        /*#__PURE__*/ _jsxDEV(Badge, {
+                                                            variant: "outline",
+                                                            className: getStatusColor(log.status),
+                                                            children: log.status
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                            lineNumber: 168,
+                                                            columnNumber: 25
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                    lineNumber: 166,
+                                                    columnNumber: 23
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                lineNumber: 165,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                className: "text-center",
+                                                children: log.results_count || 0
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                lineNumber: 173,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                className: "text-muted-foreground",
+                                                children: [
+                                                    log.processing_time_ms || 0,
+                                                    "ms"
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                lineNumber: 174,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                children: /*#__PURE__*/ _jsxDEV(Button, {
+                                                    variant: "ghost",
+                                                    size: "sm",
+                                                    onClick: ()=>handleViewDetails(log),
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV(Eye, {
+                                                            className: "w-4 h-4 mr-1"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                            lineNumber: 181,
+                                                            columnNumber: 25
+                                                        }, this),
+                                                        "View"
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                    lineNumber: 176,
+                                                    columnNumber: 23
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                lineNumber: 175,
+                                                columnNumber: 21
+                                            }, this)
+                                        ]
+                                    }, log.id, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                        lineNumber: 144,
+                                        columnNumber: 19
+                                    }, this);
+                                }),
+                                (!displayLogs || displayLogs.length === 0) && /*#__PURE__*/ _jsxDEV("tr", {
+                                    children: /*#__PURE__*/ _jsxDEV("td", {
+                                        colSpan: 9,
+                                        className: "text-center py-12 text-muted-foreground",
+                                        children: "No communication logs found"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                        lineNumber: 190,
+                                        columnNumber: 19
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                    lineNumber: 189,
+                                    columnNumber: 17
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                            lineNumber: 140,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                    lineNumber: 126,
+                    columnNumber: 11
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                lineNumber: 120,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Dialog, {
+                open: showDetailDialog,
+                onOpenChange: setShowDetailDialog,
+                children: /*#__PURE__*/ _jsxDEV(DialogContent, {
+                    className: "max-w-4xl max-h-[80vh] overflow-y-auto",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV(DialogHeader, {
+                            children: /*#__PURE__*/ _jsxDEV(DialogTitle, {
+                                children: "Message Details"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                lineNumber: 204,
+                                columnNumber: 13
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                            lineNumber: 203,
+                            columnNumber: 11
+                        }, this),
+                        selectedLog && /*#__PURE__*/ _jsxDEV("div", {
+                            className: "space-y-4",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "grid grid-cols-2 gap-4",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("p", {
+                                                    className: "text-sm text-muted-foreground",
+                                                    children: "Timestamp"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                    lineNumber: 211,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("p", {
+                                                    className: "font-medium",
+                                                    children: new Date(selectedLog.created_at).toLocaleString()
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                    lineNumber: 212,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                            lineNumber: 210,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("p", {
+                                                    className: "text-sm text-muted-foreground",
+                                                    children: "Protocol"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                    lineNumber: 215,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("p", {
+                                                    className: "font-mono",
+                                                    children: selectedLog.protocol
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                    lineNumber: 216,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                            lineNumber: 214,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("p", {
+                                                    className: "text-sm text-muted-foreground",
+                                                    children: "Message Type"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                    lineNumber: 219,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("p", {
+                                                    className: "font-mono",
+                                                    children: selectedLog.message_type || '-'
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                    lineNumber: 220,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                            lineNumber: 218,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("p", {
+                                                    className: "text-sm text-muted-foreground",
+                                                    children: "Control ID"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                    lineNumber: 223,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("p", {
+                                                    className: "font-mono",
+                                                    children: selectedLog.message_control_id || '-'
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                    lineNumber: 224,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                            lineNumber: 222,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("p", {
+                                                    className: "text-sm text-muted-foreground",
+                                                    children: "Status"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                    lineNumber: 227,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV(Badge, {
+                                                    variant: "outline",
+                                                    className: getStatusColor(selectedLog.status),
+                                                    children: selectedLog.status
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                    lineNumber: 228,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                            lineNumber: 226,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("p", {
+                                                    className: "text-sm text-muted-foreground",
+                                                    children: "Processing Time"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                    lineNumber: 233,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("p", {
+                                                    children: [
+                                                        selectedLog.processing_time_ms || 0,
+                                                        "ms"
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                                    lineNumber: 234,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                            lineNumber: 232,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                    lineNumber: 209,
+                                    columnNumber: 15
+                                }, this),
+                                selectedLog.error_message && /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "bg-status-critical/10 border border-status-critical/20 rounded-lg p-4",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("p", {
+                                            className: "text-sm font-medium text-status-critical mb-1",
+                                            children: "Error Message"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                            lineNumber: 240,
+                                            columnNumber: 19
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("p", {
+                                            className: "text-sm",
+                                            children: selectedLog.error_message
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                            lineNumber: 241,
+                                            columnNumber: 19
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                    lineNumber: 239,
+                                    columnNumber: 17
+                                }, this),
+                                selectedLog.parsed_summary && /*#__PURE__*/ _jsxDEV("div", {
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("p", {
+                                            className: "text-sm font-medium mb-2",
+                                            children: "Parsed Summary"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                            lineNumber: 247,
+                                            columnNumber: 19
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("pre", {
+                                            className: "bg-muted p-4 rounded-lg text-xs overflow-x-auto",
+                                            children: JSON.stringify(selectedLog.parsed_summary, null, 2)
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                            lineNumber: 248,
+                                            columnNumber: 19
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                    lineNumber: 246,
+                                    columnNumber: 17
+                                }, this),
+                                selectedLog.raw_message && /*#__PURE__*/ _jsxDEV("div", {
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("p", {
+                                            className: "text-sm font-medium mb-2",
+                                            children: "Raw Message"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                            lineNumber: 256,
+                                            columnNumber: 19
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("pre", {
+                                            className: "bg-muted p-4 rounded-lg text-xs overflow-x-auto max-h-96",
+                                            children: selectedLog.raw_message
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                            lineNumber: 257,
+                                            columnNumber: 19
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                                    lineNumber: 255,
+                                    columnNumber: 17
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                            lineNumber: 208,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                    lineNumber: 202,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+                lineNumber: 201,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx",
+        lineNumber: 58,
+        columnNumber: 5
+    }, this);
+}
+_s(CommunicationLogs, "3lJ5kGu2D8h6pfY+wUeeqHKRDGw=", false, function() {
+    return [
+        useAuth,
+        useMachines,
+        useCommunicationLogs,
+        useRealtimeCommunicationLogs
+    ];
+});
+_c = CommunicationLogs;
+var _c;
+$RefreshReg$(_c, "CommunicationLogs");
+
+
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+
+
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/HP/Downloads/lab/frontend/src/pages/admin/CommunicationLogs.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIkNvbW11bmljYXRpb25Mb2dzLnRzeCJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyB1c2VTdGF0ZSB9IGZyb20gJ3JlYWN0JztcclxuaW1wb3J0IHsgUm9sZUxheW91dCB9IGZyb20gJ0AvY29tcG9uZW50cy9sYXlvdXQvUm9sZUxheW91dCc7XHJcbmltcG9ydCB7IHVzZUF1dGggfSBmcm9tICdAL2NvbnRleHQvQXV0aENvbnRleHQnO1xyXG5pbXBvcnQgeyB1c2VDb21tdW5pY2F0aW9uTG9ncywgdXNlUmVhbHRpbWVDb21tdW5pY2F0aW9uTG9ncyB9IGZyb20gJ0AvaG9va3MvdXNlQ29tbXVuaWNhdGlvbkxvZ3MnO1xyXG5pbXBvcnQgeyB1c2VNYWNoaW5lcyB9IGZyb20gJ0AvaG9va3MvdXNlTWFjaGluZXMnO1xyXG5pbXBvcnQgeyBCdXR0b24gfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvYnV0dG9uJztcclxuaW1wb3J0IHsgQmFkZ2UgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvYmFkZ2UnO1xyXG5pbXBvcnQgeyBTZWxlY3QsIFNlbGVjdENvbnRlbnQsIFNlbGVjdEl0ZW0sIFNlbGVjdFRyaWdnZXIsIFNlbGVjdFZhbHVlIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL3NlbGVjdCc7XHJcbmltcG9ydCB7IERpYWxvZywgRGlhbG9nQ29udGVudCwgRGlhbG9nSGVhZGVyLCBEaWFsb2dUaXRsZSB9IGZyb20gJ0AvY29tcG9uZW50cy91aS9kaWFsb2cnO1xyXG5pbXBvcnQgeyBSZWZyZXNoQ3csIEV5ZSwgUmFkaW8sIExvYWRlcjIsIENoZWNrQ2lyY2xlLCBYQ2lyY2xlLCBBbGVydENpcmNsZSB9IGZyb20gJ2x1Y2lkZS1yZWFjdCc7XHJcbmltcG9ydCB7IGNuIH0gZnJvbSAnQC9saWIvdXRpbHMnO1xyXG5cclxuZXhwb3J0IGRlZmF1bHQgZnVuY3Rpb24gQ29tbXVuaWNhdGlvbkxvZ3MoKSB7XHJcbiAgY29uc3QgeyBwcm9maWxlIH0gPSB1c2VBdXRoKCk7XHJcbiAgY29uc3QgW3NlbGVjdGVkTWFjaGluZSwgc2V0U2VsZWN0ZWRNYWNoaW5lXSA9IHVzZVN0YXRlPHN0cmluZz4oJ2FsbCcpO1xyXG4gIGNvbnN0IHsgZGF0YTogbWFjaGluZXMgfSA9IHVzZU1hY2hpbmVzKCk7XHJcbiAgY29uc3QgeyBkYXRhOiBsb2dzLCBpc0xvYWRpbmcsIHJlZmV0Y2ggfSA9IHVzZUNvbW11bmljYXRpb25Mb2dzKFxyXG4gICAgc2VsZWN0ZWRNYWNoaW5lID09PSAnYWxsJyA/IHVuZGVmaW5lZCA6IHNlbGVjdGVkTWFjaGluZSxcclxuICAgIDEwMFxyXG4gICk7XHJcbiAgY29uc3QgeyBsb2dzOiByZWFsdGltZUxvZ3MsIGlzQ29ubmVjdGVkIH0gPSB1c2VSZWFsdGltZUNvbW11bmljYXRpb25Mb2dzKFxyXG4gICAgc2VsZWN0ZWRNYWNoaW5lID09PSAnYWxsJyA/IHVuZGVmaW5lZCA6IHNlbGVjdGVkTWFjaGluZVxyXG4gICk7XHJcblxyXG4gIGNvbnN0IFtzZWxlY3RlZExvZywgc2V0U2VsZWN0ZWRMb2ddID0gdXNlU3RhdGU8YW55PihudWxsKTtcclxuICBjb25zdCBbc2hvd0RldGFpbERpYWxvZywgc2V0U2hvd0RldGFpbERpYWxvZ10gPSB1c2VTdGF0ZShmYWxzZSk7XHJcblxyXG4gIGNvbnN0IGRpc3BsYXlMb2dzID0gcmVhbHRpbWVMb2dzLmxlbmd0aCA+IDAgPyByZWFsdGltZUxvZ3MgOiBsb2dzO1xyXG5cclxuICBjb25zdCBnZXRTdGF0dXNJY29uID0gKHN0YXR1czogc3RyaW5nKSA9PiB7XHJcbiAgICBzd2l0Y2ggKHN0YXR1cykge1xyXG4gICAgICBjYXNlICdwcm9jZXNzZWQnOlxyXG4gICAgICAgIHJldHVybiA8Q2hlY2tDaXJjbGUgY2xhc3NOYW1lPVwidy00IGgtNCB0ZXh0LXN0YXR1cy1ub3JtYWxcIiAvPjtcclxuICAgICAgY2FzZSAnZXJyb3InOlxyXG4gICAgICAgIHJldHVybiA8WENpcmNsZSBjbGFzc05hbWU9XCJ3LTQgaC00IHRleHQtc3RhdHVzLWNyaXRpY2FsXCIgLz47XHJcbiAgICAgIGRlZmF1bHQ6XHJcbiAgICAgICAgcmV0dXJuIDxBbGVydENpcmNsZSBjbGFzc05hbWU9XCJ3LTQgaC00IHRleHQtc3RhdHVzLXdhcm5pbmdcIiAvPjtcclxuICAgIH1cclxuICB9O1xyXG5cclxuICBjb25zdCBnZXRTdGF0dXNDb2xvciA9IChzdGF0dXM6IHN0cmluZykgPT4ge1xyXG4gICAgc3dpdGNoIChzdGF0dXMpIHtcclxuICAgICAgY2FzZSAncHJvY2Vzc2VkJzpcclxuICAgICAgICByZXR1cm4gJ2JnLXN0YXR1cy1ub3JtYWwvMTAgdGV4dC1zdGF0dXMtbm9ybWFsIGJvcmRlci1zdGF0dXMtbm9ybWFsLzIwJztcclxuICAgICAgY2FzZSAnZXJyb3InOlxyXG4gICAgICAgIHJldHVybiAnYmctc3RhdHVzLWNyaXRpY2FsLzEwIHRleHQtc3RhdHVzLWNyaXRpY2FsIGJvcmRlci1zdGF0dXMtY3JpdGljYWwvMjAnO1xyXG4gICAgICBkZWZhdWx0OlxyXG4gICAgICAgIHJldHVybiAnYmctc3RhdHVzLXdhcm5pbmcvMTAgdGV4dC1zdGF0dXMtd2FybmluZyBib3JkZXItc3RhdHVzLXdhcm5pbmcvMjAnO1xyXG4gICAgfVxyXG4gIH07XHJcblxyXG4gIGNvbnN0IGhhbmRsZVZpZXdEZXRhaWxzID0gKGxvZzogYW55KSA9PiB7XHJcbiAgICBzZXRTZWxlY3RlZExvZyhsb2cpO1xyXG4gICAgc2V0U2hvd0RldGFpbERpYWxvZyh0cnVlKTtcclxuICB9O1xyXG5cclxuICByZXR1cm4gKFxyXG4gICAgPFJvbGVMYXlvdXQgXHJcbiAgICAgIHRpdGxlPVwiQ29tbXVuaWNhdGlvbiBMb2dzXCIgXHJcbiAgICAgIHN1YnRpdGxlPVwiQW5hbHl6ZXIgbWVzc2FnZSBoaXN0b3J5IGFuZCBtb25pdG9yaW5nXCJcclxuICAgICAgcm9sZT1cImFkbWluXCJcclxuICAgICAgdXNlck5hbWU9e3Byb2ZpbGU/LmZ1bGxfbmFtZX1cclxuICAgID5cclxuICAgICAgey8qIEFjdGlvbnMgQmFyICovfVxyXG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGp1c3RpZnktYmV0d2VlbiBtYi02XCI+XHJcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBnYXAtM1wiPlxyXG4gICAgICAgICAgPFNlbGVjdCB2YWx1ZT17c2VsZWN0ZWRNYWNoaW5lfSBvblZhbHVlQ2hhbmdlPXtzZXRTZWxlY3RlZE1hY2hpbmV9PlxyXG4gICAgICAgICAgICA8U2VsZWN0VHJpZ2dlciBjbGFzc05hbWU9XCJ3LTY0XCI+XHJcbiAgICAgICAgICAgICAgPFNlbGVjdFZhbHVlIC8+XHJcbiAgICAgICAgICAgIDwvU2VsZWN0VHJpZ2dlcj5cclxuICAgICAgICAgICAgPFNlbGVjdENvbnRlbnQ+XHJcbiAgICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJhbGxcIj5BbGwgTWFjaGluZXM8L1NlbGVjdEl0ZW0+XHJcbiAgICAgICAgICAgICAge21hY2hpbmVzPy5tYXAobWFjaGluZSA9PiAoXHJcbiAgICAgICAgICAgICAgICA8U2VsZWN0SXRlbSBrZXk9e21hY2hpbmUuaWR9IHZhbHVlPXttYWNoaW5lLmlkfT5cclxuICAgICAgICAgICAgICAgICAge21hY2hpbmUubmFtZX1cclxuICAgICAgICAgICAgICAgIDwvU2VsZWN0SXRlbT5cclxuICAgICAgICAgICAgICApKX1cclxuICAgICAgICAgICAgPC9TZWxlY3RDb250ZW50PlxyXG4gICAgICAgICAgPC9TZWxlY3Q+XHJcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGdhcC0yIHB4LTMgcHktMiBiZy1jYXJkIGJvcmRlciByb3VuZGVkLWxnXCI+XHJcbiAgICAgICAgICAgIDxSYWRpbyBjbGFzc05hbWU9e2NuKCd3LTQgaC00JywgaXNDb25uZWN0ZWQgPyAndGV4dC1zdGF0dXMtbm9ybWFsIGFuaW1hdGUtcHVsc2UnIDogJ3RleHQtbXV0ZWQtZm9yZWdyb3VuZCcpfSAvPlxyXG4gICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJ0ZXh0LXNtXCI+e2lzQ29ubmVjdGVkID8gJ0xpdmUnIDogJ09mZmxpbmUnfTwvc3Bhbj5cclxuICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgIDwvZGl2PlxyXG4gICAgICAgIDxCdXR0b24gdmFyaWFudD1cIm91dGxpbmVcIiBvbkNsaWNrPXsoKSA9PiByZWZldGNoKCl9PlxyXG4gICAgICAgICAgPFJlZnJlc2hDdyBjbGFzc05hbWU9XCJ3LTQgaC00IG1yLTJcIiAvPlxyXG4gICAgICAgICAgUmVmcmVzaFxyXG4gICAgICAgIDwvQnV0dG9uPlxyXG4gICAgICA8L2Rpdj5cclxuXHJcbiAgICAgIHsvKiBTdGF0cyAqL31cclxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJncmlkIGdyaWQtY29scy00IGdhcC00IG1iLTZcIj5cclxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImJnLWNhcmQgYm9yZGVyIHJvdW5kZWQtbGcgcC00XCI+XHJcbiAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LXNtIHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPlRvdGFsIE1lc3NhZ2VzPC9wPlxyXG4gICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC0yeGwgZm9udC1ib2xkXCI+e2Rpc3BsYXlMb2dzPy5sZW5ndGggfHwgMH08L3A+XHJcbiAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJiZy1jYXJkIGJvcmRlciByb3VuZGVkLWxnIHAtNFwiPlxyXG4gICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1zbSB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5Qcm9jZXNzZWQ8L3A+XHJcbiAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LTJ4bCBmb250LWJvbGQgdGV4dC1zdGF0dXMtbm9ybWFsXCI+XHJcbiAgICAgICAgICAgIHtkaXNwbGF5TG9ncz8uZmlsdGVyKGwgPT4gbC5zdGF0dXMgPT09ICdwcm9jZXNzZWQnKS5sZW5ndGggfHwgMH1cclxuICAgICAgICAgIDwvcD5cclxuICAgICAgICA8L2Rpdj5cclxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImJnLWNhcmQgYm9yZGVyIHJvdW5kZWQtbGcgcC00XCI+XHJcbiAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LXNtIHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPkVycm9yczwvcD5cclxuICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtMnhsIGZvbnQtYm9sZCB0ZXh0LXN0YXR1cy1jcml0aWNhbFwiPlxyXG4gICAgICAgICAgICB7ZGlzcGxheUxvZ3M/LmZpbHRlcihsID0+IGwuc3RhdHVzID09PSAnZXJyb3InKS5sZW5ndGggfHwgMH1cclxuICAgICAgICAgIDwvcD5cclxuICAgICAgICA8L2Rpdj5cclxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImJnLWNhcmQgYm9yZGVyIHJvdW5kZWQtbGcgcC00XCI+XHJcbiAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LXNtIHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPkF2ZyBQcm9jZXNzaW5nIFRpbWU8L3A+XHJcbiAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LTJ4bCBmb250LWJvbGRcIj5cclxuICAgICAgICAgICAge2Rpc3BsYXlMb2dzPy5sZW5ndGggXHJcbiAgICAgICAgICAgICAgPyBNYXRoLnJvdW5kKGRpc3BsYXlMb2dzLnJlZHVjZSgoc3VtLCBsKSA9PiBzdW0gKyAobC5wcm9jZXNzaW5nX3RpbWVfbXMgfHwgMCksIDApIC8gZGlzcGxheUxvZ3MubGVuZ3RoKVxyXG4gICAgICAgICAgICAgIDogMH1tc1xyXG4gICAgICAgICAgPC9wPlxyXG4gICAgICAgIDwvZGl2PlxyXG4gICAgICA8L2Rpdj5cclxuXHJcbiAgICAgIHsvKiBMb2dzIFRhYmxlICovfVxyXG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImJnLWNhcmQgYm9yZGVyIHJvdW5kZWQtbGcgb3ZlcmZsb3ctaGlkZGVuXCI+XHJcbiAgICAgICAge2lzTG9hZGluZyA/IChcclxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIganVzdGlmeS1jZW50ZXIgcHktMTJcIj5cclxuICAgICAgICAgICAgPExvYWRlcjIgY2xhc3NOYW1lPVwidy02IGgtNiBhbmltYXRlLXNwaW4gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCIgLz5cclxuICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICkgOiAoXHJcbiAgICAgICAgICA8dGFibGUgY2xhc3NOYW1lPVwiZGF0YS10YWJsZVwiPlxyXG4gICAgICAgICAgICA8dGhlYWQ+XHJcbiAgICAgICAgICAgICAgPHRyPlxyXG4gICAgICAgICAgICAgICAgPHRoPlRpbWU8L3RoPlxyXG4gICAgICAgICAgICAgICAgPHRoPk1hY2hpbmU8L3RoPlxyXG4gICAgICAgICAgICAgICAgPHRoPkRpcmVjdGlvbjwvdGg+XHJcbiAgICAgICAgICAgICAgICA8dGg+UHJvdG9jb2w8L3RoPlxyXG4gICAgICAgICAgICAgICAgPHRoPk1lc3NhZ2UgVHlwZTwvdGg+XHJcbiAgICAgICAgICAgICAgICA8dGg+U3RhdHVzPC90aD5cclxuICAgICAgICAgICAgICAgIDx0aD5SZXN1bHRzPC90aD5cclxuICAgICAgICAgICAgICAgIDx0aD5Qcm9jZXNzaW5nIFRpbWU8L3RoPlxyXG4gICAgICAgICAgICAgICAgPHRoPkFjdGlvbnM8L3RoPlxyXG4gICAgICAgICAgICAgIDwvdHI+XHJcbiAgICAgICAgICAgIDwvdGhlYWQ+XHJcbiAgICAgICAgICAgIDx0Ym9keT5cclxuICAgICAgICAgICAgICB7ZGlzcGxheUxvZ3M/Lm1hcChsb2cgPT4ge1xyXG4gICAgICAgICAgICAgICAgY29uc3QgbWFjaGluZSA9IG1hY2hpbmVzPy5maW5kKG0gPT4gbS5pZCA9PT0gbG9nLm1hY2hpbmVfaWQpO1xyXG4gICAgICAgICAgICAgICAgcmV0dXJuIChcclxuICAgICAgICAgICAgICAgICAgPHRyIGtleT17bG9nLmlkfT5cclxuICAgICAgICAgICAgICAgICAgICA8dGQgY2xhc3NOYW1lPVwidGV4dC1zbVwiPlxyXG4gICAgICAgICAgICAgICAgICAgICAge25ldyBEYXRlKGxvZy5jcmVhdGVkX2F0KS50b0xvY2FsZVRpbWVTdHJpbmcoKX1cclxuICAgICAgICAgICAgICAgICAgICAgIDxiciAvPlxyXG4gICAgICAgICAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwidGV4dC14cyB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5cclxuICAgICAgICAgICAgICAgICAgICAgICAge25ldyBEYXRlKGxvZy5jcmVhdGVkX2F0KS50b0xvY2FsZURhdGVTdHJpbmcoKX1cclxuICAgICAgICAgICAgICAgICAgICAgIDwvc3Bhbj5cclxuICAgICAgICAgICAgICAgICAgICA8L3RkPlxyXG4gICAgICAgICAgICAgICAgICAgIDx0ZD5cclxuICAgICAgICAgICAgICAgICAgICAgIDxkaXY+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cImZvbnQtbWVkaXVtXCI+e21hY2hpbmU/Lm5hbWUgfHwgJ1Vua25vd24nfTwvcD5cclxuICAgICAgICAgICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC14cyB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj57bWFjaGluZT8ubW9kZWx9PC9wPlxyXG4gICAgICAgICAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAgICAgICAgPC90ZD5cclxuICAgICAgICAgICAgICAgICAgICA8dGQ+XHJcbiAgICAgICAgICAgICAgICAgICAgICA8QmFkZ2UgdmFyaWFudD1cIm91dGxpbmVcIiBjbGFzc05hbWU9e2xvZy5kaXJlY3Rpb24gPT09ICdpbmJvdW5kJyA/ICdiZy1ibHVlLTUwJyA6ICdiZy1ncmVlbi01MCd9PlxyXG4gICAgICAgICAgICAgICAgICAgICAgICB7bG9nLmRpcmVjdGlvbn1cclxuICAgICAgICAgICAgICAgICAgICAgIDwvQmFkZ2U+XHJcbiAgICAgICAgICAgICAgICAgICAgPC90ZD5cclxuICAgICAgICAgICAgICAgICAgICA8dGQgY2xhc3NOYW1lPVwiZm9udC1tb25vIHRleHQtc21cIj57bG9nLnByb3RvY29sfTwvdGQ+XHJcbiAgICAgICAgICAgICAgICAgICAgPHRkIGNsYXNzTmFtZT1cImZvbnQtbW9ubyB0ZXh0LXNtXCI+e2xvZy5tZXNzYWdlX3R5cGUgfHwgJy0nfTwvdGQ+XHJcbiAgICAgICAgICAgICAgICAgICAgPHRkPlxyXG4gICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBnYXAtMlwiPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICB7Z2V0U3RhdHVzSWNvbihsb2cuc3RhdHVzKX1cclxuICAgICAgICAgICAgICAgICAgICAgICAgPEJhZGdlIHZhcmlhbnQ9XCJvdXRsaW5lXCIgY2xhc3NOYW1lPXtnZXRTdGF0dXNDb2xvcihsb2cuc3RhdHVzKX0+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAge2xvZy5zdGF0dXN9XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIDwvQmFkZ2U+XHJcbiAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgICAgICA8L3RkPlxyXG4gICAgICAgICAgICAgICAgICAgIDx0ZCBjbGFzc05hbWU9XCJ0ZXh0LWNlbnRlclwiPntsb2cucmVzdWx0c19jb3VudCB8fCAwfTwvdGQ+XHJcbiAgICAgICAgICAgICAgICAgICAgPHRkIGNsYXNzTmFtZT1cInRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPntsb2cucHJvY2Vzc2luZ190aW1lX21zIHx8IDB9bXM8L3RkPlxyXG4gICAgICAgICAgICAgICAgICAgIDx0ZD5cclxuICAgICAgICAgICAgICAgICAgICAgIDxCdXR0b25cclxuICAgICAgICAgICAgICAgICAgICAgICAgdmFyaWFudD1cImdob3N0XCJcclxuICAgICAgICAgICAgICAgICAgICAgICAgc2l6ZT1cInNtXCJcclxuICAgICAgICAgICAgICAgICAgICAgICAgb25DbGljaz17KCkgPT4gaGFuZGxlVmlld0RldGFpbHMobG9nKX1cclxuICAgICAgICAgICAgICAgICAgICAgID5cclxuICAgICAgICAgICAgICAgICAgICAgICAgPEV5ZSBjbGFzc05hbWU9XCJ3LTQgaC00IG1yLTFcIiAvPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICBWaWV3XHJcbiAgICAgICAgICAgICAgICAgICAgICA8L0J1dHRvbj5cclxuICAgICAgICAgICAgICAgICAgICA8L3RkPlxyXG4gICAgICAgICAgICAgICAgICA8L3RyPlxyXG4gICAgICAgICAgICAgICAgKTtcclxuICAgICAgICAgICAgICB9KX1cclxuICAgICAgICAgICAgICB7KCFkaXNwbGF5TG9ncyB8fCBkaXNwbGF5TG9ncy5sZW5ndGggPT09IDApICYmIChcclxuICAgICAgICAgICAgICAgIDx0cj5cclxuICAgICAgICAgICAgICAgICAgPHRkIGNvbFNwYW49ezl9IGNsYXNzTmFtZT1cInRleHQtY2VudGVyIHB5LTEyIHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPlxyXG4gICAgICAgICAgICAgICAgICAgIE5vIGNvbW11bmljYXRpb24gbG9ncyBmb3VuZFxyXG4gICAgICAgICAgICAgICAgICA8L3RkPlxyXG4gICAgICAgICAgICAgICAgPC90cj5cclxuICAgICAgICAgICAgICApfVxyXG4gICAgICAgICAgICA8L3Rib2R5PlxyXG4gICAgICAgICAgPC90YWJsZT5cclxuICAgICAgICApfVxyXG4gICAgICA8L2Rpdj5cclxuXHJcbiAgICAgIHsvKiBEZXRhaWwgRGlhbG9nICovfVxyXG4gICAgICA8RGlhbG9nIG9wZW49e3Nob3dEZXRhaWxEaWFsb2d9IG9uT3BlbkNoYW5nZT17c2V0U2hvd0RldGFpbERpYWxvZ30+XHJcbiAgICAgICAgPERpYWxvZ0NvbnRlbnQgY2xhc3NOYW1lPVwibWF4LXctNHhsIG1heC1oLVs4MHZoXSBvdmVyZmxvdy15LWF1dG9cIj5cclxuICAgICAgICAgIDxEaWFsb2dIZWFkZXI+XHJcbiAgICAgICAgICAgIDxEaWFsb2dUaXRsZT5NZXNzYWdlIERldGFpbHM8L0RpYWxvZ1RpdGxlPlxyXG4gICAgICAgICAgPC9EaWFsb2dIZWFkZXI+XHJcblxyXG4gICAgICAgICAge3NlbGVjdGVkTG9nICYmIChcclxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTRcIj5cclxuICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImdyaWQgZ3JpZC1jb2xzLTIgZ2FwLTRcIj5cclxuICAgICAgICAgICAgICAgIDxkaXY+XHJcbiAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc20gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+VGltZXN0YW1wPC9wPlxyXG4gICAgICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJmb250LW1lZGl1bVwiPntuZXcgRGF0ZShzZWxlY3RlZExvZy5jcmVhdGVkX2F0KS50b0xvY2FsZVN0cmluZygpfTwvcD5cclxuICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgPGRpdj5cclxuICAgICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1zbSB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5Qcm90b2NvbDwvcD5cclxuICAgICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwiZm9udC1tb25vXCI+e3NlbGVjdGVkTG9nLnByb3RvY29sfTwvcD5cclxuICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgPGRpdj5cclxuICAgICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1zbSB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5NZXNzYWdlIFR5cGU8L3A+XHJcbiAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cImZvbnQtbW9ub1wiPntzZWxlY3RlZExvZy5tZXNzYWdlX3R5cGUgfHwgJy0nfTwvcD5cclxuICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgPGRpdj5cclxuICAgICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1zbSB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5Db250cm9sIElEPC9wPlxyXG4gICAgICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJmb250LW1vbm9cIj57c2VsZWN0ZWRMb2cubWVzc2FnZV9jb250cm9sX2lkIHx8ICctJ308L3A+XHJcbiAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgIDxkaXY+XHJcbiAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc20gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+U3RhdHVzPC9wPlxyXG4gICAgICAgICAgICAgICAgICA8QmFkZ2UgdmFyaWFudD1cIm91dGxpbmVcIiBjbGFzc05hbWU9e2dldFN0YXR1c0NvbG9yKHNlbGVjdGVkTG9nLnN0YXR1cyl9PlxyXG4gICAgICAgICAgICAgICAgICAgIHtzZWxlY3RlZExvZy5zdGF0dXN9XHJcbiAgICAgICAgICAgICAgICAgIDwvQmFkZ2U+XHJcbiAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgIDxkaXY+XHJcbiAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc20gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+UHJvY2Vzc2luZyBUaW1lPC9wPlxyXG4gICAgICAgICAgICAgICAgICA8cD57c2VsZWN0ZWRMb2cucHJvY2Vzc2luZ190aW1lX21zIHx8IDB9bXM8L3A+XHJcbiAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgICAgICAge3NlbGVjdGVkTG9nLmVycm9yX21lc3NhZ2UgJiYgKFxyXG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJiZy1zdGF0dXMtY3JpdGljYWwvMTAgYm9yZGVyIGJvcmRlci1zdGF0dXMtY3JpdGljYWwvMjAgcm91bmRlZC1sZyBwLTRcIj5cclxuICAgICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1zbSBmb250LW1lZGl1bSB0ZXh0LXN0YXR1cy1jcml0aWNhbCBtYi0xXCI+RXJyb3IgTWVzc2FnZTwvcD5cclxuICAgICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1zbVwiPntzZWxlY3RlZExvZy5lcnJvcl9tZXNzYWdlfTwvcD5cclxuICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICl9XHJcblxyXG4gICAgICAgICAgICAgIHtzZWxlY3RlZExvZy5wYXJzZWRfc3VtbWFyeSAmJiAoXHJcbiAgICAgICAgICAgICAgICA8ZGl2PlxyXG4gICAgICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LXNtIGZvbnQtbWVkaXVtIG1iLTJcIj5QYXJzZWQgU3VtbWFyeTwvcD5cclxuICAgICAgICAgICAgICAgICAgPHByZSBjbGFzc05hbWU9XCJiZy1tdXRlZCBwLTQgcm91bmRlZC1sZyB0ZXh0LXhzIG92ZXJmbG93LXgtYXV0b1wiPlxyXG4gICAgICAgICAgICAgICAgICAgIHtKU09OLnN0cmluZ2lmeShzZWxlY3RlZExvZy5wYXJzZWRfc3VtbWFyeSwgbnVsbCwgMil9XHJcbiAgICAgICAgICAgICAgICAgIDwvcHJlPlxyXG4gICAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAgKX1cclxuXHJcbiAgICAgICAgICAgICAge3NlbGVjdGVkTG9nLnJhd19tZXNzYWdlICYmIChcclxuICAgICAgICAgICAgICAgIDxkaXY+XHJcbiAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc20gZm9udC1tZWRpdW0gbWItMlwiPlJhdyBNZXNzYWdlPC9wPlxyXG4gICAgICAgICAgICAgICAgICA8cHJlIGNsYXNzTmFtZT1cImJnLW11dGVkIHAtNCByb3VuZGVkLWxnIHRleHQteHMgb3ZlcmZsb3cteC1hdXRvIG1heC1oLTk2XCI+XHJcbiAgICAgICAgICAgICAgICAgICAge3NlbGVjdGVkTG9nLnJhd19tZXNzYWdlfVxyXG4gICAgICAgICAgICAgICAgICA8L3ByZT5cclxuICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICl9XHJcbiAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgKX1cclxuICAgICAgICA8L0RpYWxvZ0NvbnRlbnQ+XHJcbiAgICAgIDwvRGlhbG9nPlxyXG4gICAgPC9Sb2xlTGF5b3V0PlxyXG4gICk7XHJcbn1cclxuIl0sIm5hbWVzIjpbInVzZVN0YXRlIiwiUm9sZUxheW91dCIsInVzZUF1dGgiLCJ1c2VDb21tdW5pY2F0aW9uTG9ncyIsInVzZVJlYWx0aW1lQ29tbXVuaWNhdGlvbkxvZ3MiLCJ1c2VNYWNoaW5lcyIsIkJ1dHRvbiIsIkJhZGdlIiwiU2VsZWN0IiwiU2VsZWN0Q29udGVudCIsIlNlbGVjdEl0ZW0iLCJTZWxlY3RUcmlnZ2VyIiwiU2VsZWN0VmFsdWUiLCJEaWFsb2ciLCJEaWFsb2dDb250ZW50IiwiRGlhbG9nSGVhZGVyIiwiRGlhbG9nVGl0bGUiLCJSZWZyZXNoQ3ciLCJFeWUiLCJSYWRpbyIsIkxvYWRlcjIiLCJDaGVja0NpcmNsZSIsIlhDaXJjbGUiLCJBbGVydENpcmNsZSIsImNuIiwiQ29tbXVuaWNhdGlvbkxvZ3MiLCJwcm9maWxlIiwic2VsZWN0ZWRNYWNoaW5lIiwic2V0U2VsZWN0ZWRNYWNoaW5lIiwiZGF0YSIsIm1hY2hpbmVzIiwibG9ncyIsImlzTG9hZGluZyIsInJlZmV0Y2giLCJ1bmRlZmluZWQiLCJyZWFsdGltZUxvZ3MiLCJpc0Nvbm5lY3RlZCIsInNlbGVjdGVkTG9nIiwic2V0U2VsZWN0ZWRMb2ciLCJzaG93RGV0YWlsRGlhbG9nIiwic2V0U2hvd0RldGFpbERpYWxvZyIsImRpc3BsYXlMb2dzIiwibGVuZ3RoIiwiZ2V0U3RhdHVzSWNvbiIsInN0YXR1cyIsImNsYXNzTmFtZSIsImdldFN0YXR1c0NvbG9yIiwiaGFuZGxlVmlld0RldGFpbHMiLCJsb2ciLCJ0aXRsZSIsInN1YnRpdGxlIiwicm9sZSIsInVzZXJOYW1lIiwiZnVsbF9uYW1lIiwiZGl2IiwidmFsdWUiLCJvblZhbHVlQ2hhbmdlIiwibWFwIiwibWFjaGluZSIsImlkIiwibmFtZSIsInNwYW4iLCJ2YXJpYW50Iiwib25DbGljayIsInAiLCJmaWx0ZXIiLCJsIiwiTWF0aCIsInJvdW5kIiwicmVkdWNlIiwic3VtIiwicHJvY2Vzc2luZ190aW1lX21zIiwidGFibGUiLCJ0aGVhZCIsInRyIiwidGgiLCJ0Ym9keSIsImZpbmQiLCJtIiwibWFjaGluZV9pZCIsInRkIiwiRGF0ZSIsImNyZWF0ZWRfYXQiLCJ0b0xvY2FsZVRpbWVTdHJpbmciLCJiciIsInRvTG9jYWxlRGF0ZVN0cmluZyIsIm1vZGVsIiwiZGlyZWN0aW9uIiwicHJvdG9jb2wiLCJtZXNzYWdlX3R5cGUiLCJyZXN1bHRzX2NvdW50Iiwic2l6ZSIsImNvbFNwYW4iLCJvcGVuIiwib25PcGVuQ2hhbmdlIiwidG9Mb2NhbGVTdHJpbmciLCJtZXNzYWdlX2NvbnRyb2xfaWQiLCJlcnJvcl9tZXNzYWdlIiwicGFyc2VkX3N1bW1hcnkiLCJwcmUiLCJKU09OIiwic3RyaW5naWZ5IiwicmF3X21lc3NhZ2UiXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OztBQUFBLFNBQVNBLFFBQVEsUUFBUSxRQUFRO0FBQ2pDLFNBQVNDLFVBQVUsUUFBUSxpQ0FBaUM7QUFDNUQsU0FBU0MsT0FBTyxRQUFRLHdCQUF3QjtBQUNoRCxTQUFTQyxvQkFBb0IsRUFBRUMsNEJBQTRCLFFBQVEsK0JBQStCO0FBQ2xHLFNBQVNDLFdBQVcsUUFBUSxzQkFBc0I7QUFDbEQsU0FBU0MsTUFBTSxRQUFRLHlCQUF5QjtBQUNoRCxTQUFTQyxLQUFLLFFBQVEsd0JBQXdCO0FBQzlDLFNBQVNDLE1BQU0sRUFBRUMsYUFBYSxFQUFFQyxVQUFVLEVBQUVDLGFBQWEsRUFBRUMs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

@@ -39,6 +39,11 @@ export class TestCatalogController {
     return this.testCatalogService.findAllTests(true);
   }
 
+  @Get('active-with-panels')
+  async findActiveTestsAndPanels() {
+    return this.testCatalogService.findActiveTestsAndPanels();
+  }
+
   @Get('category/:category')
   async findTestsByCategory(@Param('category') category: string) {
     return this.testCatalogService.findTestsByCategory(category);

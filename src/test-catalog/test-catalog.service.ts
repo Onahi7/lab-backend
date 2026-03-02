@@ -63,6 +63,40 @@ export class TestCatalogService {
       .exec();
   }
 
+  async findActiveTestsAndPanels(): Promise<any[]> {
+    // Get active tests
+    const tests = await this.testCatalogModel
+      .find({ isActive: true })
+      .populate('machineId', 'name manufacturer model')
+      .sort({ category: 1, name: 1 })
+      .exec();
+
+    // Get active panels
+    const panels = await this.testPanelModel
+      .find({ isActive: true })
+      .sort({ name: 1 })
+      .exec();
+
+    // Transform panels to match test structure for frontend compatibility
+    const transformedPanels = panels.map(panel => ({
+      _id: panel._id,
+      id: panel._id.toString(),
+      code: panel.code,
+      name: panel.name,
+      category: 'panel', // Special category for panels
+      price: panel.price,
+      isActive: panel.isActive,
+      description: panel.description,
+      sampleType: 'blood', // Default for panels
+      turnaroundTime: 180, // Default for panels
+      isPanel: true, // Flag to identify panels
+      tests: panel.tests, // Include component tests
+    }));
+
+    // Combine and return
+    return [...tests, ...transformedPanels];
+  }
+
   async findTestById(id: string): Promise<TestCatalog> {
     if (!Types.ObjectId.isValid(id)) {
       throw new BadRequestException('Invalid test ID format');

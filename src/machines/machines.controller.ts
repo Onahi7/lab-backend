@@ -67,6 +67,12 @@ export class MachinesController {
     return { message: 'Machine deleted successfully' };
   }
 
+  @Post(':id/test-connection')
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH)
+  async testConnection(@Param('id') id: string) {
+    return this.machinesService.testConnection(id);
+  }
+
   @Get(':id/maintenance')
   @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH)
   async getMaintenanceHistory(@Param('id') id: string) {

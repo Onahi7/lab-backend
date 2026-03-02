@@ -1,0 +1,268 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/components/dashboard/MachineStatusCard.tsx");import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+
+let prevRefreshReg;
+let prevRefreshSig;
+
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react-swc can't detect preamble. Something is wrong."
+    );
+  }
+
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/HP/Downloads/lab/frontend/src/components/dashboard/MachineStatusCard.tsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+
+import __vite__cjsImport2_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=27cfabb6"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime["jsxDEV"];
+import { cn } from "/src/lib/utils.ts";
+import { Cpu, Clock, Wifi } from "/node_modules/.vite/deps/lucide-react.js?v=27cfabb6";
+export function MachineStatusCard({ machine }) {
+    const statusClasses = {
+        online: 'machine-online',
+        offline: 'machine-offline',
+        error: 'machine-error',
+        processing: 'machine-processing'
+    };
+    const statusText = {
+        online: 'Online',
+        offline: 'Offline',
+        error: 'Error',
+        processing: 'Processing'
+    };
+    const lastComm = machine.lastCommunication ? new Date(machine.lastCommunication).toLocaleTimeString() : 'Never';
+    return /*#__PURE__*/ _jsxDEV("div", {
+        className: "bg-card border rounded-lg p-4 hover:shadow-md transition-shadow",
+        children: [
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "flex items-start justify-between mb-3",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "flex items-center gap-3",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "p-2 rounded-lg bg-muted",
+                                children: /*#__PURE__*/ _jsxDEV(Cpu, {
+                                    className: "w-5 h-5 text-muted-foreground"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/dashboard/MachineStatusCard.tsx",
+                                    lineNumber: 33,
+                                    columnNumber: 13
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/dashboard/MachineStatusCard.tsx",
+                                lineNumber: 32,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("h3", {
+                                        className: "font-semibold text-sm",
+                                        children: machine.name
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/dashboard/MachineStatusCard.tsx",
+                                        lineNumber: 36,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("p", {
+                                        className: "text-xs text-muted-foreground",
+                                        children: [
+                                            machine.manufacturer,
+                                            " ",
+                                            machine.model
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/dashboard/MachineStatusCard.tsx",
+                                        lineNumber: 37,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/dashboard/MachineStatusCard.tsx",
+                                lineNumber: 35,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/dashboard/MachineStatusCard.tsx",
+                        lineNumber: 31,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "flex items-center gap-2",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: cn('machine-indicator', statusClasses[machine.status])
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/dashboard/MachineStatusCard.tsx",
+                                lineNumber: 41,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: "text-xs font-medium",
+                                children: statusText[machine.status]
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/dashboard/MachineStatusCard.tsx",
+                                lineNumber: 42,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/dashboard/MachineStatusCard.tsx",
+                        lineNumber: 40,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/dashboard/MachineStatusCard.tsx",
+                lineNumber: 30,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "space-y-2 text-xs text-muted-foreground",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "flex items-center gap-2",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(Wifi, {
+                                className: "w-3.5 h-3.5"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/dashboard/MachineStatusCard.tsx",
+                                lineNumber: 48,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                children: [
+                                    machine.ipAddress,
+                                    ":",
+                                    machine.port
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/dashboard/MachineStatusCard.tsx",
+                                lineNumber: 49,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                className: "px-1.5 py-0.5 bg-muted rounded text-[10px] font-medium",
+                                children: machine.protocol
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/dashboard/MachineStatusCard.tsx",
+                                lineNumber: 50,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/dashboard/MachineStatusCard.tsx",
+                        lineNumber: 47,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "flex items-center gap-2",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(Clock, {
+                                className: "w-3.5 h-3.5"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/dashboard/MachineStatusCard.tsx",
+                                lineNumber: 53,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("span", {
+                                children: [
+                                    "Last communication: ",
+                                    lastComm
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/dashboard/MachineStatusCard.tsx",
+                                lineNumber: 54,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/dashboard/MachineStatusCard.tsx",
+                        lineNumber: 52,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/dashboard/MachineStatusCard.tsx",
+                lineNumber: 46,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "mt-3 pt-3 border-t",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("p", {
+                        className: "text-xs text-muted-foreground mb-1",
+                        children: "Supported Tests"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/dashboard/MachineStatusCard.tsx",
+                        lineNumber: 59,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "flex flex-wrap gap-1",
+                        children: [
+                            machine.testsSupported.slice(0, 4).map((test)=>/*#__PURE__*/ _jsxDEV("span", {
+                                    className: "px-2 py-0.5 bg-accent rounded text-[10px] font-medium",
+                                    children: test
+                                }, test, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/dashboard/MachineStatusCard.tsx",
+                                    lineNumber: 62,
+                                    columnNumber: 13
+                                }, this)),
+                            machine.testsSupported.length > 4 && /*#__PURE__*/ _jsxDEV("span", {
+                                className: "px-2 py-0.5 bg-muted rounded text-[10px]",
+                                children: [
+                                    "+",
+                                    machine.testsSupported.length - 4
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/dashboard/MachineStatusCard.tsx",
+                                lineNumber: 67,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/dashboard/MachineStatusCard.tsx",
+                        lineNumber: 60,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/dashboard/MachineStatusCard.tsx",
+                lineNumber: 58,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/dashboard/MachineStatusCard.tsx",
+        lineNumber: 29,
+        columnNumber: 5
+    }, this);
+}
+_c = MachineStatusCard;
+var _c;
+$RefreshReg$(_c, "MachineStatusCard");
+
+
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+
+
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/HP/Downloads/lab/frontend/src/components/dashboard/MachineStatusCard.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/HP/Downloads/lab/frontend/src/components/dashboard/MachineStatusCard.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIk1hY2hpbmVTdGF0dXNDYXJkLnRzeCJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBMYWJNYWNoaW5lIH0gZnJvbSAnQC90eXBlcy9saXMnO1xuaW1wb3J0IHsgY24gfSBmcm9tICdAL2xpYi91dGlscyc7XG5pbXBvcnQgeyBDcHUsIENsb2NrLCBXaWZpIH0gZnJvbSAnbHVjaWRlLXJlYWN0JztcblxuaW50ZXJmYWNlIE1hY2hpbmVTdGF0dXNDYXJkUHJvcHMge1xuICBtYWNoaW5lOiBMYWJNYWNoaW5lO1xufVxuXG5leHBvcnQgZnVuY3Rpb24gTWFjaGluZVN0YXR1c0NhcmQoeyBtYWNoaW5lIH06IE1hY2hpbmVTdGF0dXNDYXJkUHJvcHMpIHtcbiAgY29uc3Qgc3RhdHVzQ2xhc3NlcyA9IHtcbiAgICBvbmxpbmU6ICdtYWNoaW5lLW9ubGluZScsXG4gICAgb2ZmbGluZTogJ21hY2hpbmUtb2ZmbGluZScsXG4gICAgZXJyb3I6ICdtYWNoaW5lLWVycm9yJyxcbiAgICBwcm9jZXNzaW5nOiAnbWFjaGluZS1wcm9jZXNzaW5nJyxcbiAgfTtcblxuICBjb25zdCBzdGF0dXNUZXh0ID0ge1xuICAgIG9ubGluZTogJ09ubGluZScsXG4gICAgb2ZmbGluZTogJ09mZmxpbmUnLFxuICAgIGVycm9yOiAnRXJyb3InLFxuICAgIHByb2Nlc3Npbmc6ICdQcm9jZXNzaW5nJyxcbiAgfTtcblxuICBjb25zdCBsYXN0Q29tbSA9IG1hY2hpbmUubGFzdENvbW11bmljYXRpb24gXG4gICAgPyBuZXcgRGF0ZShtYWNoaW5lLmxhc3RDb21tdW5pY2F0aW9uKS50b0xvY2FsZVRpbWVTdHJpbmcoKSBcbiAgICA6ICdOZXZlcic7XG5cbiAgcmV0dXJuIChcbiAgICA8ZGl2IGNsYXNzTmFtZT1cImJnLWNhcmQgYm9yZGVyIHJvdW5kZWQtbGcgcC00IGhvdmVyOnNoYWRvdy1tZCB0cmFuc2l0aW9uLXNoYWRvd1wiPlxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLXN0YXJ0IGp1c3RpZnktYmV0d2VlbiBtYi0zXCI+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIgZ2FwLTNcIj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInAtMiByb3VuZGVkLWxnIGJnLW11dGVkXCI+XG4gICAgICAgICAgICA8Q3B1IGNsYXNzTmFtZT1cInctNSBoLTUgdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCIgLz5cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICA8ZGl2PlxuICAgICAgICAgICAgPGgzIGNsYXNzTmFtZT1cImZvbnQtc2VtaWJvbGQgdGV4dC1zbVwiPnttYWNoaW5lLm5hbWV9PC9oMz5cbiAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQteHMgdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+e21hY2hpbmUubWFudWZhY3R1cmVyfSB7bWFjaGluZS5tb2RlbH08L3A+XG4gICAgICAgICAgPC9kaXY+XG4gICAgICAgIDwvZGl2PlxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGdhcC0yXCI+XG4gICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPXtjbignbWFjaGluZS1pbmRpY2F0b3InLCBzdGF0dXNDbGFzc2VzW21hY2hpbmUuc3RhdHVzXSl9IC8+XG4gICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwidGV4dC14cyBmb250LW1lZGl1bVwiPntzdGF0dXNUZXh0W21hY2hpbmUuc3RhdHVzXX08L3NwYW4+XG4gICAgICAgIDwvZGl2PlxuICAgICAgPC9kaXY+XG5cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0yIHRleHQteHMgdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIgZ2FwLTJcIj5cbiAgICAgICAgICA8V2lmaSBjbGFzc05hbWU9XCJ3LTMuNSBoLTMuNVwiIC8+XG4gICAgICAgICAgPHNwYW4+e21hY2hpbmUuaXBBZGRyZXNzfTp7bWFjaGluZS5wb3J0fTwvc3Bhbj5cbiAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJweC0xLjUgcHktMC41IGJnLW11dGVkIHJvdW5kZWQgdGV4dC1bMTBweF0gZm9udC1tZWRpdW1cIj57bWFjaGluZS5wcm90b2NvbH08L3NwYW4+XG4gICAgICAgIDwvZGl2PlxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGdhcC0yXCI+XG4gICAgICAgICAgPENsb2NrIGNsYXNzTmFtZT1cInctMy41IGgtMy41XCIgLz5cbiAgICAgICAgICA8c3Bhbj5MYXN0IGNvbW11bmljYXRpb246IHtsYXN0Q29tbX08L3NwYW4+XG4gICAgICAgIDwvZGl2PlxuICAgICAgPC9kaXY+XG5cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwibXQtMyBwdC0zIGJvcmRlci10XCI+XG4gICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQteHMgdGV4dC1tdXRlZC1mb3JlZ3JvdW5kIG1iLTFcIj5TdXBwb3J0ZWQgVGVzdHM8L3A+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBmbGV4LXdyYXAgZ2FwLTFcIj5cbiAgICAgICAgICB7bWFjaGluZS50ZXN0c1N1cHBvcnRlZC5zbGljZSgwLCA0KS5tYXAodGVzdCA9PiAoXG4gICAgICAgICAgICA8c3BhbiBrZXk9e3Rlc3R9IGNsYXNzTmFtZT1cInB4LTIgcHktMC41IGJnLWFjY2VudCByb3VuZGVkIHRleHQtWzEwcHhdIGZvbnQtbWVkaXVtXCI+XG4gICAgICAgICAgICAgIHt0ZXN0fVxuICAgICAgICAgICAgPC9zcGFuPlxuICAgICAgICAgICkpfVxuICAgICAgICAgIHttYWNoaW5lLnRlc3RzU3VwcG9ydGVkLmxlbmd0aCA+IDQgJiYgKFxuICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwicHgtMiBweS0wLjUgYmctbXV0ZWQgcm91bmRlZCB0ZXh0LVsxMHB4XVwiPlxuICAgICAgICAgICAgICAre21hY2hpbmUudGVzdHNTdXBwb3J0ZWQubGVuZ3RoIC0gNH1cbiAgICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgICApfVxuICAgICAgICA8L2Rpdj5cbiAgICAgIDwvZGl2PlxuICAgIDwvZGl2PlxuICApO1xufVxuIl0sIm5hbWVzIjpbImNuIiwiQ3B1IiwiQ2xvY2siLCJXaWZpIiwiTWFjaGluZVN0YXR1c0NhcmQiLCJtYWNoaW5lIiwic3RhdHVzQ2xhc3NlcyIsIm9ubGluZSIsIm9mZmxpbmUiLCJlcnJvciIsInByb2Nlc3NpbmciLCJzdGF0dXNUZXh0IiwibGFzdENvbW0iLCJsYXN0Q29tbXVuaWNhdGlvbiIsIkRhdGUiLCJ0b0xvY2FsZVRpbWVTdHJpbmciLCJkaXYiLCJjbGFzc05hbWUiLCJoMyIsIm5hbWUiLCJwIiwibWFudWZhY3R1cmVyIiwibW9kZWwiLCJzcGFuIiwic3RhdHVzIiwiaXBBZGRyZXNzIiwicG9ydCIsInByb3RvY29sIiwidGVzdHNTdXBwb3J0ZWQiLCJzbGljZSIsIm1hcCIsInRlc3QiLCJsZW5ndGgiXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O0FBQ0EsU0FBU0EsRUFBRSxRQUFRLGNBQWM7QUFDakMsU0FBU0MsR0FBRyxFQUFFQyxLQUFLLEVBQUVDLElBQUksUUFBUSxlQUFlO0FBTWhELE9BQU8sU0FBU0Msa0JBQWtCLEVBQUVDLE9BQU8sRUFBMEI7SUFDbkUsTUFBTUMsZ0JBQWdCO1FBQ3BCQyxRQUFRO1FBQ1JDLFNBQVM7UUFDVEMsT0FBTztRQUNQQyxZQUFZO0lBQ2Q7SUFFQSxNQUFNQyxhQUFhO1FBQ2pCSixRQUFRO1FBQ1JDLFNBQVM7UUFDVEMsT0FBTztRQUNQQyxZQUFZO0lBQ2Q7SUFFQSxNQUFNRSxXQUFXUCxRQUFRUSxpQkFBaUIsR0FDdEMsSUFBSUMsS0FBS1QsUUFBUVEsaUJBQWlCLEVBQUVFLGtCQUFrQixLQUN0RDtJQUVKLHFCQUNFLFFBQUNDO1FBQUlDLFdBQVU7OzBCQUNiLFFBQUNEO2dCQUFJQyxXQUFVOztrQ0FDYixRQUFDRDt3QkFBSUMsV0FBVTs7MENBQ2IsUUFBQ0Q7Z0NBQUlDLFdBQVU7MENBQ2IsY0FBQSxRQUFDaEI7b0NBQUlnQixXQUFVOzs7Ozs7Ozs7OzswQ0FFakIsUUFBQ0Q7O2tEQUNDLFFBQUNFO3dDQUFHRCxXQUFVO2tEQUF5QlosUUFBUWMsSUFBSTs7Ozs7O2tEQUNuRCxRQUFDQzt3Q0FBRUgsV0FBVTs7NENBQWlDWixRQUFRZ0IsWUFBWTs0Q0FBQzs0Q0FBRWhCLFFBQVFpQixLQUFLOzs7Ozs7Ozs7Ozs7Ozs7Ozs7O2tDQUd0RixRQUFDTjt3QkFBSUMsV0FBVTs7MENBQ2IsUUFBQ007Z0NBQUtOLFdBQVdqQixHQUFHLHFCQUFxQk0sYUFBYSxDQUFDRCxRQUFRbUIsTUFBTSxDQUFDOzs7Ozs7MENBQ3RFLFFBQUNEO2dDQUFLTixXQUFVOzBDQUF1Qk4sVUFBVSxDQUFDTixRQUFRbUIsTUFBTSxDQUFDOzs7Ozs7Ozs7Ozs7Ozs7Ozs7MEJBSXJFLFFBQUNSO2dCQUFJQyxXQUFVOztrQ0FDYixRQUFDRDt3QkFBSUMsV0FBVTs7MENBQ2IsUUFBQ2Q7Z0NBQUtjLFdBQVU7Ozs7OzswQ0FDaEIsUUFBQ007O29DQUFNbEIsUUFBUW9CLFNBQVM7b0NBQUM7b0NBQUVwQixRQUFRcUIsSUFBSTs7Ozs7OzswQ0FDdkMsUUFBQ0g7Z0NBQUtOLFdBQVU7MENBQTBEWixRQUFRc0IsUUFBUTs7Ozs7Ozs7Ozs7O2tDQUU1RixRQUFDWDt3QkFBSUMsV0FBVTs7MENBQ2IsUUFBQ2Y7Z0NBQU1lLFdBQVU7Ozs7OzswQ0FDakIsUUFBQ007O29DQUFLO29DQUFxQlg7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7MEJBSS9CLFFBQUNJO2dCQUFJQyxXQUFVOztrQ0FDYixRQUFDRzt3QkFBRUgsV0FBVTtrQ0FBcUM7Ozs7OztrQ0FDbEQsUUFBQ0Q7d0JBQUlDLFdBQVU7OzRCQUNaWixRQUFRdUIsY0FBYyxDQUFDQyxLQUFLLENBQUMsR0FBRyxHQUFHQyxHQUFHLENBQUNDLENBQUFBLHFCQUN0QyxRQUFDUjtvQ0FBZ0JOLFdBQVU7OENBQ3hCYzttQ0FEUUE7Ozs7OzRCQUlaMUIsUUFBUXVCLGNBQWMsQ0FBQ0ksTUFBTSxHQUFHLG1CQUMvQixRQUFDVDtnQ0FBS04sV0FBVTs7b0NBQTJDO29DQUN2RFosUUFBUXVCLGNBQWMsQ0FBQ0ksTUFBTSxHQUFHOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O0FBT2hEO0tBbEVnQjVCIn0=

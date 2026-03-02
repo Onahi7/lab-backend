@@ -5,6 +5,7 @@ import { OrdersController } from './orders.controller';
 import { Order, OrderSchema } from '../database/schemas/order.schema';
 import { OrderTest, OrderTestSchema } from '../database/schemas/order-test.schema';
 import { IdSequence, IdSequenceSchema } from '../database/schemas/id-sequence.schema';
+import { Payment, PaymentSchema } from '../database/schemas/payment.schema';
 import { RealtimeModule } from '../realtime/realtime.module';
 
 @Module({
@@ -13,6 +14,7 @@ import { RealtimeModule } from '../realtime/realtime.module';
       { name: Order.name, schema: OrderSchema },
       { name: OrderTest.name, schema: OrderTestSchema },
       { name: IdSequence.name, schema: IdSequenceSchema },
+      { name: Payment.name, schema: PaymentSchema },
     ]),
     RealtimeModule,
   ],

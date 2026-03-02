@@ -1,0 +1,486 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/pages/Settings.tsx");import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+
+let prevRefreshReg;
+let prevRefreshSig;
+
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react-swc can't detect preamble. Something is wrong."
+    );
+  }
+
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+
+import __vite__cjsImport2_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=27cfabb6"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime["jsxDEV"];
+import { MainLayout } from "/src/components/layout/MainLayout.tsx";
+import { Button } from "/src/components/ui/button.tsx";
+import { Input } from "/src/components/ui/input.tsx";
+import { Building2, Globe, Shield, Database, Bell, Plug } from "/node_modules/.vite/deps/lucide-react.js?v=27cfabb6";
+export default function Settings() {
+    const settingsSections = [
+        {
+            id: 'organization',
+            title: 'Organization',
+            description: 'Laboratory name, address, and contact information',
+            icon: Building2
+        },
+        {
+            id: 'interfaces',
+            title: 'Interface Settings',
+            description: 'HL7, ASTM, and FHIR protocol configuration',
+            icon: Plug
+        },
+        {
+            id: 'network',
+            title: 'Network',
+            description: 'IP ranges, ports, and firewall settings',
+            icon: Globe
+        },
+        {
+            id: 'security',
+            title: 'Security',
+            description: 'User roles, permissions, and audit settings',
+            icon: Shield
+        },
+        {
+            id: 'database',
+            title: 'Database',
+            description: 'Backup, retention, and storage configuration',
+            icon: Database
+        },
+        {
+            id: 'notifications',
+            title: 'Notifications',
+            description: 'Critical alerts, email, and SMS settings',
+            icon: Bell
+        }
+    ];
+    return /*#__PURE__*/ _jsxDEV(MainLayout, {
+        title: "Settings",
+        subtitle: "Configure system preferences",
+        children: /*#__PURE__*/ _jsxDEV("div", {
+            className: "max-w-4xl",
+            children: [
+                /*#__PURE__*/ _jsxDEV("div", {
+                    className: "bg-card border rounded-lg p-6 mb-6",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV("h2", {
+                            className: "font-semibold text-lg mb-4",
+                            children: "Laboratory Information"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                            lineNumber: 58,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "grid grid-cols-2 gap-4",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("label", {
+                                            className: "text-sm font-medium text-muted-foreground",
+                                            children: "Laboratory Name"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                            lineNumber: 61,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(Input, {
+                                            defaultValue: "Central Diagnostics Lab",
+                                            className: "mt-1"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                            lineNumber: 62,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                    lineNumber: 60,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("label", {
+                                            className: "text-sm font-medium text-muted-foreground",
+                                            children: "License Number"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                            lineNumber: 65,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(Input, {
+                                            defaultValue: "LAB-2024-001234",
+                                            className: "mt-1"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                            lineNumber: 66,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                    lineNumber: 64,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("label", {
+                                            className: "text-sm font-medium text-muted-foreground",
+                                            children: "HL7 Facility ID"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                            lineNumber: 69,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(Input, {
+                                            defaultValue: "CDL001",
+                                            className: "mt-1"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                            lineNumber: 70,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                    lineNumber: 68,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("label", {
+                                            className: "text-sm font-medium text-muted-foreground",
+                                            children: "Default Protocol"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                            lineNumber: 73,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(Input, {
+                                            defaultValue: "HL7 v2.5.1",
+                                            className: "mt-1"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                            lineNumber: 74,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                    lineNumber: 72,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                            lineNumber: 59,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "mt-4 flex justify-end",
+                            children: /*#__PURE__*/ _jsxDEV(Button, {
+                                children: "Save Changes"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                lineNumber: 78,
+                                columnNumber: 13
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                            lineNumber: 77,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                    lineNumber: 57,
+                    columnNumber: 9
+                }, this),
+                /*#__PURE__*/ _jsxDEV("div", {
+                    className: "grid grid-cols-2 gap-4",
+                    children: settingsSections.map((section)=>/*#__PURE__*/ _jsxDEV("div", {
+                            className: "bg-card border rounded-lg p-5 hover:shadow-md transition-shadow cursor-pointer",
+                            children: /*#__PURE__*/ _jsxDEV("div", {
+                                className: "flex items-start gap-4",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "p-3 rounded-lg bg-primary/10",
+                                        children: /*#__PURE__*/ _jsxDEV(section.icon, {
+                                            className: "w-6 h-6 text-primary"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                            lineNumber: 91,
+                                            columnNumber: 19
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                        lineNumber: 90,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("h3", {
+                                                className: "font-semibold",
+                                                children: section.title
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                                lineNumber: 94,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                className: "text-sm text-muted-foreground mt-1",
+                                                children: section.description
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                                lineNumber: 95,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                        lineNumber: 93,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                lineNumber: 89,
+                                columnNumber: 15
+                            }, this)
+                        }, section.id, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                            lineNumber: 85,
+                            columnNumber: 13
+                        }, this))
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                    lineNumber: 83,
+                    columnNumber: 9
+                }, this),
+                /*#__PURE__*/ _jsxDEV("div", {
+                    className: "mt-6 bg-muted/50 border rounded-lg p-6",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV("h3", {
+                            className: "font-semibold mb-3",
+                            children: "Supported Protocols & Manufacturers"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                            lineNumber: 104,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "grid grid-cols-3 gap-6 text-sm",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("p", {
+                                            className: "font-medium text-muted-foreground mb-2",
+                                            children: "Protocols"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                            lineNumber: 107,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("ul", {
+                                            className: "space-y-1",
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("li", {
+                                                    children: "• HL7 v2.3.1, v2.5, v2.5.1"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                                    lineNumber: 109,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("li", {
+                                                    children: "• ASTM E1381, E1394"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                                    lineNumber: 110,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("li", {
+                                                    children: "• LIS2-A2 (CLSI)"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                                    lineNumber: 111,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("li", {
+                                                    children: "• FHIR R4"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                                    lineNumber: 112,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                            lineNumber: 108,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                    lineNumber: 106,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("p", {
+                                            className: "font-medium text-muted-foreground mb-2",
+                                            children: "Supported Analyzers"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                            lineNumber: 116,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("ul", {
+                                            className: "space-y-1",
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("li", {
+                                                    children: "• ZYBIO (WX200, Z5, Z3)"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                                    lineNumber: 118,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("li", {
+                                                    children: "• Finecare (FIA Meter, FS-113)"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                                    lineNumber: 119,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("li", {
+                                                    children: "• Mindray (BC-5000, BS-240)"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                                    lineNumber: 120,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("li", {
+                                                    children: "• Sysmex (XN Series)"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                                    lineNumber: 121,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                            lineNumber: 117,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                    lineNumber: 115,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("p", {
+                                            className: "font-medium text-muted-foreground mb-2",
+                                            children: "Test Categories"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                            lineNumber: 125,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("ul", {
+                                            className: "space-y-1",
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("li", {
+                                                    children: "• Hematology"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                                    lineNumber: 127,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("li", {
+                                                    children: "• Clinical Chemistry"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                                    lineNumber: 128,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("li", {
+                                                    children: "• Immunoassay"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                                    lineNumber: 129,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("li", {
+                                                    children: "• Coagulation"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                                    lineNumber: 130,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                            lineNumber: 126,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                                    lineNumber: 124,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                            lineNumber: 105,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+                    lineNumber: 103,
+                    columnNumber: 9
+                }, this)
+            ]
+        }, void 0, true, {
+            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+            lineNumber: 55,
+            columnNumber: 7
+        }, this)
+    }, void 0, false, {
+        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx",
+        lineNumber: 54,
+        columnNumber: 5
+    }, this);
+}
+_c = Settings;
+var _c;
+$RefreshReg$(_c, "Settings");
+
+
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+
+
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/HP/Downloads/lab/frontend/src/pages/Settings.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIlNldHRpbmdzLnRzeCJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBNYWluTGF5b3V0IH0gZnJvbSAnQC9jb21wb25lbnRzL2xheW91dC9NYWluTGF5b3V0JztcbmltcG9ydCB7IEJ1dHRvbiB9IGZyb20gJ0AvY29tcG9uZW50cy91aS9idXR0b24nO1xuaW1wb3J0IHsgSW5wdXQgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvaW5wdXQnO1xuaW1wb3J0IHsgXG4gIEJ1aWxkaW5nMiwgXG4gIEdsb2JlLCBcbiAgU2hpZWxkLCBcbiAgRGF0YWJhc2UsIFxuICBCZWxsLFxuICBQbHVnXG59IGZyb20gJ2x1Y2lkZS1yZWFjdCc7XG5cbmV4cG9ydCBkZWZhdWx0IGZ1bmN0aW9uIFNldHRpbmdzKCkge1xuICBjb25zdCBzZXR0aW5nc1NlY3Rpb25zID0gW1xuICAgIHtcbiAgICAgIGlkOiAnb3JnYW5pemF0aW9uJyxcbiAgICAgIHRpdGxlOiAnT3JnYW5pemF0aW9uJyxcbiAgICAgIGRlc2NyaXB0aW9uOiAnTGFib3JhdG9yeSBuYW1lLCBhZGRyZXNzLCBhbmQgY29udGFjdCBpbmZvcm1hdGlvbicsXG4gICAgICBpY29uOiBCdWlsZGluZzIsXG4gICAgfSxcbiAgICB7XG4gICAgICBpZDogJ2ludGVyZmFjZXMnLFxuICAgICAgdGl0bGU6ICdJbnRlcmZhY2UgU2V0dGluZ3MnLFxuICAgICAgZGVzY3JpcHRpb246ICdITDcsIEFTVE0sIGFuZCBGSElSIHByb3RvY29sIGNvbmZpZ3VyYXRpb24nLFxuICAgICAgaWNvbjogUGx1ZyxcbiAgICB9LFxuICAgIHtcbiAgICAgIGlkOiAnbmV0d29yaycsXG4gICAgICB0aXRsZTogJ05ldHdvcmsnLFxuICAgICAgZGVzY3JpcHRpb246ICdJUCByYW5nZXMsIHBvcnRzLCBhbmQgZmlyZXdhbGwgc2V0dGluZ3MnLFxuICAgICAgaWNvbjogR2xvYmUsXG4gICAgfSxcbiAgICB7XG4gICAgICBpZDogJ3NlY3VyaXR5JyxcbiAgICAgIHRpdGxlOiAnU2VjdXJpdHknLFxuICAgICAgZGVzY3JpcHRpb246ICdVc2VyIHJvbGVzLCBwZXJtaXNzaW9ucywgYW5kIGF1ZGl0IHNldHRpbmdzJyxcbiAgICAgIGljb246IFNoaWVsZCxcbiAgICB9LFxuICAgIHtcbiAgICAgIGlkOiAnZGF0YWJhc2UnLFxuICAgICAgdGl0bGU6ICdEYXRhYmFzZScsXG4gICAgICBkZXNjcmlwdGlvbjogJ0JhY2t1cCwgcmV0ZW50aW9uLCBhbmQgc3RvcmFnZSBjb25maWd1cmF0aW9uJyxcbiAgICAgIGljb246IERhdGFiYXNlLFxuICAgIH0sXG4gICAge1xuICAgICAgaWQ6ICdub3RpZmljYXRpb25zJyxcbiAgICAgIHRpdGxlOiAnTm90aWZpY2F0aW9ucycsXG4gICAgICBkZXNjcmlwdGlvbjogJ0NyaXRpY2FsIGFsZXJ0cywgZW1haWwsIGFuZCBTTVMgc2V0dGluZ3MnLFxuICAgICAgaWNvbjogQmVsbCxcbiAgICB9LFxuICBdO1xuXG4gIHJldHVybiAoXG4gICAgPE1haW5MYXlvdXQgdGl0bGU9XCJTZXR0aW5nc1wiIHN1YnRpdGxlPVwiQ29uZmlndXJlIHN5c3RlbSBwcmVmZXJlbmNlc1wiPlxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJtYXgtdy00eGxcIj5cbiAgICAgICAgey8qIFF1aWNrIFNldHRpbmdzICovfVxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImJnLWNhcmQgYm9yZGVyIHJvdW5kZWQtbGcgcC02IG1iLTZcIj5cbiAgICAgICAgICA8aDIgY2xhc3NOYW1lPVwiZm9udC1zZW1pYm9sZCB0ZXh0LWxnIG1iLTRcIj5MYWJvcmF0b3J5IEluZm9ybWF0aW9uPC9oMj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImdyaWQgZ3JpZC1jb2xzLTIgZ2FwLTRcIj5cbiAgICAgICAgICAgIDxkaXY+XG4gICAgICAgICAgICAgIDxsYWJlbCBjbGFzc05hbWU9XCJ0ZXh0LXNtIGZvbnQtbWVkaXVtIHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPkxhYm9yYXRvcnkgTmFtZTwvbGFiZWw+XG4gICAgICAgICAgICAgIDxJbnB1dCBkZWZhdWx0VmFsdWU9XCJDZW50cmFsIERpYWdub3N0aWNzIExhYlwiIGNsYXNzTmFtZT1cIm10LTFcIiAvPlxuICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICA8ZGl2PlxuICAgICAgICAgICAgICA8bGFiZWwgY2xhc3NOYW1lPVwidGV4dC1zbSBmb250LW1lZGl1bSB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5MaWNlbnNlIE51bWJlcjwvbGFiZWw+XG4gICAgICAgICAgICAgIDxJbnB1dCBkZWZhdWx0VmFsdWU9XCJMQUItMjAyNC0wMDEyMzRcIiBjbGFzc05hbWU9XCJtdC0xXCIgLz5cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgPGRpdj5cbiAgICAgICAgICAgICAgPGxhYmVsIGNsYXNzTmFtZT1cInRleHQtc20gZm9udC1tZWRpdW0gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+SEw3IEZhY2lsaXR5IElEPC9sYWJlbD5cbiAgICAgICAgICAgICAgPElucHV0IGRlZmF1bHRWYWx1ZT1cIkNETDAwMVwiIGNsYXNzTmFtZT1cIm10LTFcIiAvPlxuICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICA8ZGl2PlxuICAgICAgICAgICAgICA8bGFiZWwgY2xhc3NOYW1lPVwidGV4dC1zbSBmb250LW1lZGl1bSB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5EZWZhdWx0IFByb3RvY29sPC9sYWJlbD5cbiAgICAgICAgICAgICAgPElucHV0IGRlZmF1bHRWYWx1ZT1cIkhMNyB2Mi41LjFcIiBjbGFzc05hbWU9XCJtdC0xXCIgLz5cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwibXQtNCBmbGV4IGp1c3RpZnktZW5kXCI+XG4gICAgICAgICAgICA8QnV0dG9uPlNhdmUgQ2hhbmdlczwvQnV0dG9uPlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICA8L2Rpdj5cblxuICAgICAgICB7LyogU2V0dGluZ3MgR3JpZCAqL31cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJncmlkIGdyaWQtY29scy0yIGdhcC00XCI+XG4gICAgICAgICAge3NldHRpbmdzU2VjdGlvbnMubWFwKHNlY3Rpb24gPT4gKFxuICAgICAgICAgICAgPGRpdiBcbiAgICAgICAgICAgICAga2V5PXtzZWN0aW9uLmlkfVxuICAgICAgICAgICAgICBjbGFzc05hbWU9XCJiZy1jYXJkIGJvcmRlciByb3VuZGVkLWxnIHAtNSBob3ZlcjpzaGFkb3ctbWQgdHJhbnNpdGlvbi1zaGFkb3cgY3Vyc29yLXBvaW50ZXJcIlxuICAgICAgICAgICAgPlxuICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtc3RhcnQgZ2FwLTRcIj5cbiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInAtMyByb3VuZGVkLWxnIGJnLXByaW1hcnkvMTBcIj5cbiAgICAgICAgICAgICAgICAgIDxzZWN0aW9uLmljb24gY2xhc3NOYW1lPVwidy02IGgtNiB0ZXh0LXByaW1hcnlcIiAvPlxuICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICAgIDxkaXY+XG4gICAgICAgICAgICAgICAgICA8aDMgY2xhc3NOYW1lPVwiZm9udC1zZW1pYm9sZFwiPntzZWN0aW9uLnRpdGxlfTwvaDM+XG4gICAgICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LXNtIHRleHQtbXV0ZWQtZm9yZWdyb3VuZCBtdC0xXCI+e3NlY3Rpb24uZGVzY3JpcHRpb259PC9wPlxuICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICkpfVxuICAgICAgICA8L2Rpdj5cblxuICAgICAgICB7LyogUHJvdG9jb2wgU3VwcG9ydCBJbmZvICovfVxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cIm10LTYgYmctbXV0ZWQvNTAgYm9yZGVyIHJvdW5kZWQtbGcgcC02XCI+XG4gICAgICAgICAgPGgzIGNsYXNzTmFtZT1cImZvbnQtc2VtaWJvbGQgbWItM1wiPlN1cHBvcnRlZCBQcm90b2NvbHMgJiBNYW51ZmFjdHVyZXJzPC9oMz5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImdyaWQgZ3JpZC1jb2xzLTMgZ2FwLTYgdGV4dC1zbVwiPlxuICAgICAgICAgICAgPGRpdj5cbiAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwiZm9udC1tZWRpdW0gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kIG1iLTJcIj5Qcm90b2NvbHM8L3A+XG4gICAgICAgICAgICAgIDx1bCBjbGFzc05hbWU9XCJzcGFjZS15LTFcIj5cbiAgICAgICAgICAgICAgICA8bGk+4oCiIEhMNyB2Mi4zLjEsIHYyLjUsIHYyLjUuMTwvbGk+XG4gICAgICAgICAgICAgICAgPGxpPuKAoiBBU1RNIEUxMzgxLCBFMTM5NDwvbGk+XG4gICAgICAgICAgICAgICAgPGxpPuKAoiBMSVMyLUEyIChDTFNJKTwvbGk+XG4gICAgICAgICAgICAgICAgPGxpPuKAoiBGSElSIFI0PC9saT5cbiAgICAgICAgICAgICAgPC91bD5cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgPGRpdj5cbiAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwiZm9udC1tZWRpdW0gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kIG1iLTJcIj5TdXBwb3J0ZWQgQW5hbHl6ZXJzPC9wPlxuICAgICAgICAgICAgICA8dWwgY2xhc3NOYW1lPVwic3BhY2UteS0xXCI+XG4gICAgICAgICAgICAgICAgPGxpPuKAoiBaWUJJTyAoV1gyMDAsIFo1LCBaMyk8L2xpPlxuICAgICAgICAgICAgICAgIDxsaT7igKIgRmluZWNhcmUgKEZJQSBNZXRlciwgRlMtMTEzKTwvbGk+XG4gICAgICAgICAgICAgICAgPGxpPuKAoiBNaW5kcmF5IChCQy01MDAwLCBCUy0yNDApPC9saT5cbiAgICAgICAgICAgICAgICA8bGk+4oCiIFN5c21leCAoWE4gU2VyaWVzKTwvbGk+XG4gICAgICAgICAgICAgIDwvdWw+XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgIDxkaXY+XG4gICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cImZvbnQtbWVkaXVtIHRleHQtbXV0ZWQtZm9yZWdyb3VuZCBtYi0yXCI+VGVzdCBDYXRlZ29yaWVzPC9wPlxuICAgICAgICAgICAgICA8dWwgY2xhc3NOYW1lPVwic3BhY2UteS0xXCI+XG4gICAgICAgICAgICAgICAgPGxpPuKAoiBIZW1hdG9sb2d5PC9saT5cbiAgICAgICAgICAgICAgICA8bGk+4oCiIENsaW5pY2FsIENoZW1pc3RyeTwvbGk+XG4gICAgICAgICAgICAgICAgPGxpPuKAoiBJbW11bm9hc3NheTwvbGk+XG4gICAgICAgICAgICAgICAgPGxpPuKAoiBDb2FndWxhdGlvbjwvbGk+XG4gICAgICAgICAgICAgIDwvdWw+XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgPC9kaXY+XG4gICAgICA8L2Rpdj5cbiAgICA8L01haW5MYXlvdXQ+XG4gICk7XG59XG4iXSwibmFtZXMiOlsiTWFpbkxheW91dCIsIkJ1dHRvbiIsIklucHV0IiwiQnVpbGRpbmcyIiwiR2xvYmUiLCJTaGllbGQiLCJEYXRhYmFzZSIsIkJlbGwiLCJQbHVnIiwiU2V0dGluZ3MiLCJzZXR0aW5nc1NlY3Rpb25zIiwiaWQiLCJ0aXRsZSIsImRlc2NyaXB0aW9uIiwiaWNvbiIsInN1YnRpdGxlIiwiZGl2IiwiY2xhc3NOYW1lIiwiaDIiLCJsYWJlbCIsImRlZmF1bHRWYWx1ZSIsIm1hcCIsInNlY3Rpb24iLCJoMyIsInAiLCJ1bCIsImxpIl0sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7OztBQUFBLFNBQVNBLFVBQVUsUUFBUSxpQ0FBaUM7QUFDNUQsU0FBU0MsTUFBTSxRQUFRLHlCQUF5QjtBQUNoRCxTQUFTQyxLQUFLLFFBQVEsd0JBQXdCO0FBQzlD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

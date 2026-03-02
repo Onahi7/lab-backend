@@ -1,10 +1,13 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
+import * as net from 'net';
 import { CommunicationLog } from '../database/schemas/communication-log.schema';
 import { Result } from '../database/schemas/result.schema';
 import { Order } from '../database/schemas/order.schema';
+import { OrderTest } from '../database/schemas/order-test.schema';
 import { Machine } from '../database/schemas/machine.schema';
+import { Patient } from '../database/schemas/patient.schema';
 
 interface ParsedHL7Message {
   messageType: string;
@@ -44,8 +47,12 @@ export class Hl7Service {
     private resultModel: Model<Result>,
     @InjectModel(Order.name)
     private orderModel: Model<Order>,
+    @InjectModel(OrderTest.name)
+    private orderTestModel: Model<OrderTest>,
     @InjectModel(Machine.name)
     private machineModel: Model<Machine>,
+    @InjectModel(Patient.name)
+    private patientModel: Model<Patient>,
   ) {}
 
   /**
@@ -498,5 +505,159 @@ export class Hl7Service {
     }
 
     return log;
+  }
+
+  /**
+   * Generate HL7 ORM^O01 order message for sending to analyzer
+   */
+  generateHL7OrderMessage(
+    order: Order & { patientId: Patient },
+    tests: OrderTest[],
+  ): string {
+    const timestamp = new Date()
+      .toISOString()
+      .replace(/[-:]/g, '')
+      .replace('T', '')
+      .substring(0, 14);
+
+    const patient = order.patientId as unknown as Patient;
+    const segments = [
+      `MSH|^~\\&|LIS|LAB|ANALYZER|LAB|${timestamp}||ORM^O01|${order.orderNumber}|P|2.5`,
+      `PID|1||${patient.patientId}||${patient.lastName}^${patient.firstName}||${patient.gender}|||${patient.address || ''}`,
+      `PV1|1|O`,
+    ];
+
+    tests.forEach((test, idx) => {
+      segments.push(
+        `ORC|NW|${order.orderNumber}|||${order.priority === 'stat' ? 'S' : 'R'}`,
+        `OBR|${idx + 1}|${order.orderNumber}||${test.testCode}^${test.testName}|||${timestamp}`,
+      );
+    });
+
+    return segments.join('\r') + '\r';
+  }
+
+  /**
+   * Generate ASTM order message for sending to analyzer
+   */
+  generateASTMOrderMessage(
+    order: Order & { patientId: Patient },
+    tests: OrderTest[],
+  ): string {
+    const patient = order.patientId as unknown as Patient;
+    const records = [
+      `H|\\^&|||LIS|||||LAB||P|1`,
+      `P|1||${patient.patientId}||${patient.lastName}^${patient.firstName}||${patient.gender}`,
+    ];
+
+    tests.forEach((test, idx) => {
+      records.push(
+        `O|${idx + 1}|${order.orderNumber}||^^^${test.testCode}|${order.priority === 'stat' ? 'S' : 'R'}`,
+      );
+    });
+
+    records.push('L|1|N');
+    return records.join('\r') + '\r';
+  }
+
+  /**
+   * Send order to a machine via TCP
+   */
+  async sendOrderToMachine(
+    orderId: string,
+    machineId: string,
+  ): Promise<{ success: boolean; message: string }> {
+    // Validate IDs
+    if (!Types.ObjectId.isValid(orderId) || !Types.ObjectId.isValid(machineId)) {
+      throw new BadRequestException('Invalid order or machine ID');
+    }
+
+    const machine = await this.machineModel.findById(machineId).exec();
+    if (!machine) {
+      throw new BadRequestException('Machine not found');
+    }
+    if (!machine.ipAddress || !machine.port) {
+      throw new BadRequestException('Machine has no IP address or port configured');
+    }
+
+    // Get order with patient populated
+    const order = await this.orderModel
+      .findById(orderId)
+      .populate('patientId')
+      .exec() as (Order & { patientId: Patient }) | null;
+    if (!order) {
+      throw new BadRequestException('Order not found');
+    }
+
+    // Get order tests
+    const tests = await this.orderTestModel
+      .find({ orderId: new Types.ObjectId(orderId) })
+      .exec();
+    if (tests.length === 0) {
+      throw new BadRequestException('No tests found for this order');
+    }
+
+    // Generate message based on machine protocol
+    let message: string;
+    if (machine.protocol === 'HL7') {
+      message = this.generateHL7OrderMessage(order, tests);
+    } else if (machine.protocol === 'ASTM' || machine.protocol === 'LIS2_A2') {
+      message = this.generateASTMOrderMessage(order, tests);
+    } else {
+      throw new BadRequestException(`Protocol ${machine.protocol} does not support outbound orders`);
+    }
+
+    // Log outbound communication
+    const logEntry = await this.logCommunication(
+      machineId,
+      machine.protocol,
+      'outbound',
+      'ORM',
+      message,
+      'processing',
+    );
+
+    // Send via TCP
+    return new Promise((resolve) => {
+      const socket = new net.Socket();
+      socket.setTimeout(10000);
+
+      socket.connect(machine.port!, machine.ipAddress!, () => {
+        socket.write(message);
+        this.logger.log(`Order ${order.orderNumber} sent to ${machine.name}`);
+      });
+
+      let response = '';
+
+      socket.on('data', (data) => {
+        response += data.toString();
+        // Check if we received an ACK
+        if (response.includes('AA') || response.includes('ACK') || response.includes('MSA')) {
+          socket.destroy();
+          this.updateCommunicationLog(logEntry._id, 'success');
+          this.updateMachineStatus(machineId, 'online');
+          resolve({
+            success: true,
+            message: `Order ${order.orderNumber} sent successfully to ${machine.name}`,
+          });
+        }
+      });
+
+      socket.on('error', (err: Error) => {
+        socket.destroy();
+        this.updateCommunicationLog(logEntry._id, 'failed', err.message);
+        resolve({ success: false, message: `Connection error: ${err.message}` });
+      });
+
+      socket.on('timeout', () => {
+        socket.destroy();
+        // Timeout might still be OK if message was sent
+        this.updateCommunicationLog(logEntry._id, 'success', 'No ACK received (timeout)');
+        resolve({
+          success: true,
+          message: `Order sent to ${machine.name} (no ACK received within timeout)`,
+        });
+      });
+    });
   }
 }

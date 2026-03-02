@@ -30,8 +30,8 @@ export enum DiscountTypeEnum {
 
 export enum PaymentMethodEnum {
   CASH = 'cash',
-  CARD = 'card',
-  MOBILE_MONEY = 'mobile_money',
+  ORANGE_MONEY = 'orange_money',
+  AFRIMONEY = 'afrimoney',
 }
 
 @Schema({ timestamps: true, collection: 'orders' })
@@ -45,7 +45,6 @@ export class Order extends Document {
   @Prop({
     required: true,
     enum: Object.values(OrderStatusEnum),
-    index: true,
   })
   status: OrderStatusEnum;
 
@@ -73,6 +72,12 @@ export class Order extends Document {
 
   @Prop({ enum: Object.values(PaymentMethodEnum) })
   paymentMethod?: PaymentMethodEnum;
+
+  @Prop({ default: 0 })
+  amountPaid: number;
+
+  @Prop({ default: 0 })
+  balance: number;
 
   @Prop()
   notes?: string;

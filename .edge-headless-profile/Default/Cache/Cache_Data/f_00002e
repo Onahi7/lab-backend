@@ -1,0 +1,812 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/pages/reception/OrdersPage.tsx");import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+
+let prevRefreshReg;
+let prevRefreshSig;
+
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react-swc can't detect preamble. Something is wrong."
+    );
+  }
+
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+
+import __vite__cjsImport2_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=27cfabb6"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime["jsxDEV"];
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=27cfabb6"; const useState = __vite__cjsImport3_react["useState"];
+import { RoleLayout } from "/src/components/layout/RoleLayout.tsx";
+import { useAuth } from "/src/context/AuthContext.tsx";
+import { useOrders, useUpdateOrder } from "/src/hooks/useOrders.ts";
+import { Button } from "/src/components/ui/button.tsx";
+import { Input } from "/src/components/ui/input.tsx";
+import { Badge } from "/src/components/ui/badge.tsx";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "/src/components/ui/dialog.tsx";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "/src/components/ui/select.tsx";
+import { toast } from "/node_modules/.vite/deps/sonner.js?v=27cfabb6";
+import { Search, CreditCard, Banknote, Smartphone, Check, Loader2, Eye } from "/node_modules/.vite/deps/lucide-react.js?v=27cfabb6";
+import { format } from "/node_modules/.vite/deps/date-fns.js?v=27cfabb6";
+import { cn } from "/src/lib/utils.ts";
+import { getPatientName } from "/src/utils/orderHelpers.ts";
+export default function OrdersPage() {
+    _s();
+    const { profile } = useAuth();
+    const [statusFilter, setStatusFilter] = useState('all');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedOrder, setSelectedOrder] = useState(null);
+    const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
+    const { data: orders, isLoading } = useOrders(statusFilter);
+    const updateOrder = useUpdateOrder();
+    const filteredOrders = Array.isArray(orders) ? orders.filter((order)=>{
+        if (!searchTerm) return true;
+        const search = searchTerm.toLowerCase();
+        const orderNum = (order.orderNumber || order.order_number || '').toLowerCase();
+        const firstName = (order.patientId?.firstName || order.patients?.first_name || '').toLowerCase();
+        const lastName = (order.patientId?.lastName || order.patients?.last_name || '').toLowerCase();
+        const patientId = (order.patientId?.patientId || order.patients?.patient_id || '').toLowerCase();
+        return orderNum.includes(search) || firstName.includes(search) || lastName.includes(search) || patientId.includes(search);
+    }) : [];
+    const handleProcessPayment = async ()=>{
+        if (!selectedOrder || !selectedPaymentMethod) return;
+        try {
+            const orderId = selectedOrder.id || selectedOrder._id;
+            await updateOrder.mutateAsync({
+                id: orderId,
+                updates: {
+                    payment_status: 'paid',
+                    payment_method: selectedPaymentMethod,
+                    status: selectedOrder.status === 'pending_payment' || selectedOrder.status === 'pending_collection' ? 'pending_collection' : selectedOrder.status
+                }
+            });
+            toast.success('Payment processed successfully');
+            setShowPaymentDialog(false);
+            setSelectedOrder(null);
+            setSelectedPaymentMethod(null);
+        } catch (error) {
+            toast.error('Failed to process payment');
+        }
+    };
+    const statusStyles = {
+        pending_payment: 'bg-status-warning/10 text-status-warning border-status-warning/20',
+        pending_collection: 'bg-primary/10 text-primary border-primary/20',
+        collected: 'bg-blue-100 text-blue-800 border-blue-200',
+        processing: 'bg-purple-100 text-purple-800 border-purple-200',
+        completed: 'bg-status-normal/10 text-status-normal border-status-normal/20',
+        cancelled: 'bg-muted text-muted-foreground border-muted'
+    };
+    const priorityStyles = {
+        routine: 'bg-muted text-muted-foreground',
+        urgent: 'bg-status-warning/10 text-status-warning',
+        stat: 'bg-status-critical/10 text-status-critical'
+    };
+    return /*#__PURE__*/ _jsxDEV(RoleLayout, {
+        title: "Orders",
+        subtitle: "View and manage test orders",
+        role: "receptionist",
+        userName: profile?.full_name,
+        children: [
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "flex items-center justify-between mb-6",
+                children: /*#__PURE__*/ _jsxDEV("div", {
+                    className: "flex items-center gap-3",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "relative",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV(Search, {
+                                    className: "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                    lineNumber: 97,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV(Input, {
+                                    placeholder: "Search orders...",
+                                    className: "pl-10 w-80",
+                                    value: searchTerm,
+                                    onChange: (e)=>setSearchTerm(e.target.value)
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                    lineNumber: 98,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                            lineNumber: 96,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV(Select, {
+                            value: statusFilter,
+                            onValueChange: setStatusFilter,
+                            children: [
+                                /*#__PURE__*/ _jsxDEV(SelectTrigger, {
+                                    className: "w-48",
+                                    children: /*#__PURE__*/ _jsxDEV(SelectValue, {
+                                        placeholder: "All Statuses"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                        lineNumber: 107,
+                                        columnNumber: 15
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                    lineNumber: 106,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV(SelectContent, {
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                            value: "all",
+                                            children: "All Statuses"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                            lineNumber: 110,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                            value: "pending_payment",
+                                            children: "Pending Payment"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                            lineNumber: 111,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                            value: "pending_collection",
+                                            children: "Pending Collection"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                            lineNumber: 112,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                            value: "collected",
+                                            children: "Collected"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                            lineNumber: 113,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                            value: "processing",
+                                            children: "Processing"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                            lineNumber: 114,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                            value: "completed",
+                                            children: "Completed"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                            lineNumber: 115,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                    lineNumber: 109,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                            lineNumber: 105,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                    lineNumber: 95,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                lineNumber: 94,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "bg-card border rounded-lg overflow-hidden",
+                children: isLoading ? /*#__PURE__*/ _jsxDEV("div", {
+                    className: "flex items-center justify-center py-12",
+                    children: /*#__PURE__*/ _jsxDEV(Loader2, {
+                        className: "w-6 h-6 animate-spin text-muted-foreground"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                        lineNumber: 125,
+                        columnNumber: 13
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                    lineNumber: 124,
+                    columnNumber: 11
+                }, this) : /*#__PURE__*/ _jsxDEV("table", {
+                    className: "data-table",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV("thead", {
+                            children: /*#__PURE__*/ _jsxDEV("tr", {
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Order #"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                        lineNumber: 131,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Patient"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                        lineNumber: 132,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Tests"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                        lineNumber: 133,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Total"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                        lineNumber: 134,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Priority"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                        lineNumber: 135,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Payment"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                        lineNumber: 136,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Status"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                        lineNumber: 137,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Created"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                        lineNumber: 138,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Actions"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                        lineNumber: 139,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                lineNumber: 130,
+                                columnNumber: 15
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                            lineNumber: 129,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("tbody", {
+                            children: [
+                                filteredOrders?.map((order)=>/*#__PURE__*/ _jsxDEV("tr", {
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                className: "font-mono text-sm",
+                                                children: order.orderNumber || order.order_number
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                lineNumber: 145,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                children: /*#__PURE__*/ _jsxDEV("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV("p", {
+                                                            className: "font-medium",
+                                                            children: getPatientName(order)
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                            lineNumber: 148,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("p", {
+                                                            className: "text-xs text-muted-foreground",
+                                                            children: order.patientId?.patientId || order.patients?.patient_id
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                            lineNumber: 151,
+                                                            columnNumber: 23
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                    lineNumber: 147,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                lineNumber: 146,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                children: /*#__PURE__*/ _jsxDEV("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV("p", {
+                                                            className: "font-medium",
+                                                            children: [
+                                                                order.order_tests?.length || 0,
+                                                                " test(s)"
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                            lineNumber: 158,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("p", {
+                                                            className: "text-xs text-muted-foreground",
+                                                            children: [
+                                                                order.order_tests?.slice(0, 2).map((t)=>`${t.test_code || t.testCode} (${t.test_name || t.testName})`).join(', '),
+                                                                order.order_tests?.length > 2 && ` +${order.order_tests.length - 2} more`
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                            lineNumber: 159,
+                                                            columnNumber: 23
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                    lineNumber: 157,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                lineNumber: 156,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                className: "font-medium",
+                                                children: [
+                                                    "Le ",
+                                                    Number(order.total || order.totalAmount).toLocaleString()
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                lineNumber: 167,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                children: /*#__PURE__*/ _jsxDEV(Badge, {
+                                                    variant: "outline",
+                                                    className: cn('capitalize', priorityStyles[order.priority]),
+                                                    children: order.priority
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                    lineNumber: 169,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                lineNumber: 168,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                children: /*#__PURE__*/ _jsxDEV(Badge, {
+                                                    variant: "outline",
+                                                    className: cn((order.paymentStatus || order.payment_status) === 'paid' ? 'bg-status-normal/10 text-status-normal' : (order.paymentStatus || order.payment_status) === 'pending' ? 'bg-status-warning/10 text-status-warning' : 'bg-muted text-muted-foreground'),
+                                                    children: order.paymentStatus || order.payment_status
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                    lineNumber: 174,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                lineNumber: 173,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                children: /*#__PURE__*/ _jsxDEV(Badge, {
+                                                    variant: "outline",
+                                                    className: cn('capitalize', statusStyles[order.status]),
+                                                    children: order.status.replace(/_/g, ' ')
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                    lineNumber: 183,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                lineNumber: 182,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                className: "text-muted-foreground text-sm",
+                                                children: format(new Date(order.createdAt || order.created_at), 'MMM dd, HH:mm')
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                lineNumber: 187,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                children: /*#__PURE__*/ _jsxDEV("div", {
+                                                    className: "flex gap-1",
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV(Button, {
+                                                            variant: "ghost",
+                                                            size: "sm",
+                                                            children: /*#__PURE__*/ _jsxDEV(Eye, {
+                                                                className: "w-4 h-4"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                                lineNumber: 193,
+                                                                columnNumber: 25
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                            lineNumber: 192,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        (order.paymentStatus || order.payment_status) !== 'paid' && /*#__PURE__*/ _jsxDEV(Button, {
+                                                            variant: "ghost",
+                                                            size: "sm",
+                                                            onClick: ()=>{
+                                                                setSelectedOrder(order);
+                                                                setShowPaymentDialog(true);
+                                                            },
+                                                            children: [
+                                                                /*#__PURE__*/ _jsxDEV(CreditCard, {
+                                                                    className: "w-4 h-4 mr-1"
+                                                                }, void 0, false, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                                    lineNumber: 204,
+                                                                    columnNumber: 27
+                                                                }, this),
+                                                                "Pay"
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                            lineNumber: 196,
+                                                            columnNumber: 25
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                    lineNumber: 191,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                lineNumber: 190,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, order.id || order._id, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                        lineNumber: 144,
+                                        columnNumber: 17
+                                    }, this)),
+                                (!filteredOrders || filteredOrders.length === 0) && /*#__PURE__*/ _jsxDEV("tr", {
+                                    children: /*#__PURE__*/ _jsxDEV("td", {
+                                        colSpan: 9,
+                                        className: "text-center py-8 text-muted-foreground",
+                                        children: "No orders found"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                        lineNumber: 214,
+                                        columnNumber: 19
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                    lineNumber: 213,
+                                    columnNumber: 17
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                            lineNumber: 142,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                    lineNumber: 128,
+                    columnNumber: 11
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                lineNumber: 122,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Dialog, {
+                open: showPaymentDialog,
+                onOpenChange: setShowPaymentDialog,
+                children: /*#__PURE__*/ _jsxDEV(DialogContent, {
+                    children: [
+                        /*#__PURE__*/ _jsxDEV(DialogHeader, {
+                            children: /*#__PURE__*/ _jsxDEV(DialogTitle, {
+                                children: "Process Payment"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                lineNumber: 228,
+                                columnNumber: 13
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                            lineNumber: 227,
+                            columnNumber: 11
+                        }, this),
+                        selectedOrder && /*#__PURE__*/ _jsxDEV("div", {
+                            className: "py-4",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "bg-muted rounded-lg p-4 mb-4",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            className: "flex justify-between mb-2",
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("span", {
+                                                    className: "text-muted-foreground",
+                                                    children: "Order"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                    lineNumber: 235,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("span", {
+                                                    className: "font-mono",
+                                                    children: selectedOrder.orderNumber || selectedOrder.order_number
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                    lineNumber: 236,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                            lineNumber: 234,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            className: "flex justify-between mb-2",
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("span", {
+                                                    className: "text-muted-foreground",
+                                                    children: "Patient"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                    lineNumber: 239,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("span", {
+                                                    children: [
+                                                        selectedOrder.patientId?.firstName || selectedOrder.patients?.first_name,
+                                                        ' ',
+                                                        selectedOrder.patientId?.lastName || selectedOrder.patients?.last_name
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                    lineNumber: 240,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                            lineNumber: 238,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            className: "flex justify-between font-bold text-lg pt-2 border-t mt-2",
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("span", {
+                                                    children: "Amount Due"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                    lineNumber: 246,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("span", {
+                                                    children: [
+                                                        "Le ",
+                                                        Number(selectedOrder.total || selectedOrder.totalAmount).toLocaleString()
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                    lineNumber: 247,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                            lineNumber: 245,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                    lineNumber: 233,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "space-y-2",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("label", {
+                                            className: "text-sm font-medium",
+                                            children: "Payment Method"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                            lineNumber: 252,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            className: "grid grid-cols-3 gap-3",
+                                            children: [
+                                                {
+                                                    id: 'cash',
+                                                    label: 'Cash',
+                                                    icon: Banknote
+                                                },
+                                                {
+                                                    id: 'card',
+                                                    label: 'Card',
+                                                    icon: CreditCard
+                                                },
+                                                {
+                                                    id: 'mobile_money',
+                                                    label: 'Mobile Money',
+                                                    icon: Smartphone
+                                                }
+                                            ].map((method)=>/*#__PURE__*/ _jsxDEV("button", {
+                                                    onClick: ()=>setSelectedPaymentMethod(method.id),
+                                                    className: cn('flex flex-col items-center gap-2 p-4 rounded-lg border transition-colors', selectedPaymentMethod === method.id ? 'border-primary bg-primary/5' : 'hover:bg-muted/50'),
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV(method.icon, {
+                                                            className: "w-6 h-6"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                            lineNumber: 269,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("span", {
+                                                            className: "text-sm font-medium",
+                                                            children: method.label
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                            lineNumber: 270,
+                                                            columnNumber: 23
+                                                        }, this)
+                                                    ]
+                                                }, method.id, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                                    lineNumber: 259,
+                                                    columnNumber: 21
+                                                }, this))
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                            lineNumber: 253,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                    lineNumber: 251,
+                                    columnNumber: 15
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                            lineNumber: 232,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV(DialogFooter, {
+                            children: [
+                                /*#__PURE__*/ _jsxDEV(Button, {
+                                    variant: "outline",
+                                    onClick: ()=>setShowPaymentDialog(false),
+                                    children: "Cancel"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                    lineNumber: 279,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV(Button, {
+                                    onClick: handleProcessPayment,
+                                    disabled: !selectedPaymentMethod || updateOrder.isPending,
+                                    children: [
+                                        updateOrder.isPending && /*#__PURE__*/ _jsxDEV(Loader2, {
+                                            className: "w-4 h-4 mr-2 animate-spin"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                            lineNumber: 284,
+                                            columnNumber: 41
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(Check, {
+                                            className: "w-4 h-4 mr-2"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                            lineNumber: 285,
+                                            columnNumber: 15
+                                        }, this),
+                                        "Confirm Payment"
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                                    lineNumber: 280,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                            lineNumber: 278,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                    lineNumber: 226,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+                lineNumber: 225,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx",
+        lineNumber: 87,
+        columnNumber: 5
+    }, this);
+}
+_s(OrdersPage, "SFcxxUW26jA3V55t3hCbeyYQGAk=", false, function() {
+    return [
+        useAuth,
+        useOrders,
+        useUpdateOrder
+    ];
+});
+_c = OrdersPage;
+var _c;
+$RefreshReg$(_c, "OrdersPage");
+
+
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+
+
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/HP/Downloads/lab/frontend/src/pages/reception/OrdersPage.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIk9yZGVyc1BhZ2UudHN4Il0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IHVzZVN0YXRlIH0gZnJvbSAncmVhY3QnO1xuaW1wb3J0IHsgUm9sZUxheW91dCB9IGZyb20gJ0AvY29tcG9uZW50cy9sYXlvdXQvUm9sZUxheW91dCc7XG5pbXBvcnQgeyB1c2VBdXRoIH0gZnJvbSAnQC9jb250ZXh0L0F1dGhDb250ZXh0JztcbmltcG9ydCB7IHVzZU9yZGVycywgdXNlVXBkYXRlT3JkZXIgfSBmcm9tICdAL2hvb2tzL3VzZU9yZGVycyc7XG5pbXBvcnQgeyBCdXR0b24gfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvYnV0dG9uJztcbmltcG9ydCB7IElucHV0IH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL2lucHV0JztcbmltcG9ydCB7IEJhZGdlIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL2JhZGdlJztcbmltcG9ydCB7IERpYWxvZywgRGlhbG9nQ29udGVudCwgRGlhbG9nSGVhZGVyLCBEaWFsb2dUaXRsZSwgRGlhbG9nRm9vdGVyIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL2RpYWxvZyc7XG5pbXBvcnQgeyBTZWxlY3QsIFNlbGVjdENvbnRlbnQsIFNlbGVjdEl0ZW0sIFNlbGVjdFRyaWdnZXIsIFNlbGVjdFZhbHVlIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL3NlbGVjdCc7XG5pbXBvcnQgeyB0b2FzdCB9IGZyb20gJ3Nvbm5lcic7XG5pbXBvcnQgeyBTZWFyY2gsIENyZWRpdENhcmQsIEJhbmtub3RlLCBTbWFydHBob25lLCBDaGVjaywgTG9hZGVyMiwgRXllIH0gZnJvbSAnbHVjaWRlLXJlYWN0JztcbmltcG9ydCB7IGZvcm1hdCB9IGZyb20gJ2RhdGUtZm5zJztcbmltcG9ydCB7IGNuIH0gZnJvbSAnQC9saWIvdXRpbHMnO1xuaW1wb3J0IHR5cGUgeyBEYXRhYmFzZSB9IGZyb20gJ0AvaW50ZWdyYXRpb25zL3N1cGFiYXNlL3R5cGVzJztcbmltcG9ydCB0eXBlIHsgT3JkZXJXaXRoRGV0YWlscyB9IGZyb20gJ0AvaG9va3MvdXNlT3JkZXJzJztcbmltcG9ydCB7IGdldFBhdGllbnROYW1lIH0gZnJvbSAnQC91dGlscy9vcmRlckhlbHBlcnMnO1xuXG50eXBlIFBheW1lbnRNZXRob2QgPSBEYXRhYmFzZVsncHVibGljJ11bJ0VudW1zJ11bJ3BheW1lbnRfbWV0aG9kJ107XG5cbmV4cG9ydCBkZWZhdWx0IGZ1bmN0aW9uIE9yZGVyc1BhZ2UoKSB7XG4gIGNvbnN0IHsgcHJvZmlsZSB9ID0gdXNlQXV0aCgpO1xuICBjb25zdCBbc3RhdHVzRmlsdGVyLCBzZXRTdGF0dXNGaWx0ZXJdID0gdXNlU3RhdGU8c3RyaW5nPignYWxsJyk7XG4gIGNvbnN0IFtzZWFyY2hUZXJtLCBzZXRTZWFyY2hUZXJtXSA9IHVzZVN0YXRlKCcnKTtcbiAgY29uc3QgW3NlbGVjdGVkT3JkZXIsIHNldFNlbGVjdGVkT3JkZXJdID0gdXNlU3RhdGU8T3JkZXJXaXRoRGV0YWlscyB8IG51bGw+KG51bGwpO1xuICBjb25zdCBbc2hvd1BheW1lbnREaWFsb2csIHNldFNob3dQYXltZW50RGlhbG9nXSA9IHVzZVN0YXRlKGZhbHNlKTtcbiAgY29uc3QgW3NlbGVjdGVkUGF5bWVudE1ldGhvZCwgc2V0U2VsZWN0ZWRQYXltZW50TWV0aG9kXSA9IHVzZVN0YXRlPFBheW1lbnRNZXRob2QgfCBudWxsPihudWxsKTtcbiAgXG4gIGNvbnN0IHsgZGF0YTogb3JkZXJzLCBpc0xvYWRpbmcgfSA9IHVzZU9yZGVycyhzdGF0dXNGaWx0ZXIgYXMgYW55KTtcbiAgY29uc3QgdXBkYXRlT3JkZXIgPSB1c2VVcGRhdGVPcmRlcigpO1xuXG4gIGNvbnN0IGZpbHRlcmVkT3JkZXJzID0gQXJyYXkuaXNBcnJheShvcmRlcnMpID8gb3JkZXJzLmZpbHRlcihvcmRlciA9PiB7XG4gICAgaWYgKCFzZWFyY2hUZXJtKSByZXR1cm4gdHJ1ZTtcbiAgICBjb25zdCBzZWFyY2ggPSBzZWFyY2hUZXJtLnRvTG93ZXJDYXNlKCk7XG4gICAgY29uc3Qgb3JkZXJOdW0gPSAob3JkZXIub3JkZXJOdW1iZXIgfHwgb3JkZXIub3JkZXJfbnVtYmVyIHx8ICcnKS50b0xvd2VyQ2FzZSgpO1xuICAgIGNvbnN0IGZpcnN0TmFtZSA9IChvcmRlci5wYXRpZW50SWQ/LmZpcnN0TmFtZSB8fCBvcmRlci5wYXRpZW50cz8uZmlyc3RfbmFtZSB8fCAnJykudG9Mb3dlckNhc2UoKTtcbiAgICBjb25zdCBsYXN0TmFtZSA9IChvcmRlci5wYXRpZW50SWQ/Lmxhc3ROYW1lIHx8IG9yZGVyLnBhdGllbnRzPy5sYXN0X25hbWUgfHwgJycpLnRvTG93ZXJDYXNlKCk7XG4gICAgY29uc3QgcGF0aWVudElkID0gKG9yZGVyLnBhdGllbnRJZD8ucGF0aWVudElkIHx8IG9yZGVyLnBhdGllbnRzPy5wYXRpZW50X2lkIHx8ICcnKS50b0xvd2VyQ2FzZSgpO1xuICAgIFxuICAgIHJldHVybiAoXG4gICAgICBvcmRlck51bS5pbmNsdWRlcyhzZWFyY2gpIHx8XG4gICAgICBmaXJzdE5hbWUuaW5jbHVkZXMoc2VhcmNoKSB8fFxuICAgICAgbGFzdE5hbWUuaW5jbHVkZXMoc2VhcmNoKSB8fFxuICAgICAgcGF0aWVudElkLmluY2x1ZGVzKHNlYXJjaClcbiAgICApO1xuICB9KSA6IFtdO1xuXG4gIGNvbnN0IGhhbmRsZVByb2Nlc3NQYXltZW50ID0gYXN5bmMgKCkgPT4ge1xuICAgIGlmICghc2VsZWN0ZWRPcmRlciB8fCAhc2VsZWN0ZWRQYXltZW50TWV0aG9kKSByZXR1cm47XG5cbiAgICB0cnkge1xuICAgICAgY29uc3Qgb3JkZXJJZCA9IHNlbGVjdGVkT3JkZXIuaWQgfHwgc2VsZWN0ZWRPcmRlci5faWQ7XG4gICAgICBhd2FpdCB1cGRhdGVPcmRlci5tdXRhdGVBc3luYyh7XG4gICAgICAgIGlkOiBvcmRlcklkLFxuICAgICAgICB1cGRhdGVzOiB7XG4gICAgICAgICAgcGF5bWVudF9zdGF0dXM6ICdwYWlkJyxcbiAgICAgICAgICBwYXltZW50X21ldGhvZDogc2VsZWN0ZWRQYXltZW50TWV0aG9kLFxuICAgICAgICAgIHN0YXR1czogKHNlbGVjdGVkT3JkZXIuc3RhdHVzID09PSAncGVuZGluZ19wYXltZW50JyB8fCBzZWxlY3RlZE9yZGVyLnN0YXR1cyA9PT0gJ3BlbmRpbmdfY29sbGVjdGlvbicpIFxuICAgICAgICAgICAgPyAncGVuZGluZ19jb2xsZWN0aW9uJyBcbiAgICAgICAgICAgIDogc2VsZWN0ZWRPcmRlci5zdGF0dXMsXG4gICAgICAgIH0sXG4gICAgICB9KTtcbiAgICAgIHRvYXN0LnN1Y2Nlc3MoJ1BheW1lbnQgcHJvY2Vzc2VkIHN1Y2Nlc3NmdWxseScpO1xuICAgICAgc2V0U2hvd1BheW1lbnREaWFsb2coZmFsc2UpO1xuICAgICAgc2V0U2VsZWN0ZWRPcmRlcihudWxsKTtcbiAgICAgIHNldFNlbGVjdGVkUGF5bWVudE1ldGhvZChudWxsKTtcbiAgICB9IGNhdGNoIChlcnJvcikge1xuICAgICAgdG9hc3QuZXJyb3IoJ0ZhaWxlZCB0byBwcm9jZXNzIHBheW1lbnQnKTtcbiAgICB9XG4gIH07XG5cbiAgY29uc3Qgc3RhdHVzU3R5bGVzOiBSZWNvcmQ8c3RyaW5nLCBzdHJpbmc+ID0ge1xuICAgIHBlbmRpbmdfcGF5bWVudDogJ2JnLXN0YXR1cy13YXJuaW5nLzEwIHRleHQtc3RhdHVzLXdhcm5pbmcgYm9yZGVyLXN0YXR1cy13YXJuaW5nLzIwJyxcbiAgICBwZW5kaW5nX2NvbGxlY3Rpb246ICdiZy1wcmltYXJ5LzEwIHRleHQtcHJpbWFyeSBib3JkZXItcHJpbWFyeS8yMCcsXG4gICAgY29sbGVjdGVkOiAnYmctYmx1ZS0xMDAgdGV4dC1ibHVlLTgwMCBib3JkZXItYmx1ZS0yMDAnLFxuICAgIHByb2Nlc3Npbmc6ICdiZy1wdXJwbGUtMTAwIHRleHQtcHVycGxlLTgwMCBib3JkZXItcHVycGxlLTIwMCcsXG4gICAgY29tcGxldGVkOiAnYmctc3RhdHVzLW5vcm1hbC8xMCB0ZXh0LXN0YXR1cy1ub3JtYWwgYm9yZGVyLXN0YXR1cy1ub3JtYWwvMjAnLFxuICAgIGNhbmNlbGxlZDogJ2JnLW11dGVkIHRleHQtbXV0ZWQtZm9yZWdyb3VuZCBib3JkZXItbXV0ZWQnLFxuICB9O1xuXG4gIGNvbnN0IHByaW9yaXR5U3R5bGVzOiBSZWNvcmQ8c3RyaW5nLCBzdHJpbmc+ID0ge1xuICAgIHJvdXRpbmU6ICdiZy1tdXRlZCB0ZXh0LW11dGVkLWZvcmVncm91bmQnLFxuICAgIHVyZ2VudDogJ2JnLXN0YXR1cy13YXJuaW5nLzEwIHRleHQtc3RhdHVzLXdhcm5pbmcnLFxuICAgIHN0YXQ6ICdiZy1zdGF0dXMtY3JpdGljYWwvMTAgdGV4dC1zdGF0dXMtY3JpdGljYWwnLFxuICB9O1xuXG4gIHJldHVybiAoXG4gICAgPFJvbGVMYXlvdXQgXG4gICAgICB0aXRsZT1cIk9yZGVyc1wiIFxuICAgICAgc3VidGl0bGU9XCJWaWV3IGFuZCBtYW5hZ2UgdGVzdCBvcmRlcnNcIlxuICAgICAgcm9sZT1cInJlY2VwdGlvbmlzdFwiXG4gICAgICB1c2VyTmFtZT17cHJvZmlsZT8uZnVsbF9uYW1lfVxuICAgID5cbiAgICAgIHsvKiBGaWx0ZXJzICovfVxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWJldHdlZW4gbWItNlwiPlxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGdhcC0zXCI+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJyZWxhdGl2ZVwiPlxuICAgICAgICAgICAgPFNlYXJjaCBjbGFzc05hbWU9XCJhYnNvbHV0ZSBsZWZ0LTMgdG9wLTEvMiAtdHJhbnNsYXRlLXktMS8yIHctNCBoLTQgdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCIgLz5cbiAgICAgICAgICAgIDxJbnB1dCBcbiAgICAgICAgICAgICAgcGxhY2Vob2xkZXI9XCJTZWFyY2ggb3JkZXJzLi4uXCIgXG4gICAgICAgICAgICAgIGNsYXNzTmFtZT1cInBsLTEwIHctODBcIlxuICAgICAgICAgICAgICB2YWx1ZT17c2VhcmNoVGVybX1cbiAgICAgICAgICAgICAgb25DaGFuZ2U9e2UgPT4gc2V0U2VhcmNoVGVybShlLnRhcmdldC52YWx1ZSl9XG4gICAgICAgICAgICAvPlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDxTZWxlY3QgdmFsdWU9e3N0YXR1c0ZpbHRlcn0gb25WYWx1ZUNoYW5nZT17c2V0U3RhdHVzRmlsdGVyfT5cbiAgICAgICAgICAgIDxTZWxlY3RUcmlnZ2VyIGNsYXNzTmFtZT1cInctNDhcIj5cbiAgICAgICAgICAgICAgPFNlbGVjdFZhbHVlIHBsYWNlaG9sZGVyPVwiQWxsIFN0YXR1c2VzXCIgLz5cbiAgICAgICAgICAgIDwvU2VsZWN0VHJpZ2dlcj5cbiAgICAgICAgICAgIDxTZWxlY3RDb250ZW50PlxuICAgICAgICAgICAgICA8U2VsZWN0SXRlbSB2YWx1ZT1cImFsbFwiPkFsbCBTdGF0dXNlczwvU2VsZWN0SXRlbT5cbiAgICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJwZW5kaW5nX3BheW1lbnRcIj5QZW5kaW5nIFBheW1lbnQ8L1NlbGVjdEl0ZW0+XG4gICAgICAgICAgICAgIDxTZWxlY3RJdGVtIHZhbHVlPVwicGVuZGluZ19jb2xsZWN0aW9uXCI+UGVuZGluZyBDb2xsZWN0aW9uPC9TZWxlY3RJdGVtPlxuICAgICAgICAgICAgICA8U2VsZWN0SXRlbSB2YWx1ZT1cImNvbGxlY3RlZFwiPkNvbGxlY3RlZDwvU2VsZWN0SXRlbT5cbiAgICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJwcm9jZXNzaW5nXCI+UHJvY2Vzc2luZzwvU2VsZWN0SXRlbT5cbiAgICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJjb21wbGV0ZWRcIj5Db21wbGV0ZWQ8L1NlbGVjdEl0ZW0+XG4gICAgICAgICAgICA8L1NlbGVjdENvbnRlbnQ+XG4gICAgICAgICAgPC9TZWxlY3Q+XG4gICAgICAgIDwvZGl2PlxuICAgICAgPC9kaXY+XG5cbiAgICAgIHsvKiBPcmRlcnMgVGFibGUgKi99XG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImJnLWNhcmQgYm9yZGVyIHJvdW5kZWQtbGcgb3ZlcmZsb3ctaGlkZGVuXCI+XG4gICAgICAgIHtpc0xvYWRpbmcgPyAoXG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWNlbnRlciBweS0xMlwiPlxuICAgICAgICAgICAgPExvYWRlcjIgY2xhc3NOYW1lPVwidy02IGgtNiBhbmltYXRlLXNwaW4gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCIgLz5cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgKSA6IChcbiAgICAgICAgICA8dGFibGUgY2xhc3NOYW1lPVwiZGF0YS10YWJsZVwiPlxuICAgICAgICAgICAgPHRoZWFkPlxuICAgICAgICAgICAgICA8dHI+XG4gICAgICAgICAgICAgICAgPHRoPk9yZGVyICM8L3RoPlxuICAgICAgICAgICAgICAgIDx0aD5QYXRpZW50PC90aD5cbiAgICAgICAgICAgICAgICA8dGg+VGVzdHM8L3RoPlxuICAgICAgICAgICAgICAgIDx0aD5Ub3RhbDwvdGg+XG4gICAgICAgICAgICAgICAgPHRoPlByaW9yaXR5PC90aD5cbiAgICAgICAgICAgICAgICA8dGg+UGF5bWVudDwvdGg+XG4gICAgICAgICAgICAgICAgPHRoPlN0YXR1czwvdGg+XG4gICAgICAgICAgICAgICAgPHRoPkNyZWF0ZWQ8L3RoPlxuICAgICAgICAgICAgICAgIDx0aD5BY3Rpb25zPC90aD5cbiAgICAgICAgICAgICAgPC90cj5cbiAgICAgICAgICAgIDwvdGhlYWQ+XG4gICAgICAgICAgICA8dGJvZHk+XG4gICAgICAgICAgICAgIHtmaWx0ZXJlZE9yZGVycz8ubWFwKG9yZGVyID0+IChcbiAgICAgICAgICAgICAgICA8dHIga2V5PXtvcmRlci5pZCB8fCBvcmRlci5faWR9PlxuICAgICAgICAgICAgICAgICAgPHRkIGNsYXNzTmFtZT1cImZvbnQtbW9ubyB0ZXh0LXNtXCI+e29yZGVyLm9yZGVyTnVtYmVyIHx8IG9yZGVyLm9yZGVyX251bWJlcn08L3RkPlxuICAgICAgICAgICAgICAgICAgPHRkPlxuICAgICAgICAgICAgICAgICAgICA8ZGl2PlxuICAgICAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cImZvbnQtbWVkaXVtXCI+XG4gICAgICAgICAgICAgICAgICAgICAgICB7Z2V0UGF0aWVudE5hbWUob3JkZXIpfVxuICAgICAgICAgICAgICAgICAgICAgIDwvcD5cbiAgICAgICAgICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LXhzIHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPlxuICAgICAgICAgICAgICAgICAgICAgICAge29yZGVyLnBhdGllbnRJZD8ucGF0aWVudElkIHx8IG9yZGVyLnBhdGllbnRzPy5wYXRpZW50X2lkfVxuICAgICAgICAgICAgICAgICAgICAgIDwvcD5cbiAgICAgICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICAgICA8L3RkPlxuICAgICAgICAgICAgICAgICAgPHRkPlxuICAgICAgICAgICAgICAgICAgICA8ZGl2PlxuICAgICAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cImZvbnQtbWVkaXVtXCI+e29yZGVyLm9yZGVyX3Rlc3RzPy5sZW5ndGggfHwgMH0gdGVzdChzKTwvcD5cbiAgICAgICAgICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LXhzIHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPlxuICAgICAgICAgICAgICAgICAgICAgICAge29yZGVyLm9yZGVyX3Rlc3RzPy5zbGljZSgwLCAyKS5tYXAodCA9PiBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgYCR7dC50ZXN0X2NvZGUgfHwgdC50ZXN0Q29kZX0gKCR7dC50ZXN0X25hbWUgfHwgdC50ZXN0TmFtZX0pYFxuICAgICAgICAgICAgICAgICAgICAgICAgKS5qb2luKCcsICcpfVxuICAgICAgICAgICAgICAgICAgICAgICAge29yZGVyLm9yZGVyX3Rlc3RzPy5sZW5ndGggPiAyICYmIGAgKyR7b3JkZXIub3JkZXJfdGVzdHMubGVuZ3RoIC0gMn0gbW9yZWB9XG4gICAgICAgICAgICAgICAgICAgICAgPC9wPlxuICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICAgIDwvdGQ+XG4gICAgICAgICAgICAgICAgICA8dGQgY2xhc3NOYW1lPVwiZm9udC1tZWRpdW1cIj5MZSB7TnVtYmVyKG9yZGVyLnRvdGFsIHx8IG9yZGVyLnRvdGFsQW1vdW50KS50b0xvY2FsZVN0cmluZygpfTwvdGQ+XG4gICAgICAgICAgICAgICAgICA8dGQ+XG4gICAgICAgICAgICAgICAgICAgIDxCYWRnZSB2YXJpYW50PVwib3V0bGluZVwiIGNsYXNzTmFtZT17Y24oJ2NhcGl0YWxpemUnLCBwcmlvcml0eVN0eWxlc1tvcmRlci5wcmlvcml0eV0pfT5cbiAgICAgICAgICAgICAgICAgICAgICB7b3JkZXIucHJpb3JpdHl9XG4gICAgICAgICAgICAgICAgICAgIDwvQmFkZ2U+XG4gICAgICAgICAgICAgICAgICA8L3RkPlxuICAgICAgICAgICAgICAgICAgPHRkPlxuICAgICAgICAgICAgICAgICAgICA8QmFkZ2UgdmFyaWFudD1cIm91dGxpbmVcIiBjbGFzc05hbWU9e2NuKFxuICAgICAgICAgICAgICAgICAgICAgIChvcmRlci5wYXltZW50U3RhdHVzIHx8IG9yZGVyLnBheW1lbnRfc3RhdHVzKSA9PT0gJ3BhaWQnID8gJ2JnLXN0YXR1cy1ub3JtYWwvMTAgdGV4dC1zdGF0dXMtbm9ybWFsJyA6XG4gICAgICAgICAgICAgICAgICAgICAgKG9yZGVyLnBheW1lbnRTdGF0dXMgfHwgb3JkZXIucGF5bWVudF9zdGF0dXMpID09PSAncGVuZGluZycgPyAnYmctc3RhdHVzLXdhcm5pbmcvMTAgdGV4dC1zdGF0dXMtd2FybmluZycgOlxuICAgICAgICAgICAgICAgICAgICAgICdiZy1tdXRlZCB0ZXh0LW11dGVkLWZvcmVncm91bmQnXG4gICAgICAgICAgICAgICAgICAgICl9PlxuICAgICAgICAgICAgICAgICAgICAgIHtvcmRlci5wYXltZW50U3RhdHVzIHx8IG9yZGVyLnBheW1lbnRfc3RhdHVzfVxuICAgICAgICAgICAgICAgICAgICA8L0JhZGdlPlxuICAgICAgICAgICAgICAgICAgPC90ZD5cbiAgICAgICAgICAgICAgICAgIDx0ZD5cbiAgICAgICAgICAgICAgICAgICAgPEJhZGdlIHZhcmlhbnQ9XCJvdXRsaW5lXCIgY2xhc3NOYW1lPXtjbignY2FwaXRhbGl6ZScsIHN0YXR1c1N0eWxlc1tvcmRlci5zdGF0dXNdKX0+XG4gICAgICAgICAgICAgICAgICAgICAge29yZGVyLnN0YXR1cy5yZXBsYWNlKC9fL2csICcgJyl9XG4gICAgICAgICAgICAgICAgICAgIDwvQmFkZ2U+XG4gICAgICAgICAgICAgICAgICA8L3RkPlxuICAgICAgICAgICAgICAgICAgPHRkIGNsYXNzTmFtZT1cInRleHQtbXV0ZWQtZm9yZWdyb3VuZCB0ZXh0LXNtXCI+XG4gICAgICAgICAgICAgICAgICAgIHtmb3JtYXQobmV3IERhdGUob3JkZXIuY3JlYXRlZEF0IHx8IG9yZGVyLmNyZWF0ZWRfYXQpLCAnTU1NIGRkLCBISDptbScpfVxuICAgICAgICAgICAgICAgICAgPC90ZD5cbiAgICAgICAgICAgICAgICAgIDx0ZD5cbiAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGdhcC0xXCI+XG4gICAgICAgICAgICAgICAgICAgICAgPEJ1dHRvbiB2YXJpYW50PVwiZ2hvc3RcIiBzaXplPVwic21cIj5cbiAgICAgICAgICAgICAgICAgICAgICAgIDxFeWUgY2xhc3NOYW1lPVwidy00IGgtNFwiIC8+XG4gICAgICAgICAgICAgICAgICAgICAgPC9CdXR0b24+XG4gICAgICAgICAgICAgICAgICAgICAgeyhvcmRlci5wYXltZW50U3RhdHVzIHx8IG9yZGVyLnBheW1lbnRfc3RhdHVzKSAhPT0gJ3BhaWQnICYmIChcbiAgICAgICAgICAgICAgICAgICAgICAgIDxCdXR0b24gXG4gICAgICAgICAgICAgICAgICAgICAgICAgIHZhcmlhbnQ9XCJnaG9zdFwiIFxuICAgICAgICAgICAgICAgICAgICAgICAgICBzaXplPVwic21cIlxuICAgICAgICAgICAgICAgICAgICAgICAgICBvbkNsaWNrPXsoKSA9PiB7XG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgc2V0U2VsZWN0ZWRPcmRlcihvcmRlcik7XG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgc2V0U2hvd1BheW1lbnREaWFsb2codHJ1ZSk7XG4gICAgICAgICAgICAgICAgICAgICAgICAgIH19XG4gICAgICAgICAgICAgICAgICAgICAgICA+XG4gICAgICAgICAgICAgICAgICAgICAgICAgIDxDcmVkaXRDYXJkIGNsYXNzTmFtZT1cInctNCBoLTQgbXItMVwiIC8+XG4gICAgICAgICAgICAgICAgICAgICAgICAgIFBheVxuICAgICAgICAgICAgICAgICAgICAgICAgPC9CdXR0b24+XG4gICAgICAgICAgICAgICAgICAgICAgKX1cbiAgICAgICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICAgICA8L3RkPlxuICAgICAgICAgICAgICAgIDwvdHI+XG4gICAgICAgICAgICAgICkpfVxuICAgICAgICAgICAgICB7KCFmaWx0ZXJlZE9yZGVycyB8fCBmaWx0ZXJlZE9yZGVycy5sZW5ndGggPT09IDApICYmIChcbiAgICAgICAgICAgICAgICA8dHI+XG4gICAgICAgICAgICAgICAgICA8dGQgY29sU3Bhbj17OX0gY2xhc3NOYW1lPVwidGV4dC1jZW50ZXIgcHktOCB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5cbiAgICAgICAgICAgICAgICAgICAgTm8gb3JkZXJzIGZvdW5kXG4gICAgICAgICAgICAgICAgICA8L3RkPlxuICAgICAgICAgICAgICAgIDwvdHI+XG4gICAgICAgICAgICAgICl9XG4gICAgICAgICAgICA8L3Rib2R5PlxuICAgICAgICAgIDwvdGFibGU+XG4gICAgICAgICl9XG4gICAgICA8L2Rpdj5cblxuICAgICAgey8qIFBheW1lbnQgRGlhbG9nICovfVxuICAgICAgPERpYWxvZyBvcGVuPXtzaG93UGF5bWVudERpYWxvZ30gb25PcGVuQ2hhbmdlPXtzZXRTaG93UGF5bWVudERpYWxvZ30+XG4gICAgICAgIDxEaWFsb2dDb250ZW50PlxuICAgICAgICAgIDxEaWFsb2dIZWFkZXI+XG4gICAgICAgICAgICA8RGlhbG9nVGl0bGU+UHJvY2VzcyBQYXltZW50PC9EaWFsb2dUaXRsZT5cbiAgICAgICAgICA8L0RpYWxvZ0hlYWRlcj5cbiAgICAgICAgICBcbiAgICAgICAgICB7c2VsZWN0ZWRPcmRlciAmJiAoXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInB5LTRcIj5cbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJiZy1tdXRlZCByb3VuZGVkLWxnIHAtNCBtYi00XCI+XG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGp1c3RpZnktYmV0d2VlbiBtYi0yXCI+XG4gICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJ0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5PcmRlcjwvc3Bhbj5cbiAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImZvbnQtbW9ub1wiPntzZWxlY3RlZE9yZGVyLm9yZGVyTnVtYmVyIHx8IHNlbGVjdGVkT3JkZXIub3JkZXJfbnVtYmVyfTwvc3Bhbj5cbiAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXgganVzdGlmeS1iZXR3ZWVuIG1iLTJcIj5cbiAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPlBhdGllbnQ8L3NwYW4+XG4gICAgICAgICAgICAgICAgICA8c3Bhbj5cbiAgICAgICAgICAgICAgICAgICAge3NlbGVjdGVkT3JkZXIucGF0aWVudElkPy5maXJzdE5hbWUgfHwgc2VsZWN0ZWRPcmRlci5wYXRpZW50cz8uZmlyc3RfbmFtZX17JyAnfVxuICAgICAgICAgICAgICAgICAgICB7c2VsZWN0ZWRPcmRlci5wYXRpZW50SWQ/Lmxhc3ROYW1lIHx8IHNlbGVjdGVkT3JkZXIucGF0aWVudHM/Lmxhc3RfbmFtZX1cbiAgICAgICAgICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXgganVzdGlmeS1iZXR3ZWVuIGZvbnQtYm9sZCB0ZXh0LWxnIHB0LTIgYm9yZGVyLXQgbXQtMlwiPlxuICAgICAgICAgICAgICAgICAgPHNwYW4+QW1vdW50IER1ZTwvc3Bhbj5cbiAgICAgICAgICAgICAgICAgIDxzcGFuPkxlIHtOdW1iZXIoc2VsZWN0ZWRPcmRlci50b3RhbCB8fCBzZWxlY3RlZE9yZGVyLnRvdGFsQW1vdW50KS50b0xvY2FsZVN0cmluZygpfTwvc3Bhbj5cbiAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTJcIj5cbiAgICAgICAgICAgICAgICA8bGFiZWwgY2xhc3NOYW1lPVwidGV4dC1zbSBmb250LW1lZGl1bVwiPlBheW1lbnQgTWV0aG9kPC9sYWJlbD5cbiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImdyaWQgZ3JpZC1jb2xzLTMgZ2FwLTNcIj5cbiAgICAgICAgICAgICAgICAgIHtbXG4gICAgICAgICAgICAgICAgICAgIHsgaWQ6ICdjYXNoJywgbGFiZWw6ICdDYXNoJywgaWNvbjogQmFua25vdGUgfSxcbiAgICAgICAgICAgICAgICAgICAgeyBpZDogJ2NhcmQnLCBsYWJlbDogJ0NhcmQnLCBpY29uOiBDcmVkaXRDYXJkIH0sXG4gICAgICAgICAgICAgICAgICAgIHsgaWQ6ICdtb2JpbGVfbW9uZXknLCBsYWJlbDogJ01vYmlsZSBNb25leScsIGljb246IFNtYXJ0cGhvbmUgfSxcbiAgICAgICAgICAgICAgICAgIF0ubWFwKG1ldGhvZCA9PiAoXG4gICAgICAgICAgICAgICAgICAgIDxidXR0b25cbiAgICAgICAgICAgICAgICAgICAgICBrZXk9e21ldGhvZC5pZH1cbiAgICAgICAgICAgICAgICAgICAgICBvbkNsaWNrPXsoKSA9PiBzZXRTZWxlY3RlZFBheW1lbnRNZXRob2QobWV0aG9kLmlkIGFzIFBheW1lbnRNZXRob2QpfVxuICAgICAgICAgICAgICAgICAgICAgIGNsYXNzTmFtZT17Y24oXG4gICAgICAgICAgICAgICAgICAgICAgICAnZmxleCBmbGV4LWNvbCBpdGVtcy1jZW50ZXIgZ2FwLTIgcC00IHJvdW5kZWQtbGcgYm9yZGVyIHRyYW5zaXRpb24tY29sb3JzJyxcbiAgICAgICAgICAgICAgICAgICAgICAgIHNlbGVjdGVkUGF5bWVudE1ldGhvZCA9PT0gbWV0aG9kLmlkIFxuICAgICAgICAgICAgICAgICAgICAgICAgICA/ICdib3JkZXItcHJpbWFyeSBiZy1wcmltYXJ5LzUnIFxuICAgICAgICAgICAgICAgICAgICAgICAgICA6ICdob3ZlcjpiZy1tdXRlZC81MCdcbiAgICAgICAgICAgICAgICAgICAgICApfVxuICAgICAgICAgICAgICAgICAgICA+XG4gICAgICAgICAgICAgICAgICAgICAgPG1ldGhvZC5pY29uIGNsYXNzTmFtZT1cInctNiBoLTZcIiAvPlxuICAgICAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInRleHQtc20gZm9udC1tZWRpdW1cIj57bWV0aG9kLmxhYmVsfTwvc3Bhbj5cbiAgICAgICAgICAgICAgICAgICAgPC9idXR0b24+XG4gICAgICAgICAgICAgICAgICApKX1cbiAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICApfVxuXG4gICAgICAgICAgPERpYWxvZ0Zvb3Rlcj5cbiAgICAgICAgICAgIDxCdXR0b24gdmFyaWFudD1cIm91dGxpbmVcIiBvbkNsaWNrPXsoKSA9PiBzZXRTaG93UGF5bWVudERpYWxvZyhmYWxzZSl9PkNhbmNlbDwvQnV0dG9uPlxuICAgICAgICAgICAgPEJ1dHRvbiBcbiAgICAgICAgICAgICAgb25DbGljaz17aGFuZGxlUHJvY2Vzc1BheW1lbnR9IFxuICAgICAgICAgICAgICBkaXNhYmxlZD17IXNlbGVjdGVkUGF5bWVudE1ldGhvZCB8fCB1cGRhdGVPcmRlci5pc1BlbmRpbmd9XG4gICAgICAgICAgICA+XG4gICAgICAgICAgICAgIHt1cGRhdGVPcmRlci5pc1BlbmRpbmcgJiYgPExvYWRlcjIgY2xhc3NOYW1lPVwidy00IGgtNCBtci0yIGFuaW1hdGUtc3BpblwiIC8+fVxuICAgICAgICAgICAgICA8Q2hlY2sgY2xhc3NOYW1lPVwidy00IGgtNCBtci0yXCIgLz5cbiAgICAgICAgICAgICAgQ29uZmlybSBQYXltZW50XG4gICAgICAgICAgICA8L0J1dHRvbj5cbiAgICAgICAgICA8L0RpYWxvZ0Zvb3Rlcj5cbiAgICAgICAgPC9EaWFsb2dDb250ZW50PlxuICAgICAgPC9EaWFsb2c+XG4gICAgPC9Sb2xlTGF5b3V0PlxuICApO1xufVxuIl0sIm5hbWVzIjpbInVzZVN0YXRlIiwiUm9sZUxheW91dCIsInVzZUF1dGgiLCJ1c2VPcmRlcnMiLCJ1c2VVcGRhdGVPcmRlciIsIkJ1dHRvbiIsIklucHV0IiwiQmFkZ2UiLCJEaWFsb2ciLCJEaWFsb2dDb250ZW50IiwiRGlhbG9nSGVhZGVyIiwiRGlhbG9nVGl0bGUiLCJEaWFsb2dGb290ZXIiLCJTZWxlY3QiLCJTZWxlY3RDb250ZW50IiwiU2VsZWN0SXRlbSIsIlNlbGVjdFRyaWdnZXIiLCJTZWxlY3RWYWx1ZSIsInRvYXN0IiwiU2VhcmNoIiwiQ3JlZGl0Q2FyZCIsIkJhbmtub3RlIiwiU21hcnRwaG9uZSIsIkNoZWNrIiwiTG9hZGVyMiIsIkV5ZSIsImZvcm1hdCIsImNuIiwiZ2V0UGF0aWVudE5hbWUiLCJPcmRlcnNQYWdlIiwicHJvZmlsZSIsInN0YXR1c0ZpbHRlciIsInNldFN0YXR1c0ZpbHRlciIsInNlYXJjaFRlcm0iLCJzZXRTZWFyY2hUZXJtIiwic2VsZWN0ZWRPcmRlciIsInNldFNlbGVjdGVkT3JkZXIiLCJzaG93UGF5bWVudERpYWxvZyIsInNldFNob3dQYXltZW50RGlhbG9nIiwic2VsZWN0ZWRQYXltZW50TWV0aG9kIiwic2V0U2VsZWN0ZWRQYXltZW50TWV0aG9kIiwiZGF0YSIsIm9yZGVycyIsImlzTG9hZGluZyIsInVwZGF0ZU9yZGVyIiwiZmlsdGVyZWRPcmRlcnMiLCJBcnJheSIsImlzQXJyYXkiLCJmaWx0ZXIiLCJvcmRlciIsInNlYXJjaCIsInRvTG93ZXJDYXNlIiwib3JkZXJOdW0iLCJvcmRlck51bWJlciIsIm9yZGVyX251bWJlciIsImZpcnN0TmFtZSIsInBhdGllbnRJZCIsInBhdGllbnRzIiwiZmlyc3RfbmFtZSIsImxhc3ROYW1lIiwibGFzdF9uYW1lIiwicGF0aWVudF9pZCIsImluY2x1ZGVzIiwiaGFuZGxlUHJvY2Vzc1BheW1lbnQiLCJvcmRlcklkIiwiaWQiLCJfaWQiLCJtdXRhdGVBc3luYyIsInVwZGF0ZXMiLCJwYXltZW50X3N0YXR1cyIsInBheW1lbnRfbWV0aG9kIiwic3RhdHVzIiwic3VjY2VzcyIsImVycm9yIiwic3RhdHVzU3R5bGVzIiwicGVuZGluZ19wYXltZW50IiwicGVuZGluZ19jb2xsZWN0aW9uIiwiY29sbGVjdGVkIiwicHJvY2Vzc2luZyIsImNvbXBsZXRlZCIsImNhbmNlbGxlZCIsInByaW9yaXR5U3R5bGVzIiwicm91dGluZSIsInVyZ2VudCIsInN0YXQiLCJ0aXRsZSIsInN1YnRpdGxlIiwicm9sZSIsInVzZXJOYW1lIiwiZnVsbF9uYW1lIiwiZGl2IiwiY2xhc3NOYW1lIiwicGxhY2Vob2xkZXIiLCJ2YWx1ZSIsIm9uQ2hhbmdlIiwiZSIsInRhcmdldCIsIm9uVmFsdWVDaGFuZ2UiLCJ0YWJsZSIsInRoZWFkIiwidHIiLCJ0aCIsInRib2R5IiwibWFwIiwidGQiLCJwIiwib3JkZXJfdGVzdHMiLCJsZW5ndGgiLCJzbGljZSIsInQiLCJ0ZXN0X2NvZGUiLCJ0ZXN0Q29kZSIsInRlc3RfbmFtZSIsInRlc3ROYW1lIiwiam9pbiIsIk51bWJlciIsInRvdGFsIiwidG90YWxBbW91bnQiLCJ0b0xvY2FsZVN0cmluZyIsInZhcmlhbnQiLCJwcmlvcml0eSIsInBheW1lbnRTdGF0dXMiLCJyZXBsYWNlIiwiRGF0ZSIsImNyZWF0ZWRBdCIsImNyZWF0ZWRfYXQiLCJzaXplIiwib25DbGljayIsImNvbFNwYW4iLCJvcGVuIiwib25PcGVuQ2hhbmdlIiwic3BhbiIsImxhYmVsIiwiaWNvbiIsIm1ldGhvZCIsImJ1dHRvbiIsImRpc2FibGVkIiwiaXNQZW5kaW5nIl0sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7QUFBQSxTQUFTQSxRQUFRLFFBQVEsUUFBUTtBQUNqQyxTQUFTQyxVQUFVLFFBQVEsaUNBQWlDO0FBQzVELFNBQVNDLE9BQU8sUUFBUSx3QkFBd0I7QUFDaEQsU0FBU0MsU0FBUyxFQUFFQyxjQUFjLFFBQVEsb0JBQW9CO0FBQzlELFNBQVNDLE1BQU0sUUFBUSx5QkFBeUI7QUFDaEQsU0FBU0MsS0FBSyxRQUFRLHdCQUF3QjtBQUM5QyxTQUFTQyxLQUFLLFFBQVEsd0JBQXdCO0FBQzlDLFNBQVNDLE1BQU0sRUFBRUMsYUFBYSxFQUFFQyxZQUFZLEVBQUVDLFdBQVcsRUFBRUMsWUFBWSxRQUFRLHlCQUF5QjtBQUN4RyxTQUFTQyxNQUFNLEVBQUVDLGFBQWEsRUFBRUMsVUFBVSxFQUFFQyxhQUFhLEVBQUVDLFdBQVcsUUFBUSx5QkFBeUI7QUFDdkcsU0FBU0MsS0FBSyxRQUFRLFNBQVM7QUFDL0IsU0FBU0MsTUFBTSxFQUFFQyxVQUFVLEVBQUVDLFFBQVEsRUFBRUMsVUFBVSxFQUFFQyxLQUFLLEVBQUVDLE9BQU8sRUFBRUMsR0FBRyxRQUFRLGVBQWU7QUFDN0YsU0FBU0MsTUFBTSxRQUFRLFdBQVc7QUFDbEMsU0FBU0MsRUFBRSxRQUFR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

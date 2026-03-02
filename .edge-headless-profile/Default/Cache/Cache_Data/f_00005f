@@ -1,0 +1,388 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/components/machines/SendToAnalyzerDialog.tsx");import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+
+let prevRefreshReg;
+let prevRefreshSig;
+
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react-swc can't detect preamble. Something is wrong."
+    );
+  }
+
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+
+import __vite__cjsImport2_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=27cfabb6"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime["jsxDEV"];
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=27cfabb6"; const useState = __vite__cjsImport3_react["useState"];
+import { useMachines, useSendOrderToMachine } from "/src/hooks/useMachines.ts";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "/src/components/ui/dialog.tsx";
+import { Button } from "/src/components/ui/button.tsx";
+import { Badge } from "/src/components/ui/badge.tsx";
+import { toast } from "/node_modules/.vite/deps/sonner.js?v=27cfabb6";
+import { Send, WifiOff, Loader2, CheckCircle, XCircle } from "/node_modules/.vite/deps/lucide-react.js?v=27cfabb6";
+import { cn } from "/src/lib/utils.ts";
+export function SendToAnalyzerDialog({ open, onOpenChange, orderId, orderNumber, testCodes }) {
+    _s();
+    const { data: machines } = useMachines();
+    const sendOrder = useSendOrderToMachine();
+    const [selectedMachineId, setSelectedMachineId] = useState(null);
+    const [sendResult, setSendResult] = useState({
+        status: 'idle'
+    });
+    // Filter machines that support at least one of the test codes
+    const compatibleMachines = machines?.filter((machine)=>{
+        if (!machine.testsSupported || machine.testsSupported.length === 0) return true; // Show all if no tests configured
+        return testCodes.some((code)=>machine.testsSupported?.includes(code));
+    }) ?? [];
+    const handleSend = async (machineId)=>{
+        setSelectedMachineId(machineId);
+        setSendResult({
+            status: 'sending'
+        });
+        try {
+            const result = await sendOrder.mutateAsync({
+                orderId,
+                machineId
+            });
+            if (result.success) {
+                setSendResult({
+                    status: 'success',
+                    message: result.message
+                });
+                toast.success(result.message);
+            } else {
+                setSendResult({
+                    status: 'error',
+                    message: result.message
+                });
+                toast.error(result.message);
+            }
+        } catch (error) {
+            const msg = error?.response?.data?.message || 'Failed to send order to analyzer';
+            setSendResult({
+                status: 'error',
+                message: msg
+            });
+            toast.error(msg);
+        }
+    };
+    const handleClose = ()=>{
+        setSendResult({
+            status: 'idle'
+        });
+        setSelectedMachineId(null);
+        onOpenChange(false);
+    };
+    return /*#__PURE__*/ _jsxDEV(Dialog, {
+        open: open,
+        onOpenChange: handleClose,
+        children: /*#__PURE__*/ _jsxDEV(DialogContent, {
+            className: "max-w-lg",
+            children: [
+                /*#__PURE__*/ _jsxDEV(DialogHeader, {
+                    children: [
+                        /*#__PURE__*/ _jsxDEV(DialogTitle, {
+                            children: "Send Order to Analyzer"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                            lineNumber: 66,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV(DialogDescription, {
+                            children: [
+                                "Dispatch order ",
+                                /*#__PURE__*/ _jsxDEV("span", {
+                                    className: "font-mono font-semibold",
+                                    children: orderNumber
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                                    lineNumber: 68,
+                                    columnNumber: 28
+                                }, this),
+                                " to a connected analyzer."
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                            lineNumber: 67,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                    lineNumber: 65,
+                    columnNumber: 9
+                }, this),
+                /*#__PURE__*/ _jsxDEV("div", {
+                    className: "mb-4",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV("p", {
+                            className: "text-xs text-muted-foreground mb-2",
+                            children: "Tests to dispatch:"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                            lineNumber: 74,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "flex flex-wrap gap-1",
+                            children: testCodes.map((code)=>/*#__PURE__*/ _jsxDEV(Badge, {
+                                    variant: "secondary",
+                                    className: "font-mono text-xs",
+                                    children: code
+                                }, code, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                                    lineNumber: 77,
+                                    columnNumber: 15
+                                }, this))
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                            lineNumber: 75,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                    lineNumber: 73,
+                    columnNumber: 9
+                }, this),
+                sendResult.status === 'success' && /*#__PURE__*/ _jsxDEV("div", {
+                    className: "flex items-center gap-3 p-3 rounded-lg bg-status-normal/10 border border-status-normal/20 mb-4",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV(CheckCircle, {
+                            className: "w-5 h-5 text-status-normal flex-shrink-0"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                            lineNumber: 85,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("p", {
+                            className: "text-sm text-status-normal",
+                            children: sendResult.message
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                            lineNumber: 86,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                    lineNumber: 84,
+                    columnNumber: 11
+                }, this),
+                sendResult.status === 'error' && /*#__PURE__*/ _jsxDEV("div", {
+                    className: "flex items-center gap-3 p-3 rounded-lg bg-destructive/10 border border-destructive/20 mb-4",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV(XCircle, {
+                            className: "w-5 h-5 text-destructive flex-shrink-0"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                            lineNumber: 91,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("p", {
+                            className: "text-sm text-destructive",
+                            children: sendResult.message
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                            lineNumber: 92,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                    lineNumber: 90,
+                    columnNumber: 11
+                }, this),
+                /*#__PURE__*/ _jsxDEV("div", {
+                    className: "space-y-2 max-h-64 overflow-y-auto",
+                    children: compatibleMachines.length === 0 ? /*#__PURE__*/ _jsxDEV("div", {
+                        className: "text-center py-8 text-muted-foreground",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(WifiOff, {
+                                className: "w-8 h-8 mx-auto mb-2 opacity-50"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                                lineNumber: 100,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-sm",
+                                children: "No compatible analyzers found."
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                                lineNumber: 101,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-xs",
+                                children: "Configure machines with matching test codes."
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                                lineNumber: 102,
+                                columnNumber: 15
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                        lineNumber: 99,
+                        columnNumber: 13
+                    }, this) : compatibleMachines.map((machine)=>{
+                        const isOnline = machine.status === 'online';
+                        const isSending = sendOrder.isPending && selectedMachineId === machine.id;
+                        const isSent = sendResult.status === 'success' && selectedMachineId === machine.id;
+                        return /*#__PURE__*/ _jsxDEV("div", {
+                            className: cn('flex items-center justify-between p-3 rounded-lg border transition-colors', isOnline ? 'hover:bg-muted/50' : 'opacity-60', isSent && 'border-status-normal/30 bg-status-normal/5'),
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "flex items-center gap-3",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            className: cn('w-2 h-2 rounded-full', isOnline ? 'bg-status-normal' : 'bg-muted-foreground')
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                                            lineNumber: 120,
+                                            columnNumber: 21
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("p", {
+                                                    className: "font-medium text-sm",
+                                                    children: machine.name
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                                                    lineNumber: 125,
+                                                    columnNumber: 23
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("p", {
+                                                    className: "text-xs text-muted-foreground",
+                                                    children: [
+                                                        machine.manufacturer,
+                                                        " ",
+                                                        machine.modelName,
+                                                        "· ",
+                                                        machine.protocol
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                                                    lineNumber: 126,
+                                                    columnNumber: 23
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                                            lineNumber: 124,
+                                            columnNumber: 21
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                                    lineNumber: 119,
+                                    columnNumber: 19
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV(Button, {
+                                    size: "sm",
+                                    variant: isSent ? 'ghost' : 'default',
+                                    disabled: isSending || isSent,
+                                    onClick: ()=>handleSend(machine.id),
+                                    children: [
+                                        isSending ? /*#__PURE__*/ _jsxDEV(Loader2, {
+                                            className: "w-4 h-4 mr-1 animate-spin"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                                            lineNumber: 139,
+                                            columnNumber: 23
+                                        }, this) : isSent ? /*#__PURE__*/ _jsxDEV(CheckCircle, {
+                                            className: "w-4 h-4 mr-1 text-status-normal"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                                            lineNumber: 141,
+                                            columnNumber: 23
+                                        }, this) : /*#__PURE__*/ _jsxDEV(Send, {
+                                            className: "w-4 h-4 mr-1"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                                            lineNumber: 143,
+                                            columnNumber: 23
+                                        }, this),
+                                        isSent ? 'Sent' : 'Send'
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                                    lineNumber: 132,
+                                    columnNumber: 19
+                                }, this)
+                            ]
+                        }, machine.id, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                            lineNumber: 111,
+                            columnNumber: 17
+                        }, this);
+                    })
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                    lineNumber: 97,
+                    columnNumber: 9
+                }, this),
+                /*#__PURE__*/ _jsxDEV("div", {
+                    className: "flex justify-end pt-2 border-t",
+                    children: /*#__PURE__*/ _jsxDEV(Button, {
+                        variant: "outline",
+                        onClick: handleClose,
+                        children: sendResult.status === 'success' ? 'Done' : 'Cancel'
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                        lineNumber: 154,
+                        columnNumber: 11
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+                    lineNumber: 153,
+                    columnNumber: 9
+                }, this)
+            ]
+        }, void 0, true, {
+            fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+            lineNumber: 64,
+            columnNumber: 7
+        }, this)
+    }, void 0, false, {
+        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx",
+        lineNumber: 63,
+        columnNumber: 5
+    }, this);
+}
+_s(SendToAnalyzerDialog, "hpUnCs9VdEG5OqFe16j3jKou8E0=", false, function() {
+    return [
+        useMachines,
+        useSendOrderToMachine
+    ];
+});
+_c = SendToAnalyzerDialog;
+var _c;
+$RefreshReg$(_c, "SendToAnalyzerDialog");
+
+
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+
+
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/HP/Downloads/lab/frontend/src/components/machines/SendToAnalyzerDialog.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIlNlbmRUb0FuYWx5emVyRGlhbG9nLnRzeCJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyB1c2VTdGF0ZSB9IGZyb20gJ3JlYWN0JztcclxuaW1wb3J0IHsgdXNlTWFjaGluZXMsIHVzZVNlbmRPcmRlclRvTWFjaGluZSB9IGZyb20gJ0AvaG9va3MvdXNlTWFjaGluZXMnO1xyXG5pbXBvcnQgeyBEaWFsb2csIERpYWxvZ0NvbnRlbnQsIERpYWxvZ0hlYWRlciwgRGlhbG9nVGl0bGUsIERpYWxvZ0Rlc2NyaXB0aW9uIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL2RpYWxvZyc7XHJcbmltcG9ydCB7IEJ1dHRvbiB9IGZyb20gJ0AvY29tcG9uZW50cy91aS9idXR0b24nO1xyXG5pbXBvcnQgeyBCYWRnZSB9IGZyb20gJ0AvY29tcG9uZW50cy91aS9iYWRnZSc7XHJcbmltcG9ydCB7IHRvYXN0IH0gZnJvbSAnc29ubmVyJztcclxuaW1wb3J0IHsgU2VuZCwgV2lmaSwgV2lmaU9mZiwgTG9hZGVyMiwgQ2hlY2tDaXJjbGUsIFhDaXJjbGUgfSBmcm9tICdsdWNpZGUtcmVhY3QnO1xyXG5pbXBvcnQgeyBjbiB9IGZyb20gJ0AvbGliL3V0aWxzJztcclxuXHJcbmludGVyZmFjZSBTZW5kVG9BbmFseXplckRpYWxvZ1Byb3BzIHtcclxuICBvcGVuOiBib29sZWFuO1xyXG4gIG9uT3BlbkNoYW5nZTogKG9wZW46IGJvb2xlYW4pID0+IHZvaWQ7XHJcbiAgb3JkZXJJZDogc3RyaW5nO1xyXG4gIG9yZGVyTnVtYmVyOiBzdHJpbmc7XHJcbiAgdGVzdENvZGVzOiBzdHJpbmdbXTtcclxufVxyXG5cclxuZXhwb3J0IGZ1bmN0aW9uIFNlbmRUb0FuYWx5emVyRGlhbG9nKHtcclxuICBvcGVuLFxyXG4gIG9uT3BlbkNoYW5nZSxcclxuICBvcmRlcklkLFxyXG4gIG9yZGVyTnVtYmVyLFxyXG4gIHRlc3RDb2RlcyxcclxufTogU2VuZFRvQW5hbHl6ZXJEaWFsb2dQcm9wcykge1xyXG4gIGNvbnN0IHsgZGF0YTogbWFjaGluZXMgfSA9IHVzZU1hY2hpbmVzKCk7XHJcbiAgY29uc3Qgc2VuZE9yZGVyID0gdXNlU2VuZE9yZGVyVG9NYWNoaW5lKCk7XHJcbiAgY29uc3QgW3NlbGVjdGVkTWFjaGluZUlkLCBzZXRTZWxlY3RlZE1hY2hpbmVJZF0gPSB1c2VTdGF0ZTxzdHJpbmcgfCBudWxsPihudWxsKTtcclxuICBjb25zdCBbc2VuZFJlc3VsdCwgc2V0U2VuZFJlc3VsdF0gPSB1c2VTdGF0ZTx7IHN0YXR1czogJ2lkbGUnIHwgJ3NlbmRpbmcnIHwgJ3N1Y2Nlc3MnIHwgJ2Vycm9yJzsgbWVzc2FnZT86IHN0cmluZyB9Pih7IHN0YXR1czogJ2lkbGUnIH0pO1xyXG5cclxuICAvLyBGaWx0ZXIgbWFjaGluZXMgdGhhdCBzdXBwb3J0IGF0IGxlYXN0IG9uZSBvZiB0aGUgdGVzdCBjb2Rlc1xyXG4gIGNvbnN0IGNvbXBhdGlibGVNYWNoaW5lcyA9IG1hY2hpbmVzPy5maWx0ZXIobWFjaGluZSA9PiB7XHJcbiAgICBpZiAoIW1hY2hpbmUudGVzdHNTdXBwb3J0ZWQgfHwgbWFjaGluZS50ZXN0c1N1cHBvcnRlZC5sZW5ndGggPT09IDApIHJldHVybiB0cnVlOyAvLyBTaG93IGFsbCBpZiBubyB0ZXN0cyBjb25maWd1cmVkXHJcbiAgICByZXR1cm4gdGVzdENvZGVzLnNvbWUoY29kZSA9PiBtYWNoaW5lLnRlc3RzU3VwcG9ydGVkPy5pbmNsdWRlcyhjb2RlKSk7XHJcbiAgfSkgPz8gW107XHJcblxyXG4gIGNvbnN0IGhhbmRsZVNlbmQgPSBhc3luYyAobWFjaGluZUlkOiBzdHJpbmcpID0+IHtcclxuICAgIHNldFNlbGVjdGVkTWFjaGluZUlkKG1hY2hpbmVJZCk7XHJcbiAgICBzZXRTZW5kUmVzdWx0KHsgc3RhdHVzOiAnc2VuZGluZycgfSk7XHJcblxyXG4gICAgdHJ5IHtcclxuICAgICAgY29uc3QgcmVzdWx0ID0gYXdhaXQgc2VuZE9yZGVyLm11dGF0ZUFzeW5jKHsgb3JkZXJJZCwgbWFjaGluZUlkIH0pO1xyXG4gICAgICBpZiAocmVzdWx0LnN1Y2Nlc3MpIHtcclxuICAgICAgICBzZXRTZW5kUmVzdWx0KHsgc3RhdHVzOiAnc3VjY2VzcycsIG1lc3NhZ2U6IHJlc3VsdC5tZXNzYWdlIH0pO1xyXG4gICAgICAgIHRvYXN0LnN1Y2Nlc3MocmVzdWx0Lm1lc3NhZ2UpO1xyXG4gICAgICB9IGVsc2Uge1xyXG4gICAgICAgIHNldFNlbmRSZXN1bHQoeyBzdGF0dXM6ICdlcnJvcicsIG1lc3NhZ2U6IHJlc3VsdC5tZXNzYWdlIH0pO1xyXG4gICAgICAgIHRvYXN0LmVycm9yKHJlc3VsdC5tZXNzYWdlKTtcclxuICAgICAgfVxyXG4gICAgfSBjYXRjaCAoZXJyb3I6IGFueSkge1xyXG4gICAgICBjb25zdCBtc2cgPSBlcnJvcj8ucmVzcG9uc2U/LmRhdGE/Lm1lc3NhZ2UgfHwgJ0ZhaWxlZCB0byBzZW5kIG9yZGVyIHRvIGFuYWx5emVyJztcclxuICAgICAgc2V0U2VuZFJlc3VsdCh7IHN0YXR1czogJ2Vycm9yJywgbWVzc2FnZTogbXNnIH0pO1xyXG4gICAgICB0b2FzdC5lcnJvcihtc2cpO1xyXG4gICAgfVxyXG4gIH07XHJcblxyXG4gIGNvbnN0IGhhbmRsZUNsb3NlID0gKCkgPT4ge1xyXG4gICAgc2V0U2VuZFJlc3VsdCh7IHN0YXR1czogJ2lkbGUnIH0pO1xyXG4gICAgc2V0U2VsZWN0ZWRNYWNoaW5lSWQobnVsbCk7XHJcbiAgICBvbk9wZW5DaGFuZ2UoZmFsc2UpO1xyXG4gIH07XHJcblxyXG4gIHJldHVybiAoXHJcbiAgICA8RGlhbG9nIG9wZW49e29wZW59IG9uT3BlbkNoYW5nZT17aGFuZGxlQ2xvc2V9PlxyXG4gICAgICA8RGlhbG9nQ29udGVudCBjbGFzc05hbWU9XCJtYXgtdy1sZ1wiPlxyXG4gICAgICAgIDxEaWFsb2dIZWFkZXI+XHJcbiAgICAgICAgICA8RGlhbG9nVGl0bGU+U2VuZCBPcmRlciB0byBBbmFseXplcjwvRGlhbG9nVGl0bGU+XHJcbiAgICAgICAgICA8RGlhbG9nRGVzY3JpcHRpb24+XHJcbiAgICAgICAgICAgIERpc3BhdGNoIG9yZGVyIDxzcGFuIGNsYXNzTmFtZT1cImZvbnQtbW9ubyBmb250LXNlbWlib2xkXCI+e29yZGVyTnVtYmVyfTwvc3Bhbj4gdG8gYSBjb25uZWN0ZWQgYW5hbHl6ZXIuXHJcbiAgICAgICAgICA8L0RpYWxvZ0Rlc2NyaXB0aW9uPlxyXG4gICAgICAgIDwvRGlhbG9nSGVhZGVyPlxyXG5cclxuICAgICAgICB7LyogVGVzdCBjb2RlcyBiZWluZyBzZW50ICovfVxyXG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwibWItNFwiPlxyXG4gICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC14cyB0ZXh0LW11dGVkLWZvcmVncm91bmQgbWItMlwiPlRlc3RzIHRvIGRpc3BhdGNoOjwvcD5cclxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBmbGV4LXdyYXAgZ2FwLTFcIj5cclxuICAgICAgICAgICAge3Rlc3RDb2Rlcy5tYXAoY29kZSA9PiAoXHJcbiAgICAgICAgICAgICAgPEJhZGdlIGtleT17Y29kZX0gdmFyaWFudD1cInNlY29uZGFyeVwiIGNsYXNzTmFtZT1cImZvbnQtbW9ubyB0ZXh0LXhzXCI+e2NvZGV9PC9CYWRnZT5cclxuICAgICAgICAgICAgKSl9XHJcbiAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgey8qIFNlbmQgcmVzdWx0IGZlZWRiYWNrICovfVxyXG4gICAgICAgIHtzZW5kUmVzdWx0LnN0YXR1cyA9PT0gJ3N1Y2Nlc3MnICYmIChcclxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIgZ2FwLTMgcC0zIHJvdW5kZWQtbGcgYmctc3RhdHVzLW5vcm1hbC8xMCBib3JkZXIgYm9yZGVyLXN0YXR1cy1ub3JtYWwvMjAgbWItNFwiPlxyXG4gICAgICAgICAgICA8Q2hlY2tDaXJjbGUgY2xhc3NOYW1lPVwidy01IGgtNSB0ZXh0LXN0YXR1cy1ub3JtYWwgZmxleC1zaHJpbmstMFwiIC8+XHJcbiAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc20gdGV4dC1zdGF0dXMtbm9ybWFsXCI+e3NlbmRSZXN1bHQubWVzc2FnZX08L3A+XHJcbiAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICApfVxyXG4gICAgICAgIHtzZW5kUmVzdWx0LnN0YXR1cyA9PT0gJ2Vycm9yJyAmJiAoXHJcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGdhcC0zIHAtMyByb3VuZGVkLWxnIGJnLWRlc3RydWN0aXZlLzEwIGJvcmRlciBib3JkZXItZGVzdHJ1Y3RpdmUvMjAgbWItNFwiPlxyXG4gICAgICAgICAgICA8WENpcmNsZSBjbGFzc05hbWU9XCJ3LTUgaC01IHRleHQtZGVzdHJ1Y3RpdmUgZmxleC1zaHJpbmstMFwiIC8+XHJcbiAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc20gdGV4dC1kZXN0cnVjdGl2ZVwiPntzZW5kUmVzdWx0Lm1lc3NhZ2V9PC9wPlxyXG4gICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgKX1cclxuXHJcbiAgICAgICAgey8qIE1hY2hpbmUgbGlzdCAqL31cclxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNwYWNlLXktMiBtYXgtaC02NCBvdmVyZmxvdy15LWF1dG9cIj5cclxuICAgICAgICAgIHtjb21wYXRpYmxlTWFjaGluZXMubGVuZ3RoID09PSAwID8gKFxyXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInRleHQtY2VudGVyIHB5LTggdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+XHJcbiAgICAgICAgICAgICAgPFdpZmlPZmYgY2xhc3NOYW1lPVwidy04IGgtOCBteC1hdXRvIG1iLTIgb3BhY2l0eS01MFwiIC8+XHJcbiAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1zbVwiPk5vIGNvbXBhdGlibGUgYW5hbHl6ZXJzIGZvdW5kLjwvcD5cclxuICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LXhzXCI+Q29uZmlndXJlIG1hY2hpbmVzIHdpdGggbWF0Y2hpbmcgdGVzdCBjb2Rlcy48L3A+XHJcbiAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgKSA6IChcclxuICAgICAgICAgICAgY29tcGF0aWJsZU1hY2hpbmVzLm1hcChtYWNoaW5lID0+IHtcclxuICAgICAgICAgICAgICBjb25zdCBpc09ubGluZSA9IG1hY2hpbmUuc3RhdHVzID09PSAnb25saW5lJztcclxuICAgICAgICAgICAgICBjb25zdCBpc1NlbmRpbmcgPSBzZW5kT3JkZXIuaXNQZW5kaW5nICYmIHNlbGVjdGVkTWFjaGluZUlkID09PSBtYWNoaW5lLmlkO1xyXG4gICAgICAgICAgICAgIGNvbnN0IGlzU2VudCA9IHNlbmRSZXN1bHQuc3RhdHVzID09PSAnc3VjY2VzcycgJiYgc2VsZWN0ZWRNYWNoaW5lSWQgPT09IG1hY2hpbmUuaWQ7XHJcblxyXG4gICAgICAgICAgICAgIHJldHVybiAoXHJcbiAgICAgICAgICAgICAgICA8ZGl2XHJcbiAgICAgICAgICAgICAgICAgIGtleT17bWFjaGluZS5pZH1cclxuICAgICAgICAgICAgICAgICAgY2xhc3NOYW1lPXtjbihcclxuICAgICAgICAgICAgICAgICAgICAnZmxleCBpdGVtcy1jZW50ZXIganVzdGlmeS1iZXR3ZWVuIHAtMyByb3VuZGVkLWxnIGJvcmRlciB0cmFuc2l0aW9uLWNvbG9ycycsXHJcbiAgICAgICAgICAgICAgICAgICAgaXNPbmxpbmUgPyAnaG92ZXI6YmctbXV0ZWQvNTAnIDogJ29wYWNpdHktNjAnLFxyXG4gICAgICAgICAgICAgICAgICAgIGlzU2VudCAmJiAnYm9yZGVyLXN0YXR1cy1ub3JtYWwvMzAgYmctc3RhdHVzLW5vcm1hbC81J1xyXG4gICAgICAgICAgICAgICAgICApfVxyXG4gICAgICAgICAgICAgICAgPlxyXG4gICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGdhcC0zXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9e2NuKFxyXG4gICAgICAgICAgICAgICAgICAgICAgJ3ctMiBoLTIgcm91bmRlZC1mdWxsJyxcclxuICAgICAgICAgICAgICAgICAgICAgIGlzT25saW5lID8gJ2JnLXN0YXR1cy1ub3JtYWwnIDogJ2JnLW11dGVkLWZvcmVncm91bmQnXHJcbiAgICAgICAgICAgICAgICAgICAgKX0gLz5cclxuICAgICAgICAgICAgICAgICAgICA8ZGl2PlxyXG4gICAgICAgICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwiZm9udC1tZWRpdW0gdGV4dC1zbVwiPnttYWNoaW5lLm5hbWV9PC9wPlxyXG4gICAgICAgICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC14cyB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5cclxuICAgICAgICAgICAgICAgICAgICAgICAge21hY2hpbmUubWFudWZhY3R1cmVyfSB7bWFjaGluZS5tb2RlbE5hbWV9ICZtaWRkb3Q7IHttYWNoaW5lLnByb3RvY29sfVxyXG4gICAgICAgICAgICAgICAgICAgICAgPC9wPlxyXG4gICAgICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgICAgICAgICAgIDxCdXR0b25cclxuICAgICAgICAgICAgICAgICAgICBzaXplPVwic21cIlxyXG4gICAgICAgICAgICAgICAgICAgIHZhcmlhbnQ9e2lzU2VudCA/ICdnaG9zdCcgOiAnZGVmYXVsdCd9XHJcbiAgICAgICAgICAgICAgICAgICAgZGlzYWJsZWQ9e2lzU2VuZGluZyB8fCBpc1NlbnR9XHJcbiAgICAgICAgICAgICAgICAgICAgb25DbGljaz17KCkgPT4gaGFuZGxlU2VuZChtYWNoaW5lLmlkKX1cclxuICAgICAgICAgICAgICAgICAgPlxyXG4gICAgICAgICAgICAgICAgICAgIHtpc1NlbmRpbmcgPyAoXHJcbiAgICAgICAgICAgICAgICAgICAgICA8TG9hZGVyMiBjbGFzc05hbWU9XCJ3LTQgaC00IG1yLTEgYW5pbWF0ZS1zcGluXCIgLz5cclxuICAgICAgICAgICAgICAgICAgICApIDogaXNTZW50ID8gKFxyXG4gICAgICAgICAgICAgICAgICAgICAgPENoZWNrQ2lyY2xlIGNsYXNzTmFtZT1cInctNCBoLTQgbXItMSB0ZXh0LXN0YXR1cy1ub3JtYWxcIiAvPlxyXG4gICAgICAgICAgICAgICAgICAgICkgOiAoXHJcbiAgICAgICAgICAgICAgICAgICAgICA8U2VuZCBjbGFzc05hbWU9XCJ3LTQgaC00IG1yLTFcIiAvPlxyXG4gICAgICAgICAgICAgICAgICAgICl9XHJcbiAgICAgICAgICAgICAgICAgICAge2lzU2VudCA/ICdTZW50JyA6ICdTZW5kJ31cclxuICAgICAgICAgICAgICAgICAgPC9CdXR0b24+XHJcbiAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICApO1xyXG4gICAgICAgICAgICB9KVxyXG4gICAgICAgICAgKX1cclxuICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGp1c3RpZnktZW5kIHB0LTIgYm9yZGVyLXRcIj5cclxuICAgICAgICAgIDxCdXR0b24gdmFyaWFudD1cIm91dGxpbmVcIiBvbkNsaWNrPXtoYW5kbGVDbG9zZX0+XHJcbiAgICAgICAgICAgIHtzZW5kUmVzdWx0LnN0YXR1cyA9PT0gJ3N1Y2Nlc3MnID8gJ0RvbmUnIDogJ0NhbmNlbCd9XHJcbiAgICAgICAgICA8L0J1dHRvbj5cclxuICAgICAgICA8L2Rpdj5cclxuICAgICAgPC9EaWFsb2dDb250ZW50PlxyXG4gICAgPC9EaWFsb2c+XHJcbiAgKTtcclxufVxyXG4iXSwibmFtZXMiOlsidXNlU3RhdGUiLCJ1c2VNYWNoaW5lcyIsInVzZVNlbmRPcmRlclRvTWFjaGluZSIsIkRpYWxvZyIsIkRpYWxvZ0NvbnRlbnQiLCJEaWFsb2dIZWFkZXIiLCJEaWFsb2dUaXRsZSIsIkRpYWxvZ0Rlc2NyaXB0aW9uIiwiQnV0dG9uIiwiQmFkZ2UiLCJ0b2FzdCIsIlNlbmQiLCJXaWZpT2ZmIiwiTG9hZGVyMiIsIkNoZWNrQ2lyY2xlIiwiWENpcmNsZSIsImNuIiwiU2VuZFRvQW5hbHl6ZXJEaWFsb2ciLCJvcGVuIiwib25PcGVuQ2hhbmdlIiwib3JkZXJJZCIsIm9yZGVyTnVtYmVyIiwidGVzdENvZGVzIiwiZGF0YSIsIm1hY2hpbmVzIiwic2VuZE9yZGVyIiwic2VsZWN0ZWRNYWNoaW5lSWQiLCJzZXRTZWxlY3RlZE1hY2hpbmVJZCIsInNlbmRSZXN1bHQiLCJzZXRTZW5kUmVzdWx0Iiwic3RhdHVzIiwiY29tcGF0aWJsZU1hY2hpbmVzIiwiZmlsdGVyIiwibWFjaGluZSIsInRlc3RzU3VwcG9ydGVkIiwibGVuZ3RoIiwic29tZSIsImNvZGUiLCJpbmNsdWRlcyIsImhhbmRsZVNlbmQiLCJtYWNoaW5lSWQiLCJyZXN1bHQiLCJtdXRhdGVBc3luYyIsInN1Y2Nlc3MiLCJtZXNzYWdlIiwiZXJyb3IiLCJtc2ciLCJyZXNwb25zZSIsImhhbmRsZUNsb3NlIiwiY2xhc3NOYW1lIiwic3BhbiIsImRpdiIsInAiLCJtYXAiLCJ2YXJpYW50IiwiaXNPbmxpbmUiLCJpc1NlbmRpbmciLCJpc1BlbmRpbmciLCJpZCIsImlzU2VudCIsIm5hbWUiLCJtYW51ZmFjdHVyZXIiLCJtb2RlbE5hbWUiLCJwcm90b2NvbCIsInNpemUiLCJkaXNhYmxlZCIsIm9uQ2xpY2siXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OztBQUFBLFNBQVNBLFFBQVEsUUFBUSxRQUFRO0FBQ2pDLFNBQVNDLFdBQVcsRUFBRUMscUJBQXFCLFFBQVEsc0JBQXNCO0FBQ3pFLFNBQVNDLE1BQU0sRUFBRUMsYUFBYSxFQUFFQyxZQUFZLEVBQUVDLFdBQVcsRUFBRUMsaUJBQWlCLFFBQVEseUJBQXlCO0FBQzdHLFNBQVNDLE1BQU0sUUFBUSx5QkFBeUI7QUFDaEQsU0FBU0MsS0FBSyxRQUFRLHdCQUF3QjtB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

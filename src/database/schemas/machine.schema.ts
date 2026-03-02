@@ -36,7 +36,6 @@ export class Machine extends Document {
     required: true,
     enum: Object.values(MachineStatusEnum),
     default: MachineStatusEnum.OFFLINE,
-    index: true,
   })
   status!: MachineStatusEnum;
 

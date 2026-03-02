@@ -1,0 +1,1977 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/pages/Machines.tsx");import.meta.env = {"BASE_URL": "/", "DEV": true, "MODE": "development", "PROD": false, "SSR": false, "VITE_API_URL": "http://localhost:3000"};import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+
+let prevRefreshReg;
+let prevRefreshSig;
+
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react-swc can't detect preamble. Something is wrong."
+    );
+  }
+
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+
+import __vite__cjsImport2_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=27cfabb6"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime["jsxDEV"]; const _Fragment = __vite__cjsImport2_react_jsxDevRuntime["Fragment"];
+var _s = $RefreshSig$(), _s1 = $RefreshSig$(), _s2 = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=27cfabb6"; const useState = __vite__cjsImport3_react["useState"];
+import { MainLayout } from "/src/components/layout/MainLayout.tsx";
+import { useMachines, useTestMachineConnection, useUpdateMachine, useCreateMachine, useRestartListener, useListenerStatus } from "/src/hooks/useMachines.ts";
+import { Button } from "/src/components/ui/button.tsx";
+import { Plus, RefreshCw, Settings, Wifi, WifiOff, Activity, Send, CheckCircle, XCircle, Loader2, RotateCw, Radio } from "/node_modules/.vite/deps/lucide-react.js?v=27cfabb6";
+import { cn } from "/src/lib/utils.ts";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "/src/components/ui/dialog.tsx";
+import { Input } from "/src/components/ui/input.tsx";
+import { Label } from "/src/components/ui/label.tsx";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "/src/components/ui/select.tsx";
+import { toast } from "/node_modules/.vite/deps/sonner.js?v=27cfabb6";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "/src/components/ui/tabs.tsx";
+import { Badge } from "/src/components/ui/badge.tsx";
+import { LiveConnectionMonitor } from "/src/components/machines/LiveConnectionMonitor.tsx";
+export default function Machines() {
+    _s();
+    const { data: machines, isLoading, refetch } = useMachines();
+    const testConnection = useTestMachineConnection();
+    const updateMachine = useUpdateMachine();
+    const createMachine = useCreateMachine();
+    const restartListener = useRestartListener();
+    const { data: listenerStatuses } = useListenerStatus();
+    const [selectedMachine, setSelectedMachine] = useState(null);
+    const [isConfigOpen, setIsConfigOpen] = useState(false);
+    const [isAddOpen, setIsAddOpen] = useState(false);
+    const [isTestOpen, setIsTestOpen] = useState(false);
+    const [testResult, setTestResult] = useState({
+        status: 'idle'
+    });
+    const statusConfig = {
+        online: {
+            indicator: 'machine-online',
+            label: 'Online',
+            icon: Wifi,
+            labelClass: 'text-status-normal'
+        },
+        offline: {
+            indicator: 'machine-offline',
+            label: 'Offline',
+            icon: WifiOff,
+            labelClass: 'text-muted-foreground'
+        },
+        error: {
+            indicator: 'machine-error',
+            label: 'Error',
+            icon: WifiOff,
+            labelClass: 'text-status-critical'
+        },
+        processing: {
+            indicator: 'machine-processing',
+            label: 'Processing',
+            icon: Activity,
+            labelClass: 'text-primary'
+        }
+    };
+    const handleTestConnection = async (machine)=>{
+        setSelectedMachine(machine);
+        setIsTestOpen(true);
+        setTestResult({
+            status: 'testing'
+        });
+        try {
+            const result = await testConnection.mutateAsync({
+                machineId: machine.id
+            });
+            if (result.success) {
+                setTestResult({
+                    status: 'success',
+                    message: result.message
+                });
+                toast.success(`Connection to ${machine.name} successful`);
+            } else {
+                setTestResult({
+                    status: 'error',
+                    message: result.message
+                });
+                toast.error(`Failed to connect to ${machine.name}: ${result.message}`);
+            }
+            refetch();
+        } catch (error) {
+            setTestResult({
+                status: 'error',
+                message: 'Unexpected error during connection test'
+            });
+            toast.error(`Failed to connect to ${machine.name}`);
+        }
+    };
+    const handleRefreshStatus = async ()=>{
+        await refetch();
+        toast.success('Machine status refreshed');
+    };
+    const handleRestartListener = async (machine)=>{
+        try {
+            await restartListener.mutateAsync({
+                machineId: machine.id
+            });
+            toast.success(`TCP listener restarted for ${machine.name}`);
+        } catch (error) {
+            toast.error(`Failed to restart listener for ${machine.name}`);
+        }
+    };
+    const getListenerStatus = (machineId)=>{
+        return listenerStatuses?.some((s)=>s.machineId === machineId && s.listening) ?? false;
+    };
+    const handleConfigSave = async (updates)=>{
+        if (!selectedMachine) return;
+        try {
+            await updateMachine.mutateAsync({
+                id: selectedMachine.id,
+                updates
+            });
+            toast.success('Machine configuration saved');
+            setIsConfigOpen(false);
+            refetch();
+        } catch (error) {
+            toast.error('Failed to save configuration');
+        }
+    };
+    const handleAddMachine = async (data)=>{
+        try {
+            await createMachine.mutateAsync(data);
+            toast.success('Machine added successfully');
+            setIsAddOpen(false);
+        } catch (error) {
+            toast.error('Failed to add machine');
+        }
+    };
+    if (isLoading) {
+        return /*#__PURE__*/ _jsxDEV(MainLayout, {
+            title: "Machines",
+            subtitle: "Configure and monitor laboratory analyzers",
+            children: /*#__PURE__*/ _jsxDEV("div", {
+                className: "flex items-center justify-center h-64",
+                children: /*#__PURE__*/ _jsxDEV(Loader2, {
+                    className: "w-8 h-8 animate-spin text-muted-foreground"
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                    lineNumber: 128,
+                    columnNumber: 11
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                lineNumber: 127,
+                columnNumber: 9
+            }, this)
+        }, void 0, false, {
+            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+            lineNumber: 126,
+            columnNumber: 7
+        }, this);
+    }
+    return /*#__PURE__*/ _jsxDEV(MainLayout, {
+        title: "Machines",
+        subtitle: "Configure and monitor laboratory analyzers",
+        children: [
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "flex items-center justify-between mb-6",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "flex items-center gap-3",
+                        children: /*#__PURE__*/ _jsxDEV(Button, {
+                            variant: "outline",
+                            size: "sm",
+                            onClick: handleRefreshStatus,
+                            children: [
+                                /*#__PURE__*/ _jsxDEV(RefreshCw, {
+                                    className: "w-4 h-4 mr-2"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                    lineNumber: 140,
+                                    columnNumber: 13
+                                }, this),
+                                "Refresh Status"
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                            lineNumber: 139,
+                            columnNumber: 11
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                        lineNumber: 138,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(Button, {
+                        onClick: ()=>setIsAddOpen(true),
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(Plus, {
+                                className: "w-4 h-4 mr-2"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 145,
+                                columnNumber: 11
+                            }, this),
+                            "Add Machine"
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                        lineNumber: 144,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                lineNumber: 137,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "mb-6",
+                children: /*#__PURE__*/ _jsxDEV(LiveConnectionMonitor, {}, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                    lineNumber: 152,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                lineNumber: 151,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "grid grid-cols-1 lg:grid-cols-2 gap-4",
+                children: machines?.map((machine)=>{
+                    const config = statusConfig[machine.status];
+                    const StatusIcon = config.icon;
+                    return /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg p-6 hover:shadow-md transition-shadow",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "flex items-start justify-between mb-4",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "flex items-center gap-4",
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                className: "w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center",
+                                                children: /*#__PURE__*/ _jsxDEV(StatusIcon, {
+                                                    className: cn('w-7 h-7', config.labelClass)
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                    lineNumber: 166,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 165,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV("h3", {
+                                                        className: "font-semibold text-lg",
+                                                        children: machine.name
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                        lineNumber: 169,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("p", {
+                                                        className: "text-sm text-muted-foreground",
+                                                        children: [
+                                                            machine.manufacturer,
+                                                            " ",
+                                                            machine.modelName
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                        lineNumber: 170,
+                                                        columnNumber: 21
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 168,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                        lineNumber: 164,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "flex items-center gap-2",
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("span", {
+                                                className: cn('machine-indicator', config.indicator)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 176,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("span", {
+                                                className: cn('text-sm font-medium', config.labelClass),
+                                                children: config.label
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 177,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                        lineNumber: 175,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 163,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "grid grid-cols-2 gap-4 mb-4",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                className: "text-xs text-muted-foreground mb-1",
+                                                children: "Serial Number"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 185,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                className: "font-mono text-sm",
+                                                children: machine.serialNumber || 'N/A'
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 186,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                        lineNumber: 184,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                className: "text-xs text-muted-foreground mb-1",
+                                                children: "Protocol"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 189,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(Badge, {
+                                                variant: "secondary",
+                                                className: "font-mono text-xs",
+                                                children: machine.protocol
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 190,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                        lineNumber: 188,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                className: "text-xs text-muted-foreground mb-1",
+                                                children: "IP Address"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 195,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                className: "font-mono text-sm",
+                                                children: machine.ipAddress ? `${machine.ipAddress}:${machine.port}` : 'Not configured'
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 196,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                        lineNumber: 194,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                className: "text-xs text-muted-foreground mb-1",
+                                                children: "Last Communication"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 201,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                className: "text-sm",
+                                                children: machine.lastCommunication ? new Date(machine.lastCommunication).toLocaleString() : 'Never'
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 202,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                        lineNumber: 200,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 183,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "mb-4",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("p", {
+                                        className: "text-xs text-muted-foreground mb-2",
+                                        children: "Supported Tests"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                        lineNumber: 211,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "flex flex-wrap gap-1",
+                                        children: [
+                                            machine.testsSupported?.slice(0, 6).map((test)=>/*#__PURE__*/ _jsxDEV("span", {
+                                                    className: "px-2 py-1 bg-muted rounded text-xs font-medium",
+                                                    children: test
+                                                }, test, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                    lineNumber: 214,
+                                                    columnNumber: 21
+                                                }, this)),
+                                            (machine.testsSupported?.length || 0) > 6 && /*#__PURE__*/ _jsxDEV("span", {
+                                                className: "px-2 py-1 bg-muted rounded text-xs",
+                                                children: [
+                                                    "+",
+                                                    (machine.testsSupported?.length || 0) - 6
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 219,
+                                                columnNumber: 21
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                        lineNumber: 212,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 210,
+                                columnNumber: 15
+                            }, this),
+                            machine.ipAddress && machine.port && /*#__PURE__*/ _jsxDEV("div", {
+                                className: "flex items-center gap-2 mb-4",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(Radio, {
+                                        className: cn('w-3 h-3', getListenerStatus(machine.id) ? 'text-status-normal animate-pulse' : 'text-muted-foreground')
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                        lineNumber: 229,
+                                        columnNumber: 19
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("span", {
+                                        className: "text-xs text-muted-foreground",
+                                        children: [
+                                            "TCP Listener: ",
+                                            getListenerStatus(machine.id) ? 'Active' : 'Inactive'
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                        lineNumber: 230,
+                                        columnNumber: 19
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 228,
+                                columnNumber: 17
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "flex gap-2 pt-4 border-t",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(Button, {
+                                        variant: "outline",
+                                        size: "sm",
+                                        className: "flex-1",
+                                        onClick: ()=>{
+                                            setSelectedMachine(machine);
+                                            setIsConfigOpen(true);
+                                        },
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV(Settings, {
+                                                className: "w-4 h-4 mr-2"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 246,
+                                                columnNumber: 19
+                                            }, this),
+                                            "Configure"
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                        lineNumber: 237,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(Button, {
+                                        variant: "outline",
+                                        size: "sm",
+                                        className: "flex-1",
+                                        onClick: ()=>handleTestConnection(machine),
+                                        disabled: testConnection.isPending,
+                                        children: [
+                                            testConnection.isPending && selectedMachine?.id === machine.id ? /*#__PURE__*/ _jsxDEV(Loader2, {
+                                                className: "w-4 h-4 mr-2 animate-spin"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 257,
+                                                columnNumber: 21
+                                            }, this) : /*#__PURE__*/ _jsxDEV(Send, {
+                                                className: "w-4 h-4 mr-2"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 259,
+                                                columnNumber: 21
+                                            }, this),
+                                            "Test Connection"
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                        lineNumber: 249,
+                                        columnNumber: 17
+                                    }, this),
+                                    machine.ipAddress && machine.port && /*#__PURE__*/ _jsxDEV(Button, {
+                                        variant: "ghost",
+                                        size: "sm",
+                                        onClick: ()=>handleRestartListener(machine),
+                                        disabled: restartListener.isPending,
+                                        title: "Restart TCP Listener",
+                                        children: restartListener.isPending ? /*#__PURE__*/ _jsxDEV(Loader2, {
+                                            className: "w-4 h-4 animate-spin"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                            lineNumber: 272,
+                                            columnNumber: 23
+                                        }, this) : /*#__PURE__*/ _jsxDEV(RotateCw, {
+                                            className: "w-4 h-4"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                            lineNumber: 274,
+                                            columnNumber: 23
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                        lineNumber: 264,
+                                        columnNumber: 19
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 236,
+                                columnNumber: 15
+                            }, this)
+                        ]
+                    }, machine.id, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                        lineNumber: 162,
+                        columnNumber: 13
+                    }, this);
+                })
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                lineNumber: 156,
+                columnNumber: 7
+            }, this),
+            (!machines || machines.length === 0) && /*#__PURE__*/ _jsxDEV("div", {
+                className: "text-center py-12 bg-muted/30 rounded-lg",
+                children: [
+                    /*#__PURE__*/ _jsxDEV(WifiOff, {
+                        className: "w-12 h-12 text-muted-foreground mx-auto mb-4"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                        lineNumber: 287,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("h3", {
+                        className: "text-lg font-medium mb-2",
+                        children: "No Analyzers Configured"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                        lineNumber: 288,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("p", {
+                        className: "text-muted-foreground mb-4",
+                        children: "Add your laboratory analyzers to enable automatic result transmission."
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                        lineNumber: 289,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(Button, {
+                        onClick: ()=>setIsAddOpen(true),
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(Plus, {
+                                className: "w-4 h-4 mr-2"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 291,
+                                columnNumber: 13
+                            }, this),
+                            "Add Machine"
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                        lineNumber: 290,
+                        columnNumber: 11
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                lineNumber: 286,
+                columnNumber: 9
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Dialog, {
+                open: isAddOpen,
+                onOpenChange: setIsAddOpen,
+                children: /*#__PURE__*/ _jsxDEV(DialogContent, {
+                    className: "max-w-lg",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV(DialogHeader, {
+                            children: [
+                                /*#__PURE__*/ _jsxDEV(DialogTitle, {
+                                    children: "Add New Machine"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                    lineNumber: 301,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV(DialogDescription, {
+                                    children: "Register a new laboratory analyzer in the system."
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                    lineNumber: 302,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                            lineNumber: 300,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV(AddMachineForm, {
+                            onSave: handleAddMachine,
+                            onCancel: ()=>setIsAddOpen(false),
+                            isSaving: createMachine.isPending
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                            lineNumber: 306,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                    lineNumber: 299,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                lineNumber: 298,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Dialog, {
+                open: isConfigOpen,
+                onOpenChange: setIsConfigOpen,
+                children: /*#__PURE__*/ _jsxDEV(DialogContent, {
+                    className: "max-w-2xl",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV(DialogHeader, {
+                            children: [
+                                /*#__PURE__*/ _jsxDEV(DialogTitle, {
+                                    children: [
+                                        "Configure ",
+                                        selectedMachine?.name
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                    lineNumber: 314,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV(DialogDescription, {
+                                    children: "Update the network and communication settings for this analyzer."
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                    lineNumber: 315,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                            lineNumber: 313,
+                            columnNumber: 11
+                        }, this),
+                        selectedMachine && /*#__PURE__*/ _jsxDEV(MachineConfigForm, {
+                            machine: selectedMachine,
+                            onSave: handleConfigSave,
+                            onCancel: ()=>setIsConfigOpen(false)
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                            lineNumber: 321,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                    lineNumber: 312,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                lineNumber: 311,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Dialog, {
+                open: isTestOpen,
+                onOpenChange: setIsTestOpen,
+                children: /*#__PURE__*/ _jsxDEV(DialogContent, {
+                    children: [
+                        /*#__PURE__*/ _jsxDEV(DialogHeader, {
+                            children: /*#__PURE__*/ _jsxDEV(DialogTitle, {
+                                children: [
+                                    "Connection Test: ",
+                                    selectedMachine?.name
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 334,
+                                columnNumber: 13
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                            lineNumber: 333,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "py-8 text-center",
+                            children: [
+                                testResult.status === 'testing' && /*#__PURE__*/ _jsxDEV(_Fragment, {
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV(Loader2, {
+                                            className: "w-16 h-16 text-primary mx-auto mb-4 animate-spin"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                            lineNumber: 340,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("p", {
+                                            className: "text-lg font-medium",
+                                            children: "Testing connection..."
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                            lineNumber: 341,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("p", {
+                                            className: "text-muted-foreground text-sm",
+                                            children: [
+                                                "Attempting to reach ",
+                                                selectedMachine?.ipAddress,
+                                                ":",
+                                                selectedMachine?.port
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                            lineNumber: 342,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true),
+                                testResult.status === 'success' && /*#__PURE__*/ _jsxDEV(_Fragment, {
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV(CheckCircle, {
+                                            className: "w-16 h-16 text-status-normal mx-auto mb-4"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                            lineNumber: 349,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("p", {
+                                            className: "text-lg font-medium text-status-normal",
+                                            children: "Connection Successful"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                            lineNumber: 350,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("p", {
+                                            className: "text-muted-foreground text-sm",
+                                            children: testResult.message || 'The analyzer is responding and ready to receive data.'
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                            lineNumber: 351,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true),
+                                testResult.status === 'error' && /*#__PURE__*/ _jsxDEV(_Fragment, {
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV(XCircle, {
+                                            className: "w-16 h-16 text-status-critical mx-auto mb-4"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                            lineNumber: 358,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("p", {
+                                            className: "text-lg font-medium text-status-critical",
+                                            children: "Connection Failed"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                            lineNumber: 359,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("p", {
+                                            className: "text-muted-foreground text-sm",
+                                            children: testResult.message || 'Could not establish connection. Check network settings and ensure the analyzer is powered on.'
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                            lineNumber: 360,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                            lineNumber: 337,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "flex justify-end",
+                            children: /*#__PURE__*/ _jsxDEV(Button, {
+                                variant: "outline",
+                                onClick: ()=>setIsTestOpen(false),
+                                children: "Close"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 368,
+                                columnNumber: 13
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                            lineNumber: 367,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                    lineNumber: 332,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                lineNumber: 331,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+        lineNumber: 135,
+        columnNumber: 5
+    }, this);
+}
+_s(Machines, "ZpJd02GPB1Aa7/yBkqXg0sMQ2i0=", false, function() {
+    return [
+        useMachines,
+        useTestMachineConnection,
+        useUpdateMachine,
+        useCreateMachine,
+        useRestartListener,
+        useListenerStatus
+    ];
+});
+_c = Machines;
+// Add Machine Form Component
+function AddMachineForm({ onSave, onCancel, isSaving }) {
+    _s1();
+    const [formData, setFormData] = useState({
+        name: '',
+        manufacturer: '',
+        modelName: '',
+        serialNumber: '',
+        protocol: 'HL7',
+        ipAddress: '',
+        port: 5000,
+        testsSupported: []
+    });
+    const [testsInput, setTestsInput] = useState('');
+    const handleSubmit = (e)=>{
+        e.preventDefault();
+        onSave({
+            ...formData,
+            testsSupported: testsInput ? testsInput.split(',').map((s)=>s.trim()).filter(Boolean) : []
+        });
+    };
+    return /*#__PURE__*/ _jsxDEV("form", {
+        onSubmit: handleSubmit,
+        className: "space-y-4",
+        children: [
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "grid grid-cols-2 gap-4",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "space-y-2",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(Label, {
+                                htmlFor: "add-name",
+                                children: "Name *"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 412,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV(Input, {
+                                id: "add-name",
+                                required: true,
+                                value: formData.name,
+                                onChange: (e)=>setFormData((prev)=>({
+                                            ...prev,
+                                            name: e.target.value
+                                        }))
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 413,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                        lineNumber: 411,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "space-y-2",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(Label, {
+                                htmlFor: "add-manufacturer",
+                                children: "Manufacturer *"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 416,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV(Input, {
+                                id: "add-manufacturer",
+                                required: true,
+                                value: formData.manufacturer,
+                                onChange: (e)=>setFormData((prev)=>({
+                                            ...prev,
+                                            manufacturer: e.target.value
+                                        }))
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 417,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                        lineNumber: 415,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "space-y-2",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(Label, {
+                                htmlFor: "add-model",
+                                children: "Model *"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 420,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV(Input, {
+                                id: "add-model",
+                                required: true,
+                                value: formData.modelName,
+                                onChange: (e)=>setFormData((prev)=>({
+                                            ...prev,
+                                            modelName: e.target.value
+                                        }))
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 421,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                        lineNumber: 419,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "space-y-2",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(Label, {
+                                htmlFor: "add-serial",
+                                children: "Serial Number *"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 424,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV(Input, {
+                                id: "add-serial",
+                                required: true,
+                                value: formData.serialNumber,
+                                onChange: (e)=>setFormData((prev)=>({
+                                            ...prev,
+                                            serialNumber: e.target.value
+                                        }))
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 425,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                        lineNumber: 423,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "space-y-2",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(Label, {
+                                htmlFor: "add-protocol",
+                                children: "Protocol *"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 428,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV(Select, {
+                                value: formData.protocol,
+                                onValueChange: (v)=>setFormData((prev)=>({
+                                            ...prev,
+                                            protocol: v
+                                        })),
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(SelectTrigger, {
+                                        children: /*#__PURE__*/ _jsxDEV(SelectValue, {}, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                            lineNumber: 430,
+                                            columnNumber: 28
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                        lineNumber: 430,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(SelectContent, {
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                value: "HL7",
+                                                children: "HL7 v2.5.1"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 432,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                value: "ASTM",
+                                                children: "ASTM E1394"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 433,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                value: "LIS2_A2",
+                                                children: "LIS2-A2"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 434,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                value: "FHIR",
+                                                children: "FHIR R4"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 435,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                        lineNumber: 431,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 429,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                        lineNumber: 427,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "space-y-2",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(Label, {
+                                htmlFor: "add-port",
+                                children: "Port"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 440,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV(Input, {
+                                id: "add-port",
+                                type: "number",
+                                value: formData.port,
+                                onChange: (e)=>setFormData((prev)=>({
+                                            ...prev,
+                                            port: parseInt(e.target.value) || 5000
+                                        }))
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 441,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                        lineNumber: 439,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "col-span-2 space-y-2",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(Label, {
+                                htmlFor: "add-ip",
+                                children: "IP Address"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 444,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV(Input, {
+                                id: "add-ip",
+                                placeholder: "192.168.1.100",
+                                value: formData.ipAddress || '',
+                                onChange: (e)=>setFormData((prev)=>({
+                                            ...prev,
+                                            ipAddress: e.target.value
+                                        }))
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 445,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                        lineNumber: 443,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "col-span-2 space-y-2",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(Label, {
+                                htmlFor: "add-tests",
+                                children: "Supported Test Codes"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 448,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV(Input, {
+                                id: "add-tests",
+                                placeholder: "CBC, WBC, RBC, HGB",
+                                value: testsInput,
+                                onChange: (e)=>setTestsInput(e.target.value)
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 449,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-xs text-muted-foreground",
+                                children: "Comma-separated test codes matching your test catalog."
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 450,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                        lineNumber: 447,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                lineNumber: 410,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "flex justify-end gap-2 pt-2 border-t",
+                children: [
+                    /*#__PURE__*/ _jsxDEV(Button, {
+                        type: "button",
+                        variant: "outline",
+                        onClick: onCancel,
+                        children: "Cancel"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                        lineNumber: 454,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(Button, {
+                        type: "submit",
+                        disabled: isSaving,
+                        children: [
+                            isSaving && /*#__PURE__*/ _jsxDEV(Loader2, {
+                                className: "w-4 h-4 mr-2 animate-spin"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 456,
+                                columnNumber: 24
+                            }, this),
+                            "Add Machine"
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                        lineNumber: 455,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                lineNumber: 453,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+        lineNumber: 409,
+        columnNumber: 5
+    }, this);
+}
+_s1(AddMachineForm, "9WKXrKZv+NKijxBPJUtxuzo8028=");
+_c1 = AddMachineForm;
+// Configuration Form Component
+function MachineConfigForm({ machine, onSave, onCancel }) {
+    _s2();
+    const [formData, setFormData] = useState({
+        name: machine.name,
+        manufacturer: machine.manufacturer,
+        modelName: machine.modelName,
+        serialNumber: machine.serialNumber || '',
+        protocol: machine.protocol,
+        ipAddress: machine.ipAddress || '',
+        port: machine.port?.toString() || '5000',
+        testsSupported: machine.testsSupported?.join(', ') || ''
+    });
+    const handleSubmit = (e)=>{
+        e.preventDefault();
+        onSave({
+            name: formData.name,
+            manufacturer: formData.manufacturer,
+            modelName: formData.modelName,
+            serialNumber: formData.serialNumber || undefined,
+            protocol: formData.protocol,
+            ipAddress: formData.ipAddress || undefined,
+            port: formData.port ? parseInt(formData.port) : undefined,
+            testsSupported: formData.testsSupported ? formData.testsSupported.split(',').map((s)=>s.trim()).filter(Boolean) : []
+        });
+    };
+    return /*#__PURE__*/ _jsxDEV("form", {
+        onSubmit: handleSubmit,
+        children: [
+            /*#__PURE__*/ _jsxDEV(Tabs, {
+                defaultValue: "general",
+                className: "w-full",
+                children: [
+                    /*#__PURE__*/ _jsxDEV(TabsList, {
+                        className: "grid w-full grid-cols-3",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(TabsTrigger, {
+                                value: "general",
+                                children: "General"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 505,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV(TabsTrigger, {
+                                value: "network",
+                                children: "Network"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 506,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV(TabsTrigger, {
+                                value: "tests",
+                                children: "Tests"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 507,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                        lineNumber: 504,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(TabsContent, {
+                        value: "general",
+                        className: "space-y-4 mt-4",
+                        children: /*#__PURE__*/ _jsxDEV("div", {
+                            className: "grid grid-cols-2 gap-4",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "space-y-2",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV(Label, {
+                                            htmlFor: "name",
+                                            children: "Name"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                            lineNumber: 513,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(Input, {
+                                            id: "name",
+                                            value: formData.name,
+                                            onChange: (e)=>setFormData((prev)=>({
+                                                        ...prev,
+                                                        name: e.target.value
+                                                    }))
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                            lineNumber: 514,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                    lineNumber: 512,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "space-y-2",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV(Label, {
+                                            htmlFor: "manufacturer",
+                                            children: "Manufacturer"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                            lineNumber: 521,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(Input, {
+                                            id: "manufacturer",
+                                            value: formData.manufacturer,
+                                            onChange: (e)=>setFormData((prev)=>({
+                                                        ...prev,
+                                                        manufacturer: e.target.value
+                                                    }))
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                            lineNumber: 522,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                    lineNumber: 520,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "space-y-2",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV(Label, {
+                                            htmlFor: "model",
+                                            children: "Model"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                            lineNumber: 529,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(Input, {
+                                            id: "model",
+                                            value: formData.modelName,
+                                            onChange: (e)=>setFormData((prev)=>({
+                                                        ...prev,
+                                                        modelName: e.target.value
+                                                    }))
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                            lineNumber: 530,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                    lineNumber: 528,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "space-y-2",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV(Label, {
+                                            htmlFor: "serial",
+                                            children: "Serial Number"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                            lineNumber: 537,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(Input, {
+                                            id: "serial",
+                                            value: formData.serialNumber,
+                                            onChange: (e)=>setFormData((prev)=>({
+                                                        ...prev,
+                                                        serialNumber: e.target.value
+                                                    }))
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                            lineNumber: 538,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                    lineNumber: 536,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                            lineNumber: 511,
+                            columnNumber: 11
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                        lineNumber: 510,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(TabsContent, {
+                        value: "network",
+                        className: "space-y-4 mt-4",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "grid grid-cols-2 gap-4",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "space-y-2",
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV(Label, {
+                                                htmlFor: "protocol",
+                                                children: "Protocol"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 550,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(Select, {
+                                                value: formData.protocol,
+                                                onValueChange: (value)=>setFormData((prev)=>({
+                                                            ...prev,
+                                                            protocol: value
+                                                        })),
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV(SelectTrigger, {
+                                                        children: /*#__PURE__*/ _jsxDEV(SelectValue, {}, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                            lineNumber: 556,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                        lineNumber: 555,
+                                                        columnNumber: 17
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV(SelectContent, {
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                                value: "HL7",
+                                                                children: "HL7 v2.5.1"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                                lineNumber: 559,
+                                                                columnNumber: 19
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                                value: "ASTM",
+                                                                children: "ASTM E1394"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                                lineNumber: 560,
+                                                                columnNumber: 19
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                                value: "LIS2_A2",
+                                                                children: "LIS2-A2"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                                lineNumber: 561,
+                                                                columnNumber: 19
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                                value: "FHIR",
+                                                                children: "FHIR R4"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                                lineNumber: 562,
+                                                                columnNumber: 19
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                        lineNumber: 558,
+                                                        columnNumber: 17
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 551,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                        lineNumber: 549,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "space-y-2",
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV(Label, {
+                                                htmlFor: "port",
+                                                children: "Port"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 567,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(Input, {
+                                                id: "port",
+                                                type: "number",
+                                                value: formData.port,
+                                                onChange: (e)=>setFormData((prev)=>({
+                                                            ...prev,
+                                                            port: e.target.value
+                                                        }))
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 568,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                        lineNumber: 566,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "col-span-2 space-y-2",
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV(Label, {
+                                                htmlFor: "ip",
+                                                children: "IP Address"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 576,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(Input, {
+                                                id: "ip",
+                                                placeholder: "192.168.1.100",
+                                                value: formData.ipAddress,
+                                                onChange: (e)=>setFormData((prev)=>({
+                                                            ...prev,
+                                                            ipAddress: e.target.value
+                                                        }))
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 577,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                        lineNumber: 575,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 548,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "p-4 bg-muted/50 rounded-lg space-y-4",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("h4", {
+                                                className: "text-sm font-medium mb-2",
+                                                children: "TCP Bridge Setup (Recommended)"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 588,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                className: "text-xs text-muted-foreground mb-2",
+                                                children: "For direct TCP connections from analyzers, run the LabConnect TCP Bridge on your local network:"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 589,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("ol", {
+                                                className: "text-xs text-muted-foreground space-y-1 list-decimal list-inside mb-3",
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV("li", {
+                                                        children: [
+                                                            "Download the TCP Bridge from ",
+                                                            /*#__PURE__*/ _jsxDEV("code", {
+                                                                className: "bg-background px-1 rounded",
+                                                                children: "middleware/tcp-bridge/"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                                lineNumber: 593,
+                                                                columnNumber: 50
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                        lineNumber: 593,
+                                                        columnNumber: 17
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("li", {
+                                                        children: [
+                                                            "Install: ",
+                                                            /*#__PURE__*/ _jsxDEV("code", {
+                                                                className: "bg-background px-1 rounded",
+                                                                children: "npm install"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                                lineNumber: 594,
+                                                                columnNumber: 30
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                        lineNumber: 594,
+                                                        columnNumber: 17
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("li", {
+                                                        children: [
+                                                            "Configure ",
+                                                            /*#__PURE__*/ _jsxDEV("code", {
+                                                                className: "bg-background px-1 rounded",
+                                                                children: ".env"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                                lineNumber: 595,
+                                                                columnNumber: 31
+                                                            }, this),
+                                                            " with settings below"
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                        lineNumber: 595,
+                                                        columnNumber: 17
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("li", {
+                                                        children: [
+                                                            "Start: ",
+                                                            /*#__PURE__*/ _jsxDEV("code", {
+                                                                className: "bg-background px-1 rounded",
+                                                                children: "npm start"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                                lineNumber: 596,
+                                                                columnNumber: 28
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                        lineNumber: 596,
+                                                        columnNumber: 17
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 592,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                className: "bg-background p-3 rounded text-xs font-mono space-y-1",
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV("p", {
+                                                        children: "TCP_PORT=5000"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                        lineNumber: 599,
+                                                        columnNumber: 17
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("p", {
+                                                        children: [
+                                                            "PROTOCOL=",
+                                                            formData.protocol
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                        lineNumber: 600,
+                                                        columnNumber: 17
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("p", {
+                                                        children: [
+                                                            "MACHINE_ID=",
+                                                            machine.id
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                        lineNumber: 601,
+                                                        columnNumber: 17
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV("p", {
+                                                        children: [
+                                                            "ENDPOINT_URL=",
+                                                            import.meta.env.VITE_API_URL || 'http://localhost:3000',
+                                                            "/hl7/receive"
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                        lineNumber: 602,
+                                                        columnNumber: 17
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 598,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                        lineNumber: 587,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "border-t pt-4",
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("h4", {
+                                                className: "text-sm font-medium mb-2",
+                                                children: "Direct HTTP Endpoint"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 607,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                className: "text-xs text-muted-foreground mb-2",
+                                                children: "For analyzers with HTTP support, configure to send messages to:"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 608,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("code", {
+                                                className: "text-xs bg-background px-2 py-1 rounded block",
+                                                children: [
+                                                    "POST ",
+                                                    import.meta.env.VITE_API_URL || 'http://localhost:3000',
+                                                    "/hl7/receive"
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 611,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                className: "text-xs text-muted-foreground mt-2",
+                                                children: [
+                                                    "Include header: ",
+                                                    /*#__PURE__*/ _jsxDEV("code", {
+                                                        className: "bg-background px-1 rounded",
+                                                        children: [
+                                                            "x-machine-id: ",
+                                                            machine.id
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                        lineNumber: 615,
+                                                        columnNumber: 33
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                                lineNumber: 614,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                        lineNumber: 606,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                lineNumber: 586,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                        lineNumber: 547,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(TabsContent, {
+                        value: "tests",
+                        className: "space-y-4 mt-4",
+                        children: /*#__PURE__*/ _jsxDEV("div", {
+                            className: "space-y-2",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV(Label, {
+                                    htmlFor: "tests",
+                                    children: "Supported Test Codes"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                    lineNumber: 623,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV(Input, {
+                                    id: "tests",
+                                    placeholder: "CBC, WBC, RBC, HGB, PLT",
+                                    value: formData.testsSupported,
+                                    onChange: (e)=>setFormData((prev)=>({
+                                                ...prev,
+                                                testsSupported: e.target.value
+                                            }))
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                    lineNumber: 624,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("p", {
+                                    className: "text-xs text-muted-foreground",
+                                    children: "Enter test codes separated by commas. These should match your test catalog codes."
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                                    lineNumber: 630,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                            lineNumber: 622,
+                            columnNumber: 11
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                        lineNumber: 621,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                lineNumber: 503,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "flex justify-end gap-2 mt-6 pt-4 border-t",
+                children: [
+                    /*#__PURE__*/ _jsxDEV(Button, {
+                        type: "button",
+                        variant: "outline",
+                        onClick: onCancel,
+                        children: "Cancel"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                        lineNumber: 638,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(Button, {
+                        type: "submit",
+                        children: "Save Changes"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                        lineNumber: 641,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+                lineNumber: 637,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx",
+        lineNumber: 502,
+        columnNumber: 5
+    }, this);
+}
+_s2(MachineConfigForm, "7xUBeWdeeBedOHwyZ1MOqKOY+5E=");
+_c2 = MachineConfigForm;
+var _c, _c1, _c2;
+$RefreshReg$(_c, "Machines");
+$RefreshReg$(_c1, "AddMachineForm");
+$RefreshReg$(_c2, "MachineConfigForm");
+
+
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+
+
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/HP/Downloads/lab/frontend/src/pages/Machines.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIk1hY2hpbmVzLnRzeCJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyB1c2VTdGF0ZSB9IGZyb20gJ3JlYWN0JztcbmltcG9ydCB7IE1haW5MYXlvdXQgfSBmcm9tICdAL2NvbXBvbmVudHMvbGF5b3V0L01haW5MYXlvdXQnO1xuaW1wb3J0IHsgdXNlTWFjaGluZXMsIHVzZVRlc3RNYWNoaW5lQ29ubmVjdGlvbiwgdXNlVXBkYXRlTWFjaGluZSwgdXNlQ3JlYXRlTWFjaGluZSwgdXNlUmVzdGFydExpc3RlbmVyLCB1c2VMaXN0ZW5lclN0YXR1cywgdHlwZSBNYWNoaW5lLCB0eXBlIE1hY2hpbmVDcmVhdGUgfSBmcm9tICdAL2hvb2tzL3VzZU1hY2hpbmVzJztcbmltcG9ydCB7IEJ1dHRvbiB9IGZyb20gJ0AvY29tcG9uZW50cy91aS9idXR0b24nO1xuaW1wb3J0IHsgUGx1cywgUmVmcmVzaEN3LCBTZXR0aW5ncywgV2lmaSwgV2lmaU9mZiwgQWN0aXZpdHksIFNlbmQsIENoZWNrQ2lyY2xlLCBYQ2lyY2xlLCBMb2FkZXIyLCBSb3RhdGVDdywgUmFkaW8gfSBmcm9tICdsdWNpZGUtcmVhY3QnO1xuaW1wb3J0IHsgY24gfSBmcm9tICdAL2xpYi91dGlscyc7XG5pbXBvcnQgeyBEaWFsb2csIERpYWxvZ0NvbnRlbnQsIERpYWxvZ0hlYWRlciwgRGlhbG9nVGl0bGUsIERpYWxvZ0Rlc2NyaXB0aW9uIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL2RpYWxvZyc7XG5pbXBvcnQgeyBJbnB1dCB9IGZyb20gJ0AvY29tcG9uZW50cy91aS9pbnB1dCc7XG5pbXBvcnQgeyBMYWJlbCB9IGZyb20gJ0AvY29tcG9uZW50cy91aS9sYWJlbCc7XG5pbXBvcnQgeyBTZWxlY3QsIFNlbGVjdENvbnRlbnQsIFNlbGVjdEl0ZW0sIFNlbGVjdFRyaWdnZXIsIFNlbGVjdFZhbHVlIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL3NlbGVjdCc7XG5pbXBvcnQgeyB0b2FzdCB9IGZyb20gJ3Nvbm5lcic7XG5pbXBvcnQgeyBUYWJzLCBUYWJzQ29udGVudCwgVGFic0xpc3QsIFRhYnNUcmlnZ2VyIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL3RhYnMnO1xuaW1wb3J0IHsgQmFkZ2UgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvYmFkZ2UnO1xuaW1wb3J0IHsgTGl2ZUNvbm5lY3Rpb25Nb25pdG9yIH0gZnJvbSAnQC9jb21wb25lbnRzL21hY2hpbmVzL0xpdmVDb25uZWN0aW9uTW9uaXRvcic7XG5cbnR5cGUgTWFjaGluZVN0YXR1cyA9IE1hY2hpbmVbJ3N0YXR1cyddO1xudHlwZSBNYWNoaW5lUHJvdG9jb2wgPSBNYWNoaW5lWydwcm90b2NvbCddO1xuXG5leHBvcnQgZGVmYXVsdCBmdW5jdGlvbiBNYWNoaW5lcygpIHtcbiAgY29uc3QgeyBkYXRhOiBtYWNoaW5lcywgaXNMb2FkaW5nLCByZWZldGNoIH0gPSB1c2VNYWNoaW5lcygpO1xuICBjb25zdCB0ZXN0Q29ubmVjdGlvbiA9IHVzZVRlc3RNYWNoaW5lQ29ubmVjdGlvbigpO1xuICBjb25zdCB1cGRhdGVNYWNoaW5lID0gdXNlVXBkYXRlTWFjaGluZSgpO1xuICBjb25zdCBjcmVhdGVNYWNoaW5lID0gdXNlQ3JlYXRlTWFjaGluZSgpO1xuICBjb25zdCByZXN0YXJ0TGlzdGVuZXIgPSB1c2VSZXN0YXJ0TGlzdGVuZXIoKTtcbiAgY29uc3QgeyBkYXRhOiBsaXN0ZW5lclN0YXR1c2VzIH0gPSB1c2VMaXN0ZW5lclN0YXR1cygpO1xuICBjb25zdCBbc2VsZWN0ZWRNYWNoaW5lLCBzZXRTZWxlY3RlZE1hY2hpbmVdID0gdXNlU3RhdGU8TWFjaGluZSB8IG51bGw+KG51bGwpO1xuICBjb25zdCBbaXNDb25maWdPcGVuLCBzZXRJc0NvbmZpZ09wZW5dID0gdXNlU3RhdGUoZmFsc2UpO1xuICBjb25zdCBbaXNBZGRPcGVuLCBzZXRJc0FkZE9wZW5dID0gdXNlU3RhdGUoZmFsc2UpO1xuICBjb25zdCBbaXNUZXN0T3Blbiwgc2V0SXNUZXN0T3Blbl0gPSB1c2VTdGF0ZShmYWxzZSk7XG4gIGNvbnN0IFt0ZXN0UmVzdWx0LCBzZXRUZXN0UmVzdWx0XSA9IHVzZVN0YXRlPHsgc3RhdHVzOiAnaWRsZScgfCAndGVzdGluZycgfCAnc3VjY2VzcycgfCAnZXJyb3InOyBtZXNzYWdlPzogc3RyaW5nIH0+KHsgc3RhdHVzOiAnaWRsZScgfSk7XG5cbiAgY29uc3Qgc3RhdHVzQ29uZmlnOiBSZWNvcmQ8TWFjaGluZVN0YXR1cywgeyBpbmRpY2F0b3I6IHN0cmluZzsgbGFiZWw6IHN0cmluZzsgaWNvbjogdHlwZW9mIFdpZmk7IGxhYmVsQ2xhc3M6IHN0cmluZyB9PiA9IHtcbiAgICBvbmxpbmU6IHtcbiAgICAgIGluZGljYXRvcjogJ21hY2hpbmUtb25saW5lJyxcbiAgICAgIGxhYmVsOiAnT25saW5lJyxcbiAgICAgIGljb246IFdpZmksXG4gICAgICBsYWJlbENsYXNzOiAndGV4dC1zdGF0dXMtbm9ybWFsJyxcbiAgICB9LFxuICAgIG9mZmxpbmU6IHtcbiAgICAgIGluZGljYXRvcjogJ21hY2hpbmUtb2ZmbGluZScsXG4gICAgICBsYWJlbDogJ09mZmxpbmUnLFxuICAgICAgaWNvbjogV2lmaU9mZixcbiAgICAgIGxhYmVsQ2xhc3M6ICd0ZXh0LW11dGVkLWZvcmVncm91bmQnLFxuICAgIH0sXG4gICAgZXJyb3I6IHtcbiAgICAgIGluZGljYXRvcjogJ21hY2hpbmUtZXJyb3InLFxuICAgICAgbGFiZWw6ICdFcnJvcicsXG4gICAgICBpY29uOiBXaWZpT2ZmLFxuICAgICAgbGFiZWxDbGFzczogJ3RleHQtc3RhdHVzLWNyaXRpY2FsJyxcbiAgICB9LFxuICAgIHByb2Nlc3Npbmc6IHtcbiAgICAgIGluZGljYXRvcjogJ21hY2hpbmUtcHJvY2Vzc2luZycsXG4gICAgICBsYWJlbDogJ1Byb2Nlc3NpbmcnLFxuICAgICAgaWNvbjogQWN0aXZpdHksXG4gICAgICBsYWJlbENsYXNzOiAndGV4dC1wcmltYXJ5JyxcbiAgICB9LFxuICB9O1xuXG4gIGNvbnN0IGhhbmRsZVRlc3RDb25uZWN0aW9uID0gYXN5bmMgKG1hY2hpbmU6IE1hY2hpbmUpID0+IHtcbiAgICBzZXRTZWxlY3RlZE1hY2hpbmUobWFjaGluZSk7XG4gICAgc2V0SXNUZXN0T3Blbih0cnVlKTtcbiAgICBzZXRUZXN0UmVzdWx0KHsgc3RhdHVzOiAndGVzdGluZycgfSk7XG4gICAgXG4gICAgdHJ5IHtcbiAgICAgIGNvbnN0IHJlc3VsdCA9IGF3YWl0IHRlc3RDb25uZWN0aW9uLm11dGF0ZUFzeW5jKHsgbWFjaGluZUlkOiBtYWNoaW5lLmlkIH0pO1xuICAgICAgaWYgKHJlc3VsdC5zdWNjZXNzKSB7XG4gICAgICAgIHNldFRlc3RSZXN1bHQoeyBzdGF0dXM6ICdzdWNjZXNzJywgbWVzc2FnZTogcmVzdWx0Lm1lc3NhZ2UgfSk7XG4gICAgICAgIHRvYXN0LnN1Y2Nlc3MoYENvbm5lY3Rpb24gdG8gJHttYWNoaW5lLm5hbWV9IHN1Y2Nlc3NmdWxgKTtcbiAgICAgIH0gZWxzZSB7XG4gICAgICAgIHNldFRlc3RSZXN1bHQoeyBzdGF0dXM6ICdlcnJvcicsIG1lc3NhZ2U6IHJlc3VsdC5tZXNzYWdlIH0pO1xuICAgICAgICB0b2FzdC5lcnJvcihgRmFpbGVkIHRvIGNvbm5lY3QgdG8gJHttYWNoaW5lLm5hbWV9OiAke3Jlc3VsdC5tZXNzYWdlfWApO1xuICAgICAgfVxuICAgICAgcmVmZXRjaCgpO1xuICAgIH0gY2F0Y2ggKGVycm9yKSB7XG4gICAgICBzZXRUZXN0UmVzdWx0KHsgc3RhdHVzOiAnZXJyb3InLCBtZXNzYWdlOiAnVW5leHBlY3RlZCBlcnJvciBkdXJpbmcgY29ubmVjdGlvbiB0ZXN0JyB9KTtcbiAgICAgIHRvYXN0LmVycm9yKGBGYWlsZWQgdG8gY29ubmVjdCB0byAke21hY2hpbmUubmFtZX1gKTtcbiAgICB9XG4gIH07XG5cbiAgY29uc3QgaGFuZGxlUmVmcmVzaFN0YXR1cyA9IGFzeW5jICgpID0+IHtcbiAgICBhd2FpdCByZWZldGNoKCk7XG4gICAgdG9hc3Quc3VjY2VzcygnTWFjaGluZSBzdGF0dXMgcmVmcmVzaGVkJyk7XG4gIH07XG5cbiAgY29uc3QgaGFuZGxlUmVzdGFydExpc3RlbmVyID0gYXN5bmMgKG1hY2hpbmU6IE1hY2hpbmUpID0+IHtcbiAgICB0cnkge1xuICAgICAgYXdhaXQgcmVzdGFydExpc3RlbmVyLm11dGF0ZUFzeW5jKHsgbWFjaGluZUlkOiBtYWNoaW5lLmlkIH0pO1xuICAgICAgdG9hc3Quc3VjY2VzcyhgVENQIGxpc3RlbmVyIHJlc3RhcnRlZCBmb3IgJHttYWNoaW5lLm5hbWV9YCk7XG4gICAgfSBjYXRjaCAoZXJyb3IpIHtcbiAgICAgIHRvYXN0LmVycm9yKGBGYWlsZWQgdG8gcmVzdGFydCBsaXN0ZW5lciBmb3IgJHttYWNoaW5lLm5hbWV9YCk7XG4gICAgfVxuICB9O1xuXG4gIGNvbnN0IGdldExpc3RlbmVyU3RhdHVzID0gKG1hY2hpbmVJZDogc3RyaW5nKTogYm9vbGVhbiA9PiB7XG4gICAgcmV0dXJuIGxpc3RlbmVyU3RhdHVzZXM/LnNvbWUocyA9PiBzLm1hY2hpbmVJZCA9PT0gbWFjaGluZUlkICYmIHMubGlzdGVuaW5nKSA/PyBmYWxzZTtcbiAgfTtcblxuICBjb25zdCBoYW5kbGVDb25maWdTYXZlID0gYXN5bmMgKHVwZGF0ZXM6IFBhcnRpYWw8TWFjaGluZT4pID0+IHtcbiAgICBpZiAoIXNlbGVjdGVkTWFjaGluZSkgcmV0dXJuO1xuICAgIFxuICAgIHRyeSB7XG4gICAgICBhd2FpdCB1cGRhdGVNYWNoaW5lLm11dGF0ZUFzeW5jKHtcbiAgICAgICAgaWQ6IHNlbGVjdGVkTWFjaGluZS5pZCxcbiAgICAgICAgdXBkYXRlcyxcbiAgICAgIH0pO1xuICAgICAgdG9hc3Quc3VjY2VzcygnTWFjaGluZSBjb25maWd1cmF0aW9uIHNhdmVkJyk7XG4gICAgICBzZXRJc0NvbmZpZ09wZW4oZmFsc2UpO1xuICAgICAgcmVmZXRjaCgpO1xuICAgIH0gY2F0Y2ggKGVycm9yKSB7XG4gICAgICB0b2FzdC5lcnJvcignRmFpbGVkIHRvIHNhdmUgY29uZmlndXJhdGlvbicpO1xuICAgIH1cbiAgfTtcblxuICBjb25zdCBoYW5kbGVBZGRNYWNoaW5lID0gYXN5bmMgKGRhdGE6IE1hY2hpbmVDcmVhdGUpID0+IHtcbiAgICB0cnkge1xuICAgICAgYXdhaXQgY3JlYXRlTWFjaGluZS5tdXRhdGVBc3luYyhkYXRhKTtcbiAgICAgIHRvYXN0LnN1Y2Nlc3MoJ01hY2hpbmUgYWRkZWQgc3VjY2Vzc2Z1bGx5Jyk7XG4gICAgICBzZXRJc0FkZE9wZW4oZmFsc2UpO1xuICAgIH0gY2F0Y2ggKGVycm9yKSB7XG4gICAgICB0b2FzdC5lcnJvcignRmFpbGVkIHRvIGFkZCBtYWNoaW5lJyk7XG4gICAgfVxuICB9O1xuXG4gIGlmIChpc0xvYWRpbmcpIHtcbiAgICByZXR1cm4gKFxuICAgICAgPE1haW5MYXlvdXQgdGl0bGU9XCJNYWNoaW5lc1wiIHN1YnRpdGxlPVwiQ29uZmlndXJlIGFuZCBtb25pdG9yIGxhYm9yYXRvcnkgYW5hbHl6ZXJzXCI+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIganVzdGlmeS1jZW50ZXIgaC02NFwiPlxuICAgICAgICAgIDxMb2FkZXIyIGNsYXNzTmFtZT1cInctOCBoLTggYW5pbWF0ZS1zcGluIHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiIC8+XG4gICAgICAgIDwvZGl2PlxuICAgICAgPC9NYWluTGF5b3V0PlxuICAgICk7XG4gIH1cblxuICByZXR1cm4gKFxuICAgIDxNYWluTGF5b3V0IHRpdGxlPVwiTWFjaGluZXNcIiBzdWJ0aXRsZT1cIkNvbmZpZ3VyZSBhbmQgbW9uaXRvciBsYWJvcmF0b3J5IGFuYWx5emVyc1wiPlxuICAgICAgey8qIEFjdGlvbnMgQmFyICovfVxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWJldHdlZW4gbWItNlwiPlxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGdhcC0zXCI+XG4gICAgICAgICAgPEJ1dHRvbiB2YXJpYW50PVwib3V0bGluZVwiIHNpemU9XCJzbVwiIG9uQ2xpY2s9e2hhbmRsZVJlZnJlc2hTdGF0dXN9PlxuICAgICAgICAgICAgPFJlZnJlc2hDdyBjbGFzc05hbWU9XCJ3LTQgaC00IG1yLTJcIiAvPlxuICAgICAgICAgICAgUmVmcmVzaCBTdGF0dXNcbiAgICAgICAgICA8L0J1dHRvbj5cbiAgICAgICAgPC9kaXY+XG4gICAgICAgIDxCdXR0b24gb25DbGljaz17KCkgPT4gc2V0SXNBZGRPcGVuKHRydWUpfT5cbiAgICAgICAgICA8UGx1cyBjbGFzc05hbWU9XCJ3LTQgaC00IG1yLTJcIiAvPlxuICAgICAgICAgIEFkZCBNYWNoaW5lXG4gICAgICAgIDwvQnV0dG9uPlxuICAgICAgPC9kaXY+XG5cbiAgICAgIHsvKiBMaXZlIENvbm5lY3Rpb24gTW9uaXRvciAqL31cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwibWItNlwiPlxuICAgICAgICA8TGl2ZUNvbm5lY3Rpb25Nb25pdG9yIC8+XG4gICAgICA8L2Rpdj5cblxuICAgICAgey8qIE1hY2hpbmVzIEdyaWQgKi99XG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImdyaWQgZ3JpZC1jb2xzLTEgbGc6Z3JpZC1jb2xzLTIgZ2FwLTRcIj5cbiAgICAgICAge21hY2hpbmVzPy5tYXAobWFjaGluZSA9PiB7XG4gICAgICAgICAgY29uc3QgY29uZmlnID0gc3RhdHVzQ29uZmlnW21hY2hpbmUuc3RhdHVzXTtcbiAgICAgICAgICBjb25zdCBTdGF0dXNJY29uID0gY29uZmlnLmljb247XG4gICAgICAgICAgXG4gICAgICAgICAgcmV0dXJuIChcbiAgICAgICAgICAgIDxkaXYga2V5PXttYWNoaW5lLmlkfSBjbGFzc05hbWU9XCJiZy1jYXJkIGJvcmRlciByb3VuZGVkLWxnIHAtNiBob3ZlcjpzaGFkb3ctbWQgdHJhbnNpdGlvbi1zaGFkb3dcIj5cbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLXN0YXJ0IGp1c3RpZnktYmV0d2VlbiBtYi00XCI+XG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBnYXAtNFwiPlxuICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJ3LTE0IGgtMTQgcm91bmRlZC14bCBiZy1wcmltYXJ5LzEwIGZsZXggaXRlbXMtY2VudGVyIGp1c3RpZnktY2VudGVyXCI+XG4gICAgICAgICAgICAgICAgICAgIDxTdGF0dXNJY29uIGNsYXNzTmFtZT17Y24oJ3ctNyBoLTcnLCBjb25maWcubGFiZWxDbGFzcyl9IC8+XG4gICAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICAgIDxkaXY+XG4gICAgICAgICAgICAgICAgICAgIDxoMyBjbGFzc05hbWU9XCJmb250LXNlbWlib2xkIHRleHQtbGdcIj57bWFjaGluZS5uYW1lfTwvaDM+XG4gICAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc20gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+XG4gICAgICAgICAgICAgICAgICAgICAge21hY2hpbmUubWFudWZhY3R1cmVyfSB7bWFjaGluZS5tb2RlbE5hbWV9XG4gICAgICAgICAgICAgICAgICAgIDwvcD5cbiAgICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIgZ2FwLTJcIj5cbiAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT17Y24oJ21hY2hpbmUtaW5kaWNhdG9yJywgY29uZmlnLmluZGljYXRvcil9IC8+XG4gICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9e2NuKCd0ZXh0LXNtIGZvbnQtbWVkaXVtJywgY29uZmlnLmxhYmVsQ2xhc3MpfT5cbiAgICAgICAgICAgICAgICAgICAge2NvbmZpZy5sYWJlbH1cbiAgICAgICAgICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJncmlkIGdyaWQtY29scy0yIGdhcC00IG1iLTRcIj5cbiAgICAgICAgICAgICAgICA8ZGl2PlxuICAgICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC14cyB0ZXh0LW11dGVkLWZvcmVncm91bmQgbWItMVwiPlNlcmlhbCBOdW1iZXI8L3A+XG4gICAgICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJmb250LW1vbm8gdGV4dC1zbVwiPnttYWNoaW5lLnNlcmlhbE51bWJlciB8fCAnTi9BJ308L3A+XG4gICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICAgPGRpdj5cbiAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQteHMgdGV4dC1tdXRlZC1mb3JlZ3JvdW5kIG1iLTFcIj5Qcm90b2NvbDwvcD5cbiAgICAgICAgICAgICAgICAgIDxCYWRnZSB2YXJpYW50PVwic2Vjb25kYXJ5XCIgY2xhc3NOYW1lPVwiZm9udC1tb25vIHRleHQteHNcIj5cbiAgICAgICAgICAgICAgICAgICAge21hY2hpbmUucHJvdG9jb2x9XG4gICAgICAgICAgICAgICAgICA8L0JhZGdlPlxuICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICAgIDxkaXY+XG4gICAgICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LXhzIHRleHQtbXV0ZWQtZm9yZWdyb3VuZCBtYi0xXCI+SVAgQWRkcmVzczwvcD5cbiAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cImZvbnQtbW9ubyB0ZXh0LXNtXCI+XG4gICAgICAgICAgICAgICAgICAgIHttYWNoaW5lLmlwQWRkcmVzcyA/IGAke21hY2hpbmUuaXBBZGRyZXNzfToke21hY2hpbmUucG9ydH1gIDogJ05vdCBjb25maWd1cmVkJ31cbiAgICAgICAgICAgICAgICAgIDwvcD5cbiAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICA8ZGl2PlxuICAgICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC14cyB0ZXh0LW11dGVkLWZvcmVncm91bmQgbWItMVwiPkxhc3QgQ29tbXVuaWNhdGlvbjwvcD5cbiAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc21cIj5cbiAgICAgICAgICAgICAgICAgICAge21hY2hpbmUubGFzdENvbW11bmljYXRpb24gXG4gICAgICAgICAgICAgICAgICAgICAgPyBuZXcgRGF0ZShtYWNoaW5lLmxhc3RDb21tdW5pY2F0aW9uKS50b0xvY2FsZVN0cmluZygpXG4gICAgICAgICAgICAgICAgICAgICAgOiAnTmV2ZXInfVxuICAgICAgICAgICAgICAgICAgPC9wPlxuICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICA8L2Rpdj5cblxuICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cIm1iLTRcIj5cbiAgICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LXhzIHRleHQtbXV0ZWQtZm9yZWdyb3VuZCBtYi0yXCI+U3VwcG9ydGVkIFRlc3RzPC9wPlxuICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBmbGV4LXdyYXAgZ2FwLTFcIj5cbiAgICAgICAgICAgICAgICAgIHttYWNoaW5lLnRlc3RzU3VwcG9ydGVkPy5zbGljZSgwLCA2KS5tYXAodGVzdCA9PiAoXG4gICAgICAgICAgICAgICAgICAgIDxzcGFuIGtleT17dGVzdH0gY2xhc3NOYW1lPVwicHgtMiBweS0xIGJnLW11dGVkIHJvdW5kZWQgdGV4dC14cyBmb250LW1lZGl1bVwiPlxuICAgICAgICAgICAgICAgICAgICAgIHt0ZXN0fVxuICAgICAgICAgICAgICAgICAgICA8L3NwYW4+XG4gICAgICAgICAgICAgICAgICApKX1cbiAgICAgICAgICAgICAgICAgIHsobWFjaGluZS50ZXN0c1N1cHBvcnRlZD8ubGVuZ3RoIHx8IDApID4gNiAmJiAoXG4gICAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInB4LTIgcHktMSBiZy1tdXRlZCByb3VuZGVkIHRleHQteHNcIj5cbiAgICAgICAgICAgICAgICAgICAgICAreyhtYWNoaW5lLnRlc3RzU3VwcG9ydGVkPy5sZW5ndGggfHwgMCkgLSA2fVxuICAgICAgICAgICAgICAgICAgICA8L3NwYW4+XG4gICAgICAgICAgICAgICAgICApfVxuICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICA8L2Rpdj5cblxuICAgICAgICAgICAgICB7LyogTGlzdGVuZXIgU3RhdHVzICovfVxuICAgICAgICAgICAgICB7bWFjaGluZS5pcEFkZHJlc3MgJiYgbWFjaGluZS5wb3J0ICYmIChcbiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGdhcC0yIG1iLTRcIj5cbiAgICAgICAgICAgICAgICAgIDxSYWRpbyBjbGFzc05hbWU9e2NuKCd3LTMgaC0zJywgZ2V0TGlzdGVuZXJTdGF0dXMobWFjaGluZS5pZCkgPyAndGV4dC1zdGF0dXMtbm9ybWFsIGFuaW1hdGUtcHVsc2UnIDogJ3RleHQtbXV0ZWQtZm9yZWdyb3VuZCcpfSAvPlxuICAgICAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwidGV4dC14cyB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5cbiAgICAgICAgICAgICAgICAgICAgVENQIExpc3RlbmVyOiB7Z2V0TGlzdGVuZXJTdGF0dXMobWFjaGluZS5pZCkgPyAnQWN0aXZlJyA6ICdJbmFjdGl2ZSd9XG4gICAgICAgICAgICAgICAgICA8L3NwYW4+XG4gICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICl9XG5cbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGdhcC0yIHB0LTQgYm9yZGVyLXRcIj5cbiAgICAgICAgICAgICAgICA8QnV0dG9uIFxuICAgICAgICAgICAgICAgICAgdmFyaWFudD1cIm91dGxpbmVcIiBcbiAgICAgICAgICAgICAgICAgIHNpemU9XCJzbVwiIFxuICAgICAgICAgICAgICAgICAgY2xhc3NOYW1lPVwiZmxleC0xXCJcbiAgICAgICAgICAgICAgICAgIG9uQ2xpY2s9eygpID0+IHtcbiAgICAgICAgICAgICAgICAgICAgc2V0U2VsZWN0ZWRNYWNoaW5lKG1hY2hpbmUpO1xuICAgICAgICAgICAgICAgICAgICBzZXRJc0NvbmZpZ09wZW4odHJ1ZSk7XG4gICAgICAgICAgICAgICAgICB9fVxuICAgICAgICAgICAgICAgID5cbiAgICAgICAgICAgICAgICAgIDxTZXR0aW5ncyBjbGFzc05hbWU9XCJ3LTQgaC00IG1yLTJcIiAvPlxuICAgICAgICAgICAgICAgICAgQ29uZmlndXJlXG4gICAgICAgICAgICAgICAgPC9CdXR0b24+XG4gICAgICAgICAgICAgICAgPEJ1dHRvbiBcbiAgICAgICAgICAgICAgICAgIHZhcmlhbnQ9XCJvdXRsaW5lXCIgXG4gICAgICAgICAgICAgICAgICBzaXplPVwic21cIiBcbiAgICAgICAgICAgICAgICAgIGNsYXNzTmFtZT1cImZsZXgtMVwiXG4gICAgICAgICAgICAgICAgICBvbkNsaWNrPXsoKSA9PiBoYW5kbGVUZXN0Q29ubmVjdGlvbihtYWNoaW5lKX1cbiAgICAgICAgICAgICAgICAgIGRpc2FibGVkPXt0ZXN0Q29ubmVjdGlvbi5pc1BlbmRpbmd9XG4gICAgICAgICAgICAgICAgPlxuICAgICAgICAgICAgICAgICAge3Rlc3RDb25uZWN0aW9uLmlzUGVuZGluZyAmJiBzZWxlY3RlZE1hY2hpbmU/LmlkID09PSBtYWNoaW5lLmlkID8gKFxuICAgICAgICAgICAgICAgICAgICA8TG9hZGVyMiBjbGFzc05hbWU9XCJ3LTQgaC00IG1yLTIgYW5pbWF0ZS1zcGluXCIgLz5cbiAgICAgICAgICAgICAgICAgICkgOiAoXG4gICAgICAgICAgICAgICAgICAgIDxTZW5kIGNsYXNzTmFtZT1cInctNCBoLTQgbXItMlwiIC8+XG4gICAgICAgICAgICAgICAgICApfVxuICAgICAgICAgICAgICAgICAgVGVzdCBDb25uZWN0aW9uXG4gICAgICAgICAgICAgICAgPC9CdXR0b24+XG4gICAgICAgICAgICAgICAge21hY2hpbmUuaXBBZGRyZXNzICYmIG1hY2hpbmUucG9ydCAmJiAoXG4gICAgICAgICAgICAgICAgICA8QnV0dG9uXG4gICAgICAgICAgICAgICAgICAgIHZhcmlhbnQ9XCJnaG9zdFwiXG4gICAgICAgICAgICAgICAgICAgIHNpemU9XCJzbVwiXG4gICAgICAgICAgICAgICAgICAgIG9uQ2xpY2s9eygpID0+IGhhbmRsZVJlc3RhcnRMaXN0ZW5lcihtYWNoaW5lKX1cbiAgICAgICAgICAgICAgICAgICAgZGlzYWJsZWQ9e3Jlc3RhcnRMaXN0ZW5lci5pc1BlbmRpbmd9XG4gICAgICAgICAgICAgICAgICAgIHRpdGxlPVwiUmVzdGFydCBUQ1AgTGlzdGVuZXJcIlxuICAgICAgICAgICAgICAgICAgPlxuICAgICAgICAgICAgICAgICAgICB7cmVzdGFydExpc3RlbmVyLmlzUGVuZGluZyA/IChcbiAgICAgICAgICAgICAgICAgICAgICA8TG9hZGVyMiBjbGFzc05hbWU9XCJ3LTQgaC00IGFuaW1hdGUtc3BpblwiIC8+XG4gICAgICAgICAgICAgICAgICAgICkgOiAoXG4gICAgICAgICAgICAgICAgICAgICAgPFJvdGF0ZUN3IGNsYXNzTmFtZT1cInctNCBoLTRcIiAvPlxuICAgICAgICAgICAgICAgICAgICApfVxuICAgICAgICAgICAgICAgICAgPC9CdXR0b24+XG4gICAgICAgICAgICAgICAgKX1cbiAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICApO1xuICAgICAgICB9KX1cbiAgICAgIDwvZGl2PlxuXG4gICAgICB7LyogTm8gbWFjaGluZXMgKi99XG4gICAgICB7KCFtYWNoaW5lcyB8fCBtYWNoaW5lcy5sZW5ndGggPT09IDApICYmIChcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJ0ZXh0LWNlbnRlciBweS0xMiBiZy1tdXRlZC8zMCByb3VuZGVkLWxnXCI+XG4gICAgICAgICAgPFdpZmlPZmYgY2xhc3NOYW1lPVwidy0xMiBoLTEyIHRleHQtbXV0ZWQtZm9yZWdyb3VuZCBteC1hdXRvIG1iLTRcIiAvPlxuICAgICAgICAgIDxoMyBjbGFzc05hbWU9XCJ0ZXh0LWxnIGZvbnQtbWVkaXVtIG1iLTJcIj5ObyBBbmFseXplcnMgQ29uZmlndXJlZDwvaDM+XG4gICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1tdXRlZC1mb3JlZ3JvdW5kIG1iLTRcIj5BZGQgeW91ciBsYWJvcmF0b3J5IGFuYWx5emVycyB0byBlbmFibGUgYXV0b21hdGljIHJlc3VsdCB0cmFuc21pc3Npb24uPC9wPlxuICAgICAgICAgIDxCdXR0b24gb25DbGljaz17KCkgPT4gc2V0SXNBZGRPcGVuKHRydWUpfT5cbiAgICAgICAgICAgIDxQbHVzIGNsYXNzTmFtZT1cInctNCBoLTQgbXItMlwiIC8+XG4gICAgICAgICAgICBBZGQgTWFjaGluZVxuICAgICAgICAgIDwvQnV0dG9uPlxuICAgICAgICA8L2Rpdj5cbiAgICAgICl9XG5cbiAgICAgIHsvKiBBZGQgTWFjaGluZSBEaWFsb2cgKi99XG4gICAgICA8RGlhbG9nIG9wZW49e2lzQWRkT3Blbn0gb25PcGVuQ2hhbmdlPXtzZXRJc0FkZE9wZW59PlxuICAgICAgICA8RGlhbG9nQ29udGVudCBjbGFzc05hbWU9XCJtYXgtdy1sZ1wiPlxuICAgICAgICAgIDxEaWFsb2dIZWFkZXI+XG4gICAgICAgICAgICA8RGlhbG9nVGl0bGU+QWRkIE5ldyBNYWNoaW5lPC9EaWFsb2dUaXRsZT5cbiAgICAgICAgICAgIDxEaWFsb2dEZXNjcmlwdGlvbj5cbiAgICAgICAgICAgICAgUmVnaXN0ZXIgYSBuZXcgbGFib3JhdG9yeSBhbmFseXplciBpbiB0aGUgc3lzdGVtLlxuICAgICAgICAgICAgPC9EaWFsb2dEZXNjcmlwdGlvbj5cbiAgICAgICAgICA8L0RpYWxvZ0hlYWRlcj5cbiAgICAgICAgICA8QWRkTWFjaGluZUZvcm0gb25TYXZlPXtoYW5kbGVBZGRNYWNoaW5lfSBvbkNhbmNlbD17KCkgPT4gc2V0SXNBZGRPcGVuKGZhbHNlKX0gaXNTYXZpbmc9e2NyZWF0ZU1hY2hpbmUuaXNQZW5kaW5nfSAvPlxuICAgICAgICA8L0RpYWxvZ0NvbnRlbnQ+XG4gICAgICA8L0RpYWxvZz5cblxuICAgICAgey8qIENvbmZpZ3VyYXRpb24gRGlhbG9nICovfVxuICAgICAgPERpYWxvZyBvcGVuPXtpc0NvbmZpZ09wZW59IG9uT3BlbkNoYW5nZT17c2V0SXNDb25maWdPcGVufT5cbiAgICAgICAgPERpYWxvZ0NvbnRlbnQgY2xhc3NOYW1lPVwibWF4LXctMnhsXCI+XG4gICAgICAgICAgPERpYWxvZ0hlYWRlcj5cbiAgICAgICAgICAgIDxEaWFsb2dUaXRsZT5Db25maWd1cmUge3NlbGVjdGVkTWFjaGluZT8ubmFtZX08L0RpYWxvZ1RpdGxlPlxuICAgICAgICAgICAgPERpYWxvZ0Rlc2NyaXB0aW9uPlxuICAgICAgICAgICAgICBVcGRhdGUgdGhlIG5ldHdvcmsgYW5kIGNvbW11bmljYXRpb24gc2V0dGluZ3MgZm9yIHRoaXMgYW5hbHl6ZXIuXG4gICAgICAgICAgICA8L0RpYWxvZ0Rlc2NyaXB0aW9uPlxuICAgICAgICAgIDwvRGlhbG9nSGVhZGVyPlxuICAgICAgICAgIFxuICAgICAgICAgIHtzZWxlY3RlZE1hY2hpbmUgJiYgKFxuICAgICAgICAgICAgPE1hY2hpbmVDb25maWdGb3JtIFxuICAgICAgICAgICAgICBtYWNoaW5lPXtzZWxlY3RlZE1hY2hpbmV9IFxuICAgICAgICAgICAgICBvblNhdmU9e2hhbmRsZUNvbmZpZ1NhdmV9XG4gICAgICAgICAgICAgIG9uQ2FuY2VsPXsoKSA9PiBzZXRJc0NvbmZpZ09wZW4oZmFsc2UpfVxuICAgICAgICAgICAgLz5cbiAgICAgICAgICApfVxuICAgICAgICA8L0RpYWxvZ0NvbnRlbnQ+XG4gICAgICA8L0RpYWxvZz5cblxuICAgICAgey8qIFRlc3QgQ29ubmVjdGlvbiBEaWFsb2cgKi99XG4gICAgICA8RGlhbG9nIG9wZW49e2lzVGVzdE9wZW59IG9uT3BlbkNoYW5nZT17c2V0SXNUZXN0T3Blbn0+XG4gICAgICAgIDxEaWFsb2dDb250ZW50PlxuICAgICAgICAgIDxEaWFsb2dIZWFkZXI+XG4gICAgICAgICAgICA8RGlhbG9nVGl0bGU+Q29ubmVjdGlvbiBUZXN0OiB7c2VsZWN0ZWRNYWNoaW5lPy5uYW1lfTwvRGlhbG9nVGl0bGU+XG4gICAgICAgICAgPC9EaWFsb2dIZWFkZXI+XG4gICAgICAgICAgXG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJweS04IHRleHQtY2VudGVyXCI+XG4gICAgICAgICAgICB7dGVzdFJlc3VsdC5zdGF0dXMgPT09ICd0ZXN0aW5nJyAmJiAoXG4gICAgICAgICAgICAgIDw+XG4gICAgICAgICAgICAgICAgPExvYWRlcjIgY2xhc3NOYW1lPVwidy0xNiBoLTE2IHRleHQtcHJpbWFyeSBteC1hdXRvIG1iLTQgYW5pbWF0ZS1zcGluXCIgLz5cbiAgICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LWxnIGZvbnQtbWVkaXVtXCI+VGVzdGluZyBjb25uZWN0aW9uLi4uPC9wPlxuICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtbXV0ZWQtZm9yZWdyb3VuZCB0ZXh0LXNtXCI+XG4gICAgICAgICAgICAgICAgICBBdHRlbXB0aW5nIHRvIHJlYWNoIHtzZWxlY3RlZE1hY2hpbmU/LmlwQWRkcmVzc306e3NlbGVjdGVkTWFjaGluZT8ucG9ydH1cbiAgICAgICAgICAgICAgICA8L3A+XG4gICAgICAgICAgICAgIDwvPlxuICAgICAgICAgICAgKX1cbiAgICAgICAgICAgIHt0ZXN0UmVzdWx0LnN0YXR1cyA9PT0gJ3N1Y2Nlc3MnICYmIChcbiAgICAgICAgICAgICAgPD5cbiAgICAgICAgICAgICAgICA8Q2hlY2tDaXJjbGUgY2xhc3NOYW1lPVwidy0xNiBoLTE2IHRleHQtc3RhdHVzLW5vcm1hbCBteC1hdXRvIG1iLTRcIiAvPlxuICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtbGcgZm9udC1tZWRpdW0gdGV4dC1zdGF0dXMtbm9ybWFsXCI+Q29ubmVjdGlvbiBTdWNjZXNzZnVsPC9wPlxuICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtbXV0ZWQtZm9yZWdyb3VuZCB0ZXh0LXNtXCI+XG4gICAgICAgICAgICAgICAgICB7dGVzdFJlc3VsdC5tZXNzYWdlIHx8ICdUaGUgYW5hbHl6ZXIgaXMgcmVzcG9uZGluZyBhbmQgcmVhZHkgdG8gcmVjZWl2ZSBkYXRhLid9XG4gICAgICAgICAgICAgICAgPC9wPlxuICAgICAgICAgICAgICA8Lz5cbiAgICAgICAgICAgICl9XG4gICAgICAgICAgICB7dGVzdFJlc3VsdC5zdGF0dXMgPT09ICdlcnJvcicgJiYgKFxuICAgICAgICAgICAgICA8PlxuICAgICAgICAgICAgICAgIDxYQ2lyY2xlIGNsYXNzTmFtZT1cInctMTYgaC0xNiB0ZXh0LXN0YXR1cy1jcml0aWNhbCBteC1hdXRvIG1iLTRcIiAvPlxuICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtbGcgZm9udC1tZWRpdW0gdGV4dC1zdGF0dXMtY3JpdGljYWxcIj5Db25uZWN0aW9uIEZhaWxlZDwvcD5cbiAgICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LW11dGVkLWZvcmVncm91bmQgdGV4dC1zbVwiPlxuICAgICAgICAgICAgICAgICAge3Rlc3RSZXN1bHQubWVzc2FnZSB8fCAnQ291bGQgbm90IGVzdGFibGlzaCBjb25uZWN0aW9uLiBDaGVjayBuZXR3b3JrIHNldHRpbmdzIGFuZCBlbnN1cmUgdGhlIGFuYWx5emVyIGlzIHBvd2VyZWQgb24uJ31cbiAgICAgICAgICAgICAgICA8L3A+XG4gICAgICAgICAgICAgIDwvPlxuICAgICAgICAgICAgKX1cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICBcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXgganVzdGlmeS1lbmRcIj5cbiAgICAgICAgICAgIDxCdXR0b24gdmFyaWFudD1cIm91dGxpbmVcIiBvbkNsaWNrPXsoKSA9PiBzZXRJc1Rlc3RPcGVuKGZhbHNlKX0+XG4gICAgICAgICAgICAgIENsb3NlXG4gICAgICAgICAgICA8L0J1dHRvbj5cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgPC9EaWFsb2dDb250ZW50PlxuICAgICAgPC9EaWFsb2c+XG4gICAgPC9NYWluTGF5b3V0PlxuICApO1xufVxuXG4vLyBBZGQgTWFjaGluZSBGb3JtIENvbXBvbmVudFxuZnVuY3Rpb24gQWRkTWFjaGluZUZvcm0oe1xuICBvblNhdmUsXG4gIG9uQ2FuY2VsLFxuICBpc1NhdmluZyxcbn06IHtcbiAgb25TYXZlOiAoZGF0YTogTWFjaGluZUNyZWF0ZSkgPT4gdm9pZDtcbiAgb25DYW5jZWw6ICgpID0+IHZvaWQ7XG4gIGlzU2F2aW5nOiBib29sZWFuO1xufSkge1xuICBjb25zdCBbZm9ybURhdGEsIHNldEZvcm1EYXRhXSA9IHVzZVN0YXRlPE1hY2hpbmVDcmVhdGU+KHtcbiAgICBuYW1lOiAnJyxcbiAgICBtYW51ZmFjdHVyZXI6ICcnLFxuICAgIG1vZGVsTmFtZTogJycsXG4gICAgc2VyaWFsTnVtYmVyOiAnJyxcbiAgICBwcm90b2NvbDogJ0hMNycsXG4gICAgaXBBZGRyZXNzOiAnJyxcbiAgICBwb3J0OiA1MDAwLFxuICAgIHRlc3RzU3VwcG9ydGVkOiBbXSxcbiAgfSk7XG4gIGNvbnN0IFt0ZXN0c0lucHV0LCBzZXRUZXN0c0lucHV0XSA9IHVzZVN0YXRlKCcnKTtcblxuICBjb25zdCBoYW5kbGVTdWJtaXQgPSAoZTogUmVhY3QuRm9ybUV2ZW50KSA9PiB7XG4gICAgZS5wcmV2ZW50RGVmYXVsdCgpO1xuICAgIG9uU2F2ZSh7XG4gICAgICAuLi5mb3JtRGF0YSxcbiAgICAgIHRlc3RzU3VwcG9ydGVkOiB0ZXN0c0lucHV0ID8gdGVzdHNJbnB1dC5zcGxpdCgnLCcpLm1hcChzID0+IHMudHJpbSgpKS5maWx0ZXIoQm9vbGVhbikgOiBbXSxcbiAgICB9KTtcbiAgfTtcblxuICByZXR1cm4gKFxuICAgIDxmb3JtIG9uU3VibWl0PXtoYW5kbGVTdWJtaXR9IGNsYXNzTmFtZT1cInNwYWNlLXktNFwiPlxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJncmlkIGdyaWQtY29scy0yIGdhcC00XCI+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0yXCI+XG4gICAgICAgICAgPExhYmVsIGh0bWxGb3I9XCJhZGQtbmFtZVwiPk5hbWUgKjwvTGFiZWw+XG4gICAgICAgICAgPElucHV0IGlkPVwiYWRkLW5hbWVcIiByZXF1aXJlZCB2YWx1ZT17Zm9ybURhdGEubmFtZX0gb25DaGFuZ2U9eyhlKSA9PiBzZXRGb3JtRGF0YShwcmV2ID0+ICh7IC4uLnByZXYsIG5hbWU6IGUudGFyZ2V0LnZhbHVlIH0pKX0gLz5cbiAgICAgICAgPC9kaXY+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0yXCI+XG4gICAgICAgICAgPExhYmVsIGh0bWxGb3I9XCJhZGQtbWFudWZhY3R1cmVyXCI+TWFudWZhY3R1cmVyICo8L0xhYmVsPlxuICAgICAgICAgIDxJbnB1dCBpZD1cImFkZC1tYW51ZmFjdHVyZXJcIiByZXF1aXJlZCB2YWx1ZT17Zm9ybURhdGEubWFudWZhY3R1cmVyfSBvbkNoYW5nZT17KGUpID0+IHNldEZvcm1EYXRhKHByZXYgPT4gKHsgLi4ucHJldiwgbWFudWZhY3R1cmVyOiBlLnRhcmdldC52YWx1ZSB9KSl9IC8+XG4gICAgICAgIDwvZGl2PlxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNwYWNlLXktMlwiPlxuICAgICAgICAgIDxMYWJlbCBodG1sRm9yPVwiYWRkLW1vZGVsXCI+TW9kZWwgKjwvTGFiZWw+XG4gICAgICAgICAgPElucHV0IGlkPVwiYWRkLW1vZGVsXCIgcmVxdWlyZWQgdmFsdWU9e2Zvcm1EYXRhLm1vZGVsTmFtZX0gb25DaGFuZ2U9eyhlKSA9PiBzZXRGb3JtRGF0YShwcmV2ID0+ICh7IC4uLnByZXYsIG1vZGVsTmFtZTogZS50YXJnZXQudmFsdWUgfSkpfSAvPlxuICAgICAgICA8L2Rpdj5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTJcIj5cbiAgICAgICAgICA8TGFiZWwgaHRtbEZvcj1cImFkZC1zZXJpYWxcIj5TZXJpYWwgTnVtYmVyICo8L0xhYmVsPlxuICAgICAgICAgIDxJbnB1dCBpZD1cImFkZC1zZXJpYWxcIiByZXF1aXJlZCB2YWx1ZT17Zm9ybURhdGEuc2VyaWFsTnVtYmVyfSBvbkNoYW5nZT17KGUpID0+IHNldEZvcm1EYXRhKHByZXYgPT4gKHsgLi4ucHJldiwgc2VyaWFsTnVtYmVyOiBlLnRhcmdldC52YWx1ZSB9KSl9IC8+XG4gICAgICAgIDwvZGl2PlxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNwYWNlLXktMlwiPlxuICAgICAgICAgIDxMYWJlbCBodG1sRm9yPVwiYWRkLXByb3RvY29sXCI+UHJvdG9jb2wgKjwvTGFiZWw+XG4gICAgICAgICAgPFNlbGVjdCB2YWx1ZT17Zm9ybURhdGEucHJvdG9jb2x9IG9uVmFsdWVDaGFuZ2U9eyh2KSA9PiBzZXRGb3JtRGF0YShwcmV2ID0+ICh7IC4uLnByZXYsIHByb3RvY29sOiB2IGFzIE1hY2hpbmVQcm90b2NvbCB9KSl9PlxuICAgICAgICAgICAgPFNlbGVjdFRyaWdnZXI+PFNlbGVjdFZhbHVlIC8+PC9TZWxlY3RUcmlnZ2VyPlxuICAgICAgICAgICAgPFNlbGVjdENvbnRlbnQ+XG4gICAgICAgICAgICAgIDxTZWxlY3RJdGVtIHZhbHVlPVwiSEw3XCI+SEw3IHYyLjUuMTwvU2VsZWN0SXRlbT5cbiAgICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJBU1RNXCI+QVNUTSBFMTM5NDwvU2VsZWN0SXRlbT5cbiAgICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJMSVMyX0EyXCI+TElTMi1BMjwvU2VsZWN0SXRlbT5cbiAgICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJGSElSXCI+RkhJUiBSNDwvU2VsZWN0SXRlbT5cbiAgICAgICAgICAgIDwvU2VsZWN0Q29udGVudD5cbiAgICAgICAgICA8L1NlbGVjdD5cbiAgICAgICAgPC9kaXY+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0yXCI+XG4gICAgICAgICAgPExhYmVsIGh0bWxGb3I9XCJhZGQtcG9ydFwiPlBvcnQ8L0xhYmVsPlxuICAgICAgICAgIDxJbnB1dCBpZD1cImFkZC1wb3J0XCIgdHlwZT1cIm51bWJlclwiIHZhbHVlPXtmb3JtRGF0YS5wb3J0fSBvbkNoYW5nZT17KGUpID0+IHNldEZvcm1EYXRhKHByZXYgPT4gKHsgLi4ucHJldiwgcG9ydDogcGFyc2VJbnQoZS50YXJnZXQudmFsdWUpIHx8IDUwMDAgfSkpfSAvPlxuICAgICAgICA8L2Rpdj5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2wtc3Bhbi0yIHNwYWNlLXktMlwiPlxuICAgICAgICAgIDxMYWJlbCBodG1sRm9yPVwiYWRkLWlwXCI+SVAgQWRkcmVzczwvTGFiZWw+XG4gICAgICAgICAgPElucHV0IGlkPVwiYWRkLWlwXCIgcGxhY2Vob2xkZXI9XCIxOTIuMTY4LjEuMTAwXCIgdmFsdWU9e2Zvcm1EYXRhLmlwQWRkcmVzcyB8fCAnJ30gb25DaGFuZ2U9eyhlKSA9PiBzZXRGb3JtRGF0YShwcmV2ID0+ICh7IC4uLnByZXYsIGlwQWRkcmVzczogZS50YXJnZXQudmFsdWUgfSkpfSAvPlxuICAgICAgICA8L2Rpdj5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2wtc3Bhbi0yIHNwYWNlLXktMlwiPlxuICAgICAgICAgIDxMYWJlbCBodG1sRm9yPVwiYWRkLXRlc3RzXCI+U3VwcG9ydGVkIFRlc3QgQ29kZXM8L0xhYmVsPlxuICAgICAgICAgIDxJbnB1dCBpZD1cImFkZC10ZXN0c1wiIHBsYWNlaG9sZGVyPVwiQ0JDLCBXQkMsIFJCQywgSEdCXCIgdmFsdWU9e3Rlc3RzSW5wdXR9IG9uQ2hhbmdlPXsoZSkgPT4gc2V0VGVzdHNJbnB1dChlLnRhcmdldC52YWx1ZSl9IC8+XG4gICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC14cyB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5Db21tYS1zZXBhcmF0ZWQgdGVzdCBjb2RlcyBtYXRjaGluZyB5b3VyIHRlc3QgY2F0YWxvZy48L3A+XG4gICAgICAgIDwvZGl2PlxuICAgICAgPC9kaXY+XG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXgganVzdGlmeS1lbmQgZ2FwLTIgcHQtMiBib3JkZXItdFwiPlxuICAgICAgICA8QnV0dG9uIHR5cGU9XCJidXR0b25cIiB2YXJpYW50PVwib3V0bGluZVwiIG9uQ2xpY2s9e29uQ2FuY2VsfT5DYW5jZWw8L0J1dHRvbj5cbiAgICAgICAgPEJ1dHRvbiB0eXBlPVwic3VibWl0XCIgZGlzYWJsZWQ9e2lzU2F2aW5nfT5cbiAgICAgICAgICB7aXNTYXZpbmcgJiYgPExvYWRlcjIgY2xhc3NOYW1lPVwidy00IGgtNCBtci0yIGFuaW1hdGUtc3BpblwiIC8+fVxuICAgICAgICAgIEFkZCBNYWNoaW5lXG4gICAgICAgIDwvQnV0dG9uPlxuICAgICAgPC9kaXY+XG4gICAgPC9mb3JtPlxuICApO1xufVxuXG4vLyBDb25maWd1cmF0aW9uIEZvcm0gQ29tcG9uZW50XG5mdW5jdGlvbiBNYWNoaW5lQ29uZmlnRm9ybSh7IFxuICBtYWNoaW5lLCBcbiAgb25TYXZlLCBcbiAgb25DYW5jZWwgXG59OiB7IFxuICBtYWNoaW5lOiBNYWNoaW5lOyBcbiAgb25TYXZlOiAodXBkYXRlczogUGFydGlhbDxNYWNoaW5lPikgPT4gdm9pZDtcbiAgb25DYW5jZWw6ICgpID0+IHZvaWQ7XG59KSB7XG4gIGNvbnN0IFtmb3JtRGF0YSwgc2V0Rm9ybURhdGFdID0gdXNlU3RhdGUoe1xuICAgIG5hbWU6IG1hY2hpbmUubmFtZSxcbiAgICBtYW51ZmFjdHVyZXI6IG1hY2hpbmUubWFudWZhY3R1cmVyLFxuICAgIG1vZGVsTmFtZTogbWFjaGluZS5tb2RlbE5hbWUsXG4gICAgc2VyaWFsTnVtYmVyOiBtYWNoaW5lLnNlcmlhbE51bWJlciB8fCAnJyxcbiAgICBwcm90b2NvbDogbWFjaGluZS5wcm90b2NvbCxcbiAgICBpcEFkZHJlc3M6IG1hY2hpbmUuaXBBZGRyZXNzIHx8ICcnLFxuICAgIHBvcnQ6IG1hY2hpbmUucG9ydD8udG9TdHJpbmcoKSB8fCAnNTAwMCcsXG4gICAgdGVzdHNTdXBwb3J0ZWQ6IG1hY2hpbmUudGVzdHNTdXBwb3J0ZWQ/LmpvaW4oJywgJykgfHwgJycsXG4gIH0pO1xuXG4gIGNvbnN0IGhhbmRsZVN1Ym1pdCA9IChlOiBSZWFjdC5Gb3JtRXZlbnQpID0+IHtcbiAgICBlLnByZXZlbnREZWZhdWx0KCk7XG4gICAgb25TYXZlKHtcbiAgICAgIG5hbWU6IGZvcm1EYXRhLm5hbWUsXG4gICAgICBtYW51ZmFjdHVyZXI6IGZvcm1EYXRhLm1hbnVmYWN0dXJlcixcbiAgICAgIG1vZGVsTmFtZTogZm9ybURhdGEubW9kZWxOYW1lLFxuICAgICAgc2VyaWFsTnVtYmVyOiBmb3JtRGF0YS5zZXJpYWxOdW1iZXIgfHwgdW5kZWZpbmVkLFxuICAgICAgcHJvdG9jb2w6IGZvcm1EYXRhLnByb3RvY29sIGFzIE1hY2hpbmVQcm90b2NvbCxcbiAgICAgIGlwQWRkcmVzczogZm9ybURhdGEuaXBBZGRyZXNzIHx8IHVuZGVmaW5lZCxcbiAgICAgIHBvcnQ6IGZvcm1EYXRhLnBvcnQgPyBwYXJzZUludChmb3JtRGF0YS5wb3J0KSA6IHVuZGVmaW5lZCxcbiAgICAgIHRlc3RzU3VwcG9ydGVkOiBmb3JtRGF0YS50ZXN0c1N1cHBvcnRlZCBcbiAgICAgICAgPyBmb3JtRGF0YS50ZXN0c1N1cHBvcnRlZC5zcGxpdCgnLCcpLm1hcChzID0+IHMudHJpbSgpKS5maWx0ZXIoQm9vbGVhbilcbiAgICAgICAgOiBbXSxcbiAgICB9KTtcbiAgfTtcblxuICByZXR1cm4gKFxuICAgIDxmb3JtIG9uU3VibWl0PXtoYW5kbGVTdWJtaXR9PlxuICAgICAgPFRhYnMgZGVmYXVsdFZhbHVlPVwiZ2VuZXJhbFwiIGNsYXNzTmFtZT1cInctZnVsbFwiPlxuICAgICAgICA8VGFic0xpc3QgY2xhc3NOYW1lPVwiZ3JpZCB3LWZ1bGwgZ3JpZC1jb2xzLTNcIj5cbiAgICAgICAgICA8VGFic1RyaWdnZXIgdmFsdWU9XCJnZW5lcmFsXCI+R2VuZXJhbDwvVGFic1RyaWdnZXI+XG4gICAgICAgICAgPFRhYnNUcmlnZ2VyIHZhbHVlPVwibmV0d29ya1wiPk5ldHdvcms8L1RhYnNUcmlnZ2VyPlxuICAgICAgICAgIDxUYWJzVHJpZ2dlciB2YWx1ZT1cInRlc3RzXCI+VGVzdHM8L1RhYnNUcmlnZ2VyPlxuICAgICAgICA8L1RhYnNMaXN0PlxuICAgICAgICBcbiAgICAgICAgPFRhYnNDb250ZW50IHZhbHVlPVwiZ2VuZXJhbFwiIGNsYXNzTmFtZT1cInNwYWNlLXktNCBtdC00XCI+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJncmlkIGdyaWQtY29scy0yIGdhcC00XCI+XG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNwYWNlLXktMlwiPlxuICAgICAgICAgICAgICA8TGFiZWwgaHRtbEZvcj1cIm5hbWVcIj5OYW1lPC9MYWJlbD5cbiAgICAgICAgICAgICAgPElucHV0XG4gICAgICAgICAgICAgICAgaWQ9XCJuYW1lXCJcbiAgICAgICAgICAgICAgICB2YWx1ZT17Zm9ybURhdGEubmFtZX1cbiAgICAgICAgICAgICAgICBvbkNoYW5nZT17KGUpID0+IHNldEZvcm1EYXRhKHByZXYgPT4gKHsgLi4ucHJldiwgbmFtZTogZS50YXJnZXQudmFsdWUgfSkpfVxuICAgICAgICAgICAgICAvPlxuICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNwYWNlLXktMlwiPlxuICAgICAgICAgICAgICA8TGFiZWwgaHRtbEZvcj1cIm1hbnVmYWN0dXJlclwiPk1hbnVmYWN0dXJlcjwvTGFiZWw+XG4gICAgICAgICAgICAgIDxJbnB1dFxuICAgICAgICAgICAgICAgIGlkPVwibWFudWZhY3R1cmVyXCJcbiAgICAgICAgICAgICAgICB2YWx1ZT17Zm9ybURhdGEubWFudWZhY3R1cmVyfVxuICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXsoZSkgPT4gc2V0Rm9ybURhdGEocHJldiA9PiAoeyAuLi5wcmV2LCBtYW51ZmFjdHVyZXI6IGUudGFyZ2V0LnZhbHVlIH0pKX1cbiAgICAgICAgICAgICAgLz5cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTJcIj5cbiAgICAgICAgICAgICAgPExhYmVsIGh0bWxGb3I9XCJtb2RlbFwiPk1vZGVsPC9MYWJlbD5cbiAgICAgICAgICAgICAgPElucHV0XG4gICAgICAgICAgICAgICAgaWQ9XCJtb2RlbFwiXG4gICAgICAgICAgICAgICAgdmFsdWU9e2Zvcm1EYXRhLm1vZGVsTmFtZX1cbiAgICAgICAgICAgICAgICBvbkNoYW5nZT17KGUpID0+IHNldEZvcm1EYXRhKHByZXYgPT4gKHsgLi4ucHJldiwgbW9kZWxOYW1lOiBlLnRhcmdldC52YWx1ZSB9KSl9XG4gICAgICAgICAgICAgIC8+XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0yXCI+XG4gICAgICAgICAgICAgIDxMYWJlbCBodG1sRm9yPVwic2VyaWFsXCI+U2VyaWFsIE51bWJlcjwvTGFiZWw+XG4gICAgICAgICAgICAgIDxJbnB1dFxuICAgICAgICAgICAgICAgIGlkPVwic2VyaWFsXCJcbiAgICAgICAgICAgICAgICB2YWx1ZT17Zm9ybURhdGEuc2VyaWFsTnVtYmVyfVxuICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXsoZSkgPT4gc2V0Rm9ybURhdGEocHJldiA9PiAoeyAuLi5wcmV2LCBzZXJpYWxOdW1iZXI6IGUudGFyZ2V0LnZhbHVlIH0pKX1cbiAgICAgICAgICAgICAgLz5cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICA8L1RhYnNDb250ZW50PlxuICAgICAgICBcbiAgICAgICAgPFRhYnNDb250ZW50IHZhbHVlPVwibmV0d29ya1wiIGNsYXNzTmFtZT1cInNwYWNlLXktNCBtdC00XCI+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJncmlkIGdyaWQtY29scy0yIGdhcC00XCI+XG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNwYWNlLXktMlwiPlxuICAgICAgICAgICAgICA8TGFiZWwgaHRtbEZvcj1cInByb3RvY29sXCI+UHJvdG9jb2w8L0xhYmVsPlxuICAgICAgICAgICAgICA8U2VsZWN0IFxuICAgICAgICAgICAgICAgIHZhbHVlPXtmb3JtRGF0YS5wcm90b2NvbH0gXG4gICAgICAgICAgICAgICAgb25WYWx1ZUNoYW5nZT17KHZhbHVlKSA9PiBzZXRGb3JtRGF0YShwcmV2ID0+ICh7IC4uLnByZXYsIHByb3RvY29sOiB2YWx1ZSBhcyBNYWNoaW5lUHJvdG9jb2wgfSkpfVxuICAgICAgICAgICAgICA+XG4gICAgICAgICAgICAgICAgPFNlbGVjdFRyaWdnZXI+XG4gICAgICAgICAgICAgICAgICA8U2VsZWN0VmFsdWUgLz5cbiAgICAgICAgICAgICAgICA8L1NlbGVjdFRyaWdnZXI+XG4gICAgICAgICAgICAgICAgPFNlbGVjdENvbnRlbnQ+XG4gICAgICAgICAgICAgICAgICA8U2VsZWN0SXRlbSB2YWx1ZT1cIkhMN1wiPkhMNyB2Mi41LjE8L1NlbGVjdEl0ZW0+XG4gICAgICAgICAgICAgICAgICA8U2VsZWN0SXRlbSB2YWx1ZT1cIkFTVE1cIj5BU1RNIEUxMzk0PC9TZWxlY3RJdGVtPlxuICAgICAgICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJMSVMyX0EyXCI+TElTMi1BMjwvU2VsZWN0SXRlbT5cbiAgICAgICAgICAgICAgICAgIDxTZWxlY3RJdGVtIHZhbHVlPVwiRkhJUlwiPkZISVIgUjQ8L1NlbGVjdEl0ZW0+XG4gICAgICAgICAgICAgICAgPC9TZWxlY3RDb250ZW50PlxuICAgICAgICAgICAgICA8L1NlbGVjdD5cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTJcIj5cbiAgICAgICAgICAgICAgPExhYmVsIGh0bWxGb3I9XCJwb3J0XCI+UG9ydDwvTGFiZWw+XG4gICAgICAgICAgICAgIDxJbnB1dFxuICAgICAgICAgICAgICAgIGlkPVwicG9ydFwiXG4gICAgICAgICAgICAgICAgdHlwZT1cIm51bWJlclwiXG4gICAgICAgICAgICAgICAgdmFsdWU9e2Zvcm1EYXRhLnBvcnR9XG4gICAgICAgICAgICAgICAgb25DaGFuZ2U9eyhlKSA9PiBzZXRGb3JtRGF0YShwcmV2ID0+ICh7IC4uLnByZXYsIHBvcnQ6IGUudGFyZ2V0LnZhbHVlIH0pKX1cbiAgICAgICAgICAgICAgLz5cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2wtc3Bhbi0yIHNwYWNlLXktMlwiPlxuICAgICAgICAgICAgICA8TGFiZWwgaHRtbEZvcj1cImlwXCI+SVAgQWRkcmVzczwvTGFiZWw+XG4gICAgICAgICAgICAgIDxJbnB1dFxuICAgICAgICAgICAgICAgIGlkPVwiaXBcIlxuICAgICAgICAgICAgICAgIHBsYWNlaG9sZGVyPVwiMTkyLjE2OC4xLjEwMFwiXG4gICAgICAgICAgICAgICAgdmFsdWU9e2Zvcm1EYXRhLmlwQWRkcmVzc31cbiAgICAgICAgICAgICAgICBvbkNoYW5nZT17KGUpID0+IHNldEZvcm1EYXRhKHByZXYgPT4gKHsgLi4ucHJldiwgaXBBZGRyZXNzOiBlLnRhcmdldC52YWx1ZSB9KSl9XG4gICAgICAgICAgICAgIC8+XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICBcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInAtNCBiZy1tdXRlZC81MCByb3VuZGVkLWxnIHNwYWNlLXktNFwiPlxuICAgICAgICAgICAgPGRpdj5cbiAgICAgICAgICAgICAgPGg0IGNsYXNzTmFtZT1cInRleHQtc20gZm9udC1tZWRpdW0gbWItMlwiPlRDUCBCcmlkZ2UgU2V0dXAgKFJlY29tbWVuZGVkKTwvaDQ+XG4gICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQteHMgdGV4dC1tdXRlZC1mb3JlZ3JvdW5kIG1iLTJcIj5cbiAgICAgICAgICAgICAgICBGb3IgZGlyZWN0IFRDUCBjb25uZWN0aW9ucyBmcm9tIGFuYWx5emVycywgcnVuIHRoZSBMYWJDb25uZWN0IFRDUCBCcmlkZ2Ugb24geW91ciBsb2NhbCBuZXR3b3JrOlxuICAgICAgICAgICAgICA8L3A+XG4gICAgICAgICAgICAgIDxvbCBjbGFzc05hbWU9XCJ0ZXh0LXhzIHRleHQtbXV0ZWQtZm9yZWdyb3VuZCBzcGFjZS15LTEgbGlzdC1kZWNpbWFsIGxpc3QtaW5zaWRlIG1iLTNcIj5cbiAgICAgICAgICAgICAgICA8bGk+RG93bmxvYWQgdGhlIFRDUCBCcmlkZ2UgZnJvbSA8Y29kZSBjbGFzc05hbWU9XCJiZy1iYWNrZ3JvdW5kIHB4LTEgcm91bmRlZFwiPm1pZGRsZXdhcmUvdGNwLWJyaWRnZS88L2NvZGU+PC9saT5cbiAgICAgICAgICAgICAgICA8bGk+SW5zdGFsbDogPGNvZGUgY2xhc3NOYW1lPVwiYmctYmFja2dyb3VuZCBweC0xIHJvdW5kZWRcIj5ucG0gaW5zdGFsbDwvY29kZT48L2xpPlxuICAgICAgICAgICAgICAgIDxsaT5Db25maWd1cmUgPGNvZGUgY2xhc3NOYW1lPVwiYmctYmFja2dyb3VuZCBweC0xIHJvdW5kZWRcIj4uZW52PC9jb2RlPiB3aXRoIHNldHRpbmdzIGJlbG93PC9saT5cbiAgICAgICAgICAgICAgICA8bGk+U3RhcnQ6IDxjb2RlIGNsYXNzTmFtZT1cImJnLWJhY2tncm91bmQgcHgtMSByb3VuZGVkXCI+bnBtIHN0YXJ0PC9jb2RlPjwvbGk+XG4gICAgICAgICAgICAgIDwvb2w+XG4gICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiYmctYmFja2dyb3VuZCBwLTMgcm91bmRlZCB0ZXh0LXhzIGZvbnQtbW9ubyBzcGFjZS15LTFcIj5cbiAgICAgICAgICAgICAgICA8cD5UQ1BfUE9SVD01MDAwPC9wPlxuICAgICAgICAgICAgICAgIDxwPlBST1RPQ09MPXtmb3JtRGF0YS5wcm90b2NvbH08L3A+XG4gICAgICAgICAgICAgICAgPHA+TUFDSElORV9JRD17bWFjaGluZS5pZH08L3A+XG4gICAgICAgICAgICAgICAgPHA+RU5EUE9JTlRfVVJMPXtpbXBvcnQubWV0YS5lbnYuVklURV9BUElfVVJMIHx8ICdodHRwOi8vbG9jYWxob3N0OjMwMDAnfS9obDcvcmVjZWl2ZTwvcD5cbiAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgIFxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJib3JkZXItdCBwdC00XCI+XG4gICAgICAgICAgICAgIDxoNCBjbGFzc05hbWU9XCJ0ZXh0LXNtIGZvbnQtbWVkaXVtIG1iLTJcIj5EaXJlY3QgSFRUUCBFbmRwb2ludDwvaDQ+XG4gICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQteHMgdGV4dC1tdXRlZC1mb3JlZ3JvdW5kIG1iLTJcIj5cbiAgICAgICAgICAgICAgICBGb3IgYW5hbHl6ZXJzIHdpdGggSFRUUCBzdXBwb3J0LCBjb25maWd1cmUgdG8gc2VuZCBtZXNzYWdlcyB0bzpcbiAgICAgICAgICAgICAgPC9wPlxuICAgICAgICAgICAgICA8Y29kZSBjbGFzc05hbWU9XCJ0ZXh0LXhzIGJnLWJhY2tncm91bmQgcHgtMiBweS0xIHJvdW5kZWQgYmxvY2tcIj5cbiAgICAgICAgICAgICAgICBQT1NUIHtpbXBvcnQubWV0YS5lbnYuVklURV9BUElfVVJMIHx8ICdodHRwOi8vbG9jYWxob3N0OjMwMDAnfS9obDcvcmVjZWl2ZVxuICAgICAgICAgICAgICA8L2NvZGU+XG4gICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQteHMgdGV4dC1tdXRlZC1mb3JlZ3JvdW5kIG10LTJcIj5cbiAgICAgICAgICAgICAgICBJbmNsdWRlIGhlYWRlcjogPGNvZGUgY2xhc3NOYW1lPVwiYmctYmFja2dyb3VuZCBweC0xIHJvdW5kZWRcIj54LW1hY2hpbmUtaWQ6IHttYWNoaW5lLmlkfTwvY29kZT5cbiAgICAgICAgICAgICAgPC9wPlxuICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgPC9kaXY+XG4gICAgICAgIDwvVGFic0NvbnRlbnQ+XG4gICAgICAgIFxuICAgICAgICA8VGFic0NvbnRlbnQgdmFsdWU9XCJ0ZXN0c1wiIGNsYXNzTmFtZT1cInNwYWNlLXktNCBtdC00XCI+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTJcIj5cbiAgICAgICAgICAgIDxMYWJlbCBodG1sRm9yPVwidGVzdHNcIj5TdXBwb3J0ZWQgVGVzdCBDb2RlczwvTGFiZWw+XG4gICAgICAgICAgICA8SW5wdXRcbiAgICAgICAgICAgICAgaWQ9XCJ0ZXN0c1wiXG4gICAgICAgICAgICAgIHBsYWNlaG9sZGVyPVwiQ0JDLCBXQkMsIFJCQywgSEdCLCBQTFRcIlxuICAgICAgICAgICAgICB2YWx1ZT17Zm9ybURhdGEudGVzdHNTdXBwb3J0ZWR9XG4gICAgICAgICAgICAgIG9uQ2hhbmdlPXsoZSkgPT4gc2V0Rm9ybURhdGEocHJldiA9PiAoeyAuLi5wcmV2LCB0ZXN0c1N1cHBvcnRlZDogZS50YXJnZXQudmFsdWUgfSkpfVxuICAgICAgICAgICAgLz5cbiAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQteHMgdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+XG4gICAgICAgICAgICAgIEVudGVyIHRlc3QgY29kZXMgc2VwYXJhdGVkIGJ5IGNvbW1hcy4gVGhlc2Ugc2hvdWxkIG1hdGNoIHlvdXIgdGVzdCBjYXRhbG9nIGNvZGVzLlxuICAgICAgICAgICAgPC9wPlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICA8L1RhYnNDb250ZW50PlxuICAgICAgPC9UYWJzPlxuICAgICAgXG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXgganVzdGlmeS1lbmQgZ2FwLTIgbXQtNiBwdC00IGJvcmRlci10XCI+XG4gICAgICAgIDxCdXR0b24gdHlwZT1cImJ1dHRvblwiIHZhcmlhbnQ9XCJvdXRsaW5lXCIgb25DbGljaz17b25DYW5jZWx9PlxuICAgICAgICAgIENhbmNlbFxuICAgICAgICA8L0J1dHRvbj5cbiAgICAgICAgPEJ1dHRvbiB0eXBlPVwic3VibWl0XCI+XG4gICAgICAgICAgU2F2ZSBDaGFuZ2VzXG4gICAgICAgIDwvQnV0dG9uPlxuICAgICAgPC9kaXY+XG4gICAgPC9mb3JtPlxuICApO1xufVxuIl0sIm5hbWVzIjpbInVzZVN0YXRlIiwiTWFpbkxheW91dCIsInVzZU1hY2hpbmVzIiwidXNlVGVzdE1hY2hpbmVDb25uZWN0aW9uIiwidXNlVXBkYXRlTWFjaGluZSIsInVzZUNyZWF0ZU1hY2hpbmUiLCJ1c2VSZXN0YXJ0TGlzdGVuZXIiLCJ1c2VMaXN0ZW5lclN0YXR1cyIsIkJ1dHRvbiIsIlBsdXMiLCJSZWZyZXNoQ3ciLCJTZXR0aW5ncyIsIldpZmkiLCJXaWZpT2ZmIiwiQWN0aXZpdHkiLCJTZW5kIiwiQ2hlY2tDaXJjbGUiLCJYQ2lyY2xlIiwiTG9hZGVyMiIsIlJvdGF0ZUN3IiwiUmFkaW8iLCJjbiIsIkRpYWxvZyIsIkRpYWxvZ0NvbnRlbnQiLCJEaWFsb2dIZWFkZXIiLCJEaWFsb2dUaXRsZSIsIkRpYWxvZ0Rlc2NyaXB0aW9uIiwiSW5wdXQiLCJMYWJlbCIsIlNlbGVjdCIsIlNlbGVjdENvbnRlbnQiLCJTZWxlY3RJdGVtIiwiU2VsZWN0VHJpZ2dlciIsIlNlbGVjdFZhbHVlIiwidG9hc3QiLCJUYWJzIiwiVGFic0NvbnRlbnQiLCJUYWJzTGlzdCIsIlRhYnNUcmlnZ2VyIiwiQmFkZ2UiLCJMaXZlQ29ubmVjdGlvbk1vbml0b3IiLCJNYWNoaW5lcyIsImRhdGEiLCJtYWNoaW5lcyIsImlzTG9hZGluZyIsInJlZmV0Y2giLCJ0ZXN0Q29ubmVjdGlvbiIsInVwZGF0ZU1hY2hpbmUiLCJjcmVhdGVNYWNoaW5lIiwicmVzdGFydExpc3RlbmVyIiwibGlzdGVuZXJTdGF0dXNlcyIsInNlbGVjdGVkTWFjaGluZSIsInNldFNlbGVjdGVkTWFjaGluZSIsImlzQ29uZmlnT3BlbiIsInNldElzQ29uZmlnT3BlbiIsImlzQWRkT3BlbiIsInNldElzQWRkT3BlbiIsImlzVGVzdE9wZW4iLCJzZXRJc1Rlc3RPcGVuIiwidGVzdFJlc3VsdCIsInNldFRlc3RSZXN1bHQiLCJzdGF0dXMiLCJzdGF0dXNDb25maWciLCJvbmxpbmUiLCJpbmRpY2F0b3IiLCJsYWJlbCIsImljb24iLCJsYWJlbENsYXNzIiwib2ZmbGluZSIsImVycm9yIiwicHJvY2Vzc2luZyIsImhhbmRsZVRlc3RDb25uZWN0aW9uIiwibWFjaGluZSIsInJlc3VsdCIsIm11dGF0ZUFzeW5jIiwibWFjaGluZUlkIiwiaWQiLCJzdWNjZXNzIiwibWVzc2FnZSIsIm5hbWUiLCJoYW5kbGVSZWZyZXNoU3RhdHVzIiwiaGFuZGxlUmVzdGFydExpc3RlbmVyIiwiZ2V0TGlzdGVuZXJTdGF0dXMiLCJzb21lIiwicyIsImxpc3RlbmluZyIsImhhbmRsZUNvbmZpZ1NhdmUiLCJ1cGRhdGVzIiwiaGFuZGxlQWRkTWFjaGluZSIsInRpdGxlIiwic3VidGl0bGUiLCJkaXYiLCJjbGFzc05hbWUiLCJ2YXJpYW50Iiwic2l6ZSIsIm9uQ2xpY2siLCJtYXAiLCJjb25maWciLCJTdGF0dXNJY29uIiwiaDMiLCJwIiwibWFudWZhY3R1cmVyIiwibW9kZWxOYW1lIiwic3BhbiIsInNlcmlhbE51bWJlciIsInByb3RvY29sIiwiaXBBZGRyZXNzIiwicG9ydCIsImxhc3RDb21tdW5pY2F0aW9uIiwiRGF0ZSIsInRvTG9jYWxlU3RyaW5nIiwidGVzdHNTdXBwb3J0ZWQiLCJzbGljZSIsInRlc3QiLCJsZW5ndGgiLCJkaXNhYmxlZCIsImlzUGVuZGluZyIsIm9wZW4iLCJvbk9wZW5DaGFuZ2UiLCJBZGRNYWNoaW5lRm9ybSIsIm9uU2F2ZSIsIm9uQ2FuY2VsIiwiaXNTYXZpbmciLCJNYWNoaW5lQ29uZmlnRm9ybSIsImZvcm1EYXRhIiwic2V0Rm9ybURhdGEiLCJ0ZXN0c0lucHV0Iiwic2V0VGVzdHNJbnB1dCIsImhhbmRsZVN1Ym1pdCIsImUiLCJwcmV2ZW50RGVmYXVsdCIsInNwbGl0IiwidHJpbSIsImZpbHRlciIsIkJvb2xlYW4iLCJmb3JtIiwib25TdWJtaXQiLCJodG1sRm9yIiwicmVxdWlyZWQiLCJ2YWx1ZSIsIm9uQ2hhbmdlIiwicHJldiIsInRhcmdldCIsIm9uVmFsdWVDaGFuZ2UiLCJ2IiwidHlwZSIsInBhcnNlSW50IiwicGxhY2Vob2xkZXIiLCJ0b1N0cmluZyIsImpvaW4iLCJ1bmRlZmluZWQiLCJkZWZhdWx0VmFsdWUiLCJoNCIsIm9sIiwibGkiLCJjb2RlIiwiZW52IiwiVklURV9BUElfVVJMIl0sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7QUFBQSxTQUFTQSxRQUFRLFFBQVEsUUFBUTtBQUNqQyxTQUFTQyxVQUFVLFFBQVEsaUNBQWlDO0FBQzVELFNBQVNDLFdBQVcsRUFBRUMsd0JBQXdCLEVBQUVDLGdCQUFnQixFQUFFQyxnQkFBZ0IsRUFBRUMsa0JBQWtCLEVBQUVDLGlCQUFpQixRQUEwQyxzQkFBc0I7QUFDekwsU0FBU0MsTUFBTSxRQUFRLHlCQUF5QjtBQUNoRCxTQUFTQyxJQUFJLEVBQUVDLFNBQVMsRUFBRUMsUUFBUSxFQUFFQyxJQUFJLEVBQUVDLE9BQU8sRUFBRUMsUUFBUSxFQUFFQyxJQUFJLEVBQUVDLFdBQVcsRUFBRUMsT0FBTyxFQUFFQyxPQUFPLEVBQUVDLFFBQVEsRUFBRUMsS0FBSyxRQUFRLGVBQWU7QUFDeEksU0FBU0MsRUFBRSxRQUFRLGNBQWM7QUFDakMsU0FBU0MsTUFBTSxFQUFFQyxhQUFhLEVBQUVDLFlBQVksRUFBRUMsV0FBVyxFQUFFQyxpQkFBaUIsUUFBUSx5QkFBeUI7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

@@ -17,3 +17,6 @@ export * from './test-reference-range.schema';
 export * from './machine-maintenance.schema';
 export * from './critical-result-notification.schema';
 export * from './id-sequence.schema';
+export * from './cash-reconciliation.schema';
+export * from './report-template.schema';
+export * from './payment.schema';

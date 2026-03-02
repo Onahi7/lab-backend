@@ -15,6 +15,7 @@ import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { CancelOrderDto } from './dto/cancel-order.dto';
+import { AddPaymentDto } from './dto/add-payment.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -52,9 +53,27 @@ export class OrdersController {
   }
 
   @Get('pending-results')
-  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH)
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH, UserRoleEnum.RECEPTIONIST)
   async getPendingResults() {
     return this.ordersService.getPendingResults();
+  }
+
+  @Get('stats/payment')
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.RECEPTIONIST)
+  async getPaymentStats(
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    return this.ordersService.getPaymentStats(startDate, endDate);
+  }
+
+  @Get('stats/daily-income')
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.RECEPTIONIST)
+  async getDailyIncome(
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    return this.ordersService.getDailyIncome(startDate, endDate);
   }
 
   @Get(':id')
@@ -92,5 +111,22 @@ export class OrdersController {
   @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH, UserRoleEnum.RECEPTIONIST)
   async collect(@Param('id') id: string, @Request() req: any) {
     return this.ordersService.collect(id, req.user?.userId);
+  }
+
+  @Post(':id/payment')
+  @HttpCode(HttpStatus.CREATED)
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.RECEPTIONIST)
+  async addPayment(
+    @Param('id') id: string,
+    @Body() addPaymentDto: AddPaymentDto,
+    @Request() req: any,
+  ) {
+    return this.ordersService.addPayment(id, addPaymentDto, req.user?.userId);
+  }
+
+  @Get(':id/payments')
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH, UserRoleEnum.RECEPTIONIST)
+  async getPaymentHistory(@Param('id') id: string) {
+    return this.ordersService.getPaymentHistory(id);
   }
 }

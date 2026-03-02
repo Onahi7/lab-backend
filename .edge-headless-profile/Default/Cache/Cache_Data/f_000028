@@ -1,0 +1,1276 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/pages/admin/UserManagementPage.tsx");import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+
+let prevRefreshReg;
+let prevRefreshSig;
+
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react-swc can't detect preamble. Something is wrong."
+    );
+  }
+
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+
+import __vite__cjsImport2_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=27cfabb6"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime["jsxDEV"]; const _Fragment = __vite__cjsImport2_react_jsxDevRuntime["Fragment"];
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=27cfabb6"; const useState = __vite__cjsImport3_react["useState"];
+import { RoleLayout } from "/src/components/layout/RoleLayout.tsx";
+import { useAuth } from "/src/context/AuthContext.tsx";
+import { useUsers, useAssignRole, useRemoveRole } from "/src/hooks/useUsers.ts";
+import { Button } from "/src/components/ui/button.tsx";
+import { Badge } from "/src/components/ui/badge.tsx";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "/src/components/ui/dialog.tsx";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "/src/components/ui/select.tsx";
+import { Input } from "/src/components/ui/input.tsx";
+import { Label } from "/src/components/ui/label.tsx";
+import { toast } from "/node_modules/.vite/deps/sonner.js?v=27cfabb6";
+import { UserPlus, Shield, Trash2, Loader2, Mail } from "/node_modules/.vite/deps/lucide-react.js?v=27cfabb6";
+import { usersAPI } from "/src/services/api.ts";
+export default function UserManagementPage() {
+    _s();
+    const { profile } = useAuth();
+    const { data: users, isLoading } = useUsers();
+    const assignRole = useAssignRole();
+    const removeRole = useRemoveRole();
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [showRoleDialog, setShowRoleDialog] = useState(false);
+    const [showCreateDialog, setShowCreateDialog] = useState(false);
+    const [selectedRole, setSelectedRole] = useState('receptionist');
+    const [isCreating, setIsCreating] = useState(false);
+    // Create user form state
+    const [newUserEmail, setNewUserEmail] = useState('');
+    const [newUserPassword, setNewUserPassword] = useState('');
+    const [newUserName, setNewUserName] = useState('');
+    const [newUserRole, setNewUserRole] = useState('receptionist');
+    const roleColors = {
+        admin: 'bg-purple-100 text-purple-800 border-purple-200',
+        receptionist: 'bg-blue-100 text-blue-800 border-blue-200',
+        lab_tech: 'bg-green-100 text-green-800 border-green-200'
+    };
+    const roleLabels = {
+        admin: 'Administrator',
+        receptionist: 'Receptionist',
+        lab_tech: 'Lab Technician'
+    };
+    const handleAssignRole = async ()=>{
+        if (!selectedUser) return;
+        try {
+            await assignRole.mutateAsync({
+                userId: selectedUser.id,
+                role: selectedRole
+            });
+            toast.success(`Role ${roleLabels[selectedRole]} assigned to ${selectedUser.full_name}`);
+            setShowRoleDialog(false);
+        } catch (error) {
+            if (error.message?.includes('duplicate')) {
+                toast.error('User already has this role');
+            } else {
+                toast.error('Failed to assign role');
+            }
+        }
+    };
+    const handleRemoveRole = async (userId, role, userName)=>{
+        if (!confirm(`Remove ${roleLabels[role]} role from ${userName}?`)) return;
+        try {
+            await removeRole.mutateAsync({
+                userId,
+                role
+            });
+            toast.success(`Role removed from ${userName}`);
+        } catch (error) {
+            toast.error('Failed to remove role');
+        }
+    };
+    const handleCreateUser = async ()=>{
+        if (!newUserEmail || !newUserPassword || !newUserName) {
+            toast.error('Please fill in all fields');
+            return;
+        }
+        if (newUserPassword.length < 8) {
+            toast.error('Password must be at least 8 characters');
+            return;
+        }
+        setIsCreating(true);
+        try {
+            // Step 1: Create user using backend API
+            const newUser = await usersAPI.create({
+                email: newUserEmail,
+                password: newUserPassword,
+                fullName: newUserName
+            });
+            // Step 2: Assign role to the newly created user
+            await usersAPI.assignRole(newUser.id, newUserRole);
+            toast.success(`User ${newUserName} created successfully with ${roleLabels[newUserRole]} role`);
+            // Reset form
+            setNewUserEmail('');
+            setNewUserPassword('');
+            setNewUserName('');
+            setNewUserRole('receptionist');
+            setShowCreateDialog(false);
+        } catch (error) {
+            console.error('Error creating user:', error);
+            if (error.response?.data?.message?.includes('duplicate') || error.response?.data?.message?.includes('already exists')) {
+                toast.error('A user with this email already exists');
+            } else {
+                toast.error(error.response?.data?.message || error.message || 'Failed to create user');
+            }
+        } finally{
+            setIsCreating(false);
+        }
+    };
+    return /*#__PURE__*/ _jsxDEV(RoleLayout, {
+        title: "User Management",
+        subtitle: "Manage users and role assignments",
+        role: "admin",
+        userName: profile?.full_name,
+        children: [
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "flex justify-between items-center mb-6",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("div", {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                        lineNumber: 131,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(Button, {
+                        onClick: ()=>setShowCreateDialog(true),
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(UserPlus, {
+                                className: "w-4 h-4 mr-2"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                lineNumber: 133,
+                                columnNumber: 11
+                            }, this),
+                            "Create User"
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                        lineNumber: 132,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                lineNumber: 130,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "grid grid-cols-4 gap-4 mb-6",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg p-4",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-sm text-muted-foreground",
+                                children: "Total Users"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                lineNumber: 141,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-2xl font-bold",
+                                children: users?.length || 0
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                lineNumber: 142,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                        lineNumber: 140,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg p-4",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-sm text-muted-foreground",
+                                children: "Administrators"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                lineNumber: 145,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-2xl font-bold text-purple-600",
+                                children: users?.filter((u)=>u.user_roles.some((r)=>r.role === 'admin')).length || 0
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                lineNumber: 146,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                        lineNumber: 144,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg p-4",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-sm text-muted-foreground",
+                                children: "Receptionists"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                lineNumber: 151,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-2xl font-bold text-blue-600",
+                                children: users?.filter((u)=>u.user_roles.some((r)=>r.role === 'receptionist')).length || 0
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                lineNumber: 152,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                        lineNumber: 150,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg p-4",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-sm text-muted-foreground",
+                                children: "Lab Technicians"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                lineNumber: 157,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-2xl font-bold text-green-600",
+                                children: users?.filter((u)=>u.user_roles.some((r)=>r.role === 'lab_tech')).length || 0
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                lineNumber: 158,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                        lineNumber: 156,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                lineNumber: 139,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "bg-card border rounded-lg overflow-hidden",
+                children: isLoading ? /*#__PURE__*/ _jsxDEV("div", {
+                    className: "flex items-center justify-center py-12",
+                    children: /*#__PURE__*/ _jsxDEV(Loader2, {
+                        className: "w-6 h-6 animate-spin text-muted-foreground"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                        lineNumber: 168,
+                        columnNumber: 13
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                    lineNumber: 167,
+                    columnNumber: 11
+                }, this) : /*#__PURE__*/ _jsxDEV("table", {
+                    className: "data-table",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV("thead", {
+                            children: /*#__PURE__*/ _jsxDEV("tr", {
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "User"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                        lineNumber: 174,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Email"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                        lineNumber: 175,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Department"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                        lineNumber: 176,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Roles"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                        lineNumber: 177,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Joined"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                        lineNumber: 178,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Actions"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                        lineNumber: 179,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                lineNumber: 173,
+                                columnNumber: 15
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                            lineNumber: 172,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("tbody", {
+                            children: [
+                                users?.map((user)=>/*#__PURE__*/ _jsxDEV("tr", {
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                children: /*#__PURE__*/ _jsxDEV("div", {
+                                                    className: "flex items-center gap-3",
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV("div", {
+                                                            className: "w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center",
+                                                            children: /*#__PURE__*/ _jsxDEV("span", {
+                                                                className: "font-semibold text-primary",
+                                                                children: user.full_name.split(' ').map((n)=>n[0]).join('').toUpperCase()
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                                lineNumber: 188,
+                                                                columnNumber: 25
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                            lineNumber: 187,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("div", {
+                                                            children: [
+                                                                /*#__PURE__*/ _jsxDEV("p", {
+                                                                    className: "font-medium",
+                                                                    children: user.full_name
+                                                                }, void 0, false, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                                    lineNumber: 193,
+                                                                    columnNumber: 25
+                                                                }, this),
+                                                                user.id === profile?.id && /*#__PURE__*/ _jsxDEV(Badge, {
+                                                                    variant: "outline",
+                                                                    className: "text-xs",
+                                                                    children: "You"
+                                                                }, void 0, false, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                                    lineNumber: 195,
+                                                                    columnNumber: 27
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                            lineNumber: 192,
+                                                            columnNumber: 23
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                    lineNumber: 186,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                lineNumber: 185,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                children: /*#__PURE__*/ _jsxDEV("div", {
+                                                    className: "flex items-center gap-2",
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV(Mail, {
+                                                            className: "w-4 h-4 text-muted-foreground"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                            lineNumber: 202,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("span", {
+                                                            className: "text-sm",
+                                                            children: user.email
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                            lineNumber: 203,
+                                                            columnNumber: 23
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                    lineNumber: 201,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                lineNumber: 200,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                children: user.department || '-'
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                lineNumber: 206,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                children: /*#__PURE__*/ _jsxDEV("div", {
+                                                    className: "flex flex-wrap gap-1",
+                                                    children: user.user_roles.length > 0 ? user.user_roles.map((roleItem)=>/*#__PURE__*/ _jsxDEV(Badge, {
+                                                            variant: "outline",
+                                                            className: roleColors[roleItem.role],
+                                                            children: [
+                                                                roleLabels[roleItem.role],
+                                                                /*#__PURE__*/ _jsxDEV("button", {
+                                                                    onClick: ()=>handleRemoveRole(user.id, roleItem.role, user.full_name),
+                                                                    className: "ml-1 hover:text-destructive",
+                                                                    children: /*#__PURE__*/ _jsxDEV(Trash2, {
+                                                                        className: "w-3 h-3"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                                        lineNumber: 221,
+                                                                        columnNumber: 31
+                                                                    }, this)
+                                                                }, void 0, false, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                                    lineNumber: 217,
+                                                                    columnNumber: 29
+                                                                }, this)
+                                                            ]
+                                                        }, roleItem.id, true, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                            lineNumber: 211,
+                                                            columnNumber: 27
+                                                        }, this)) : /*#__PURE__*/ _jsxDEV("span", {
+                                                        className: "text-sm text-muted-foreground",
+                                                        children: "No roles"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                        lineNumber: 226,
+                                                        columnNumber: 25
+                                                    }, this)
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                    lineNumber: 208,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                lineNumber: 207,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                className: "text-sm text-muted-foreground",
+                                                children: new Date(user.created_at).toLocaleDateString()
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                lineNumber: 230,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                children: /*#__PURE__*/ _jsxDEV(Button, {
+                                                    variant: "ghost",
+                                                    size: "sm",
+                                                    onClick: ()=>{
+                                                        setSelectedUser(user);
+                                                        setShowRoleDialog(true);
+                                                    },
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV(Shield, {
+                                                            className: "w-4 h-4 mr-1"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                            lineNumber: 242,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        "Assign Role"
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                    lineNumber: 234,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                lineNumber: 233,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, user.id, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                        lineNumber: 184,
+                                        columnNumber: 17
+                                    }, this)),
+                                (!users || users.length === 0) && /*#__PURE__*/ _jsxDEV("tr", {
+                                    children: /*#__PURE__*/ _jsxDEV("td", {
+                                        colSpan: 6,
+                                        className: "text-center py-12 text-muted-foreground",
+                                        children: "No users found"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                        lineNumber: 250,
+                                        columnNumber: 19
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                    lineNumber: 249,
+                                    columnNumber: 17
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                            lineNumber: 182,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                    lineNumber: 171,
+                    columnNumber: 11
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                lineNumber: 165,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Dialog, {
+                open: showRoleDialog,
+                onOpenChange: setShowRoleDialog,
+                children: /*#__PURE__*/ _jsxDEV(DialogContent, {
+                    children: [
+                        /*#__PURE__*/ _jsxDEV(DialogHeader, {
+                            children: /*#__PURE__*/ _jsxDEV(DialogTitle, {
+                                children: [
+                                    "Assign Role to ",
+                                    selectedUser?.full_name
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                lineNumber: 264,
+                                columnNumber: 13
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                            lineNumber: 263,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "py-4",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "mb-4",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("p", {
+                                            className: "text-sm text-muted-foreground mb-2",
+                                            children: "Current Roles:"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                            lineNumber: 269,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            className: "flex flex-wrap gap-2",
+                                            children: selectedUser?.user_roles.length > 0 ? selectedUser.user_roles.map((roleItem)=>/*#__PURE__*/ _jsxDEV(Badge, {
+                                                    variant: "outline",
+                                                    className: roleColors[roleItem.role],
+                                                    children: roleLabels[roleItem.role]
+                                                }, roleItem.id, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                    lineNumber: 273,
+                                                    columnNumber: 21
+                                                }, this)) : /*#__PURE__*/ _jsxDEV("span", {
+                                                className: "text-sm text-muted-foreground",
+                                                children: "No roles assigned"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                lineNumber: 282,
+                                                columnNumber: 19
+                                            }, this)
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                            lineNumber: 270,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                    lineNumber: 268,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "space-y-2",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("label", {
+                                            className: "text-sm font-medium",
+                                            children: "Select Role to Assign"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                            lineNumber: 288,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(Select, {
+                                            value: selectedRole,
+                                            onValueChange: (value)=>setSelectedRole(value),
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV(SelectTrigger, {
+                                                    children: /*#__PURE__*/ _jsxDEV(SelectValue, {}, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                        lineNumber: 291,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                    lineNumber: 290,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV(SelectContent, {
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                            value: "admin",
+                                                            children: /*#__PURE__*/ _jsxDEV("div", {
+                                                                className: "flex items-center gap-2",
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                                        className: "w-2 h-2 rounded-full bg-purple-600"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                                        lineNumber: 296,
+                                                                        columnNumber: 23
+                                                                    }, this),
+                                                                    "Administrator"
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                                lineNumber: 295,
+                                                                columnNumber: 21
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                            lineNumber: 294,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                            value: "receptionist",
+                                                            children: /*#__PURE__*/ _jsxDEV("div", {
+                                                                className: "flex items-center gap-2",
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                                        className: "w-2 h-2 rounded-full bg-blue-600"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                                        lineNumber: 302,
+                                                                        columnNumber: 23
+                                                                    }, this),
+                                                                    "Receptionist"
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                                lineNumber: 301,
+                                                                columnNumber: 21
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                            lineNumber: 300,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                            value: "lab_tech",
+                                                            children: /*#__PURE__*/ _jsxDEV("div", {
+                                                                className: "flex items-center gap-2",
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                                        className: "w-2 h-2 rounded-full bg-green-600"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                                        lineNumber: 308,
+                                                                        columnNumber: 23
+                                                                    }, this),
+                                                                    "Lab Technician"
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                                lineNumber: 307,
+                                                                columnNumber: 21
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                            lineNumber: 306,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                    lineNumber: 293,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                            lineNumber: 289,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                    lineNumber: 287,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "mt-4 p-3 bg-muted rounded-lg",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("p", {
+                                            className: "text-sm font-medium mb-1",
+                                            children: "Role Permissions:"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                            lineNumber: 317,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("ul", {
+                                            className: "text-xs text-muted-foreground space-y-1",
+                                            children: [
+                                                selectedRole === 'admin' && /*#__PURE__*/ _jsxDEV(_Fragment, {
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV("li", {
+                                                            children: "• Full system access"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                            lineNumber: 321,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("li", {
+                                                            children: "• User management"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                            lineNumber: 322,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("li", {
+                                                            children: "• Test catalog configuration"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                            lineNumber: 323,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("li", {
+                                                            children: "• Reports and analytics"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                            lineNumber: 324,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true),
+                                                selectedRole === 'receptionist' && /*#__PURE__*/ _jsxDEV(_Fragment, {
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV("li", {
+                                                            children: "• Patient registration"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                            lineNumber: 329,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("li", {
+                                                            children: "• Order creation"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                            lineNumber: 330,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("li", {
+                                                            children: "• Payment processing"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                            lineNumber: 331,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("li", {
+                                                            children: "• View results"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                            lineNumber: 332,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true),
+                                                selectedRole === 'lab_tech' && /*#__PURE__*/ _jsxDEV(_Fragment, {
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV("li", {
+                                                            children: "• Sample collection"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                            lineNumber: 337,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("li", {
+                                                            children: "• Result entry"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                            lineNumber: 338,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("li", {
+                                                            children: "• Result verification"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                            lineNumber: 339,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("li", {
+                                                            children: "• Machine management"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                            lineNumber: 340,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                            lineNumber: 318,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                    lineNumber: 316,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                            lineNumber: 267,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV(DialogFooter, {
+                            children: [
+                                /*#__PURE__*/ _jsxDEV(Button, {
+                                    variant: "outline",
+                                    onClick: ()=>setShowRoleDialog(false),
+                                    children: "Cancel"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                    lineNumber: 348,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV(Button, {
+                                    onClick: handleAssignRole,
+                                    disabled: assignRole.isPending,
+                                    children: [
+                                        assignRole.isPending && /*#__PURE__*/ _jsxDEV(Loader2, {
+                                            className: "w-4 h-4 mr-2 animate-spin"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                            lineNumber: 355,
+                                            columnNumber: 40
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(Shield, {
+                                            className: "w-4 h-4 mr-2"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                            lineNumber: 356,
+                                            columnNumber: 15
+                                        }, this),
+                                        "Assign Role"
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                    lineNumber: 351,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                            lineNumber: 347,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                    lineNumber: 262,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                lineNumber: 261,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Dialog, {
+                open: showCreateDialog,
+                onOpenChange: setShowCreateDialog,
+                children: /*#__PURE__*/ _jsxDEV(DialogContent, {
+                    children: [
+                        /*#__PURE__*/ _jsxDEV(DialogHeader, {
+                            children: /*#__PURE__*/ _jsxDEV(DialogTitle, {
+                                children: "Create New User"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                lineNumber: 367,
+                                columnNumber: 13
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                            lineNumber: 366,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "space-y-4 py-4",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "space-y-2",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV(Label, {
+                                            htmlFor: "new-user-name",
+                                            children: "Full Name"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                            lineNumber: 372,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(Input, {
+                                            id: "new-user-name",
+                                            placeholder: "John Doe",
+                                            value: newUserName,
+                                            onChange: (e)=>setNewUserName(e.target.value)
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                            lineNumber: 373,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                    lineNumber: 371,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "space-y-2",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV(Label, {
+                                            htmlFor: "new-user-email",
+                                            children: "Email"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                            lineNumber: 382,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(Input, {
+                                            id: "new-user-email",
+                                            type: "email",
+                                            placeholder: "john@example.com",
+                                            value: newUserEmail,
+                                            onChange: (e)=>setNewUserEmail(e.target.value)
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                            lineNumber: 383,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                    lineNumber: 381,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "space-y-2",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV(Label, {
+                                            htmlFor: "new-user-password",
+                                            children: "Password"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                            lineNumber: 393,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(Input, {
+                                            id: "new-user-password",
+                                            type: "password",
+                                            placeholder: "Minimum 8 characters",
+                                            value: newUserPassword,
+                                            onChange: (e)=>setNewUserPassword(e.target.value)
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                            lineNumber: 394,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("p", {
+                                            className: "text-xs text-muted-foreground",
+                                            children: "Password must be at least 8 characters. User can change it after first login."
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                            lineNumber: 401,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                    lineNumber: 392,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "space-y-2",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV(Label, {
+                                            children: "Assign Role"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                            lineNumber: 407,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(Select, {
+                                            value: newUserRole,
+                                            onValueChange: (value)=>setNewUserRole(value),
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV(SelectTrigger, {
+                                                    children: /*#__PURE__*/ _jsxDEV(SelectValue, {}, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                        lineNumber: 410,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                    lineNumber: 409,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV(SelectContent, {
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                            value: "admin",
+                                                            children: /*#__PURE__*/ _jsxDEV("div", {
+                                                                className: "flex items-center gap-2",
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                                        className: "w-2 h-2 rounded-full bg-purple-600"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                                        lineNumber: 415,
+                                                                        columnNumber: 23
+                                                                    }, this),
+                                                                    "Administrator"
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                                lineNumber: 414,
+                                                                columnNumber: 21
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                            lineNumber: 413,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                            value: "receptionist",
+                                                            children: /*#__PURE__*/ _jsxDEV("div", {
+                                                                className: "flex items-center gap-2",
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                                        className: "w-2 h-2 rounded-full bg-blue-600"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                                        lineNumber: 421,
+                                                                        columnNumber: 23
+                                                                    }, this),
+                                                                    "Receptionist"
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                                lineNumber: 420,
+                                                                columnNumber: 21
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                            lineNumber: 419,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                            value: "lab_tech",
+                                                            children: /*#__PURE__*/ _jsxDEV("div", {
+                                                                className: "flex items-center gap-2",
+                                                                children: [
+                                                                    /*#__PURE__*/ _jsxDEV("div", {
+                                                                        className: "w-2 h-2 rounded-full bg-green-600"
+                                                                    }, void 0, false, {
+                                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                                        lineNumber: 427,
+                                                                        columnNumber: 23
+                                                                    }, this),
+                                                                    "Lab Technician"
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                                lineNumber: 426,
+                                                                columnNumber: 21
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                            lineNumber: 425,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                                    lineNumber: 412,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                            lineNumber: 408,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                    lineNumber: 406,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "p-3 bg-muted rounded-lg",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("p", {
+                                            className: "text-sm font-medium mb-1",
+                                            children: "Note:"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                            lineNumber: 436,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("p", {
+                                            className: "text-xs text-muted-foreground",
+                                            children: "The user will receive an email confirmation and can log in immediately with the provided credentials."
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                            lineNumber: 437,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                    lineNumber: 435,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                            lineNumber: 370,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV(DialogFooter, {
+                            children: [
+                                /*#__PURE__*/ _jsxDEV(Button, {
+                                    variant: "outline",
+                                    onClick: ()=>setShowCreateDialog(false),
+                                    children: "Cancel"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                    lineNumber: 444,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV(Button, {
+                                    onClick: handleCreateUser,
+                                    disabled: isCreating,
+                                    children: [
+                                        isCreating && /*#__PURE__*/ _jsxDEV(Loader2, {
+                                            className: "w-4 h-4 mr-2 animate-spin"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                            lineNumber: 451,
+                                            columnNumber: 30
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(UserPlus, {
+                                            className: "w-4 h-4 mr-2"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                            lineNumber: 452,
+                                            columnNumber: 15
+                                        }, this),
+                                        "Create User"
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                                    lineNumber: 447,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                            lineNumber: 443,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                    lineNumber: 365,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+                lineNumber: 364,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx",
+        lineNumber: 123,
+        columnNumber: 5
+    }, this);
+}
+_s(UserManagementPage, "S9vgIS7zr2Rd6fbqZWfl5xX3wxY=", false, function() {
+    return [
+        useAuth,
+        useUsers,
+        useAssignRole,
+        useRemoveRole
+    ];
+});
+_c = UserManagementPage;
+var _c;
+$RefreshReg$(_c, "UserManagementPage");
+
+
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+
+
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/HP/Downloads/lab/frontend/src/pages/admin/UserManagementPage.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIlVzZXJNYW5hZ2VtZW50UGFnZS50c3giXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgdXNlU3RhdGUgfSBmcm9tICdyZWFjdCc7XHJcbmltcG9ydCB7IFJvbGVMYXlvdXQgfSBmcm9tICdAL2NvbXBvbmVudHMvbGF5b3V0L1JvbGVMYXlvdXQnO1xyXG5pbXBvcnQgeyB1c2VBdXRoIH0gZnJvbSAnQC9jb250ZXh0L0F1dGhDb250ZXh0JztcclxuaW1wb3J0IHsgdXNlVXNlcnMsIHVzZUFzc2lnblJvbGUsIHVzZVJlbW92ZVJvbGUgfSBmcm9tICdAL2hvb2tzL3VzZVVzZXJzJztcclxuaW1wb3J0IHsgQnV0dG9uIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL2J1dHRvbic7XHJcbmltcG9ydCB7IEJhZGdlIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL2JhZGdlJztcclxuaW1wb3J0IHsgRGlhbG9nLCBEaWFsb2dDb250ZW50LCBEaWFsb2dIZWFkZXIsIERpYWxvZ1RpdGxlLCBEaWFsb2dGb290ZXIgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvZGlhbG9nJztcclxuaW1wb3J0IHsgU2VsZWN0LCBTZWxlY3RDb250ZW50LCBTZWxlY3RJdGVtLCBTZWxlY3RUcmlnZ2VyLCBTZWxlY3RWYWx1ZSB9IGZyb20gJ0AvY29tcG9uZW50cy91aS9zZWxlY3QnO1xyXG5pbXBvcnQgeyBJbnB1dCB9IGZyb20gJ0AvY29tcG9uZW50cy91aS9pbnB1dCc7XHJcbmltcG9ydCB7IExhYmVsIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL2xhYmVsJztcclxuaW1wb3J0IHsgdG9hc3QgfSBmcm9tICdzb25uZXInO1xyXG5pbXBvcnQgeyBVc2VyUGx1cywgU2hpZWxkLCBUcmFzaDIsIExvYWRlcjIsIE1haWwgfSBmcm9tICdsdWNpZGUtcmVhY3QnO1xyXG5pbXBvcnQgeyB1c2Vyc0FQSSB9IGZyb20gJ0Avc2VydmljZXMvYXBpJztcclxuaW1wb3J0IHR5cGUgeyBEYXRhYmFzZSB9IGZyb20gJ0AvaW50ZWdyYXRpb25zL3N1cGFiYXNlL3R5cGVzJztcclxuXHJcbnR5cGUgQXBwUm9sZSA9IERhdGFiYXNlWydwdWJsaWMnXVsnRW51bXMnXVsnYXBwX3JvbGUnXTtcclxuXHJcbmV4cG9ydCBkZWZhdWx0IGZ1bmN0aW9uIFVzZXJNYW5hZ2VtZW50UGFnZSgpIHtcclxuICBjb25zdCB7IHByb2ZpbGUgfSA9IHVzZUF1dGgoKTtcclxuICBjb25zdCB7IGRhdGE6IHVzZXJzLCBpc0xvYWRpbmcgfSA9IHVzZVVzZXJzKCk7XHJcbiAgY29uc3QgYXNzaWduUm9sZSA9IHVzZUFzc2lnblJvbGUoKTtcclxuICBjb25zdCByZW1vdmVSb2xlID0gdXNlUmVtb3ZlUm9sZSgpO1xyXG5cclxuICBjb25zdCBbc2VsZWN0ZWRVc2VyLCBzZXRTZWxlY3RlZFVzZXJdID0gdXNlU3RhdGU8YW55PihudWxsKTtcclxuICBjb25zdCBbc2hvd1JvbGVEaWFsb2csIHNldFNob3dSb2xlRGlhbG9nXSA9IHVzZVN0YXRlKGZhbHNlKTtcclxuICBjb25zdCBbc2hvd0NyZWF0ZURpYWxvZywgc2V0U2hvd0NyZWF0ZURpYWxvZ10gPSB1c2VTdGF0ZShmYWxzZSk7XHJcbiAgY29uc3QgW3NlbGVjdGVkUm9sZSwgc2V0U2VsZWN0ZWRSb2xlXSA9IHVzZVN0YXRlPEFwcFJvbGU+KCdyZWNlcHRpb25pc3QnKTtcclxuICBjb25zdCBbaXNDcmVhdGluZywgc2V0SXNDcmVhdGluZ10gPSB1c2VTdGF0ZShmYWxzZSk7XHJcbiAgXHJcbiAgLy8gQ3JlYXRlIHVzZXIgZm9ybSBzdGF0ZVxyXG4gIGNvbnN0IFtuZXdVc2VyRW1haWwsIHNldE5ld1VzZXJFbWFpbF0gPSB1c2VTdGF0ZSgnJyk7XHJcbiAgY29uc3QgW25ld1VzZXJQYXNzd29yZCwgc2V0TmV3VXNlclBhc3N3b3JkXSA9IHVzZVN0YXRlKCcnKTtcclxuICBjb25zdCBbbmV3VXNlck5hbWUsIHNldE5ld1VzZXJOYW1lXSA9IHVzZVN0YXRlKCcnKTtcclxuICBjb25zdCBbbmV3VXNlclJvbGUsIHNldE5ld1VzZXJSb2xlXSA9IHVzZVN0YXRlPEFwcFJvbGU+KCdyZWNlcHRpb25pc3QnKTtcclxuXHJcbiAgY29uc3Qgcm9sZUNvbG9yczogUmVjb3JkPEFwcFJvbGUsIHN0cmluZz4gPSB7XHJcbiAgICBhZG1pbjogJ2JnLXB1cnBsZS0xMDAgdGV4dC1wdXJwbGUtODAwIGJvcmRlci1wdXJwbGUtMjAwJyxcclxuICAgIHJlY2VwdGlvbmlzdDogJ2JnLWJsdWUtMTAwIHRleHQtYmx1ZS04MDAgYm9yZGVyLWJsdWUtMjAwJyxcclxuICAgIGxhYl90ZWNoOiAnYmctZ3JlZW4tMTAwIHRleHQtZ3JlZW4tODAwIGJvcmRlci1ncmVlbi0yMDAnXHJcbiAgfTtcclxuXHJcbiAgY29uc3Qgcm9sZUxhYmVsczogUmVjb3JkPEFwcFJvbGUsIHN0cmluZz4gPSB7XHJcbiAgICBhZG1pbjogJ0FkbWluaXN0cmF0b3InLFxyXG4gICAgcmVjZXB0aW9uaXN0OiAnUmVjZXB0aW9uaXN0JyxcclxuICAgIGxhYl90ZWNoOiAnTGFiIFRlY2huaWNpYW4nXHJcbiAgfTtcclxuXHJcbiAgY29uc3QgaGFuZGxlQXNzaWduUm9sZSA9IGFzeW5jICgpID0+IHtcclxuICAgIGlmICghc2VsZWN0ZWRVc2VyKSByZXR1cm47XHJcblxyXG4gICAgdHJ5IHtcclxuICAgICAgYXdhaXQgYXNzaWduUm9sZS5tdXRhdGVBc3luYyh7XHJcbiAgICAgICAgdXNlcklkOiBzZWxlY3RlZFVzZXIuaWQsXHJcbiAgICAgICAgcm9sZTogc2VsZWN0ZWRSb2xlXHJcbiAgICAgIH0pO1xyXG4gICAgICB0b2FzdC5zdWNjZXNzKGBSb2xlICR7cm9sZUxhYmVsc1tzZWxlY3RlZFJvbGVdfSBhc3NpZ25lZCB0byAke3NlbGVjdGVkVXNlci5mdWxsX25hbWV9YCk7XHJcbiAgICAgIHNldFNob3dSb2xlRGlhbG9nKGZhbHNlKTtcclxuICAgIH0gY2F0Y2ggKGVycm9yOiBhbnkpIHtcclxuICAgICAgaWYgKGVycm9yLm1lc3NhZ2U/LmluY2x1ZGVzKCdkdXBsaWNhdGUnKSkge1xyXG4gICAgICAgIHRvYXN0LmVycm9yKCdVc2VyIGFscmVhZHkgaGFzIHRoaXMgcm9sZScpO1xyXG4gICAgICB9IGVsc2Uge1xyXG4gICAgICAgIHRvYXN0LmVycm9yKCdGYWlsZWQgdG8gYXNzaWduIHJvbGUnKTtcclxuICAgICAgfVxyXG4gICAgfVxyXG4gIH07XHJcblxyXG4gIGNvbnN0IGhhbmRsZVJlbW92ZVJvbGUgPSBhc3luYyAodXNlcklkOiBzdHJpbmcsIHJvbGU6IEFwcFJvbGUsIHVzZXJOYW1lOiBzdHJpbmcpID0+IHtcclxuICAgIGlmICghY29uZmlybShgUmVtb3ZlICR7cm9sZUxhYmVsc1tyb2xlXX0gcm9sZSBmcm9tICR7dXNlck5hbWV9P2ApKSByZXR1cm47XHJcblxyXG4gICAgdHJ5IHtcclxuICAgICAgYXdhaXQgcmVtb3ZlUm9sZS5tdXRhdGVBc3luYyh7IHVzZXJJZCwgcm9sZSB9KTtcclxuICAgICAgdG9hc3Quc3VjY2VzcyhgUm9sZSByZW1vdmVkIGZyb20gJHt1c2VyTmFtZX1gKTtcclxuICAgIH0gY2F0Y2ggKGVycm9yKSB7XHJcbiAgICAgIHRvYXN0LmVycm9yKCdGYWlsZWQgdG8gcmVtb3ZlIHJvbGUnKTtcclxuICAgIH1cclxuICB9O1xyXG5cclxuICBjb25zdCBoYW5kbGVDcmVhdGVVc2VyID0gYXN5bmMgKCkgPT4ge1xyXG4gICAgaWYgKCFuZXdVc2VyRW1haWwgfHwgIW5ld1VzZXJQYXNzd29yZCB8fCAhbmV3VXNlck5hbWUpIHtcclxuICAgICAgdG9hc3QuZXJyb3IoJ1BsZWFzZSBmaWxsIGluIGFsbCBmaWVsZHMnKTtcclxuICAgICAgcmV0dXJuO1xyXG4gICAgfVxyXG5cclxuICAgIGlmIChuZXdVc2VyUGFzc3dvcmQubGVuZ3RoIDwgOCkge1xyXG4gICAgICB0b2FzdC5lcnJvcignUGFzc3dvcmQgbXVzdCBiZSBhdCBsZWFzdCA4IGNoYXJhY3RlcnMnKTtcclxuICAgICAgcmV0dXJuO1xyXG4gICAgfVxyXG5cclxuICAgIHNldElzQ3JlYXRpbmcodHJ1ZSk7XHJcbiAgICB0cnkge1xyXG4gICAgICAvLyBTdGVwIDE6IENyZWF0ZSB1c2VyIHVzaW5nIGJhY2tlbmQgQVBJXHJcbiAgICAgIGNvbnN0IG5ld1VzZXIgPSBhd2FpdCB1c2Vyc0FQSS5jcmVhdGUoe1xyXG4gICAgICAgIGVtYWlsOiBuZXdVc2VyRW1haWwsXHJcbiAgICAgICAgcGFzc3dvcmQ6IG5ld1VzZXJQYXNzd29yZCxcclxuICAgICAgICBmdWxsTmFtZTogbmV3VXNlck5hbWVcclxuICAgICAgfSk7XHJcblxyXG4gICAgICAvLyBTdGVwIDI6IEFzc2lnbiByb2xlIHRvIHRoZSBuZXdseSBjcmVhdGVkIHVzZXJcclxuICAgICAgYXdhaXQgdXNlcnNBUEkuYXNzaWduUm9sZShuZXdVc2VyLmlkLCBuZXdVc2VyUm9sZSk7XHJcblxyXG4gICAgICB0b2FzdC5zdWNjZXNzKGBVc2VyICR7bmV3VXNlck5hbWV9IGNyZWF0ZWQgc3VjY2Vzc2Z1bGx5IHdpdGggJHtyb2xlTGFiZWxzW25ld1VzZXJSb2xlXX0gcm9sZWApO1xyXG4gICAgICBcclxuICAgICAgLy8gUmVzZXQgZm9ybVxyXG4gICAgICBzZXROZXdVc2VyRW1haWwoJycpO1xyXG4gICAgICBzZXROZXdVc2VyUGFzc3dvcmQoJycpO1xyXG4gICAgICBzZXROZXdVc2VyTmFtZSgnJyk7XHJcbiAgICAgIHNldE5ld1VzZXJSb2xlKCdyZWNlcHRpb25pc3QnKTtcclxuICAgICAgc2V0U2hvd0NyZWF0ZURpYWxvZyhmYWxzZSk7XHJcbiAgICAgIFxyXG4gICAgfSBjYXRjaCAoZXJyb3I6IGFueSkge1xyXG4gICAgICBjb25zb2xlLmVycm9yKCdFcnJvciBjcmVhdGluZyB1c2VyOicsIGVycm9yKTtcclxuICAgICAgaWYgKGVycm9yLnJlc3BvbnNlPy5kYXRhPy5tZXNzYWdlPy5pbmNsdWRlcygnZHVwbGljYXRlJykgfHwgZXJyb3IucmVzcG9uc2U/LmRhdGE/Lm1lc3NhZ2U/LmluY2x1ZGVzKCdhbHJlYWR5IGV4aXN0cycpKSB7XHJcbiAgICAgICAgdG9hc3QuZXJyb3IoJ0EgdXNlciB3aXRoIHRoaXMgZW1haWwgYWxyZWFkeSBleGlzdHMnKTtcclxuICAgICAgfSBlbHNlIHtcclxuICAgICAgICB0b2FzdC5lcnJvcihlcnJvci5yZXNwb25zZT8uZGF0YT8ubWVzc2FnZSB8fCBlcnJvci5tZXNzYWdlIHx8ICdGYWlsZWQgdG8gY3JlYXRlIHVzZXInKTtcclxuICAgICAgfVxyXG4gICAgfSBmaW5hbGx5IHtcclxuICAgICAgc2V0SXNDcmVhdGluZyhmYWxzZSk7XHJcbiAgICB9XHJcbiAgfTtcclxuXHJcbiAgcmV0dXJuIChcclxuICAgIDxSb2xlTGF5b3V0IFxyXG4gICAgICB0aXRsZT1cIlVzZXIgTWFuYWdlbWVudFwiIFxyXG4gICAgICBzdWJ0aXRsZT1cIk1hbmFnZSB1c2VycyBhbmQgcm9sZSBhc3NpZ25tZW50c1wiXHJcbiAgICAgIHJvbGU9XCJhZG1pblwiXHJcbiAgICAgIHVzZXJOYW1lPXtwcm9maWxlPy5mdWxsX25hbWV9XHJcbiAgICA+XHJcbiAgICAgIHsvKiBIZWFkZXIgd2l0aCBDcmVhdGUgQnV0dG9uICovfVxyXG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXgganVzdGlmeS1iZXR3ZWVuIGl0ZW1zLWNlbnRlciBtYi02XCI+XHJcbiAgICAgICAgPGRpdj48L2Rpdj5cclxuICAgICAgICA8QnV0dG9uIG9uQ2xpY2s9eygpID0+IHNldFNob3dDcmVhdGVEaWFsb2codHJ1ZSl9PlxyXG4gICAgICAgICAgPFVzZXJQbHVzIGNsYXNzTmFtZT1cInctNCBoLTQgbXItMlwiIC8+XHJcbiAgICAgICAgICBDcmVhdGUgVXNlclxyXG4gICAgICAgIDwvQnV0dG9uPlxyXG4gICAgICA8L2Rpdj5cclxuXHJcbiAgICAgIHsvKiBTdGF0cyAqL31cclxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJncmlkIGdyaWQtY29scy00IGdhcC00IG1iLTZcIj5cclxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImJnLWNhcmQgYm9yZGVyIHJvdW5kZWQtbGcgcC00XCI+XHJcbiAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LXNtIHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPlRvdGFsIFVzZXJzPC9wPlxyXG4gICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC0yeGwgZm9udC1ib2xkXCI+e3VzZXJzPy5sZW5ndGggfHwgMH08L3A+XHJcbiAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJiZy1jYXJkIGJvcmRlciByb3VuZGVkLWxnIHAtNFwiPlxyXG4gICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1zbSB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5BZG1pbmlzdHJhdG9yczwvcD5cclxuICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtMnhsIGZvbnQtYm9sZCB0ZXh0LXB1cnBsZS02MDBcIj5cclxuICAgICAgICAgICAge3VzZXJzPy5maWx0ZXIodSA9PiB1LnVzZXJfcm9sZXMuc29tZShyID0+IHIucm9sZSA9PT0gJ2FkbWluJykpLmxlbmd0aCB8fCAwfVxyXG4gICAgICAgICAgPC9wPlxyXG4gICAgICAgIDwvZGl2PlxyXG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiYmctY2FyZCBib3JkZXIgcm91bmRlZC1sZyBwLTRcIj5cclxuICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc20gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+UmVjZXB0aW9uaXN0czwvcD5cclxuICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtMnhsIGZvbnQtYm9sZCB0ZXh0LWJsdWUtNjAwXCI+XHJcbiAgICAgICAgICAgIHt1c2Vycz8uZmlsdGVyKHUgPT4gdS51c2VyX3JvbGVzLnNvbWUociA9PiByLnJvbGUgPT09ICdyZWNlcHRpb25pc3QnKSkubGVuZ3RoIHx8IDB9XHJcbiAgICAgICAgICA8L3A+XHJcbiAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJiZy1jYXJkIGJvcmRlciByb3VuZGVkLWxnIHAtNFwiPlxyXG4gICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1zbSB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5MYWIgVGVjaG5pY2lhbnM8L3A+XHJcbiAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LTJ4bCBmb250LWJvbGQgdGV4dC1ncmVlbi02MDBcIj5cclxuICAgICAgICAgICAge3VzZXJzPy5maWx0ZXIodSA9PiB1LnVzZXJfcm9sZXMuc29tZShyID0+IHIucm9sZSA9PT0gJ2xhYl90ZWNoJykpLmxlbmd0aCB8fCAwfVxyXG4gICAgICAgICAgPC9wPlxyXG4gICAgICAgIDwvZGl2PlxyXG4gICAgICA8L2Rpdj5cclxuXHJcbiAgICAgIHsvKiBVc2VycyBUYWJsZSAqL31cclxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJiZy1jYXJkIGJvcmRlciByb3VuZGVkLWxnIG92ZXJmbG93LWhpZGRlblwiPlxyXG4gICAgICAgIHtpc0xvYWRpbmcgPyAoXHJcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGp1c3RpZnktY2VudGVyIHB5LTEyXCI+XHJcbiAgICAgICAgICAgIDxMb2FkZXIyIGNsYXNzTmFtZT1cInctNiBoLTYgYW5pbWF0ZS1zcGluIHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiIC8+XHJcbiAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICApIDogKFxyXG4gICAgICAgICAgPHRhYmxlIGNsYXNzTmFtZT1cImRhdGEtdGFibGVcIj5cclxuICAgICAgICAgICAgPHRoZWFkPlxyXG4gICAgICAgICAgICAgIDx0cj5cclxuICAgICAgICAgICAgICAgIDx0aD5Vc2VyPC90aD5cclxuICAgICAgICAgICAgICAgIDx0aD5FbWFpbDwvdGg+XHJcbiAgICAgICAgICAgICAgICA8dGg+RGVwYXJ0bWVudDwvdGg+XHJcbiAgICAgICAgICAgICAgICA8dGg+Um9sZXM8L3RoPlxyXG4gICAgICAgICAgICAgICAgPHRoPkpvaW5lZDwvdGg+XHJcbiAgICAgICAgICAgICAgICA8dGg+QWN0aW9uczwvdGg+XHJcbiAgICAgICAgICAgICAgPC90cj5cclxuICAgICAgICAgICAgPC90aGVhZD5cclxuICAgICAgICAgICAgPHRib2R5PlxyXG4gICAgICAgICAgICAgIHt1c2Vycz8ubWFwKHVzZXIgPT4gKFxyXG4gICAgICAgICAgICAgICAgPHRyIGtleT17dXNlci5pZH0+XHJcbiAgICAgICAgICAgICAgICAgIDx0ZD5cclxuICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGdhcC0zXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInctMTAgaC0xMCByb3VuZGVkLWZ1bGwgYmctcHJpbWFyeS8xMCBmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWNlbnRlclwiPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJmb250LXNlbWlib2xkIHRleHQtcHJpbWFyeVwiPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIHt1c2VyLmZ1bGxfbmFtZS5zcGxpdCgnICcpLm1hcChuID0+IG5bMF0pLmpvaW4oJycpLnRvVXBwZXJDYXNlKCl9XHJcbiAgICAgICAgICAgICAgICAgICAgICAgIDwvc3Bhbj5cclxuICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgICAgICAgPGRpdj5cclxuICAgICAgICAgICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwiZm9udC1tZWRpdW1cIj57dXNlci5mdWxsX25hbWV9PC9wPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICB7dXNlci5pZCA9PT0gcHJvZmlsZT8uaWQgJiYgKFxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIDxCYWRnZSB2YXJpYW50PVwib3V0bGluZVwiIGNsYXNzTmFtZT1cInRleHQteHNcIj5Zb3U8L0JhZGdlPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICApfVxyXG4gICAgICAgICAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAgICAgIDwvdGQ+XHJcbiAgICAgICAgICAgICAgICAgIDx0ZD5cclxuICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGdhcC0yXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgICA8TWFpbCBjbGFzc05hbWU9XCJ3LTQgaC00IHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiIC8+XHJcbiAgICAgICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJ0ZXh0LXNtXCI+e3VzZXIuZW1haWx9PC9zcGFuPlxyXG4gICAgICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgICA8L3RkPlxyXG4gICAgICAgICAgICAgICAgICA8dGQ+e3VzZXIuZGVwYXJ0bWVudCB8fCAnLSd9PC90ZD5cclxuICAgICAgICAgICAgICAgICAgPHRkPlxyXG4gICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBmbGV4LXdyYXAgZ2FwLTFcIj5cclxuICAgICAgICAgICAgICAgICAgICAgIHt1c2VyLnVzZXJfcm9sZXMubGVuZ3RoID4gMCA/IChcclxuICAgICAgICAgICAgICAgICAgICAgICAgdXNlci51c2VyX3JvbGVzLm1hcChyb2xlSXRlbSA9PiAoXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgPEJhZGdlXHJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICBrZXk9e3JvbGVJdGVtLmlkfVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgdmFyaWFudD1cIm91dGxpbmVcIlxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgY2xhc3NOYW1lPXtyb2xlQ29sb3JzW3JvbGVJdGVtLnJvbGVdfVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgID5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIHtyb2xlTGFiZWxzW3JvbGVJdGVtLnJvbGVdfVxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgPGJ1dHRvblxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICBvbkNsaWNrPXsoKSA9PiBoYW5kbGVSZW1vdmVSb2xlKHVzZXIuaWQsIHJvbGVJdGVtLnJvbGUsIHVzZXIuZnVsbF9uYW1lKX1cclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY2xhc3NOYW1lPVwibWwtMSBob3Zlcjp0ZXh0LWRlc3RydWN0aXZlXCJcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgID5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPFRyYXNoMiBjbGFzc05hbWU9XCJ3LTMgaC0zXCIgLz5cclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvYnV0dG9uPlxyXG4gICAgICAgICAgICAgICAgICAgICAgICAgIDwvQmFkZ2U+XHJcbiAgICAgICAgICAgICAgICAgICAgICAgICkpXHJcbiAgICAgICAgICAgICAgICAgICAgICApIDogKFxyXG4gICAgICAgICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJ0ZXh0LXNtIHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPk5vIHJvbGVzPC9zcGFuPlxyXG4gICAgICAgICAgICAgICAgICAgICAgKX1cclxuICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgICAgPC90ZD5cclxuICAgICAgICAgICAgICAgICAgPHRkIGNsYXNzTmFtZT1cInRleHQtc20gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+XHJcbiAgICAgICAgICAgICAgICAgICAge25ldyBEYXRlKHVzZXIuY3JlYXRlZF9hdCkudG9Mb2NhbGVEYXRlU3RyaW5nKCl9XHJcbiAgICAgICAgICAgICAgICAgIDwvdGQ+XHJcbiAgICAgICAgICAgICAgICAgIDx0ZD5cclxuICAgICAgICAgICAgICAgICAgICA8QnV0dG9uXHJcbiAgICAgICAgICAgICAgICAgICAgICB2YXJpYW50PVwiZ2hvc3RcIlxyXG4gICAgICAgICAgICAgICAgICAgICAgc2l6ZT1cInNtXCJcclxuICAgICAgICAgICAgICAgICAgICAgIG9uQ2xpY2s9eygpID0+IHtcclxuICAgICAgICAgICAgICAgICAgICAgICAgc2V0U2VsZWN0ZWRVc2VyKHVzZXIpO1xyXG4gICAgICAgICAgICAgICAgICAgICAgICBzZXRTaG93Um9sZURpYWxvZyh0cnVlKTtcclxuICAgICAgICAgICAgICAgICAgICAgIH19XHJcbiAgICAgICAgICAgICAgICAgICAgPlxyXG4gICAgICAgICAgICAgICAgICAgICAgPFNoaWVsZCBjbGFzc05hbWU9XCJ3LTQgaC00IG1yLTFcIiAvPlxyXG4gICAgICAgICAgICAgICAgICAgICAgQXNzaWduIFJvbGVcclxuICAgICAgICAgICAgICAgICAgICA8L0J1dHRvbj5cclxuICAgICAgICAgICAgICAgICAgPC90ZD5cclxuICAgICAgICAgICAgICAgIDwvdHI+XHJcbiAgICAgICAgICAgICAgKSl9XHJcbiAgICAgICAgICAgICAgeyghdXNlcnMgfHwgdXNlcnMubGVuZ3RoID09PSAwKSAmJiAoXHJcbiAgICAgICAgICAgICAgICA8dHI+XHJcbiAgICAgICAgICAgICAgICAgIDx0ZCBjb2xTcGFuPXs2fSBjbGFzc05hbWU9XCJ0ZXh0LWNlbnRlciBweS0xMiB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5cclxuICAgICAgICAgICAgICAgICAgICBObyB1c2VycyBmb3VuZFxyXG4gICAgICAgICAgICAgICAgICA8L3RkPlxyXG4gICAgICAgICAgICAgICAgPC90cj5cclxuICAgICAgICAgICAgICApfVxyXG4gICAgICAgICAgICA8L3Rib2R5PlxyXG4gICAgICAgICAgPC90YWJsZT5cclxuICAgICAgICApfVxyXG4gICAgICA8L2Rpdj5cclxuXHJcbiAgICAgIHsvKiBSb2xlIEFzc2lnbm1lbnQgRGlhbG9nICovfVxyXG4gICAgICA8RGlhbG9nIG9wZW49e3Nob3dSb2xlRGlhbG9nfSBvbk9wZW5DaGFuZ2U9e3NldFNob3dSb2xlRGlhbG9nfT5cclxuICAgICAgICA8RGlhbG9nQ29udGVudD5cclxuICAgICAgICAgIDxEaWFsb2dIZWFkZXI+XHJcbiAgICAgICAgICAgIDxEaWFsb2dUaXRsZT5Bc3NpZ24gUm9sZSB0byB7c2VsZWN0ZWRVc2VyPy5mdWxsX25hbWV9PC9EaWFsb2dUaXRsZT5cclxuICAgICAgICAgIDwvRGlhbG9nSGVhZGVyPlxyXG5cclxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwicHktNFwiPlxyXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cIm1iLTRcIj5cclxuICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LXNtIHRleHQtbXV0ZWQtZm9yZWdyb3VuZCBtYi0yXCI+Q3VycmVudCBSb2xlczo8L3A+XHJcbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGZsZXgtd3JhcCBnYXAtMlwiPlxyXG4gICAgICAgICAgICAgICAge3NlbGVjdGVkVXNlcj8udXNlcl9yb2xlcy5sZW5ndGggPiAwID8gKFxyXG4gICAgICAgICAgICAgICAgICBzZWxlY3RlZFVzZXIudXNlcl9yb2xlcy5tYXAoKHJvbGVJdGVtOiBhbnkpID0+IChcclxuICAgICAgICAgICAgICAgICAgICA8QmFkZ2VcclxuICAgICAgICAgICAgICAgICAgICAgIGtleT17cm9sZUl0ZW0uaWR9XHJcbiAgICAgICAgICAgICAgICAgICAgICB2YXJpYW50PVwib3V0bGluZVwiXHJcbiAgICAgICAgICAgICAgICAgICAgICBjbGFzc05hbWU9e3JvbGVDb2xvcnNbcm9sZUl0ZW0ucm9sZV19XHJcbiAgICAgICAgICAgICAgICAgICAgPlxyXG4gICAgICAgICAgICAgICAgICAgICAge3JvbGVMYWJlbHNbcm9sZUl0ZW0ucm9sZV19XHJcbiAgICAgICAgICAgICAgICAgICAgPC9CYWRnZT5cclxuICAgICAgICAgICAgICAgICAgKSlcclxuICAgICAgICAgICAgICAgICkgOiAoXHJcbiAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInRleHQtc20gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+Tm8gcm9sZXMgYXNzaWduZWQ8L3NwYW4+XHJcbiAgICAgICAgICAgICAgICApfVxyXG4gICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0yXCI+XHJcbiAgICAgICAgICAgICAgPGxhYmVsIGNsYXNzTmFtZT1cInRleHQtc20gZm9udC1tZWRpdW1cIj5TZWxlY3QgUm9sZSB0byBBc3NpZ248L2xhYmVsPlxyXG4gICAgICAgICAgICAgIDxTZWxlY3QgdmFsdWU9e3NlbGVjdGVkUm9sZX0gb25WYWx1ZUNoYW5nZT17KHZhbHVlKSA9PiBzZXRTZWxlY3RlZFJvbGUodmFsdWUgYXMgQXBwUm9sZSl9PlxyXG4gICAgICAgICAgICAgICAgPFNlbGVjdFRyaWdnZXI+XHJcbiAgICAgICAgICAgICAgICAgIDxTZWxlY3RWYWx1ZSAvPlxyXG4gICAgICAgICAgICAgICAgPC9TZWxlY3RUcmlnZ2VyPlxyXG4gICAgICAgICAgICAgICAgPFNlbGVjdENvbnRlbnQ+XHJcbiAgICAgICAgICAgICAgICAgIDxTZWxlY3RJdGVtIHZhbHVlPVwiYWRtaW5cIj5cclxuICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGdhcC0yXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInctMiBoLTIgcm91bmRlZC1mdWxsIGJnLXB1cnBsZS02MDBcIiAvPlxyXG4gICAgICAgICAgICAgICAgICAgICAgQWRtaW5pc3RyYXRvclxyXG4gICAgICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgICA8L1NlbGVjdEl0ZW0+XHJcbiAgICAgICAgICAgICAgICAgIDxTZWxlY3RJdGVtIHZhbHVlPVwicmVjZXB0aW9uaXN0XCI+XHJcbiAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBnYXAtMlwiPlxyXG4gICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJ3LTIgaC0yIHJvdW5kZWQtZnVsbCBiZy1ibHVlLTYwMFwiIC8+XHJcbiAgICAgICAgICAgICAgICAgICAgICBSZWNlcHRpb25pc3RcclxuICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgICAgPC9TZWxlY3RJdGVtPlxyXG4gICAgICAgICAgICAgICAgICA8U2VsZWN0SXRlbSB2YWx1ZT1cImxhYl90ZWNoXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBnYXAtMlwiPlxyXG4gICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJ3LTIgaC0yIHJvdW5kZWQtZnVsbCBiZy1ncmVlbi02MDBcIiAvPlxyXG4gICAgICAgICAgICAgICAgICAgICAgTGFiIFRlY2huaWNpYW5cclxuICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgICAgICAgPC9TZWxlY3RJdGVtPlxyXG4gICAgICAgICAgICAgICAgPC9TZWxlY3RDb250ZW50PlxyXG4gICAgICAgICAgICAgIDwvU2VsZWN0PlxyXG4gICAgICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwibXQtNCBwLTMgYmctbXV0ZWQgcm91bmRlZC1sZ1wiPlxyXG4gICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc20gZm9udC1tZWRpdW0gbWItMVwiPlJvbGUgUGVybWlzc2lvbnM6PC9wPlxyXG4gICAgICAgICAgICAgIDx1bCBjbGFzc05hbWU9XCJ0ZXh0LXhzIHRleHQtbXV0ZWQtZm9yZWdyb3VuZCBzcGFjZS15LTFcIj5cclxuICAgICAgICAgICAgICAgIHtzZWxlY3RlZFJvbGUgPT09ICdhZG1pbicgJiYgKFxyXG4gICAgICAgICAgICAgICAgICA8PlxyXG4gICAgICAgICAgICAgICAgICAgIDxsaT7igKIgRnVsbCBzeXN0ZW0gYWNjZXNzPC9saT5cclxuICAgICAgICAgICAgICAgICAgICA8bGk+4oCiIFVzZXIgbWFuYWdlbWVudDwvbGk+XHJcbiAgICAgICAgICAgICAgICAgICAgPGxpPuKAoiBUZXN0IGNhdGFsb2cgY29uZmlndXJhdGlvbjwvbGk+XHJcbiAgICAgICAgICAgICAgICAgICAgPGxpPuKAoiBSZXBvcnRzIGFuZCBhbmFseXRpY3M8L2xpPlxyXG4gICAgICAgICAgICAgICAgICA8Lz5cclxuICAgICAgICAgICAgICAgICl9XHJcbiAgICAgICAgICAgICAgICB7c2VsZWN0ZWRSb2xlID09PSAncmVjZXB0aW9uaXN0JyAmJiAoXHJcbiAgICAgICAgICAgICAgICAgIDw+XHJcbiAgICAgICAgICAgICAgICAgICAgPGxpPuKAoiBQYXRpZW50IHJlZ2lzdHJhdGlvbjwvbGk+XHJcbiAgICAgICAgICAgICAgICAgICAgPGxpPuKAoiBPcmRlciBjcmVhdGlvbjwvbGk+XHJcbiAgICAgICAgICAgICAgICAgICAgPGxpPuKAoiBQYXltZW50IHByb2Nlc3Npbmc8L2xpPlxyXG4gICAgICAgICAgICAgICAgICAgIDxsaT7igKIgVmlldyByZXN1bHRzPC9saT5cclxuICAgICAgICAgICAgICAgICAgPC8+XHJcbiAgICAgICAgICAgICAgICApfVxyXG4gICAgICAgICAgICAgICAge3NlbGVjdGVkUm9sZSA9PT0gJ2xhYl90ZWNoJyAmJiAoXHJcbiAgICAgICAgICAgICAgICAgIDw+XHJcbiAgICAgICAgICAgICAgICAgICAgPGxpPuKAoiBTYW1wbGUgY29sbGVjdGlvbjwvbGk+XHJcbiAgICAgICAgICAgICAgICAgICAgPGxpPuKAoiBSZXN1bHQgZW50cnk8L2xpPlxyXG4gICAgICAgICAgICAgICAgICAgIDxsaT7igKIgUmVzdWx0IHZlcmlmaWNhdGlvbjwvbGk+XHJcbiAgICAgICAgICAgICAgICAgICAgPGxpPuKAoiBNYWNoaW5lIG1hbmFnZW1lbnQ8L2xpPlxyXG4gICAgICAgICAgICAgICAgICA8Lz5cclxuICAgICAgICAgICAgICAgICl9XHJcbiAgICAgICAgICAgICAgPC91bD5cclxuICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgICA8RGlhbG9nRm9vdGVyPlxyXG4gICAgICAgICAgICA8QnV0dG9uIHZhcmlhbnQ9XCJvdXRsaW5lXCIgb25DbGljaz17KCkgPT4gc2V0U2hvd1JvbGVEaWFsb2coZmFsc2UpfT5cclxuICAgICAgICAgICAgICBDYW5jZWxcclxuICAgICAgICAgICAgPC9CdXR0b24+XHJcbiAgICAgICAgICAgIDxCdXR0b25cclxuICAgICAgICAgICAgICBvbkNsaWNrPXtoYW5kbGVBc3NpZ25Sb2xlfVxyXG4gICAgICAgICAgICAgIGRpc2FibGVkPXthc3NpZ25Sb2xlLmlzUGVuZGluZ31cclxuICAgICAgICAgICAgPlxyXG4gICAgICAgICAgICAgIHthc3NpZ25Sb2xlLmlzUGVuZGluZyAmJiA8TG9hZGVyMiBjbGFzc05hbWU9XCJ3LTQgaC00IG1yLTIgYW5pbWF0ZS1zcGluXCIgLz59XHJcbiAgICAgICAgICAgICAgPFNoaWVsZCBjbGFzc05hbWU9XCJ3LTQgaC00IG1yLTJcIiAvPlxyXG4gICAgICAgICAgICAgIEFzc2lnbiBSb2xlXHJcbiAgICAgICAgICAgIDwvQnV0dG9uPlxyXG4gICAgICAgICAgPC9EaWFsb2dGb290ZXI+XHJcbiAgICAgICAgPC9EaWFsb2dDb250ZW50PlxyXG4gICAgICA8L0RpYWxvZz5cclxuXHJcbiAgICAgIHsvKiBDcmVhdGUgVXNlciBEaWFsb2cgKi99XHJcbiAgICAgIDxEaWFsb2cgb3Blbj17c2hvd0NyZWF0ZURpYWxvZ30gb25PcGVuQ2hhbmdlPXtzZXRTaG93Q3JlYXRlRGlhbG9nfT5cclxuICAgICAgICA8RGlhbG9nQ29udGVudD5cclxuICAgICAgICAgIDxEaWFsb2dIZWFkZXI+XHJcbiAgICAgICAgICAgIDxEaWFsb2dUaXRsZT5DcmVhdGUgTmV3IFVzZXI8L0RpYWxvZ1RpdGxlPlxyXG4gICAgICAgICAgPC9EaWFsb2dIZWFkZXI+XHJcblxyXG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTQgcHktNFwiPlxyXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNwYWNlLXktMlwiPlxyXG4gICAgICAgICAgICAgIDxMYWJlbCBodG1sRm9yPVwibmV3LXVzZXItbmFtZVwiPkZ1bGwgTmFtZTwvTGFiZWw+XHJcbiAgICAgICAgICAgICAgPElucHV0XHJcbiAgICAgICAgICAgICAgICBpZD1cIm5ldy11c2VyLW5hbWVcIlxyXG4gICAgICAgICAgICAgICAgcGxhY2Vob2xkZXI9XCJKb2huIERvZVwiXHJcbiAgICAgICAgICAgICAgICB2YWx1ZT17bmV3VXNlck5hbWV9XHJcbiAgICAgICAgICAgICAgICBvbkNoYW5nZT17KGUpID0+IHNldE5ld1VzZXJOYW1lKGUudGFyZ2V0LnZhbHVlKX1cclxuICAgICAgICAgICAgICAvPlxyXG4gICAgICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0yXCI+XHJcbiAgICAgICAgICAgICAgPExhYmVsIGh0bWxGb3I9XCJuZXctdXNlci1lbWFpbFwiPkVtYWlsPC9MYWJlbD5cclxuICAgICAgICAgICAgICA8SW5wdXRcclxuICAgICAgICAgICAgICAgIGlkPVwibmV3LXVzZXItZW1haWxcIlxyXG4gICAgICAgICAgICAgICAgdHlwZT1cImVtYWlsXCJcclxuICAgICAgICAgICAgICAgIHBsYWNlaG9sZGVyPVwiam9obkBleGFtcGxlLmNvbVwiXHJcbiAgICAgICAgICAgICAgICB2YWx1ZT17bmV3VXNlckVtYWlsfVxyXG4gICAgICAgICAgICAgICAgb25DaGFuZ2U9eyhlKSA9PiBzZXROZXdVc2VyRW1haWwoZS50YXJnZXQudmFsdWUpfVxyXG4gICAgICAgICAgICAgIC8+XHJcbiAgICAgICAgICAgIDwvZGl2PlxyXG5cclxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTJcIj5cclxuICAgICAgICAgICAgICA8TGFiZWwgaHRtbEZvcj1cIm5ldy11c2VyLXBhc3N3b3JkXCI+UGFzc3dvcmQ8L0xhYmVsPlxyXG4gICAgICAgICAgICAgIDxJbnB1dFxyXG4gICAgICAgICAgICAgICAgaWQ9XCJuZXctdXNlci1wYXNzd29yZFwiXHJcbiAgICAgICAgICAgICAgICB0eXBlPVwicGFzc3dvcmRcIlxyXG4gICAgICAgICAgICAgICAgcGxhY2Vob2xkZXI9XCJNaW5pbXVtIDggY2hhcmFjdGVyc1wiXHJcbiAgICAgICAgICAgICAgICB2YWx1ZT17bmV3VXNlclBhc3N3b3JkfVxyXG4gICAgICAgICAgICAgICAgb25DaGFuZ2U9eyhlKSA9PiBzZXROZXdVc2VyUGFzc3dvcmQoZS50YXJnZXQudmFsdWUpfVxyXG4gICAgICAgICAgICAgIC8+XHJcbiAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC14cyB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5cclxuICAgICAgICAgICAgICAgIFBhc3N3b3JkIG11c3QgYmUgYXQgbGVhc3QgOCBjaGFyYWN0ZXJzLiBVc2VyIGNhbiBjaGFuZ2UgaXQgYWZ0ZXIgZmlyc3QgbG9naW4uXHJcbiAgICAgICAgICAgICAgPC9wPlxyXG4gICAgICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0yXCI+XHJcbiAgICAgICAgICAgICAgPExhYmVsPkFzc2lnbiBSb2xlPC9MYWJlbD5cclxuICAgICAgICAgICAgICA8U2VsZWN0IHZhbHVlPXtuZXdVc2VyUm9sZX0gb25WYWx1ZUNoYW5nZT17KHZhbHVlKSA9PiBzZXROZXdVc2VyUm9sZSh2YWx1ZSBhcyBBcHBSb2xlKX0+XHJcbiAgICAgICAgICAgICAgICA8U2VsZWN0VHJpZ2dlcj5cclxuICAgICAgICAgICAgICAgICAgPFNlbGVjdFZhbHVlIC8+XHJcbiAgICAgICAgICAgICAgICA8L1NlbGVjdFRyaWdnZXI+XHJcbiAgICAgICAgICAgICAgICA8U2VsZWN0Q29udGVudD5cclxuICAgICAgICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJhZG1pblwiPlxyXG4gICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIgZ2FwLTJcIj5cclxuICAgICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwidy0yIGgtMiByb3VuZGVkLWZ1bGwgYmctcHVycGxlLTYwMFwiIC8+XHJcbiAgICAgICAgICAgICAgICAgICAgICBBZG1pbmlzdHJhdG9yXHJcbiAgICAgICAgICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgICAgICAgIDwvU2VsZWN0SXRlbT5cclxuICAgICAgICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJyZWNlcHRpb25pc3RcIj5cclxuICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGdhcC0yXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInctMiBoLTIgcm91bmRlZC1mdWxsIGJnLWJsdWUtNjAwXCIgLz5cclxuICAgICAgICAgICAgICAgICAgICAgIFJlY2VwdGlvbmlzdFxyXG4gICAgICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgICA8L1NlbGVjdEl0ZW0+XHJcbiAgICAgICAgICAgICAgICAgIDxTZWxlY3RJdGVtIHZhbHVlPVwibGFiX3RlY2hcIj5cclxuICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGdhcC0yXCI+XHJcbiAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInctMiBoLTIgcm91bmRlZC1mdWxsIGJnLWdyZWVuLTYwMFwiIC8+XHJcbiAgICAgICAgICAgICAgICAgICAgICBMYWIgVGVjaG5pY2lhblxyXG4gICAgICAgICAgICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICAgICAgICAgICA8L1NlbGVjdEl0ZW0+XHJcbiAgICAgICAgICAgICAgICA8L1NlbGVjdENvbnRlbnQ+XHJcbiAgICAgICAgICAgICAgPC9TZWxlY3Q+XHJcbiAgICAgICAgICAgIDwvZGl2PlxyXG5cclxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJwLTMgYmctbXV0ZWQgcm91bmRlZC1sZ1wiPlxyXG4gICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc20gZm9udC1tZWRpdW0gbWItMVwiPk5vdGU6PC9wPlxyXG4gICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQteHMgdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+XHJcbiAgICAgICAgICAgICAgICBUaGUgdXNlciB3aWxsIHJlY2VpdmUgYW4gZW1haWwgY29uZmlybWF0aW9uIGFuZCBjYW4gbG9nIGluIGltbWVkaWF0ZWx5IHdpdGggdGhlIHByb3ZpZGVkIGNyZWRlbnRpYWxzLlxyXG4gICAgICAgICAgICAgIDwvcD5cclxuICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgICA8RGlhbG9nRm9vdGVyPlxyXG4gICAgICAgICAgICA8QnV0dG9uIHZhcmlhbnQ9XCJvdXRsaW5lXCIgb25DbGljaz17KCkgPT4gc2V0U2hvd0NyZWF0ZURpYWxvZyhmYWxzZSl9PlxyXG4gICAgICAgICAgICAgIENhbmNlbFxyXG4gICAgICAgICAgICA8L0J1dHRvbj5cclxuICAgICAgICAgICAgPEJ1dHRvblxyXG4gICAgICAgICAgICAgIG9uQ2xpY2s9e2hhbmRsZUNyZWF0ZVVzZXJ9XHJcbiAgICAgICAgICAgICAgZGlzYWJsZWQ9e2lzQ3JlYXRpbmd9XHJcbiAgICAgICAgICAgID5cclxuICAgICAgICAgICAgICB7aXNDcmVhdGluZyAmJiA8TG9hZGVyMiBjbGFzc05hbWU9XCJ3LTQgaC00IG1yLTIgYW5pbWF0ZS1zcGluXCIgLz59XHJcbiAgICAgICAgICAgICAgPFVzZXJQbHVzIGNsYXNzTmFtZT1cInctNCBoLTQgbXItMlwiIC8+XHJcbiAgICAgICAgICAgICAgQ3JlYXRlIFVzZXJcclxuICAgICAgICAgICAgPC9CdXR0b24+XHJcbiAgICAgICAgICA8L0RpYWxvZ0Zvb3Rlcj5cclxuICAgICAgICA8L0RpYWxvZ0NvbnRlbnQ+XHJcbiAgICAgIDwvRGlhbG9nPlxyXG4gICAgPC9Sb2xlTGF5b3V0PlxyXG4gICk7XHJcbn1cclxuIl0sIm5hbWVzIjpbInVzZVN0YXRlIiwiUm9sZUxheW91dCIsInVzZUF1dGgiLCJ1c2VVc2VycyIsInVzZUFzc2lnblJvbGUiLCJ1c2VSZW1vdmVSb2xlIiwiQnV0dG9uIiwiQmFkZ2UiLCJEaWFsb2ciLCJEaWFsb2dDb250ZW50IiwiRGlhbG9nSGVhZGVyIiwiRGlhbG9nVGl0bGUiLCJEaWFsb2dGb290ZXIiLCJTZWxlY3QiLCJTZWxlY3RDb250ZW50IiwiU2VsZWN0SXRlbSIsIlNlbGVjdFRyaWdnZXIiLCJTZWxlY3RWYWx1ZSIsIklucHV0IiwiTGFiZWwiLCJ0b2FzdCIsIlVzZXJQbHVzIiwiU2hpZWxkIiwiVHJhc2gyIiwiTG9hZGVyMiIsIk1haWwiLCJ1c2Vyc0FQSSIsIlVzZXJNYW5hZ2VtZW50UGFnZSIsInByb2ZpbGUiLCJkYXRhIiwidXNlcnMiLCJpc0xvYWRpbmciLCJhc3NpZ25Sb2xlIiwicmVtb3ZlUm9sZSIsInNlbGVjdGVkVXNlciIsInNldFNlbGVjdGVkVXNlciIsInNob3dSb2xlRGlhbG9nIiwic2V0U2hvd1JvbGVEaWFsb2ciLCJzaG93Q3JlYXRlRGlhbG9nIiwic2V0U2hvd0NyZWF0ZURpYWxvZyIsInNlbGVjdGVkUm9sZSIsInNldFNlbGVjdGVkUm9sZSIsImlzQ3JlYXRpbmciLCJzZXRJc0NyZWF0aW5nIiwibmV3VXNlckVtYWlsIiwic2V0TmV3VXNlckVtYWlsIiwibmV3VXNlclBhc3N3b3JkIiwic2V0TmV3VXNlclBhc3N3b3JkIiwibmV3VXNlck5hbWUiLCJzZXROZXdVc2VyTmFtZSIsIm5ld1VzZXJSb2xlIiwic2V0TmV3VXNlclJvbGUiLCJyb2xlQ29sb3JzIiwiYWRtaW4iLCJyZWNlcHRpb25pc3QiLCJsYWJfdGVjaCIsInJvbGVMYWJlbHMiLCJoYW5kbGVBc3NpZ25Sb2xlIiwibXV0YXRlQXN5bmMiLCJ1c2VySWQiLCJpZCIsInJvbGUiLCJzdWNjZXNzIiwiZnVsbF9uYW1lIiwiZXJyb3IiLCJtZXNzYWdlIiwiaW5jbHVkZXMiLCJoYW5kbGVSZW1vdmVSb2xlIiwidXNlck5hbWUiLCJjb25maXJtIiwiaGFuZGxlQ3JlYXRlVXNlciIsImxlbmd0aCIsIm5ld1VzZXIiLCJjcmVhdGUiLCJlbWFpbCIsInBhc3N3b3JkIiwiZnVsbE5hbWUiLCJjb25zb2xlIiwicmVzcG9uc2UiLCJ0aXRsZSIsInN1YnRpdGxlIiwiZGl2IiwiY2xhc3NOYW1lIiwib25DbGljayIsInAiLCJmaWx0ZXIiLCJ1IiwidXNlcl9yb2xlcyIsInNvbWUiLCJyIiwidGFibGUiLCJ0aGVhZCIsInRyIiwidGgiLCJ0Ym9keSIsIm1hcCIsInVzZXIiLCJ0ZCIsInNwYW4iLCJzcGxpdCIsIm4iLCJqb2luIiwidG9VcHBlckNhc2UiLCJ2YXJpYW50IiwiZGVwYXJ0bWVudCIsInJvbGVJdGVtIiwiYnV0dG9uIiwiRGF0ZSIsImNyZWF0ZWRfYXQiLCJ0b0xvY2FsZURhdGVTdHJpbmciLCJzaXplIiwiY29sU3BhbiIsIm9wZW4iLCJvbk9wZW5DaGFuZ2UiLCJsYWJlbCIsInZhbHVlIiwib25WYWx1ZUNoYW5nZSIsInVsIiwibGkiLCJkaXNhYmxlZCIsImlzUGVuZGluZyIsImh0bWxGb3IiLCJwbGFjZWhvbGRlciIsIm9uQ2hhbmdlIiwiZSIsInRhcmdldCIsInR5cGUiXSwibWFwcGluZ3Mi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

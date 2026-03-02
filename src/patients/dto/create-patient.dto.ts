@@ -8,7 +8,7 @@ import {
   Min,
   Max,
 } from 'class-validator';
-import { GenderEnum } from '../../database/schemas/patient.schema';
+import { AgeUnitEnum, GenderEnum } from '../../database/schemas/patient.schema';
 
 export class CreatePatientDto {
   @IsString()
@@ -24,6 +24,16 @@ export class CreatePatientDto {
   @Min(0)
   @Max(150)
   age: number;
+
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  @Max(54750)
+  ageValue?: number;
+
+  @IsEnum(AgeUnitEnum)
+  @IsOptional()
+  ageUnit?: AgeUnitEnum;
 
   @IsEnum(GenderEnum)
   @IsNotEmpty()

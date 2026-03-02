@@ -1,0 +1,713 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/pages/reception/RegisterPatient.tsx");import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+
+let prevRefreshReg;
+let prevRefreshSig;
+
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react-swc can't detect preamble. Something is wrong."
+    );
+  }
+
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+
+import __vite__cjsImport2_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=27cfabb6"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime["jsxDEV"]; const _Fragment = __vite__cjsImport2_react_jsxDevRuntime["Fragment"];
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=27cfabb6"; const useState = __vite__cjsImport3_react["useState"];
+import { useNavigate } from "/node_modules/.vite/deps/react-router-dom.js?v=27cfabb6";
+import { RoleLayout } from "/src/components/layout/RoleLayout.tsx";
+import { useAuth } from "/src/context/AuthContext.tsx";
+import { useCreatePatient } from "/src/hooks/usePatients.ts";
+import { Button } from "/src/components/ui/button.tsx";
+import { Input } from "/src/components/ui/input.tsx";
+import { Label } from "/src/components/ui/label.tsx";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "/src/components/ui/select.tsx";
+import { toast } from "/node_modules/.vite/deps/sonner.js?v=27cfabb6";
+import { UserPlus, ArrowRight, Loader2 } from "/node_modules/.vite/deps/lucide-react.js?v=27cfabb6";
+const convertAgeToYears = (ageValue, ageUnit)=>{
+    switch(ageUnit){
+        case 'months':
+            return Number((ageValue / 12).toFixed(2));
+        case 'weeks':
+            return Number((ageValue / 52.1429).toFixed(2));
+        case 'days':
+            return Number((ageValue / 365.25).toFixed(2));
+        case 'years':
+        default:
+            return ageValue;
+    }
+};
+const normalizeSierraLeonePhone = (value)=>{
+    const trimmed = value.trim();
+    if (!trimmed) {
+        return '';
+    }
+    const digitsOnly = trimmed.replace(/\D/g, '');
+    if (!digitsOnly) {
+        return '';
+    }
+    if (digitsOnly.startsWith('232')) {
+        return `+${digitsOnly}`;
+    }
+    if (digitsOnly.startsWith('0')) {
+        return `+232${digitsOnly.slice(1)}`;
+    }
+    return `+232${digitsOnly}`;
+};
+export default function RegisterPatient() {
+    _s();
+    const { profile } = useAuth();
+    const createPatient = useCreatePatient();
+    const navigate = useNavigate();
+    const [formData, setFormData] = useState({
+        firstName: '',
+        lastName: '',
+        age: '',
+        ageUnit: 'years',
+        gender: '',
+        phone: '',
+        email: '',
+        address: ''
+    });
+    const [createdPatient, setCreatedPatient] = useState(null);
+    const handleSubmit = async (e)=>{
+        e.preventDefault();
+        if (!formData.firstName || !formData.lastName || !formData.age || !formData.gender) {
+            toast.error('Please fill in all required fields');
+            return;
+        }
+        const ageValue = Number(formData.age);
+        if (isNaN(ageValue) || ageValue < 0) {
+            toast.error('Please enter a valid age value');
+            return;
+        }
+        const normalizedAge = convertAgeToYears(ageValue, formData.ageUnit);
+        if (normalizedAge > 150) {
+            toast.error('Age exceeds allowed limit (150 years)');
+            return;
+        }
+        try {
+            const normalizedPhone = normalizeSierraLeonePhone(formData.phone);
+            const newPatient = await createPatient.mutateAsync({
+                firstName: formData.firstName.trim(),
+                lastName: formData.lastName.trim(),
+                age: normalizedAge,
+                ageValue,
+                ageUnit: formData.ageUnit,
+                gender: formData.gender,
+                phone: normalizedPhone || undefined,
+                email: formData.email.trim() || undefined,
+                address: formData.address.trim() || undefined
+            });
+            setCreatedPatient(newPatient);
+            toast.success(`Patient registered: ${newPatient.patientId}`);
+        } catch (error) {
+            console.error('Failed to register patient:', error);
+            toast.error('Failed to register patient. Please try again.');
+        }
+    };
+    const resetForm = ()=>{
+        setFormData({
+            firstName: '',
+            lastName: '',
+            age: '',
+            ageUnit: 'years',
+            gender: '',
+            phone: '',
+            email: '',
+            address: ''
+        });
+        setCreatedPatient(null);
+    };
+    if (createdPatient) {
+        return /*#__PURE__*/ _jsxDEV(RoleLayout, {
+            title: "Patient Registered",
+            subtitle: "Registration successful",
+            role: "receptionist",
+            userName: profile?.full_name,
+            children: /*#__PURE__*/ _jsxDEV("div", {
+                className: "max-w-lg mx-auto",
+                children: /*#__PURE__*/ _jsxDEV("div", {
+                    className: "bg-card border rounded-xl p-8 text-center",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "w-16 h-16 rounded-full bg-status-normal/10 flex items-center justify-center mx-auto mb-4",
+                            children: /*#__PURE__*/ _jsxDEV(UserPlus, {
+                                className: "w-8 h-8 text-status-normal"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                lineNumber: 138,
+                                columnNumber: 15
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                            lineNumber: 137,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("h2", {
+                            className: "text-2xl font-bold mb-2",
+                            children: "Registration Complete!"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                            lineNumber: 140,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("p", {
+                            className: "text-muted-foreground mb-6",
+                            children: "Patient has been successfully registered in the system."
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                            lineNumber: 141,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "bg-muted rounded-lg p-4 mb-6",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("p", {
+                                    className: "text-sm text-muted-foreground",
+                                    children: "Patient ID"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                    lineNumber: 146,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("p", {
+                                    className: "text-2xl font-mono font-bold text-primary",
+                                    children: createdPatient.patientId
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                    lineNumber: 147,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("p", {
+                                    className: "text-sm text-muted-foreground mt-2",
+                                    children: [
+                                        formData.firstName,
+                                        " ",
+                                        formData.lastName
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                    lineNumber: 150,
+                                    columnNumber: 15
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                            lineNumber: 145,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "flex gap-3",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV(Button, {
+                                    variant: "outline",
+                                    onClick: resetForm,
+                                    className: "flex-1",
+                                    children: "Register Another"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                    lineNumber: 156,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV(Button, {
+                                    onClick: ()=>navigate(`/reception/new-order?patient=${createdPatient.id}`),
+                                    className: "flex-1",
+                                    children: [
+                                        "Create Order",
+                                        /*#__PURE__*/ _jsxDEV(ArrowRight, {
+                                            className: "w-4 h-4 ml-2"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                            lineNumber: 161,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                    lineNumber: 159,
+                                    columnNumber: 15
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                            lineNumber: 155,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                    lineNumber: 136,
+                    columnNumber: 11
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                lineNumber: 135,
+                columnNumber: 9
+            }, this)
+        }, void 0, false, {
+            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+            lineNumber: 129,
+            columnNumber: 7
+        }, this);
+    }
+    return /*#__PURE__*/ _jsxDEV(RoleLayout, {
+        title: "Register Patient",
+        subtitle: "Add a new patient to the system",
+        role: "receptionist",
+        userName: profile?.full_name,
+        children: /*#__PURE__*/ _jsxDEV("div", {
+            className: "max-w-2xl mx-auto",
+            children: /*#__PURE__*/ _jsxDEV("form", {
+                onSubmit: handleSubmit,
+                className: "bg-card border rounded-xl p-6",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "grid grid-cols-1 md:grid-cols-2 gap-6",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "space-y-2",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                        htmlFor: "firstName",
+                                        children: "First Name *"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                        lineNumber: 182,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(Input, {
+                                        id: "firstName",
+                                        value: formData.firstName,
+                                        onChange: (e)=>setFormData((prev)=>({
+                                                    ...prev,
+                                                    firstName: e.target.value
+                                                })),
+                                        placeholder: "Enter first name",
+                                        required: true
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                        lineNumber: 183,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                lineNumber: 181,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "space-y-2",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                        htmlFor: "lastName",
+                                        children: "Last Name *"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                        lineNumber: 194,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(Input, {
+                                        id: "lastName",
+                                        value: formData.lastName,
+                                        onChange: (e)=>setFormData((prev)=>({
+                                                    ...prev,
+                                                    lastName: e.target.value
+                                                })),
+                                        placeholder: "Enter last name",
+                                        required: true
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                        lineNumber: 195,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                lineNumber: 193,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "space-y-2",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                        htmlFor: "age",
+                                        children: "Age *"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                        lineNumber: 206,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "grid grid-cols-2 gap-2",
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV(Input, {
+                                                id: "age",
+                                                type: "number",
+                                                min: "0",
+                                                step: "1",
+                                                value: formData.age,
+                                                onChange: (e)=>setFormData((prev)=>({
+                                                            ...prev,
+                                                            age: e.target.value
+                                                        })),
+                                                placeholder: "Enter value",
+                                                required: true
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                                lineNumber: 208,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(Select, {
+                                                value: formData.ageUnit,
+                                                onValueChange: (value)=>setFormData((prev)=>({
+                                                            ...prev,
+                                                            ageUnit: value
+                                                        })),
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV(SelectTrigger, {
+                                                        children: /*#__PURE__*/ _jsxDEV(SelectValue, {
+                                                            placeholder: "Unit"
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                                            lineNumber: 223,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                                        lineNumber: 222,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV(SelectContent, {
+                                                        children: [
+                                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                                value: "years",
+                                                                children: "Years"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                                                lineNumber: 226,
+                                                                columnNumber: 21
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                                value: "months",
+                                                                children: "Months"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                                                lineNumber: 227,
+                                                                columnNumber: 21
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                                value: "weeks",
+                                                                children: "Weeks"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                                                lineNumber: 228,
+                                                                columnNumber: 21
+                                                            }, this),
+                                                            /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                                value: "days",
+                                                                children: "Days"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                                                lineNumber: 229,
+                                                                columnNumber: 21
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                                        lineNumber: 225,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                                lineNumber: 218,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                        lineNumber: 207,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                lineNumber: 205,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "space-y-2",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                        children: "Gender *"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                        lineNumber: 237,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(Select, {
+                                        value: formData.gender,
+                                        onValueChange: (value)=>setFormData((prev)=>({
+                                                    ...prev,
+                                                    gender: value
+                                                })),
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV(SelectTrigger, {
+                                                children: /*#__PURE__*/ _jsxDEV(SelectValue, {
+                                                    placeholder: "Select gender"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                                    lineNumber: 243,
+                                                    columnNumber: 19
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                                lineNumber: 242,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV(SelectContent, {
+                                                children: [
+                                                    /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                        value: "M",
+                                                        children: "Male"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                                        lineNumber: 246,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                        value: "F",
+                                                        children: "Female"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                                        lineNumber: 247,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                                        value: "O",
+                                                        children: "Other"
+                                                    }, void 0, false, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                                        lineNumber: 248,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                                lineNumber: 245,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                        lineNumber: 238,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                lineNumber: 236,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "space-y-2",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                        htmlFor: "phone",
+                                        children: "Phone Number"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                        lineNumber: 255,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(Input, {
+                                        id: "phone",
+                                        type: "tel",
+                                        value: formData.phone,
+                                        onChange: (e)=>setFormData((prev)=>({
+                                                    ...prev,
+                                                    phone: e.target.value
+                                                })),
+                                        placeholder: "+232 XX XXXXXX"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                        lineNumber: 256,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                lineNumber: 254,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "space-y-2",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                        htmlFor: "email",
+                                        children: "Email"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                        lineNumber: 267,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(Input, {
+                                        id: "email",
+                                        type: "email",
+                                        value: formData.email,
+                                        onChange: (e)=>setFormData((prev)=>({
+                                                    ...prev,
+                                                    email: e.target.value
+                                                })),
+                                        placeholder: "patient@email.com"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                        lineNumber: 268,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                lineNumber: 266,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "space-y-2 md:col-span-2",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(Label, {
+                                        htmlFor: "address",
+                                        children: "Address"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                        lineNumber: 279,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(Input, {
+                                        id: "address",
+                                        value: formData.address,
+                                        onChange: (e)=>setFormData((prev)=>({
+                                                    ...prev,
+                                                    address: e.target.value
+                                                })),
+                                        placeholder: "Enter address"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                        lineNumber: 280,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                lineNumber: 278,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                        lineNumber: 179,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "flex justify-end gap-3 mt-6 pt-6 border-t",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(Button, {
+                                type: "button",
+                                variant: "outline",
+                                onClick: ()=>navigate('/reception'),
+                                children: "Cancel"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                lineNumber: 290,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV(Button, {
+                                type: "submit",
+                                disabled: createPatient.isPending,
+                                children: createPatient.isPending ? /*#__PURE__*/ _jsxDEV(_Fragment, {
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV(Loader2, {
+                                            className: "w-4 h-4 mr-2 animate-spin"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                            lineNumber: 296,
+                                            columnNumber: 19
+                                        }, this),
+                                        "Registering..."
+                                    ]
+                                }, void 0, true) : /*#__PURE__*/ _jsxDEV(_Fragment, {
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV(UserPlus, {
+                                            className: "w-4 h-4 mr-2"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                            lineNumber: 301,
+                                            columnNumber: 19
+                                        }, this),
+                                        "Register Patient"
+                                    ]
+                                }, void 0, true)
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                                lineNumber: 293,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                        lineNumber: 289,
+                        columnNumber: 11
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+                lineNumber: 178,
+                columnNumber: 9
+            }, this)
+        }, void 0, false, {
+            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+            lineNumber: 177,
+            columnNumber: 7
+        }, this)
+    }, void 0, false, {
+        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx",
+        lineNumber: 171,
+        columnNumber: 5
+    }, this);
+}
+_s(RegisterPatient, "/2a5dmuxGTClr1WHhrp6sWy2ygc=", false, function() {
+    return [
+        useAuth,
+        useCreatePatient,
+        useNavigate
+    ];
+});
+_c = RegisterPatient;
+var _c;
+$RefreshReg$(_c, "RegisterPatient");
+
+
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+
+
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/HP/Downloads/lab/frontend/src/pages/reception/RegisterPatient.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIlJlZ2lzdGVyUGF0aWVudC50c3giXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgdXNlU3RhdGUgfSBmcm9tICdyZWFjdCc7XG5pbXBvcnQgeyB1c2VOYXZpZ2F0ZSB9IGZyb20gJ3JlYWN0LXJvdXRlci1kb20nO1xuaW1wb3J0IHsgUm9sZUxheW91dCB9IGZyb20gJ0AvY29tcG9uZW50cy9sYXlvdXQvUm9sZUxheW91dCc7XG5pbXBvcnQgeyB1c2VBdXRoIH0gZnJvbSAnQC9jb250ZXh0L0F1dGhDb250ZXh0JztcbmltcG9ydCB7IHVzZUNyZWF0ZVBhdGllbnQgfSBmcm9tICdAL2hvb2tzL3VzZVBhdGllbnRzJztcbmltcG9ydCB7IEJ1dHRvbiB9IGZyb20gJ0AvY29tcG9uZW50cy91aS9idXR0b24nO1xuaW1wb3J0IHsgSW5wdXQgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvaW5wdXQnO1xuaW1wb3J0IHsgTGFiZWwgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvbGFiZWwnO1xuaW1wb3J0IHsgU2VsZWN0LCBTZWxlY3RDb250ZW50LCBTZWxlY3RJdGVtLCBTZWxlY3RUcmlnZ2VyLCBTZWxlY3RWYWx1ZSB9IGZyb20gJ0AvY29tcG9uZW50cy91aS9zZWxlY3QnO1xuaW1wb3J0IHsgdG9hc3QgfSBmcm9tICdzb25uZXInO1xuaW1wb3J0IHsgVXNlclBsdXMsIEFycm93UmlnaHQsIExvYWRlcjIgfSBmcm9tICdsdWNpZGUtcmVhY3QnO1xuXG50eXBlIEFnZVVuaXQgPSAneWVhcnMnIHwgJ21vbnRocycgfCAnd2Vla3MnIHwgJ2RheXMnO1xuXG5jb25zdCBjb252ZXJ0QWdlVG9ZZWFycyA9IChhZ2VWYWx1ZTogbnVtYmVyLCBhZ2VVbml0OiBBZ2VVbml0KTogbnVtYmVyID0+IHtcbiAgc3dpdGNoIChhZ2VVbml0KSB7XG4gICAgY2FzZSAnbW9udGhzJzpcbiAgICAgIHJldHVybiBOdW1iZXIoKGFnZVZhbHVlIC8gMTIpLnRvRml4ZWQoMikpO1xuICAgIGNhc2UgJ3dlZWtzJzpcbiAgICAgIHJldHVybiBOdW1iZXIoKGFnZVZhbHVlIC8gNTIuMTQyOSkudG9GaXhlZCgyKSk7XG4gICAgY2FzZSAnZGF5cyc6XG4gICAgICByZXR1cm4gTnVtYmVyKChhZ2VWYWx1ZSAvIDM2NS4yNSkudG9GaXhlZCgyKSk7XG4gICAgY2FzZSAneWVhcnMnOlxuICAgIGRlZmF1bHQ6XG4gICAgICByZXR1cm4gYWdlVmFsdWU7XG4gIH1cbn07XG5cbmNvbnN0IG5vcm1hbGl6ZVNpZXJyYUxlb25lUGhvbmUgPSAodmFsdWU6IHN0cmluZyk6IHN0cmluZyA9PiB7XG4gIGNvbnN0IHRyaW1tZWQgPSB2YWx1ZS50cmltKCk7XG4gIGlmICghdHJpbW1lZCkge1xuICAgIHJldHVybiAnJztcbiAgfVxuXG4gIGNvbnN0IGRpZ2l0c09ubHkgPSB0cmltbWVkLnJlcGxhY2UoL1xcRC9nLCAnJyk7XG5cbiAgaWYgKCFkaWdpdHNPbmx5KSB7XG4gICAgcmV0dXJuICcnO1xuICB9XG5cbiAgaWYgKGRpZ2l0c09ubHkuc3RhcnRzV2l0aCgnMjMyJykpIHtcbiAgICByZXR1cm4gYCske2RpZ2l0c09ubHl9YDtcbiAgfVxuXG4gIGlmIChkaWdpdHNPbmx5LnN0YXJ0c1dpdGgoJzAnKSkge1xuICAgIHJldHVybiBgKzIzMiR7ZGlnaXRzT25seS5zbGljZSgxKX1gO1xuICB9XG5cbiAgcmV0dXJuIGArMjMyJHtkaWdpdHNPbmx5fWA7XG59O1xuXG5leHBvcnQgZGVmYXVsdCBmdW5jdGlvbiBSZWdpc3RlclBhdGllbnQoKSB7XG4gIGNvbnN0IHsgcHJvZmlsZSB9ID0gdXNlQXV0aCgpO1xuICBjb25zdCBjcmVhdGVQYXRpZW50ID0gdXNlQ3JlYXRlUGF0aWVudCgpO1xuICBjb25zdCBuYXZpZ2F0ZSA9IHVzZU5hdmlnYXRlKCk7XG5cbiAgY29uc3QgW2Zvcm1EYXRhLCBzZXRGb3JtRGF0YV0gPSB1c2VTdGF0ZSh7XG4gICAgZmlyc3ROYW1lOiAnJyxcbiAgICBsYXN0TmFtZTogJycsXG4gICAgYWdlOiAnJyxcbiAgICBhZ2VVbml0OiAneWVhcnMnIGFzIEFnZVVuaXQsXG4gICAgZ2VuZGVyOiAnJyBhcyAnTScgfCAnRicgfCAnTycgfCAnJyxcbiAgICBwaG9uZTogJycsXG4gICAgZW1haWw6ICcnLFxuICAgIGFkZHJlc3M6ICcnLFxuICB9KTtcblxuICBjb25zdCBbY3JlYXRlZFBhdGllbnQsIHNldENyZWF0ZWRQYXRpZW50XSA9IHVzZVN0YXRlPHsgaWQ6IHN0cmluZzsgcGF0aWVudElkOiBzdHJpbmcgfSB8IG51bGw+KG51bGwpO1xuXG4gIGNvbnN0IGhhbmRsZVN1Ym1pdCA9IGFzeW5jIChlOiBSZWFjdC5Gb3JtRXZlbnQpID0+IHtcbiAgICBlLnByZXZlbnREZWZhdWx0KCk7XG4gICAgXG4gICAgaWYgKCFmb3JtRGF0YS5maXJzdE5hbWUgfHwgIWZvcm1EYXRhLmxhc3ROYW1lIHx8ICFmb3JtRGF0YS5hZ2UgfHwgIWZvcm1EYXRhLmdlbmRlcikge1xuICAgICAgdG9hc3QuZXJyb3IoJ1BsZWFzZSBmaWxsIGluIGFsbCByZXF1aXJlZCBmaWVsZHMnKTtcbiAgICAgIHJldHVybjtcbiAgICB9XG5cbiAgICBjb25zdCBhZ2VWYWx1ZSA9IE51bWJlcihmb3JtRGF0YS5hZ2UpO1xuICAgIGlmIChpc05hTihhZ2VWYWx1ZSkgfHwgYWdlVmFsdWUgPCAwKSB7XG4gICAgICB0b2FzdC5lcnJvcignUGxlYXNlIGVudGVyIGEgdmFsaWQgYWdlIHZhbHVlJyk7XG4gICAgICByZXR1cm47XG4gICAgfVxuXG4gICAgY29uc3Qgbm9ybWFsaXplZEFnZSA9IGNvbnZlcnRBZ2VUb1llYXJzKGFnZVZhbHVlLCBmb3JtRGF0YS5hZ2VVbml0KTtcbiAgICBpZiAobm9ybWFsaXplZEFnZSA+IDE1MCkge1xuICAgICAgdG9hc3QuZXJyb3IoJ0FnZSBleGNlZWRzIGFsbG93ZWQgbGltaXQgKDE1MCB5ZWFycyknKTtcbiAgICAgIHJldHVybjtcbiAgICB9XG5cbiAgICB0cnkge1xuICAgICAgY29uc3Qgbm9ybWFsaXplZFBob25lID0gbm9ybWFsaXplU2llcnJhTGVvbmVQaG9uZShmb3JtRGF0YS5waG9uZSk7XG5cbiAgICAgIGNvbnN0IG5ld1BhdGllbnQgPSBhd2FpdCBjcmVhdGVQYXRpZW50Lm11dGF0ZUFzeW5jKHtcbiAgICAgICAgZmlyc3ROYW1lOiBmb3JtRGF0YS5maXJzdE5hbWUudHJpbSgpLFxuICAgICAgICBsYXN0TmFtZTogZm9ybURhdGEubGFzdE5hbWUudHJpbSgpLFxuICAgICAgICBhZ2U6IG5vcm1hbGl6ZWRBZ2UsXG4gICAgICAgIGFnZVZhbHVlLFxuICAgICAgICBhZ2VVbml0OiBmb3JtRGF0YS5hZ2VVbml0LFxuICAgICAgICBnZW5kZXI6IGZvcm1EYXRhLmdlbmRlciBhcyAnTScgfCAnRicgfCAnTycsXG4gICAgICAgIHBob25lOiBub3JtYWxpemVkUGhvbmUgfHwgdW5kZWZpbmVkLFxuICAgICAgICBlbWFpbDogZm9ybURhdGEuZW1haWwudHJpbSgpIHx8IHVuZGVmaW5lZCxcbiAgICAgICAgYWRkcmVzczogZm9ybURhdGEuYWRkcmVzcy50cmltKCkgfHwgdW5kZWZpbmVkLFxuICAgICAgfSk7XG5cbiAgICAgIHNldENyZWF0ZWRQYXRpZW50KG5ld1BhdGllbnQpO1xuICAgICAgdG9hc3Quc3VjY2VzcyhgUGF0aWVudCByZWdpc3RlcmVkOiAke25ld1BhdGllbnQucGF0aWVudElkfWApO1xuICAgIH0gY2F0Y2ggKGVycm9yKSB7XG4gICAgICBjb25zb2xlLmVycm9yKCdGYWlsZWQgdG8gcmVnaXN0ZXIgcGF0aWVudDonLCBlcnJvcik7XG4gICAgICB0b2FzdC5lcnJvcignRmFpbGVkIHRvIHJlZ2lzdGVyIHBhdGllbnQuIFBsZWFzZSB0cnkgYWdhaW4uJyk7XG4gICAgfVxuICB9O1xuXG4gIGNvbnN0IHJlc2V0Rm9ybSA9ICgpID0+IHtcbiAgICBzZXRGb3JtRGF0YSh7XG4gICAgICBmaXJzdE5hbWU6ICcnLFxuICAgICAgbGFzdE5hbWU6ICcnLFxuICAgICAgYWdlOiAnJyxcbiAgICAgIGFnZVVuaXQ6ICd5ZWFycycsXG4gICAgICBnZW5kZXI6ICcnLFxuICAgICAgcGhvbmU6ICcnLFxuICAgICAgZW1haWw6ICcnLFxuICAgICAgYWRkcmVzczogJycsXG4gICAgfSk7XG4gICAgc2V0Q3JlYXRlZFBhdGllbnQobnVsbCk7XG4gIH07XG5cbiAgaWYgKGNyZWF0ZWRQYXRpZW50KSB7XG4gICAgcmV0dXJuIChcbiAgICAgIDxSb2xlTGF5b3V0IFxuICAgICAgICB0aXRsZT1cIlBhdGllbnQgUmVnaXN0ZXJlZFwiIFxuICAgICAgICBzdWJ0aXRsZT1cIlJlZ2lzdHJhdGlvbiBzdWNjZXNzZnVsXCJcbiAgICAgICAgcm9sZT1cInJlY2VwdGlvbmlzdFwiXG4gICAgICAgIHVzZXJOYW1lPXtwcm9maWxlPy5mdWxsX25hbWV9XG4gICAgICA+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwibWF4LXctbGcgbXgtYXV0b1wiPlxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiYmctY2FyZCBib3JkZXIgcm91bmRlZC14bCBwLTggdGV4dC1jZW50ZXJcIj5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwidy0xNiBoLTE2IHJvdW5kZWQtZnVsbCBiZy1zdGF0dXMtbm9ybWFsLzEwIGZsZXggaXRlbXMtY2VudGVyIGp1c3RpZnktY2VudGVyIG14LWF1dG8gbWItNFwiPlxuICAgICAgICAgICAgICA8VXNlclBsdXMgY2xhc3NOYW1lPVwidy04IGgtOCB0ZXh0LXN0YXR1cy1ub3JtYWxcIiAvPlxuICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICA8aDIgY2xhc3NOYW1lPVwidGV4dC0yeGwgZm9udC1ib2xkIG1iLTJcIj5SZWdpc3RyYXRpb24gQ29tcGxldGUhPC9oMj5cbiAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtbXV0ZWQtZm9yZWdyb3VuZCBtYi02XCI+XG4gICAgICAgICAgICAgIFBhdGllbnQgaGFzIGJlZW4gc3VjY2Vzc2Z1bGx5IHJlZ2lzdGVyZWQgaW4gdGhlIHN5c3RlbS5cbiAgICAgICAgICAgIDwvcD5cbiAgICAgICAgICAgIFxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJiZy1tdXRlZCByb3VuZGVkLWxnIHAtNCBtYi02XCI+XG4gICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc20gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+UGF0aWVudCBJRDwvcD5cbiAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC0yeGwgZm9udC1tb25vIGZvbnQtYm9sZCB0ZXh0LXByaW1hcnlcIj5cbiAgICAgICAgICAgICAgICB7Y3JlYXRlZFBhdGllbnQucGF0aWVudElkfVxuICAgICAgICAgICAgICA8L3A+XG4gICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc20gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kIG10LTJcIj5cbiAgICAgICAgICAgICAgICB7Zm9ybURhdGEuZmlyc3ROYW1lfSB7Zm9ybURhdGEubGFzdE5hbWV9XG4gICAgICAgICAgICAgIDwvcD5cbiAgICAgICAgICAgIDwvZGl2PlxuXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggZ2FwLTNcIj5cbiAgICAgICAgICAgICAgPEJ1dHRvbiB2YXJpYW50PVwib3V0bGluZVwiIG9uQ2xpY2s9e3Jlc2V0Rm9ybX0gY2xhc3NOYW1lPVwiZmxleC0xXCI+XG4gICAgICAgICAgICAgICAgUmVnaXN0ZXIgQW5vdGhlclxuICAgICAgICAgICAgICA8L0J1dHRvbj5cbiAgICAgICAgICAgICAgPEJ1dHRvbiBvbkNsaWNrPXsoKSA9PiBuYXZpZ2F0ZShgL3JlY2VwdGlvbi9uZXctb3JkZXI/cGF0aWVudD0ke2NyZWF0ZWRQYXRpZW50LmlkfWApfSBjbGFzc05hbWU9XCJmbGV4LTFcIj5cbiAgICAgICAgICAgICAgICBDcmVhdGUgT3JkZXJcbiAgICAgICAgICAgICAgICA8QXJyb3dSaWdodCBjbGFzc05hbWU9XCJ3LTQgaC00IG1sLTJcIiAvPlxuICAgICAgICAgICAgICA8L0J1dHRvbj5cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICA8L2Rpdj5cbiAgICAgIDwvUm9sZUxheW91dD5cbiAgICApO1xuICB9XG5cbiAgcmV0dXJuIChcbiAgICA8Um9sZUxheW91dCBcbiAgICAgIHRpdGxlPVwiUmVnaXN0ZXIgUGF0aWVudFwiIFxuICAgICAgc3VidGl0bGU9XCJBZGQgYSBuZXcgcGF0aWVudCB0byB0aGUgc3lzdGVtXCJcbiAgICAgIHJvbGU9XCJyZWNlcHRpb25pc3RcIlxuICAgICAgdXNlck5hbWU9e3Byb2ZpbGU/LmZ1bGxfbmFtZX1cbiAgICA+XG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cIm1heC13LTJ4bCBteC1hdXRvXCI+XG4gICAgICAgIDxmb3JtIG9uU3VibWl0PXtoYW5kbGVTdWJtaXR9IGNsYXNzTmFtZT1cImJnLWNhcmQgYm9yZGVyIHJvdW5kZWQteGwgcC02XCI+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJncmlkIGdyaWQtY29scy0xIG1kOmdyaWQtY29scy0yIGdhcC02XCI+XG4gICAgICAgICAgICB7LyogRmlyc3QgTmFtZSAqL31cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0yXCI+XG4gICAgICAgICAgICAgIDxMYWJlbCBodG1sRm9yPVwiZmlyc3ROYW1lXCI+Rmlyc3QgTmFtZSAqPC9MYWJlbD5cbiAgICAgICAgICAgICAgPElucHV0XG4gICAgICAgICAgICAgICAgaWQ9XCJmaXJzdE5hbWVcIlxuICAgICAgICAgICAgICAgIHZhbHVlPXtmb3JtRGF0YS5maXJzdE5hbWV9XG4gICAgICAgICAgICAgICAgb25DaGFuZ2U9e2UgPT4gc2V0Rm9ybURhdGEocHJldiA9PiAoeyAuLi5wcmV2LCBmaXJzdE5hbWU6IGUudGFyZ2V0LnZhbHVlIH0pKX1cbiAgICAgICAgICAgICAgICBwbGFjZWhvbGRlcj1cIkVudGVyIGZpcnN0IG5hbWVcIlxuICAgICAgICAgICAgICAgIHJlcXVpcmVkXG4gICAgICAgICAgICAgIC8+XG4gICAgICAgICAgICA8L2Rpdj5cblxuICAgICAgICAgICAgey8qIExhc3QgTmFtZSAqL31cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0yXCI+XG4gICAgICAgICAgICAgIDxMYWJlbCBodG1sRm9yPVwibGFzdE5hbWVcIj5MYXN0IE5hbWUgKjwvTGFiZWw+XG4gICAgICAgICAgICAgIDxJbnB1dFxuICAgICAgICAgICAgICAgIGlkPVwibGFzdE5hbWVcIlxuICAgICAgICAgICAgICAgIHZhbHVlPXtmb3JtRGF0YS5sYXN0TmFtZX1cbiAgICAgICAgICAgICAgICBvbkNoYW5nZT17ZSA9PiBzZXRGb3JtRGF0YShwcmV2ID0+ICh7IC4uLnByZXYsIGxhc3ROYW1lOiBlLnRhcmdldC52YWx1ZSB9KSl9XG4gICAgICAgICAgICAgICAgcGxhY2Vob2xkZXI9XCJFbnRlciBsYXN0IG5hbWVcIlxuICAgICAgICAgICAgICAgIHJlcXVpcmVkXG4gICAgICAgICAgICAgIC8+XG4gICAgICAgICAgICA8L2Rpdj5cblxuICAgICAgICAgICAgey8qIEFnZSAqL31cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0yXCI+XG4gICAgICAgICAgICAgIDxMYWJlbCBodG1sRm9yPVwiYWdlXCI+QWdlICo8L0xhYmVsPlxuICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImdyaWQgZ3JpZC1jb2xzLTIgZ2FwLTJcIj5cbiAgICAgICAgICAgICAgICA8SW5wdXRcbiAgICAgICAgICAgICAgICAgIGlkPVwiYWdlXCJcbiAgICAgICAgICAgICAgICAgIHR5cGU9XCJudW1iZXJcIlxuICAgICAgICAgICAgICAgICAgbWluPVwiMFwiXG4gICAgICAgICAgICAgICAgICBzdGVwPVwiMVwiXG4gICAgICAgICAgICAgICAgICB2YWx1ZT17Zm9ybURhdGEuYWdlfVxuICAgICAgICAgICAgICAgICAgb25DaGFuZ2U9e2UgPT4gc2V0Rm9ybURhdGEocHJldiA9PiAoeyAuLi5wcmV2LCBhZ2U6IGUudGFyZ2V0LnZhbHVlIH0pKX1cbiAgICAgICAgICAgICAgICAgIHBsYWNlaG9sZGVyPVwiRW50ZXIgdmFsdWVcIlxuICAgICAgICAgICAgICAgICAgcmVxdWlyZWRcbiAgICAgICAgICAgICAgICAvPlxuICAgICAgICAgICAgICAgIDxTZWxlY3RcbiAgICAgICAgICAgICAgICAgIHZhbHVlPXtmb3JtRGF0YS5hZ2VVbml0fVxuICAgICAgICAgICAgICAgICAgb25WYWx1ZUNoYW5nZT17dmFsdWUgPT4gc2V0Rm9ybURhdGEocHJldiA9PiAoeyAuLi5wcmV2LCBhZ2VVbml0OiB2YWx1ZSBhcyBBZ2VVbml0IH0pKX1cbiAgICAgICAgICAgICAgICA+XG4gICAgICAgICAgICAgICAgICA8U2VsZWN0VHJpZ2dlcj5cbiAgICAgICAgICAgICAgICAgICAgPFNlbGVjdFZhbHVlIHBsYWNlaG9sZGVyPVwiVW5pdFwiIC8+XG4gICAgICAgICAgICAgICAgICA8L1NlbGVjdFRyaWdnZXI+XG4gICAgICAgICAgICAgICAgICA8U2VsZWN0Q29udGVudD5cbiAgICAgICAgICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJ5ZWFyc1wiPlllYXJzPC9TZWxlY3RJdGVtPlxuICAgICAgICAgICAgICAgICAgICA8U2VsZWN0SXRlbSB2YWx1ZT1cIm1vbnRoc1wiPk1vbnRoczwvU2VsZWN0SXRlbT5cbiAgICAgICAgICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJ3ZWVrc1wiPldlZWtzPC9TZWxlY3RJdGVtPlxuICAgICAgICAgICAgICAgICAgICA8U2VsZWN0SXRlbSB2YWx1ZT1cImRheXNcIj5EYXlzPC9TZWxlY3RJdGVtPlxuICAgICAgICAgICAgICAgICAgPC9TZWxlY3RDb250ZW50PlxuICAgICAgICAgICAgICAgIDwvU2VsZWN0PlxuICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgIDwvZGl2PlxuXG4gICAgICAgICAgICB7LyogR2VuZGVyICovfVxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTJcIj5cbiAgICAgICAgICAgICAgPExhYmVsPkdlbmRlciAqPC9MYWJlbD5cbiAgICAgICAgICAgICAgPFNlbGVjdCBcbiAgICAgICAgICAgICAgICB2YWx1ZT17Zm9ybURhdGEuZ2VuZGVyfSBcbiAgICAgICAgICAgICAgICBvblZhbHVlQ2hhbmdlPXt2YWx1ZSA9PiBzZXRGb3JtRGF0YShwcmV2ID0+ICh7IC4uLnByZXYsIGdlbmRlcjogdmFsdWUgYXMgJ00nIHwgJ0YnIHwgJ08nIH0pKX1cbiAgICAgICAgICAgICAgPlxuICAgICAgICAgICAgICAgIDxTZWxlY3RUcmlnZ2VyPlxuICAgICAgICAgICAgICAgICAgPFNlbGVjdFZhbHVlIHBsYWNlaG9sZGVyPVwiU2VsZWN0IGdlbmRlclwiIC8+XG4gICAgICAgICAgICAgICAgPC9TZWxlY3RUcmlnZ2VyPlxuICAgICAgICAgICAgICAgIDxTZWxlY3RDb250ZW50PlxuICAgICAgICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJNXCI+TWFsZTwvU2VsZWN0SXRlbT5cbiAgICAgICAgICAgICAgICAgIDxTZWxlY3RJdGVtIHZhbHVlPVwiRlwiPkZlbWFsZTwvU2VsZWN0SXRlbT5cbiAgICAgICAgICAgICAgICAgIDxTZWxlY3RJdGVtIHZhbHVlPVwiT1wiPk90aGVyPC9TZWxlY3RJdGVtPlxuICAgICAgICAgICAgICAgIDwvU2VsZWN0Q29udGVudD5cbiAgICAgICAgICAgICAgPC9TZWxlY3Q+XG4gICAgICAgICAgICA8L2Rpdj5cblxuICAgICAgICAgICAgey8qIFBob25lICovfVxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTJcIj5cbiAgICAgICAgICAgICAgPExhYmVsIGh0bWxGb3I9XCJwaG9uZVwiPlBob25lIE51bWJlcjwvTGFiZWw+XG4gICAgICAgICAgICAgIDxJbnB1dFxuICAgICAgICAgICAgICAgIGlkPVwicGhvbmVcIlxuICAgICAgICAgICAgICAgIHR5cGU9XCJ0ZWxcIlxuICAgICAgICAgICAgICAgIHZhbHVlPXtmb3JtRGF0YS5waG9uZX1cbiAgICAgICAgICAgICAgICBvbkNoYW5nZT17ZSA9PiBzZXRGb3JtRGF0YShwcmV2ID0+ICh7IC4uLnByZXYsIHBob25lOiBlLnRhcmdldC52YWx1ZSB9KSl9XG4gICAgICAgICAgICAgICAgcGxhY2Vob2xkZXI9XCIrMjMyIFhYIFhYWFhYWFwiXG4gICAgICAgICAgICAgIC8+XG4gICAgICAgICAgICA8L2Rpdj5cblxuICAgICAgICAgICAgey8qIEVtYWlsICovfVxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTJcIj5cbiAgICAgICAgICAgICAgPExhYmVsIGh0bWxGb3I9XCJlbWFpbFwiPkVtYWlsPC9MYWJlbD5cbiAgICAgICAgICAgICAgPElucHV0XG4gICAgICAgICAgICAgICAgaWQ9XCJlbWFpbFwiXG4gICAgICAgICAgICAgICAgdHlwZT1cImVtYWlsXCJcbiAgICAgICAgICAgICAgICB2YWx1ZT17Zm9ybURhdGEuZW1haWx9XG4gICAgICAgICAgICAgICAgb25DaGFuZ2U9e2UgPT4gc2V0Rm9ybURhdGEocHJldiA9PiAoeyAuLi5wcmV2LCBlbWFpbDogZS50YXJnZXQudmFsdWUgfSkpfVxuICAgICAgICAgICAgICAgIHBsYWNlaG9sZGVyPVwicGF0aWVudEBlbWFpbC5jb21cIlxuICAgICAgICAgICAgICAvPlxuICAgICAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgICAgIHsvKiBBZGRyZXNzICovfVxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTIgbWQ6Y29sLXNwYW4tMlwiPlxuICAgICAgICAgICAgICA8TGFiZWwgaHRtbEZvcj1cImFkZHJlc3NcIj5BZGRyZXNzPC9MYWJlbD5cbiAgICAgICAgICAgICAgPElucHV0XG4gICAgICAgICAgICAgICAgaWQ9XCJhZGRyZXNzXCJcbiAgICAgICAgICAgICAgICB2YWx1ZT17Zm9ybURhdGEuYWRkcmVzc31cbiAgICAgICAgICAgICAgICBvbkNoYW5nZT17ZSA9PiBzZXRGb3JtRGF0YShwcmV2ID0+ICh7IC4uLnByZXYsIGFkZHJlc3M6IGUudGFyZ2V0LnZhbHVlIH0pKX1cbiAgICAgICAgICAgICAgICBwbGFjZWhvbGRlcj1cIkVudGVyIGFkZHJlc3NcIlxuICAgICAgICAgICAgICAvPlxuICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXgganVzdGlmeS1lbmQgZ2FwLTMgbXQtNiBwdC02IGJvcmRlci10XCI+XG4gICAgICAgICAgICA8QnV0dG9uIHR5cGU9XCJidXR0b25cIiB2YXJpYW50PVwib3V0bGluZVwiIG9uQ2xpY2s9eygpID0+IG5hdmlnYXRlKCcvcmVjZXB0aW9uJyl9PlxuICAgICAgICAgICAgICBDYW5jZWxcbiAgICAgICAgICAgIDwvQnV0dG9uPlxuICAgICAgICAgICAgPEJ1dHRvbiB0eXBlPVwic3VibWl0XCIgZGlzYWJsZWQ9e2NyZWF0ZVBhdGllbnQuaXNQZW5kaW5nfT5cbiAgICAgICAgICAgICAge2NyZWF0ZVBhdGllbnQuaXNQZW5kaW5nID8gKFxuICAgICAgICAgICAgICAgIDw+XG4gICAgICAgICAgICAgICAgICA8TG9hZGVyMiBjbGFzc05hbWU9XCJ3LTQgaC00IG1yLTIgYW5pbWF0ZS1zcGluXCIgLz5cbiAgICAgICAgICAgICAgICAgIFJlZ2lzdGVyaW5nLi4uXG4gICAgICAgICAgICAgICAgPC8+XG4gICAgICAgICAgICAgICkgOiAoXG4gICAgICAgICAgICAgICAgPD5cbiAgICAgICAgICAgICAgICAgIDxVc2VyUGx1cyBjbGFzc05hbWU9XCJ3LTQgaC00IG1yLTJcIiAvPlxuICAgICAgICAgICAgICAgICAgUmVnaXN0ZXIgUGF0aWVudFxuICAgICAgICAgICAgICAgIDwvPlxuICAgICAgICAgICAgICApfVxuICAgICAgICAgICAgPC9CdXR0b24+XG4gICAgICAgICAgPC9kaXY+XG4gICAgICAgIDwvZm9ybT5cbiAgICAgIDwvZGl2PlxuICAgIDwvUm9sZUxheW91dD5cbiAgKTtcbn1cbiJdLCJuYW1lcyI6WyJ1c2VTdGF0ZSIsInVzZU5hdmlnYXRlIiwiUm9sZUxheW91dCIsInVzZUF1dGgiLCJ1c2VDcmVhdGVQYXRpZW50IiwiQnV0dG9uIiwiSW5wdXQiLCJMYWJlbCIsIlNlbGVjdCIsIlNlbGVjdENvbnRlbnQiLCJTZWxlY3RJdGVtIiwiU2VsZWN0VHJpZ2dlciIsIlNlbGVjdFZhbHVlIiwidG9hc3QiLCJVc2VyUGx1cyIsIkFycm93UmlnaHQiLCJMb2FkZXIyIiwiY29udmVydEFnZVRvWWVhcnMiLCJhZ2VWYWx1ZSIsImFnZVVuaXQiLCJOdW1iZXIiLCJ0b0ZpeGVkIiwibm9ybWFsaXplU2llcnJhTGVvbmVQaG9uZSIsInZhbHVlIiwidHJpbW1lZCIsInRyaW0iLCJkaWdpdHNPbmx5IiwicmVwbGFjZSIsInN0YXJ0c1dpdGgiLCJzbGljZSIsIlJlZ2lzdGVyUGF0aWVudCIsInByb2ZpbGUiLCJjcmVhdGVQYXRpZW50IiwibmF2aWdhdGUiLCJmb3JtRGF0YSIsInNldEZvcm1EYXRhIiwiZmlyc3ROYW1lIiwibGFzdE5hbWUiLCJhZ2UiLCJnZW5kZXIiLCJwaG9uZSIsImVtYWlsIiwiYWRkcmVzcyIsImNyZWF0ZWRQYXRpZW50Iiwic2V0Q3JlYXRlZFBhdGllbnQiLCJoYW5kbGVTdWJtaXQiLCJlIiwicHJldmVudERlZmF1bHQiLCJlcnJvciIsImlzTmFOIiwibm9ybWFsaXplZEFnZSIsIm5vcm1hbGl6ZWRQaG9uZSIsIm5ld1BhdGllbnQiLCJtdXRhdGVBc3luYyIsInVuZGVmaW5lZCIsInN1Y2Nlc3MiLCJwYXRpZW50SWQiLCJjb25zb2xlIiwicmVzZXRGb3JtIiwidGl0bGUiLCJzdWJ0aXRsZSIsInJvbGUiLCJ1c2VyTmFtZSIsImZ1bGxfbmFtZSIsImRpdiIsImNsYXNzTmFtZSIsImgyIiwicCIsInZhcmlhbnQiLCJvbkNsaWNrIiwiaWQiLCJmb3JtIiwib25TdWJtaXQiLCJodG1sRm9yIiwib25DaGFuZ2UiLCJwcmV2IiwidGFyZ2V0IiwicGxhY2Vob2xkZXIiLCJyZXF1aXJlZCIsInR5cGUiLCJtaW4iLCJzdGVwIiwib25WYWx1ZUNoYW5nZSIsImRpc2FibGVkIiwiaXNQZW5kaW5nIl0sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7QUFBQSxTQUFTQSxRQUFRLFFBQVEsUUFBUTtBQUNqQyxTQUFTQyxXQUFXLFFBQVEsbUJBQW1CO0FBQy9DLFNBQVNDLFVBQVUsUUFBUSxpQ0FBaUM7QUFDNUQsU0FBU0MsT0FBTyxRQUFRLHdCQUF3QjtBQUNoRCxTQUFTQyxnQkFBZ0IsUUFBUSxzQkFBc0I7QUFDdkQsU0FBU0MsTUFBTSxRQUFRLHlCQUF5QjtBQUNoRCxTQUFTQyxLQUFLLFFBQVEsd0JBQXdCO0FBQzlDLFNBQVNDLEtBQUssUUFBUSx3QkFBd0I7QUFDOUMsU0FBU0MsTUFBTSxFQUFFQyxhQUFhLEVBQUVDLFVBQVUsRUFBRUMsYUFBYSxFQUFFQyxXQUFXLFFBQVEseUJBQXlCO0FBQ3ZHLFNBQVNDLEtBQUssUUFBUSxTQUFTO0FBQy9CLFNBQVNDLFFBQVEsRUFBRUMsVUFBVSxFQUFFQyxPQUFPLFFBQVEsZUFBZTtBQUk3RCxNQUFNQyxvQkFBb0IsQ0FBQ0MsVUFBa0JDO0lBQzNDLE9BQVFBO1FBQ04sS0FBSztZQUNILE9BQU9DLE9BQU8sQUFBQ0YsQ0FBQUEsV0FBVyxFQUFDLEVBQUdHLE9BQU8sQ0FBQztRQUN4QyxLQUFLO1lBQ0gsT0FBT0QsT0FBTyxBQUFDRixDQUFBQSxXQUFXLE9BQU0sRUFBR0csT0FBTyxDQUFDO1FBQzdDLEtBQUs7WUFDSCxPQUFPRCxPQUFPLEFBQUNGLENBQUFBLFdBQVcsTUFBSyxFQUFHRyxPQUFPLENBQUM7UUFDNUMsS0FBSztRQUNMO1lBQ0UsT0FBT0g7SUFDWDtBQUNGO0FBRUEsTUFBTUksNEJBQTRCLENBQUNDO0lBQ2pDLE1BQU1DLFVBQVVELE1BQU1FLElBQUk7SUFDMUIsSUFBSSxDQUFDRCxTQUFTO1FBQ1osT0FBTztJQUNUO0lBRUEsTUFB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

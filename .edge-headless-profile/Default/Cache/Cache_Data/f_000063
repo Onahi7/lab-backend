@@ -1,0 +1,323 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/components/reports/PatientInfoSection.tsx");import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+
+let prevRefreshReg;
+let prevRefreshSig;
+
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react-swc can't detect preamble. Something is wrong."
+    );
+  }
+
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+
+import __vite__cjsImport2_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=27cfabb6"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime["jsxDEV"];
+function formatDate(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-GB', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    });
+}
+export function PatientInfoSection({ patientInfo, orderInfo, template }) {
+    const patientSettings = template?.patientSettings;
+    const patientSection = template?.patientSection;
+    const showDoctor = patientSection?.showDoctor ?? template?.patientInfo?.showDoctor ?? true;
+    const showCopiesTo = patientSection?.showCopiesTo ?? true;
+    const showCollected = patientSection?.showCollectionDate ?? true;
+    const showReceived = patientSection?.showReceivedDate ?? true;
+    const showReported = patientSection?.showReportedDate ?? true;
+    const showPrinted = patientSection?.showPrintedDate ?? true;
+    const patientAge = Number.isFinite(patientInfo.age) ? `${patientInfo.age} Year${patientInfo.age === 1 ? '' : 's'}` : '-';
+    const orderingPhysician = orderInfo.orderingPhysician || '-';
+    const copiesTo = orderInfo.orderingPhysician || '-';
+    return /*#__PURE__*/ _jsxDEV("div", {
+        className: "patient-info-section mb-5",
+        children: [
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "grid grid-cols-3 gap-6 border-b border-gray-300 pb-2 mb-2",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("h3", {
+                        className: "text-sm font-bold uppercase text-gray-700",
+                        children: "Patient"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx",
+                        lineNumber: 40,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("h3", {
+                        className: "text-sm font-bold uppercase text-gray-700",
+                        children: "Doctor"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx",
+                        lineNumber: 41,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("h3", {
+                        className: "text-sm font-bold uppercase text-gray-700",
+                        children: "Copies To"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx",
+                        lineNumber: 42,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx",
+                lineNumber: 39,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "grid grid-cols-3 gap-6 text-sm",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "space-y-1",
+                        children: [
+                            patientSettings?.showName !== false && /*#__PURE__*/ _jsxDEV("p", {
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("span", {
+                                        className: "font-semibold uppercase text-xs",
+                                        children: "Name:"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx",
+                                        lineNumber: 48,
+                                        columnNumber: 16
+                                    }, this),
+                                    " ",
+                                    patientInfo.fullName || '-'
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx",
+                                lineNumber: 48,
+                                columnNumber: 13
+                            }, this),
+                            patientSettings?.showAge !== false && /*#__PURE__*/ _jsxDEV("p", {
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("span", {
+                                        className: "font-semibold uppercase text-xs",
+                                        children: "Age:"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx",
+                                        lineNumber: 51,
+                                        columnNumber: 16
+                                    }, this),
+                                    " ",
+                                    patientAge
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx",
+                                lineNumber: 51,
+                                columnNumber: 13
+                            }, this),
+                            patientSettings?.showGender !== false && /*#__PURE__*/ _jsxDEV("p", {
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("span", {
+                                        className: "font-semibold uppercase text-xs",
+                                        children: "Gender:"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx",
+                                        lineNumber: 54,
+                                        columnNumber: 16
+                                    }, this),
+                                    " ",
+                                    patientInfo.gender || '-'
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx",
+                                lineNumber: 54,
+                                columnNumber: 13
+                            }, this),
+                            patientSettings?.showPatientId !== false && /*#__PURE__*/ _jsxDEV("p", {
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("span", {
+                                        className: "font-semibold uppercase text-xs",
+                                        children: "ID Number:"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx",
+                                        lineNumber: 57,
+                                        columnNumber: 16
+                                    }, this),
+                                    " ",
+                                    patientInfo.patientId || '-'
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx",
+                                lineNumber: 57,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx",
+                        lineNumber: 46,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "space-y-1",
+                        children: [
+                            showDoctor && /*#__PURE__*/ _jsxDEV("p", {
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("span", {
+                                        className: "font-semibold uppercase text-xs",
+                                        children: "Name Of Doctor:"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx",
+                                        lineNumber: 63,
+                                        columnNumber: 16
+                                    }, this),
+                                    " ",
+                                    orderingPhysician
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx",
+                                lineNumber: 63,
+                                columnNumber: 13
+                            }, this),
+                            showCollected && /*#__PURE__*/ _jsxDEV("p", {
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("span", {
+                                        className: "font-semibold uppercase text-xs",
+                                        children: "Collected:"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx",
+                                        lineNumber: 66,
+                                        columnNumber: 16
+                                    }, this),
+                                    " ",
+                                    formatDate(orderInfo.collectedAt || orderInfo.orderDate)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx",
+                                lineNumber: 66,
+                                columnNumber: 13
+                            }, this),
+                            showReceived && /*#__PURE__*/ _jsxDEV("p", {
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("span", {
+                                        className: "font-semibold uppercase text-xs",
+                                        children: "Received:"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx",
+                                        lineNumber: 69,
+                                        columnNumber: 16
+                                    }, this),
+                                    " ",
+                                    formatDate(orderInfo.receivedAt || orderInfo.orderDate)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx",
+                                lineNumber: 69,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx",
+                        lineNumber: 61,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "space-y-1",
+                        children: [
+                            showCopiesTo && /*#__PURE__*/ _jsxDEV("p", {
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("span", {
+                                        className: "font-semibold uppercase text-xs",
+                                        children: "Name Of Doctor:"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx",
+                                        lineNumber: 75,
+                                        columnNumber: 16
+                                    }, this),
+                                    " ",
+                                    copiesTo
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx",
+                                lineNumber: 75,
+                                columnNumber: 13
+                            }, this),
+                            showReported && /*#__PURE__*/ _jsxDEV("p", {
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("span", {
+                                        className: "font-semibold uppercase text-xs",
+                                        children: "Reported:"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx",
+                                        lineNumber: 78,
+                                        columnNumber: 16
+                                    }, this),
+                                    " ",
+                                    formatDate(orderInfo.reportedAt || orderInfo.orderDate)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx",
+                                lineNumber: 78,
+                                columnNumber: 13
+                            }, this),
+                            showPrinted && /*#__PURE__*/ _jsxDEV("p", {
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("span", {
+                                        className: "font-semibold uppercase text-xs",
+                                        children: "Printed:"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx",
+                                        lineNumber: 81,
+                                        columnNumber: 16
+                                    }, this),
+                                    " ",
+                                    formatDate(orderInfo.reportedAt || orderInfo.orderDate)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx",
+                                lineNumber: 81,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx",
+                        lineNumber: 73,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx",
+                lineNumber: 45,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx",
+        lineNumber: 38,
+        columnNumber: 5
+    }, this);
+}
+_c = PatientInfoSection;
+var _c;
+$RefreshReg$(_c, "PatientInfoSection");
+
+
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+
+
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/HP/Downloads/lab/frontend/src/components/reports/PatientInfoSection.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIlBhdGllbnRJbmZvU2VjdGlvbi50c3giXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgUGF0aWVudEluZm8sIE9yZGVySW5mbyB9IGZyb20gJy4uLy4uL2hvb2tzL3VzZUxhYlJlcG9ydCc7XHJcbmltcG9ydCB7IFJlcG9ydFRlbXBsYXRlIH0gZnJvbSAnLi4vLi4vaG9va3MvdXNlUmVwb3J0VGVtcGxhdGVzJztcclxuXHJcbmludGVyZmFjZSBQYXRpZW50SW5mb1NlY3Rpb25Qcm9wcyB7XHJcbiAgcGF0aWVudEluZm86IFBhdGllbnRJbmZvO1xyXG4gIG9yZGVySW5mbzogT3JkZXJJbmZvO1xyXG4gIHRlbXBsYXRlPzogUmVwb3J0VGVtcGxhdGU7XHJcbn1cclxuXHJcbmZ1bmN0aW9uIGZvcm1hdERhdGUoZGF0ZVN0cmluZzogc3RyaW5nIHwgdW5kZWZpbmVkKTogc3RyaW5nIHtcclxuICBpZiAoIWRhdGVTdHJpbmcpIHJldHVybiAnLSc7XHJcbiAgY29uc3QgZGF0ZSA9IG5ldyBEYXRlKGRhdGVTdHJpbmcpO1xyXG4gIHJldHVybiBkYXRlLnRvTG9jYWxlRGF0ZVN0cmluZygnZW4tR0InLCB7XHJcbiAgICB5ZWFyOiAnbnVtZXJpYycsXHJcbiAgICBtb250aDogJzItZGlnaXQnLFxyXG4gICAgZGF5OiAnMi1kaWdpdCcsXHJcbiAgfSk7XHJcbn1cclxuXHJcbmV4cG9ydCBmdW5jdGlvbiBQYXRpZW50SW5mb1NlY3Rpb24oeyBwYXRpZW50SW5mbywgb3JkZXJJbmZvLCB0ZW1wbGF0ZSB9OiBQYXRpZW50SW5mb1NlY3Rpb25Qcm9wcykge1xyXG4gIGNvbnN0IHBhdGllbnRTZXR0aW5ncyA9IHRlbXBsYXRlPy5wYXRpZW50U2V0dGluZ3M7XHJcbiAgY29uc3QgcGF0aWVudFNlY3Rpb24gPSB0ZW1wbGF0ZT8ucGF0aWVudFNlY3Rpb247XHJcbiAgY29uc3Qgc2hvd0RvY3RvciA9IHBhdGllbnRTZWN0aW9uPy5zaG93RG9jdG9yID8/IHRlbXBsYXRlPy5wYXRpZW50SW5mbz8uc2hvd0RvY3RvciA/PyB0cnVlO1xyXG4gIGNvbnN0IHNob3dDb3BpZXNUbyA9IHBhdGllbnRTZWN0aW9uPy5zaG93Q29waWVzVG8gPz8gdHJ1ZTtcclxuICBjb25zdCBzaG93Q29sbGVjdGVkID0gcGF0aWVudFNlY3Rpb24/LnNob3dDb2xsZWN0aW9uRGF0ZSA/PyB0cnVlO1xyXG4gIGNvbnN0IHNob3dSZWNlaXZlZCA9IHBhdGllbnRTZWN0aW9uPy5zaG93UmVjZWl2ZWREYXRlID8/IHRydWU7XHJcbiAgY29uc3Qgc2hvd1JlcG9ydGVkID0gcGF0aWVudFNlY3Rpb24/LnNob3dSZXBvcnRlZERhdGUgPz8gdHJ1ZTtcclxuICBjb25zdCBzaG93UHJpbnRlZCA9IHBhdGllbnRTZWN0aW9uPy5zaG93UHJpbnRlZERhdGUgPz8gdHJ1ZTtcclxuXHJcbiAgY29uc3QgcGF0aWVudEFnZSA9IE51bWJlci5pc0Zpbml0ZShwYXRpZW50SW5mby5hZ2UpXHJcbiAgICA/IGAke3BhdGllbnRJbmZvLmFnZX0gWWVhciR7cGF0aWVudEluZm8uYWdlID09PSAxID8gJycgOiAncyd9YFxyXG4gICAgOiAnLSc7XHJcblxyXG4gIGNvbnN0IG9yZGVyaW5nUGh5c2ljaWFuID0gb3JkZXJJbmZvLm9yZGVyaW5nUGh5c2ljaWFuIHx8ICctJztcclxuICBjb25zdCBjb3BpZXNUbyA9IG9yZGVySW5mby5vcmRlcmluZ1BoeXNpY2lhbiB8fCAnLSc7XHJcbiAgXHJcbiAgcmV0dXJuIChcclxuICAgIDxkaXYgY2xhc3NOYW1lPVwicGF0aWVudC1pbmZvLXNlY3Rpb24gbWItNVwiPlxyXG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImdyaWQgZ3JpZC1jb2xzLTMgZ2FwLTYgYm9yZGVyLWIgYm9yZGVyLWdyYXktMzAwIHBiLTIgbWItMlwiPlxyXG4gICAgICAgIDxoMyBjbGFzc05hbWU9XCJ0ZXh0LXNtIGZvbnQtYm9sZCB1cHBlcmNhc2UgdGV4dC1ncmF5LTcwMFwiPlBhdGllbnQ8L2gzPlxyXG4gICAgICAgIDxoMyBjbGFzc05hbWU9XCJ0ZXh0LXNtIGZvbnQtYm9sZCB1cHBlcmNhc2UgdGV4dC1ncmF5LTcwMFwiPkRvY3RvcjwvaDM+XHJcbiAgICAgICAgPGgzIGNsYXNzTmFtZT1cInRleHQtc20gZm9udC1ib2xkIHVwcGVyY2FzZSB0ZXh0LWdyYXktNzAwXCI+Q29waWVzIFRvPC9oMz5cclxuICAgICAgPC9kaXY+XHJcblxyXG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImdyaWQgZ3JpZC1jb2xzLTMgZ2FwLTYgdGV4dC1zbVwiPlxyXG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0xXCI+XHJcbiAgICAgICAgICB7cGF0aWVudFNldHRpbmdzPy5zaG93TmFtZSAhPT0gZmFsc2UgJiYgKFxyXG4gICAgICAgICAgICA8cD48c3BhbiBjbGFzc05hbWU9XCJmb250LXNlbWlib2xkIHVwcGVyY2FzZSB0ZXh0LXhzXCI+TmFtZTo8L3NwYW4+IHtwYXRpZW50SW5mby5mdWxsTmFtZSB8fCAnLSd9PC9wPlxyXG4gICAgICAgICAgKX1cclxuICAgICAgICAgIHtwYXRpZW50U2V0dGluZ3M/LnNob3dBZ2UgIT09IGZhbHNlICYmIChcclxuICAgICAgICAgICAgPHA+PHNwYW4gY2xhc3NOYW1lPVwiZm9udC1zZW1pYm9sZCB1cHBlcmNhc2UgdGV4dC14c1wiPkFnZTo8L3NwYW4+IHtwYXRpZW50QWdlfTwvcD5cclxuICAgICAgICAgICl9XHJcbiAgICAgICAgICB7cGF0aWVudFNldHRpbmdzPy5zaG93R2VuZGVyICE9PSBmYWxzZSAmJiAoXHJcbiAgICAgICAgICAgIDxwPjxzcGFuIGNsYXNzTmFtZT1cImZvbnQtc2VtaWJvbGQgdXBwZXJjYXNlIHRleHQteHNcIj5HZW5kZXI6PC9zcGFuPiB7cGF0aWVudEluZm8uZ2VuZGVyIHx8ICctJ308L3A+XHJcbiAgICAgICAgICApfVxyXG4gICAgICAgICAge3BhdGllbnRTZXR0aW5ncz8uc2hvd1BhdGllbnRJZCAhPT0gZmFsc2UgJiYgKFxyXG4gICAgICAgICAgICA8cD48c3BhbiBjbGFzc05hbWU9XCJmb250LXNlbWlib2xkIHVwcGVyY2FzZSB0ZXh0LXhzXCI+SUQgTnVtYmVyOjwvc3Bhbj4ge3BhdGllbnRJbmZvLnBhdGllbnRJZCB8fCAnLSd9PC9wPlxyXG4gICAgICAgICAgKX1cclxuICAgICAgICA8L2Rpdj5cclxuXHJcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTFcIj5cclxuICAgICAgICAgIHtzaG93RG9jdG9yICYmIChcclxuICAgICAgICAgICAgPHA+PHNwYW4gY2xhc3NOYW1lPVwiZm9udC1zZW1pYm9sZCB1cHBlcmNhc2UgdGV4dC14c1wiPk5hbWUgT2YgRG9jdG9yOjwvc3Bhbj4ge29yZGVyaW5nUGh5c2ljaWFufTwvcD5cclxuICAgICAgICAgICl9XHJcbiAgICAgICAgICB7c2hvd0NvbGxlY3RlZCAmJiAoXHJcbiAgICAgICAgICAgIDxwPjxzcGFuIGNsYXNzTmFtZT1cImZvbnQtc2VtaWJvbGQgdXBwZXJjYXNlIHRleHQteHNcIj5Db2xsZWN0ZWQ6PC9zcGFuPiB7Zm9ybWF0RGF0ZShvcmRlckluZm8uY29sbGVjdGVkQXQgfHwgb3JkZXJJbmZvLm9yZGVyRGF0ZSl9PC9wPlxyXG4gICAgICAgICAgKX1cclxuICAgICAgICAgIHtzaG93UmVjZWl2ZWQgJiYgKFxyXG4gICAgICAgICAgICA8cD48c3BhbiBjbGFzc05hbWU9XCJmb250LXNlbWlib2xkIHVwcGVyY2FzZSB0ZXh0LXhzXCI+UmVjZWl2ZWQ6PC9zcGFuPiB7Zm9ybWF0RGF0ZShvcmRlckluZm8ucmVjZWl2ZWRBdCB8fCBvcmRlckluZm8ub3JkZXJEYXRlKX08L3A+XHJcbiAgICAgICAgICApfVxyXG4gICAgICAgIDwvZGl2PlxyXG5cclxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNwYWNlLXktMVwiPlxyXG4gICAgICAgICAge3Nob3dDb3BpZXNUbyAmJiAoXHJcbiAgICAgICAgICAgIDxwPjxzcGFuIGNsYXNzTmFtZT1cImZvbnQtc2VtaWJvbGQgdXBwZXJjYXNlIHRleHQteHNcIj5OYW1lIE9mIERvY3Rvcjo8L3NwYW4+IHtjb3BpZXNUb308L3A+XHJcbiAgICAgICAgICApfVxyXG4gICAgICAgICAge3Nob3dSZXBvcnRlZCAmJiAoXHJcbiAgICAgICAgICAgIDxwPjxzcGFuIGNsYXNzTmFtZT1cImZvbnQtc2VtaWJvbGQgdXBwZXJjYXNlIHRleHQteHNcIj5SZXBvcnRlZDo8L3NwYW4+IHtmb3JtYXREYXRlKG9yZGVySW5mby5yZXBvcnRlZEF0IHx8IG9yZGVySW5mby5vcmRlckRhdGUpfTwvcD5cclxuICAgICAgICAgICl9XHJcbiAgICAgICAgICB7c2hvd1ByaW50ZWQgJiYgKFxyXG4gICAgICAgICAgICA8cD48c3BhbiBjbGFzc05hbWU9XCJmb250LXNlbWlib2xkIHVwcGVyY2FzZSB0ZXh0LXhzXCI+UHJpbnRlZDo8L3NwYW4+IHtmb3JtYXREYXRlKG9yZGVySW5mby5yZXBvcnRlZEF0IHx8IG9yZGVySW5mby5vcmRlckRhdGUpfTwvcD5cclxuICAgICAgICAgICl9XHJcbiAgICAgICAgPC9kaXY+XHJcbiAgICAgIDwvZGl2PlxyXG4gICAgPC9kaXY+XHJcbiAgKTtcclxufVxyXG4iXSwibmFtZXMiOlsiZm9ybWF0RGF0ZSIsImRhdGVTdHJpbmciLCJkYXRlIiwiRGF0ZSIsInRvTG9jYWxlRGF0ZVN0cmluZyIsInllYXIiLCJtb250aCIsImRheSIsIlBhdGllbnRJbmZvU2VjdGlvbiIsInBhdGllbnRJbmZvIiwib3JkZXJJbmZvIiwidGVtcGxhdGUiLCJwYXRpZW50U2V0dGluZ3MiLCJwYXRpZW50U2VjdGlvbiIsInNob3dEb2N0b3IiLCJzaG93Q29waWVzVG8iLCJzaG93Q29sbGVjdGVkIiwic2hvd0NvbGxlY3Rpb25EYXRlIiwic2hvd1JlY2VpdmVkIiwic2hvd1JlY2VpdmVkRGF0ZSIsInNob3dSZXBvcnRlZCIsInNob3dSZXBvcnRlZERhdGUiLCJzaG93UHJpbnRlZCIsInNob3dQcmludGVkRGF0ZSIsInBhdGllbnRBZ2UiLCJOdW1iZXIiLCJpc0Zpbml0ZSIsImFnZSIsIm9yZGVyaW5nUGh5c2ljaWFuIiwiY29waWVzVG8iLCJkaXYiLCJjbGFzc05hbWUiLCJoMyIsInNob3dOYW1lIiwicCIsInNwYW4iLCJmdWxsTmFtZSIsInNob3dBZ2UiLCJzaG93R2VuZGVyIiwiZ2VuZGVyIiwic2hvd1BhdGllbnRJZCIsInBhdGllbnRJZCIsImNvbGxlY3RlZEF0Iiwib3JkZXJEYXRlIiwicmVjZWl2ZWRBdCIsInJlcG9ydGVkQXQiXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O0FBU0EsU0FBU0EsV0FBV0MsVUFBOEI7SUFDaEQsSUFBSSxDQUFDQSxZQUFZLE9BQU87SUFDeEIsTUFBTUMsT0FBTyxJQUFJQyxLQUFLRjtJQUN0QixPQUFPQyxLQUFLRSxrQkFBa0IsQ0FBQyxTQUFTO1FBQ3RDQyxNQUFNO1FBQ05DLE9BQU87UUFDUEMsS0FBSztJQUNQO0FBQ0Y7QUFFQSxPQUFPLFNBQVNDLG1CQUFtQixFQUFFQyxXQUFXLEVBQUVDLFNBQVMsRUFBRUMsUUFBUSxFQUEyQjtJQUM5RixNQUFNQyxrQkFBa0JELFVBQVVDO0lBQ2xDLE1BQU1DLGlCQUFpQkYsVUFBVUU7SUFDakMsTUFBTUMsYUFBYUQsZ0JBQWdCQyxjQUFjSCxVQUFVRixhQUFhSyxjQUFjO0lBQ3RGLE1BQU1DLGVBQWVGLGdCQUFnQkUsZ0JBQWdCO0lBQ3JELE1BQU1DLGdCQUFnQkgsZ0JBQWdCSSxzQkFBc0I7SUFDNUQsTUFBTUMsZUFBZUwsZ0JBQWdCTSxvQkFBb0I7SUFDekQsTUFBTUMsZUFBZVAsZ0JBQWdCUSxvQkFBb0I7SUFDekQsTUFBTUMsY0FBY1QsZ0JBQWdCVSxtQkFBbUI7SUFFdkQsTUFBTUMsYUFBYUMsT0FBT0MsUUFBUSxDQUFDakIsWUFBWWtCLEdBQUcsSUFDOUMsR0FBR2xCLFlBQVlrQixHQUFHLENBQUMsS0FBSyxFQUFFbEIsWUFBWWtCLEdBQUcsS0FBSyxJQUFJLEtBQUssS0FBSyxHQUM1RDtJQUVKLE1BQU1DLG9CQUFvQmxCLFVBQVVrQixpQkFBaUIsSUFBSTtJQUN6RCxNQUFNQyxXQUFXbkIsVUFBVWtCLGlCQUFpQixJQUFJO0lBRWhELHFCQUNFLFFBQUNFO1FBQUlDLFdBQVU7OzBCQUNiLFFBQUNEO2dCQUFJQyxXQUFVOztrQ0FDYixRQUFDQzt3QkFBR0QsV0FBVTtrQ0FBNEM7Ozs7OztrQ0FDMUQsUUFBQ0M7d0JBQUdELFdBQVU7a0NBQTRDOzs7Ozs7a0NBQzFELFFBQUNDO3dCQUFHRCxXQUFVO2tDQUE0Qzs7Ozs7Ozs7Ozs7OzBCQUc1RCxRQUFDRDtnQkFBSUMsV0FBVTs7a0NBQ2IsUUFBQ0Q7d0JBQUlDLFdBQVU7OzRCQUNabkIsaUJBQWlCcUIsYUFBYSx1QkFDN0IsUUFBQ0M7O2tEQUFFLFFBQUNDO3dDQUFLSixXQUFVO2tEQUFrQzs7Ozs7O29DQUFZO29DQUFFdEIsWUFBWTJCLFFBQVEsSUFBSTs7Ozs7Ozs0QkFFNUZ4QixpQkFBaUJ5QixZQUFZLHVCQUM1QixRQUFDSDs7a0RBQUUsUUFBQ0M7d0NBQUtKLFdBQVU7a0RBQWtDOzs7Ozs7b0NBQVc7b0NBQUVQOzs7Ozs7OzRCQUVuRVosaUJBQWlCMEIsZUFBZSx1QkFDL0IsUUFBQ0o7O2tEQUFFLFFBQUNDO3dDQUFLSixXQUFVO2tEQUFrQzs7Ozs7O29DQUFjO29DQUFFdEIsWUFBWThCLE1BQU0sSUFBSTs7Ozs7Ozs0QkFFNUYzQixpQkFBaUI0QixrQkFBa0IsdUJBQ2xDLFFBQUNOOztrREFBRSxRQUFDQzt3Q0FBS0osV0FBVTtrREFBa0M7Ozs7OztvQ0FBaUI7b0NBQUV0QixZQUFZZ0MsU0FBUyxJQUFJOzs7Ozs7Ozs7Ozs7O2tDQUlyRyxRQUFDWDt3QkFBSUMsV0FBVTs7NEJBQ1pqQiw0QkFDQyxRQUFDb0I7O2tEQUFFLFFBQUNDO3dDQUFLSixXQUFVO2tEQUFrQzs7Ozs7O29DQUFzQjtvQ0FBRUg7Ozs7Ozs7NEJBRTlFWiwrQkFDQyxRQUFDa0I7O2tEQUFFLFFBQUNDO3dDQUFLSixXQUFVO2tEQUFrQzs7Ozs7O29DQUFpQjtvQ0FBRS9CLFdBQVdVLFVBQVVnQyxXQUFXLElBQUloQyxVQUFVaUMsU0FBUzs7Ozs7Ozs0QkFFaEl6Qiw4QkFDQyxRQUFDZ0I7O2tEQUFFLFFBQUNDO3dDQUFLSixXQUFVO2tEQUFrQzs7Ozs7O29DQUFnQjtvQ0FBRS9CLFdBQVdVLFVBQVVrQyxVQUFVLElBQUlsQyxVQUFVaUMsU0FBUzs7Ozs7Ozs7Ozs7OztrQ0FJakksUUFBQ2I7d0JBQUlDLFdBQVU7OzRCQUNaaEIsOEJBQ0MsUUFBQ21COztrREFBRSxRQUFDQzt3Q0FBS0osV0FBVTtrREFBa0M7Ozs7OztvQ0FBc0I7b0NBQUVGOzs7Ozs7OzRCQUU5RVQsOEJBQ0MsUUFBQ2M7O2tEQUFFLFFBQUNDO3dDQUFLSixXQUFVO2tEQUFrQzs7Ozs7O29DQUFnQjtvQ0FBRS9CLFdBQVdVLFVBQVVtQyxVQUFVLElBQUluQyxVQUFVaUMsU0FBUzs7Ozs7Ozs0QkFFOUhyQiw2QkFDQyxRQUFDWTs7a0RBQUUsUUFBQ0M7d0NBQUtKLFdBQVU7a0RBQWtDOzs7Ozs7b0NBQWU7b0NBQUUvQixXQUFXVSxVQUFVbUMsVUFBVSxJQUFJbkMsVUFBVWlDLFNBQVM7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7QUFNeEk7S0FuRWdCbkMifQ==

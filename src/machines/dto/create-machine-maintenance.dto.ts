@@ -1,11 +1,11 @@
-import { IsString, IsEnum, IsOptional, IsDateString } from 'class-validator';
+import { IsString, IsEnum, IsOptional, IsDateString, IsNumber, Min } from 'class-validator';
 
 export class CreateMachineMaintenanceDto {
   @IsString()
   @IsOptional()
   machineId?: string;
 
-  @IsEnum(['preventive', 'corrective', 'calibration', 'other'])
+  @IsEnum(['preventive', 'corrective', 'calibration', 'validation'])
   maintenanceType: string;
 
   @IsString()
@@ -16,12 +16,16 @@ export class CreateMachineMaintenanceDto {
   performedBy?: string;
 
   @IsDateString()
-  @IsOptional()
-  scheduledDate?: string;
+  performedAt: string;
 
   @IsDateString()
   @IsOptional()
-  completedDate?: string;
+  nextDueDate?: string;
+
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  cost?: number;
 
   @IsString()
   @IsOptional()

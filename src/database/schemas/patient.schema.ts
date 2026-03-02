@@ -7,6 +7,13 @@ export enum GenderEnum {
   OTHER = 'O',
 }
 
+export enum AgeUnitEnum {
+  YEARS = 'years',
+  MONTHS = 'months',
+  WEEKS = 'weeks',
+  DAYS = 'days',
+}
+
 @Schema({ timestamps: true, collection: 'patients' })
 export class Patient extends Document {
   @Prop({ required: true, unique: true })
@@ -20,6 +27,12 @@ export class Patient extends Document {
 
   @Prop({ required: true })
   age: number;
+
+  @Prop()
+  ageValue?: number;
+
+  @Prop({ enum: Object.values(AgeUnitEnum) })
+  ageUnit?: AgeUnitEnum;
 
   @Prop({ required: true, enum: Object.values(GenderEnum) })
   gender: GenderEnum;

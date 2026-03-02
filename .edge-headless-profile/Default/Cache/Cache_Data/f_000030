@@ -1,0 +1,1481 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/pages/reception/PaymentReceipt.tsx");import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+
+let prevRefreshReg;
+let prevRefreshSig;
+
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react-swc can't detect preamble. Something is wrong."
+    );
+  }
+
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+
+import __vite__cjsImport2_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=27cfabb6"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime["jsxDEV"];
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=27cfabb6"; const useState = __vite__cjsImport3_react["useState"]; const useRef = __vite__cjsImport3_react["useRef"];
+import { useParams, useNavigate } from "/node_modules/.vite/deps/react-router-dom.js?v=27cfabb6";
+import { Button } from "/src/components/ui/button.tsx";
+import { Card } from "/src/components/ui/card.tsx";
+import { Badge } from "/src/components/ui/badge.tsx";
+import { Printer, Check, ArrowLeft, Loader2 } from "/node_modules/.vite/deps/lucide-react.js?v=27cfabb6";
+import { toast } from "/node_modules/.vite/deps/sonner.js?v=27cfabb6";
+import { format } from "/node_modules/.vite/deps/date-fns.js?v=27cfabb6";
+import { useAuth } from "/src/context/AuthContext.tsx";
+import { useOrder } from "/src/hooks/useOrders.ts";
+import { getPatientName } from "/src/utils/orderHelpers.ts";
+export default function PaymentReceipt() {
+    _s();
+    const { orderId } = useParams();
+    const navigate = useNavigate();
+    const { profile } = useAuth();
+    const { data: order, isLoading } = useOrder(orderId);
+    const patientReceiptRef = useRef(null);
+    const labReceiptRef = useRef(null);
+    const [isPrinting, setIsPrinting] = useState(false);
+    const [printCount, setPrintCount] = useState(0);
+    // Transform order data to receipt format
+    const receiptData = order ? {
+        receiptNumber: `RCP-${format(new Date(), 'yyyyMMdd')}-${order.order_number.split('-').pop()}`,
+        orderNumber: order.order_number,
+        patientName: getPatientName(order),
+        patientId: (order.patient || order.patients)?.patientId || (order.patient || order.patients)?.patient_id || 'Unknown',
+        patientPhone: (order.patient || order.patients)?.phone || undefined,
+        tests: (order.order_tests || []).map((ot)=>({
+                code: ot.test_catalog?.code || 'N/A',
+                name: ot.test_catalog?.name || 'Unknown Test',
+                price: ot.price || 0
+            })),
+        subtotal: order.subtotal || 0,
+        discount: order.discount || 0,
+        discountType: order.discount_type || 'fixed',
+        total: order.total || 0,
+        amountPaid: order.total || 0,
+        paymentMethod: order.payment_method || 'cash',
+        paymentDate: order.created_at,
+        cashier: profile?.full_name || 'Cashier',
+        collectionDate: order.collected_at ? format(new Date(order.collected_at), 'yyyy-MM-dd HH:mm') : undefined
+    } : null;
+    if (isLoading) {
+        return /*#__PURE__*/ _jsxDEV("div", {
+            className: "min-h-screen bg-gray-50 flex items-center justify-center",
+            children: /*#__PURE__*/ _jsxDEV(Loader2, {
+                className: "w-8 h-8 animate-spin text-primary"
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                lineNumber: 71,
+                columnNumber: 9
+            }, this)
+        }, void 0, false, {
+            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+            lineNumber: 70,
+            columnNumber: 7
+        }, this);
+    }
+    if (!order || !receiptData) {
+        return /*#__PURE__*/ _jsxDEV("div", {
+            className: "min-h-screen bg-gray-50 flex items-center justify-center",
+            children: /*#__PURE__*/ _jsxDEV(Card, {
+                className: "p-8 text-center",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("h2", {
+                        className: "text-xl font-semibold mb-2",
+                        children: "Order Not Found"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                        lineNumber: 80,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("p", {
+                        className: "text-muted-foreground mb-4",
+                        children: "The order you're looking for doesn't exist."
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                        lineNumber: 81,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(Button, {
+                        onClick: ()=>navigate('/reception/orders'),
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(ArrowLeft, {
+                                className: "w-4 h-4 mr-2"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                lineNumber: 83,
+                                columnNumber: 13
+                            }, this),
+                            "Back to Orders"
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                        lineNumber: 82,
+                        columnNumber: 11
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                lineNumber: 79,
+                columnNumber: 9
+            }, this)
+        }, void 0, false, {
+            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+            lineNumber: 78,
+            columnNumber: 7
+        }, this);
+    }
+    const formatCurrency = (amount)=>{
+        return `Le ${amount.toLocaleString()}`;
+    };
+    const handlePrintBoth = async ()=>{
+        setIsPrinting(true);
+        try {
+            // Print patient copy
+            await printReceipt(patientReceiptRef.current, 'Patient Copy');
+            setPrintCount(1);
+            // Small delay between prints
+            await new Promise((resolve)=>setTimeout(resolve, 1000));
+            // Print lab copy
+            await printReceipt(labReceiptRef.current, 'Lab Copy');
+            setPrintCount(2);
+            toast.success('Both receipts printed successfully');
+            // Redirect after successful print
+            setTimeout(()=>{
+                navigate('/reception/orders');
+            }, 2000);
+        } catch (error) {
+            toast.error('Failed to print receipts');
+            console.error('Print error:', error);
+        } finally{
+            setIsPrinting(false);
+        }
+    };
+    const printReceipt = (element, copyType)=>{
+        return new Promise((resolve, reject)=>{
+            if (!element) {
+                reject(new Error('Receipt element not found'));
+                return;
+            }
+            const printWindow = window.open('', '', 'width=302,height=600');
+            if (!printWindow) {
+                reject(new Error('Failed to open print window'));
+                return;
+            }
+            printWindow.document.write(`
+        <html>
+          <head>
+            <title>${copyType} - ${receiptData.receiptNumber}</title>
+            <style>
+              @page {
+                size: 80mm auto;
+                margin: 0;
+              }
+              
+              * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+              }
+              
+              body {
+                font-family: 'Courier New', monospace;
+                font-size: 12px;
+                line-height: 1.4;
+                color: #000;
+                width: 80mm;
+                padding: 5mm;
+                background: white;
+              }
+              
+              .receipt {
+                width: 100%;
+              }
+              
+              .header {
+                text-align: center;
+                margin-bottom: 10px;
+                border-bottom: 2px dashed #000;
+                padding-bottom: 10px;
+              }
+              
+              .logo {
+                font-size: 18px;
+                font-weight: bold;
+                margin-bottom: 5px;
+              }
+              
+              .company-name {
+                font-size: 14px;
+                font-weight: bold;
+              }
+              
+              .company-info {
+                font-size: 10px;
+                margin-top: 3px;
+              }
+              
+              .copy-type {
+                font-size: 14px;
+                font-weight: bold;
+                margin: 10px 0;
+                text-align: center;
+                padding: 5px;
+                border: 2px solid #000;
+                background: ${copyType === 'Patient Copy' ? '#f0f0f0' : '#e0e0e0'};
+              }
+              
+              .section {
+                margin: 10px 0;
+                padding: 5px 0;
+              }
+              
+              .section-title {
+                font-weight: bold;
+                font-size: 11px;
+                margin-bottom: 5px;
+                text-transform: uppercase;
+              }
+              
+              .info-row {
+                display: flex;
+                justify-content: space-between;
+                margin: 3px 0;
+                font-size: 11px;
+              }
+              
+              .info-label {
+                font-weight: bold;
+              }
+              
+              .info-value {
+                text-align: right;
+              }
+              
+              .items-table {
+                width: 100%;
+                margin: 10px 0;
+                border-top: 1px dashed #000;
+                border-bottom: 1px dashed #000;
+                padding: 5px 0;
+              }
+              
+              .item-row {
+                display: flex;
+                justify-content: space-between;
+                margin: 5px 0;
+                font-size: 11px;
+              }
+              
+              .item-name {
+                flex: 1;
+                padding-right: 10px;
+              }
+              
+              .item-price {
+                white-space: nowrap;
+                font-weight: bold;
+              }
+              
+              .totals {
+                margin: 10px 0;
+                padding: 5px 0;
+                border-top: 2px solid #000;
+              }
+              
+              .total-row {
+                display: flex;
+                justify-content: space-between;
+                margin: 5px 0;
+                font-size: 12px;
+              }
+              
+              .total-row.grand-total {
+                font-size: 14px;
+                font-weight: bold;
+                border-top: 1px dashed #000;
+                padding-top: 5px;
+                margin-top: 5px;
+              }
+              
+              .payment-info {
+                margin: 10px 0;
+                padding: 10px 0;
+                border-top: 1px dashed #000;
+                border-bottom: 1px dashed #000;
+              }
+              
+              .footer {
+                text-align: center;
+                margin-top: 15px;
+                font-size: 10px;
+              }
+              
+              .barcode {
+                text-align: center;
+                font-family: 'Libre Barcode 128', cursive;
+                font-size: 40px;
+                margin: 10px 0;
+                letter-spacing: 0;
+              }
+              
+              .thank-you {
+                text-align: center;
+                font-weight: bold;
+                margin: 10px 0;
+                font-size: 12px;
+              }
+              
+              .instructions {
+                font-size: 10px;
+                margin: 10px 0;
+                padding: 5px;
+                background: #f5f5f5;
+                border: 1px solid #ddd;
+              }
+              
+              .lab-instructions {
+                background: #fff3cd;
+                border: 1px solid #ffc107;
+              }
+              
+              @media print {
+                body {
+                  width: 80mm;
+                }
+                .no-print {
+                  display: none !important;
+                }
+              }
+            </style>
+          </head>
+          <body>
+            ${element.innerHTML}
+          </body>
+        </html>
+      `);
+            printWindow.document.close();
+            printWindow.focus();
+            // Wait for content to load
+            setTimeout(()=>{
+                printWindow.print();
+                setTimeout(()=>{
+                    printWindow.close();
+                    resolve();
+                }, 500);
+            }, 250);
+        });
+    };
+    const ReceiptContent = ({ copyType })=>/*#__PURE__*/ _jsxDEV("div", {
+            className: "receipt",
+            children: [
+                /*#__PURE__*/ _jsxDEV("div", {
+                    className: "header",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "logo",
+                            children: "🏥"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 348,
+                            columnNumber: 9
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "company-name",
+                            children: "HARBOUR MEDICAL"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 349,
+                            columnNumber: 9
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "company-name",
+                            children: "DIAGNOSTIC"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 350,
+                            columnNumber: 9
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "company-info",
+                            children: "114 Fourah Bay Road"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 351,
+                            columnNumber: 9
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "company-info",
+                            children: "Freetown, Sierra Leone"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 352,
+                            columnNumber: 9
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "company-info",
+                            children: "Tel: 075 766461, 031-551811"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 353,
+                            columnNumber: 9
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "company-info",
+                            children: "ogbenecarefarmsig@gmail.com"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 354,
+                            columnNumber: 9
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                    lineNumber: 347,
+                    columnNumber: 7
+                }, this),
+                /*#__PURE__*/ _jsxDEV("div", {
+                    className: "copy-type",
+                    children: copyType === 'patient' ? '📋 PATIENT COPY' : '🔬 LAB COPY'
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                    lineNumber: 358,
+                    columnNumber: 7
+                }, this),
+                /*#__PURE__*/ _jsxDEV("div", {
+                    className: "section",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "info-row",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("span", {
+                                    className: "info-label",
+                                    children: "Receipt No:"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 365,
+                                    columnNumber: 11
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("span", {
+                                    className: "info-value",
+                                    children: receiptData.receiptNumber
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 366,
+                                    columnNumber: 11
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 364,
+                            columnNumber: 9
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "info-row",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("span", {
+                                    className: "info-label",
+                                    children: "Order No:"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 369,
+                                    columnNumber: 11
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("span", {
+                                    className: "info-value",
+                                    children: receiptData.orderNumber
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 370,
+                                    columnNumber: 11
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 368,
+                            columnNumber: 9
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "info-row",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("span", {
+                                    className: "info-label",
+                                    children: "Date:"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 373,
+                                    columnNumber: 11
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("span", {
+                                    className: "info-value",
+                                    children: format(new Date(receiptData.paymentDate), 'dd/MM/yyyy HH:mm')
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 374,
+                                    columnNumber: 11
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 372,
+                            columnNumber: 9
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                    lineNumber: 363,
+                    columnNumber: 7
+                }, this),
+                /*#__PURE__*/ _jsxDEV("div", {
+                    className: "section",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "section-title",
+                            children: "Patient Information"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 380,
+                            columnNumber: 9
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "info-row",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("span", {
+                                    className: "info-label",
+                                    children: "Name:"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 382,
+                                    columnNumber: 11
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("span", {
+                                    className: "info-value",
+                                    children: receiptData.patientName
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 383,
+                                    columnNumber: 11
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 381,
+                            columnNumber: 9
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "info-row",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("span", {
+                                    className: "info-label",
+                                    children: "Patient ID:"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 386,
+                                    columnNumber: 11
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("span", {
+                                    className: "info-value",
+                                    children: receiptData.patientId
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 387,
+                                    columnNumber: 11
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 385,
+                            columnNumber: 9
+                        }, this),
+                        receiptData.patientPhone && /*#__PURE__*/ _jsxDEV("div", {
+                            className: "info-row",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("span", {
+                                    className: "info-label",
+                                    children: "Phone:"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 391,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("span", {
+                                    className: "info-value",
+                                    children: receiptData.patientPhone
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 392,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 390,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                    lineNumber: 379,
+                    columnNumber: 7
+                }, this),
+                /*#__PURE__*/ _jsxDEV("div", {
+                    className: "items-table",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "section-title",
+                            children: "Tests Ordered"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 399,
+                            columnNumber: 9
+                        }, this),
+                        receiptData.tests.map((test, index)=>/*#__PURE__*/ _jsxDEV("div", {
+                                className: "item-row",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "item-name",
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                style: {
+                                                    fontWeight: 'bold'
+                                                },
+                                                children: test.code
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                                lineNumber: 403,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                style: {
+                                                    fontSize: '10px'
+                                                },
+                                                children: test.name
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                                lineNumber: 404,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                        lineNumber: 402,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "item-price",
+                                        children: formatCurrency(test.price)
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                        lineNumber: 406,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, index, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                lineNumber: 401,
+                                columnNumber: 11
+                            }, this))
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                    lineNumber: 398,
+                    columnNumber: 7
+                }, this),
+                /*#__PURE__*/ _jsxDEV("div", {
+                    className: "totals",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "total-row",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("span", {
+                                    children: "Subtotal:"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 414,
+                                    columnNumber: 11
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("span", {
+                                    children: formatCurrency(receiptData.subtotal)
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 415,
+                                    columnNumber: 11
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 413,
+                            columnNumber: 9
+                        }, this),
+                        receiptData.discount > 0 && /*#__PURE__*/ _jsxDEV("div", {
+                            className: "total-row",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("span", {
+                                    children: [
+                                        "Discount (",
+                                        receiptData.discountType === 'percentage' ? `${receiptData.discount}%` : formatCurrency(receiptData.discount),
+                                        "):"
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 419,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("span", {
+                                    children: [
+                                        "-",
+                                        formatCurrency(receiptData.discountType === 'percentage' ? receiptData.subtotal * receiptData.discount / 100 : receiptData.discount)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 422,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 418,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "total-row grand-total",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("span", {
+                                    children: "TOTAL:"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 432,
+                                    columnNumber: 11
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("span", {
+                                    children: formatCurrency(receiptData.total)
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 433,
+                                    columnNumber: 11
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 431,
+                            columnNumber: 9
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                    lineNumber: 412,
+                    columnNumber: 7
+                }, this),
+                /*#__PURE__*/ _jsxDEV("div", {
+                    className: "payment-info",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "info-row",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("span", {
+                                    className: "info-label",
+                                    children: "Payment Method:"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 440,
+                                    columnNumber: 11
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("span", {
+                                    className: "info-value",
+                                    style: {
+                                        textTransform: 'uppercase'
+                                    },
+                                    children: receiptData.paymentMethod.replace('-', ' ')
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 441,
+                                    columnNumber: 11
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 439,
+                            columnNumber: 9
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "info-row",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("span", {
+                                    className: "info-label",
+                                    children: "Amount Paid:"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 446,
+                                    columnNumber: 11
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("span", {
+                                    className: "info-value",
+                                    children: formatCurrency(receiptData.amountPaid)
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 447,
+                                    columnNumber: 11
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 445,
+                            columnNumber: 9
+                        }, this),
+                        receiptData.amountPaid > receiptData.total && /*#__PURE__*/ _jsxDEV("div", {
+                            className: "info-row",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("span", {
+                                    className: "info-label",
+                                    children: "Change:"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 451,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("span", {
+                                    className: "info-value",
+                                    children: formatCurrency(receiptData.amountPaid - receiptData.total)
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 452,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 450,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "info-row",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("span", {
+                                    className: "info-label",
+                                    children: "Cashier:"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 456,
+                                    columnNumber: 11
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("span", {
+                                    className: "info-value",
+                                    children: receiptData.cashier
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 457,
+                                    columnNumber: 11
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 455,
+                            columnNumber: 9
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                    lineNumber: 438,
+                    columnNumber: 7
+                }, this),
+                receiptData.collectionDate && /*#__PURE__*/ _jsxDEV("div", {
+                    className: "section",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "section-title",
+                            children: "Sample Collection"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 464,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "info-row",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("span", {
+                                    className: "info-label",
+                                    children: "Scheduled:"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 466,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("span", {
+                                    className: "info-value",
+                                    children: receiptData.collectionDate
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 467,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 465,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                    lineNumber: 463,
+                    columnNumber: 9
+                }, this),
+                copyType === 'patient' ? /*#__PURE__*/ _jsxDEV("div", {
+                    className: "instructions",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            style: {
+                                fontWeight: 'bold',
+                                marginBottom: '5px'
+                            },
+                            children: "IMPORTANT INSTRUCTIONS:"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 475,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            children: "• Please arrive 15 minutes before your scheduled time"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 476,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            children: "• Bring this receipt for sample collection"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 477,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            children: "• Fasting may be required for some tests"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 478,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            children: "• Results will be ready within 24-48 hours"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 479,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            children: "• Contact us for any queries"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 480,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                    lineNumber: 474,
+                    columnNumber: 9
+                }, this) : /*#__PURE__*/ _jsxDEV("div", {
+                    className: "instructions lab-instructions",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            style: {
+                                fontWeight: 'bold',
+                                marginBottom: '5px'
+                            },
+                            children: "LAB TECHNICIAN NOTES:"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 484,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            children: "• Verify patient ID before collection"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 485,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            children: "• Check test requirements and prep"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 486,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            children: "• Label samples with order number"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 487,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            children: "• Update system after collection"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 488,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            children: "• Handle samples per protocol"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 489,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                    lineNumber: 483,
+                    columnNumber: 9
+                }, this),
+                /*#__PURE__*/ _jsxDEV("div", {
+                    className: "barcode",
+                    children: receiptData.orderNumber
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                    lineNumber: 494,
+                    columnNumber: 7
+                }, this),
+                /*#__PURE__*/ _jsxDEV("div", {
+                    className: "thank-you",
+                    children: "THANK YOU FOR CHOOSING US!"
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                    lineNumber: 497,
+                    columnNumber: 7
+                }, this),
+                /*#__PURE__*/ _jsxDEV("div", {
+                    className: "footer",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            children: "Open 24/7 | Onsite & Online Access"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 499,
+                            columnNumber: 9
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            children: "Trusted by Clinics & Hospitals"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 500,
+                            columnNumber: 9
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            style: {
+                                marginTop: '10px',
+                                fontSize: '9px'
+                            },
+                            children: "This is a computer-generated receipt"
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 501,
+                            columnNumber: 9
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            style: {
+                                fontSize: '9px'
+                            },
+                            children: [
+                                "Printed: ",
+                                format(new Date(), 'dd/MM/yyyy HH:mm:ss')
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                            lineNumber: 504,
+                            columnNumber: 9
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                    lineNumber: 498,
+                    columnNumber: 7
+                }, this)
+            ]
+        }, void 0, true, {
+            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+            lineNumber: 345,
+            columnNumber: 5
+        }, this);
+    return /*#__PURE__*/ _jsxDEV("div", {
+        className: "min-h-screen bg-gray-50 p-4",
+        children: [
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "max-w-4xl mx-auto mb-6",
+                children: /*#__PURE__*/ _jsxDEV(Card, {
+                    className: "p-4",
+                    children: /*#__PURE__*/ _jsxDEV("div", {
+                        className: "flex items-center justify-between",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "flex items-center gap-4",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(Button, {
+                                        variant: "outline",
+                                        onClick: ()=>navigate('/reception/orders'),
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV(ArrowLeft, {
+                                                className: "w-4 h-4 mr-2"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                                lineNumber: 519,
+                                                columnNumber: 17
+                                            }, this),
+                                            "Back to Orders"
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                        lineNumber: 518,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("h2", {
+                                                className: "text-lg font-semibold",
+                                                children: "Payment Receipt"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                                lineNumber: 523,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                className: "text-sm text-muted-foreground",
+                                                children: [
+                                                    "Order: ",
+                                                    receiptData.orderNumber
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                                lineNumber: 524,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                        lineNumber: 522,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                lineNumber: 517,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "flex items-center gap-2",
+                                children: [
+                                    printCount > 0 && /*#__PURE__*/ _jsxDEV(Badge, {
+                                        variant: "outline",
+                                        className: "bg-green-50 text-green-700 border-green-200",
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV(Check, {
+                                                className: "w-3 h-3 mr-1"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                                lineNumber: 532,
+                                                columnNumber: 19
+                                            }, this),
+                                            printCount,
+                                            " of 2 printed"
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                        lineNumber: 531,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(Button, {
+                                        onClick: handlePrintBoth,
+                                        disabled: isPrinting,
+                                        size: "lg",
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV(Printer, {
+                                                className: "w-4 h-4 mr-2"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                                lineNumber: 541,
+                                                columnNumber: 17
+                                            }, this),
+                                            isPrinting ? 'Printing...' : 'Print Both Receipts'
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                        lineNumber: 536,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                lineNumber: 529,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                        lineNumber: 516,
+                        columnNumber: 11
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                    lineNumber: 515,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                lineNumber: 514,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "max-w-4xl mx-auto grid md:grid-cols-2 gap-6",
+                children: [
+                    /*#__PURE__*/ _jsxDEV(Card, {
+                        className: "p-6",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "mb-4 flex items-center justify-between",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("h3", {
+                                        className: "font-semibold text-lg",
+                                        children: "Patient Copy Preview"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                        lineNumber: 554,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(Badge, {
+                                        children: "Copy 1"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                        lineNumber: 555,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                lineNumber: 553,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                ref: patientReceiptRef,
+                                className: "bg-white border-2 border-dashed border-gray-300 p-4 font-mono text-xs",
+                                style: {
+                                    width: '302px',
+                                    margin: '0 auto'
+                                },
+                                children: /*#__PURE__*/ _jsxDEV(ReceiptContent, {
+                                    copyType: "patient"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 562,
+                                    columnNumber: 13
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                lineNumber: 557,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                        lineNumber: 552,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(Card, {
+                        className: "p-6",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "mb-4 flex items-center justify-between",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("h3", {
+                                        className: "font-semibold text-lg",
+                                        children: "Lab Copy Preview"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                        lineNumber: 569,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(Badge, {
+                                        variant: "secondary",
+                                        children: "Copy 2"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                        lineNumber: 570,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                lineNumber: 568,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                ref: labReceiptRef,
+                                className: "bg-white border-2 border-dashed border-gray-300 p-4 font-mono text-xs",
+                                style: {
+                                    width: '302px',
+                                    margin: '0 auto'
+                                },
+                                children: /*#__PURE__*/ _jsxDEV(ReceiptContent, {
+                                    copyType: "lab"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 577,
+                                    columnNumber: 13
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                lineNumber: 572,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                        lineNumber: 567,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                lineNumber: 550,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "max-w-4xl mx-auto mt-6",
+                children: /*#__PURE__*/ _jsxDEV(Card, {
+                    className: "p-4 bg-blue-50 border-blue-200",
+                    children: /*#__PURE__*/ _jsxDEV("div", {
+                        className: "flex items-start gap-3",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0",
+                                children: /*#__PURE__*/ _jsxDEV(Printer, {
+                                    className: "w-4 h-4 text-blue-600"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                    lineNumber: 587,
+                                    columnNumber: 15
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                lineNumber: 586,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("div", {
+                                className: "flex-1",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("h4", {
+                                        className: "font-semibold text-blue-900 mb-2",
+                                        children: "Thermal Printer Setup"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                        lineNumber: 590,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("ul", {
+                                        className: "text-sm text-blue-800 space-y-1",
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("li", {
+                                                children: "• Ensure thermal printer is connected and powered on"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                                lineNumber: 592,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("li", {
+                                                children: "• Paper width should be set to 80mm"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                                lineNumber: 593,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("li", {
+                                                children: "• Both receipts will print automatically in sequence"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                                lineNumber: 594,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("li", {
+                                                children: "• Patient copy prints first, followed by lab copy"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                                lineNumber: 595,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("li", {
+                                                children: "• Give patient copy to the patient, keep lab copy for records"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                                lineNumber: 596,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                        lineNumber: 591,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                                lineNumber: 589,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                        lineNumber: 585,
+                        columnNumber: 11
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                    lineNumber: 584,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+                lineNumber: 583,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx",
+        lineNumber: 512,
+        columnNumber: 5
+    }, this);
+}
+_s(PaymentReceipt, "pbh5XLPBI8OhCCfvRe4N4/UN8EE=", false, function() {
+    return [
+        useParams,
+        useNavigate,
+        useAuth,
+        useOrder
+    ];
+});
+_c = PaymentReceipt;
+var _c;
+$RefreshReg$(_c, "PaymentReceipt");
+
+
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+
+
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentReceipt.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIlBheW1lbnRSZWNlaXB0LnRzeCJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyB1c2VTdGF0ZSwgdXNlUmVmLCB1c2VFZmZlY3QgfSBmcm9tICdyZWFjdCc7XHJcbmltcG9ydCB7IHVzZVBhcmFtcywgdXNlTmF2aWdhdGUgfSBmcm9tICdyZWFjdC1yb3V0ZXItZG9tJztcclxuaW1wb3J0IHsgQnV0dG9uIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL2J1dHRvbic7XHJcbmltcG9ydCB7IENhcmQgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvY2FyZCc7XHJcbmltcG9ydCB7IEJhZGdlIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL2JhZGdlJztcclxuaW1wb3J0IHsgUHJpbnRlciwgQ2hlY2ssIEFycm93TGVmdCwgTG9hZGVyMiB9IGZyb20gJ2x1Y2lkZS1yZWFjdCc7XHJcbmltcG9ydCB7IHRvYXN0IH0gZnJvbSAnc29ubmVyJztcclxuaW1wb3J0IHsgZm9ybWF0IH0gZnJvbSAnZGF0ZS1mbnMnO1xyXG5pbXBvcnQgeyB1c2VBdXRoIH0gZnJvbSAnQC9jb250ZXh0L0F1dGhDb250ZXh0JztcclxuaW1wb3J0IHsgdXNlT3JkZXIgfSBmcm9tICdAL2hvb2tzL3VzZU9yZGVycyc7XHJcbmltcG9ydCB7IGdldFBhdGllbnROYW1lIH0gZnJvbSAnQC91dGlscy9vcmRlckhlbHBlcnMnO1xyXG5cclxuaW50ZXJmYWNlIFJlY2VpcHREYXRhIHtcclxuICByZWNlaXB0TnVtYmVyOiBzdHJpbmc7XHJcbiAgb3JkZXJOdW1iZXI6IHN0cmluZztcclxuICBwYXRpZW50TmFtZTogc3RyaW5nO1xyXG4gIHBhdGllbnRJZDogc3RyaW5nO1xyXG4gIHBhdGllbnRQaG9uZT86IHN0cmluZztcclxuICB0ZXN0czogQXJyYXk8e1xyXG4gICAgY29kZTogc3RyaW5nO1xyXG4gICAgbmFtZTogc3RyaW5nO1xyXG4gICAgcHJpY2U6IG51bWJlcjtcclxuICB9PjtcclxuICBzdWJ0b3RhbDogbnVtYmVyO1xyXG4gIGRpc2NvdW50OiBudW1iZXI7XHJcbiAgZGlzY291bnRUeXBlOiAncGVyY2VudGFnZScgfCAnZml4ZWQnO1xyXG4gIHRvdGFsOiBudW1iZXI7XHJcbiAgYW1vdW50UGFpZDogbnVtYmVyO1xyXG4gIHBheW1lbnRNZXRob2Q6ICdjYXNoJyB8ICdjYXJkJyB8ICdtb2JpbGUtbW9uZXknO1xyXG4gIHBheW1lbnREYXRlOiBzdHJpbmc7XHJcbiAgY2FzaGllcjogc3RyaW5nO1xyXG4gIGNvbGxlY3Rpb25EYXRlPzogc3RyaW5nO1xyXG59XHJcblxyXG5leHBvcnQgZGVmYXVsdCBmdW5jdGlvbiBQYXltZW50UmVjZWlwdCgpIHtcclxuICBjb25zdCB7IG9yZGVySWQgfSA9IHVzZVBhcmFtcygpO1xyXG4gIGNvbnN0IG5hdmlnYXRlID0gdXNlTmF2aWdhdGUoKTtcclxuICBjb25zdCB7IHByb2ZpbGUgfSA9IHVzZUF1dGgoKTtcclxuICBjb25zdCB7IGRhdGE6IG9yZGVyLCBpc0xvYWRpbmcgfSA9IHVzZU9yZGVyKG9yZGVySWQhKTtcclxuICBjb25zdCBwYXRpZW50UmVjZWlwdFJlZiA9IHVzZVJlZjxIVE1MRGl2RWxlbWVudD4obnVsbCk7XHJcbiAgY29uc3QgbGFiUmVjZWlwdFJlZiA9IHVzZVJlZjxIVE1MRGl2RWxlbWVudD4obnVsbCk7XHJcbiAgY29uc3QgW2lzUHJpbnRpbmcsIHNldElzUHJpbnRpbmddID0gdXNlU3RhdGUoZmFsc2UpO1xyXG4gIGNvbnN0IFtwcmludENvdW50LCBzZXRQcmludENvdW50XSA9IHVzZVN0YXRlKDApO1xyXG5cclxuICAvLyBUcmFuc2Zvcm0gb3JkZXIgZGF0YSB0byByZWNlaXB0IGZvcm1hdFxyXG4gIGNvbnN0IHJlY2VpcHREYXRhOiBSZWNlaXB0RGF0YSB8IG51bGwgPSBvcmRlciA/IHtcclxuICAgIHJlY2VpcHROdW1iZXI6IGBSQ1AtJHtmb3JtYXQobmV3IERhdGUoKSwgJ3l5eXlNTWRkJyl9LSR7b3JkZXIub3JkZXJfbnVtYmVyLnNwbGl0KCctJykucG9wKCl9YCxcclxuICAgIG9yZGVyTnVtYmVyOiBvcmRlci5vcmRlcl9udW1iZXIsXHJcbiAgICBwYXRpZW50TmFtZTogZ2V0UGF0aWVudE5hbWUob3JkZXIpLFxyXG4gICAgcGF0aWVudElkOiAob3JkZXIucGF0aWVudCB8fCBvcmRlci5wYXRpZW50cyk/LnBhdGllbnRJZCB8fCAob3JkZXIucGF0aWVudCB8fCBvcmRlci5wYXRpZW50cyk/LnBhdGllbnRfaWQgfHwgJ1Vua25vd24nLFxyXG4gICAgcGF0aWVudFBob25lOiAob3JkZXIucGF0aWVudCB8fCBvcmRlci5wYXRpZW50cyk/LnBob25lIHx8IHVuZGVmaW5lZCxcclxuICAgIHRlc3RzOiAob3JkZXIub3JkZXJfdGVzdHMgfHwgW10pLm1hcCgob3Q6IGFueSkgPT4gKHtcclxuICAgICAgY29kZTogb3QudGVzdF9jYXRhbG9nPy5jb2RlIHx8ICdOL0EnLFxyXG4gICAgICBuYW1lOiBvdC50ZXN0X2NhdGFsb2c/Lm5hbWUgfHwgJ1Vua25vd24gVGVzdCcsXHJcbiAgICAgIHByaWNlOiBvdC5wcmljZSB8fCAwLFxyXG4gICAgfSkpLFxyXG4gICAgc3VidG90YWw6IG9yZGVyLnN1YnRvdGFsIHx8IDAsXHJcbiAgICBkaXNjb3VudDogb3JkZXIuZGlzY291bnQgfHwgMCxcclxuICAgIGRpc2NvdW50VHlwZTogb3JkZXIuZGlzY291bnRfdHlwZSB8fCAnZml4ZWQnLFxyXG4gICAgdG90YWw6IG9yZGVyLnRvdGFsIHx8IDAsXHJcbiAgICBhbW91bnRQYWlkOiBvcmRlci50b3RhbCB8fCAwLFxyXG4gICAgcGF5bWVudE1ldGhvZDogb3JkZXIucGF5bWVudF9tZXRob2QgfHwgJ2Nhc2gnLFxyXG4gICAgcGF5bWVudERhdGU6IG9yZGVyLmNyZWF0ZWRfYXQsXHJcbiAgICBjYXNoaWVyOiBwcm9maWxlPy5mdWxsX25hbWUgfHwgJ0Nhc2hpZXInLFxyXG4gICAgY29sbGVjdGlvbkRhdGU6IG9yZGVyLmNvbGxlY3RlZF9hdCA/IGZvcm1hdChuZXcgRGF0ZShvcmRlci5jb2xsZWN0ZWRfYXQpLCAneXl5eS1NTS1kZCBISDptbScpIDogdW5kZWZpbmVkLFxyXG4gIH0gOiBudWxsO1xyXG5cclxuICBpZiAoaXNMb2FkaW5nKSB7XHJcbiAgICByZXR1cm4gKFxyXG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cIm1pbi1oLXNjcmVlbiBiZy1ncmF5LTUwIGZsZXggaXRlbXMtY2VudGVyIGp1c3RpZnktY2VudGVyXCI+XHJcbiAgICAgICAgPExvYWRlcjIgY2xhc3NOYW1lPVwidy04IGgtOCBhbmltYXRlLXNwaW4gdGV4dC1wcmltYXJ5XCIgLz5cclxuICAgICAgPC9kaXY+XHJcbiAgICApO1xyXG4gIH1cclxuXHJcbiAgaWYgKCFvcmRlciB8fCAhcmVjZWlwdERhdGEpIHtcclxuICAgIHJldHVybiAoXHJcbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwibWluLWgtc2NyZWVuIGJnLWdyYXktNTAgZmxleCBpdGVtcy1jZW50ZXIganVzdGlmeS1jZW50ZXJcIj5cclxuICAgICAgICA8Q2FyZCBjbGFzc05hbWU9XCJwLTggdGV4dC1jZW50ZXJcIj5cclxuICAgICAgICAgIDxoMiBjbGFzc05hbWU9XCJ0ZXh0LXhsIGZvbnQtc2VtaWJvbGQgbWItMlwiPk9yZGVyIE5vdCBGb3VuZDwvaDI+XHJcbiAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LW11dGVkLWZvcmVncm91bmQgbWItNFwiPlRoZSBvcmRlciB5b3UncmUgbG9va2luZyBmb3IgZG9lc24ndCBleGlzdC48L3A+XHJcbiAgICAgICAgICA8QnV0dG9uIG9uQ2xpY2s9eygpID0+IG5hdmlnYXRlKCcvcmVjZXB0aW9uL29yZGVycycpfT5cclxuICAgICAgICAgICAgPEFycm93TGVmdCBjbGFzc05hbWU9XCJ3LTQgaC00IG1yLTJcIiAvPlxyXG4gICAgICAgICAgICBCYWNrIHRvIE9yZGVyc1xyXG4gICAgICAgICAgPC9CdXR0b24+XHJcbiAgICAgICAgPC9DYXJkPlxyXG4gICAgICA8L2Rpdj5cclxuICAgICk7XHJcbiAgfVxyXG5cclxuICBjb25zdCBmb3JtYXRDdXJyZW5jeSA9IChhbW91bnQ6IG51bWJlcikgPT4ge1xyXG4gICAgcmV0dXJuIGBMZSAke2Ftb3VudC50b0xvY2FsZVN0cmluZygpfWA7XHJcbiAgfTtcclxuXHJcbiAgY29uc3QgaGFuZGxlUHJpbnRCb3RoID0gYXN5bmMgKCkgPT4ge1xyXG4gICAgc2V0SXNQcmludGluZyh0cnVlKTtcclxuICAgIFxyXG4gICAgdHJ5IHtcclxuICAgICAgLy8gUHJpbnQgcGF0aWVudCBjb3B5XHJcbiAgICAgIGF3YWl0IHByaW50UmVjZWlwdChwYXRpZW50UmVjZWlwdFJlZi5jdXJyZW50LCAnUGF0aWVudCBDb3B5Jyk7XHJcbiAgICAgIHNldFByaW50Q291bnQoMSk7XHJcbiAgICAgIFxyXG4gICAgICAvLyBTbWFsbCBkZWxheSBiZXR3ZWVuIHByaW50c1xyXG4gICAgICBhd2FpdCBuZXcgUHJvbWlzZShyZXNvbHZlID0+IHNldFRpbWVvdXQocmVzb2x2ZSwgMTAwMCkpO1xyXG4gICAgICBcclxuICAgICAgLy8gUHJpbnQgbGFiIGNvcHlcclxuICAgICAgYXdhaXQgcHJpbnRSZWNlaXB0KGxhYlJlY2VpcHRSZWYuY3VycmVudCwgJ0xhYiBDb3B5Jyk7XHJcbiAgICAgIHNldFByaW50Q291bnQoMik7XHJcbiAgICAgIFxyXG4gICAgICB0b2FzdC5zdWNjZXNzKCdCb3RoIHJlY2VpcHRzIHByaW50ZWQgc3VjY2Vzc2Z1bGx5Jyk7XHJcbiAgICAgIFxyXG4gICAgICAvLyBSZWRpcmVjdCBhZnRlciBzdWNjZXNzZnVsIHByaW50XHJcbiAgICAgIHNldFRpbWVvdXQoKCkgPT4ge1xyXG4gICAgICAgIG5hdmlnYXRlKCcvcmVjZXB0aW9uL29yZGVycycpO1xyXG4gICAgICB9LCAyMDAwKTtcclxuICAgIH0gY2F0Y2ggKGVycm9yKSB7XHJcbiAgICAgIHRvYXN0LmVycm9yKCdGYWlsZWQgdG8gcHJpbnQgcmVjZWlwdHMnKTtcclxuICAgICAgY29uc29sZS5lcnJvcignUHJpbnQgZXJyb3I6JywgZXJyb3IpO1xyXG4gICAgfSBmaW5hbGx5IHtcclxuICAgICAgc2V0SXNQcmludGluZyhmYWxzZSk7XHJcbiAgICB9XHJcbiAgfTtcclxuXHJcbiAgY29uc3QgcHJpbnRSZWNlaXB0ID0gKGVsZW1lbnQ6IEhUTUxFbGVtZW50IHwgbnVsbCwgY29weVR5cGU6IHN0cmluZyk6IFByb21pc2U8dm9pZD4gPT4ge1xyXG4gICAgcmV0dXJuIG5ldyBQcm9taXNlKChyZXNvbHZlLCByZWplY3QpID0+IHtcclxuICAgICAgaWYgKCFlbGVtZW50KSB7XHJcbiAgICAgICAgcmVqZWN0KG5ldyBFcnJvcignUmVjZWlwdCBlbGVtZW50IG5vdCBmb3VuZCcpKTtcclxuICAgICAgICByZXR1cm47XHJcbiAgICAgIH1cclxuXHJcbiAgICAgIGNvbnN0IHByaW50V2luZG93ID0gd2luZG93Lm9wZW4oJycsICcnLCAnd2lkdGg9MzAyLGhlaWdodD02MDAnKTtcclxuICAgICAgaWYgKCFwcmludFdpbmRvdykge1xyXG4gICAgICAgIHJlamVjdChuZXcgRXJyb3IoJ0ZhaWxlZCB0byBvcGVuIHByaW50IHdpbmRvdycpKTtcclxuICAgICAgICByZXR1cm47XHJcbiAgICAgIH1cclxuXHJcbiAgICAgIHByaW50V2luZG93LmRvY3VtZW50LndyaXRlKGBcclxuICAgICAgICA8aHRtbD5cclxuICAgICAgICAgIDxoZWFkPlxyXG4gICAgICAgICAgICA8dGl0bGU+JHtjb3B5VHlwZX0gLSAke3JlY2VpcHREYXRhLnJlY2VpcHROdW1iZXJ9PC90aXRsZT5cclxuICAgICAgICAgICAgPHN0eWxlPlxyXG4gICAgICAgICAgICAgIEBwYWdlIHtcclxuICAgICAgICAgICAgICAgIHNpemU6IDgwbW0gYXV0bztcclxuICAgICAgICAgICAgICAgIG1hcmdpbjogMDtcclxuICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgXHJcbiAgICAgICAgICAgICAgKiB7XHJcbiAgICAgICAgICAgICAgICBtYXJnaW46IDA7XHJcbiAgICAgICAgICAgICAgICBwYWRkaW5nOiAwO1xyXG4gICAgICAgICAgICAgICAgYm94LXNpemluZzogYm9yZGVyLWJveDtcclxuICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgXHJcbiAgICAgICAgICAgICAgYm9keSB7XHJcbiAgICAgICAgICAgICAgICBmb250LWZhbWlseTogJ0NvdXJpZXIgTmV3JywgbW9ub3NwYWNlO1xyXG4gICAgICAgICAgICAgICAgZm9udC1zaXplOiAxMnB4O1xyXG4gICAgICAgICAgICAgICAgbGluZS1oZWlnaHQ6IDEuNDtcclxuICAgICAgICAgICAgICAgIGNvbG9yOiAjMDAwO1xyXG4gICAgICAgICAgICAgICAgd2lkdGg6IDgwbW07XHJcbiAgICAgICAgICAgICAgICBwYWRkaW5nOiA1bW07XHJcbiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kOiB3aGl0ZTtcclxuICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgXHJcbiAgICAgICAgICAgICAgLnJlY2VpcHQge1xyXG4gICAgICAgICAgICAgICAgd2lkdGg6IDEwMCU7XHJcbiAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgIFxyXG4gICAgICAgICAgICAgIC5oZWFkZXIge1xyXG4gICAgICAgICAgICAgICAgdGV4dC1hbGlnbjogY2VudGVyO1xyXG4gICAgICAgICAgICAgICAgbWFyZ2luLWJvdHRvbTogMTBweDtcclxuICAgICAgICAgICAgICAgIGJvcmRlci1ib3R0b206IDJweCBkYXNoZWQgIzAwMDtcclxuICAgICAgICAgICAgICAgIHBhZGRpbmctYm90dG9tOiAxMHB4O1xyXG4gICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICBcclxuICAgICAgICAgICAgICAubG9nbyB7XHJcbiAgICAgICAgICAgICAgICBmb250LXNpemU6IDE4cHg7XHJcbiAgICAgICAgICAgICAgICBmb250LXdlaWdodDogYm9sZDtcclxuICAgICAgICAgICAgICAgIG1hcmdpbi1ib3R0b206IDVweDtcclxuICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgXHJcbiAgICAgICAgICAgICAgLmNvbXBhbnktbmFtZSB7XHJcbiAgICAgICAgICAgICAgICBmb250LXNpemU6IDE0cHg7XHJcbiAgICAgICAgICAgICAgICBmb250LXdlaWdodDogYm9sZDtcclxuICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgXHJcbiAgICAgICAgICAgICAgLmNvbXBhbnktaW5mbyB7XHJcbiAgICAgICAgICAgICAgICBmb250LXNpemU6IDEwcHg7XHJcbiAgICAgICAgICAgICAgICBtYXJnaW4tdG9wOiAzcHg7XHJcbiAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgIFxyXG4gICAgICAgICAgICAgIC5jb3B5LXR5cGUge1xyXG4gICAgICAgICAgICAgICAgZm9udC1zaXplOiAxNHB4O1xyXG4gICAgICAgICAgICAgICAgZm9udC13ZWlnaHQ6IGJvbGQ7XHJcbiAgICAgICAgICAgICAgICBtYXJnaW46IDEwcHggMDtcclxuICAgICAgICAgICAgICAgIHRleHQtYWxpZ246IGNlbnRlcjtcclxuICAgICAgICAgICAgICAgIHBhZGRpbmc6IDVweDtcclxuICAgICAgICAgICAgICAgIGJvcmRlcjogMnB4IHNvbGlkICMwMDA7XHJcbiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kOiAke2NvcHlUeXBlID09PSAnUGF0aWVudCBDb3B5JyA/ICcjZjBmMGYwJyA6ICcjZTBlMGUwJ307XHJcbiAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgIFxyXG4gICAgICAgICAgICAgIC5zZWN0aW9uIHtcclxuICAgICAgICAgICAgICAgIG1hcmdpbjogMTBweCAwO1xyXG4gICAgICAgICAgICAgICAgcGFkZGluZzogNXB4IDA7XHJcbiAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgIFxyXG4gICAgICAgICAgICAgIC5zZWN0aW9uLXRpdGxlIHtcclxuICAgICAgICAgICAgICAgIGZvbnQtd2VpZ2h0OiBib2xkO1xyXG4gICAgICAgICAgICAgICAgZm9udC1zaXplOiAxMXB4O1xyXG4gICAgICAgICAgICAgICAgbWFyZ2luLWJvdHRvbTogNXB4O1xyXG4gICAgICAgICAgICAgICAgdGV4dC10cmFuc2Zvcm06IHVwcGVyY2FzZTtcclxuICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgXHJcbiAgICAgICAgICAgICAgLmluZm8tcm93IHtcclxuICAgICAgICAgICAgICAgIGRpc3BsYXk6IGZsZXg7XHJcbiAgICAgICAgICAgICAgICBqdXN0aWZ5LWNvbnRlbnQ6IHNwYWNlLWJldHdlZW47XHJcbiAgICAgICAgICAgICAgICBtYXJnaW46IDNweCAwO1xyXG4gICAgICAgICAgICAgICAgZm9udC1zaXplOiAxMXB4O1xyXG4gICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICBcclxuICAgICAgICAgICAgICAuaW5mby1sYWJlbCB7XHJcbiAgICAgICAgICAgICAgICBmb250LXdlaWdodDogYm9sZDtcclxuICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgXHJcbiAgICAgICAgICAgICAgLmluZm8tdmFsdWUge1xyXG4gICAgICAgICAgICAgICAgdGV4dC1hbGlnbjogcmlnaHQ7XHJcbiAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgIFxyXG4gICAgICAgICAgICAgIC5pdGVtcy10YWJsZSB7XHJcbiAgICAgICAgICAgICAgICB3aWR0aDogMTAwJTtcclxuICAgICAgICAgICAgICAgIG1hcmdpbjogMTBweCAwO1xyXG4gICAgICAgICAgICAgICAgYm9yZGVyLXRvcDogMXB4IGRhc2hlZCAjMDAwO1xyXG4gICAgICAgICAgICAgICAgYm9yZGVyLWJvdHRvbTogMXB4IGRhc2hlZCAjMDAwO1xyXG4gICAgICAgICAgICAgICAgcGFkZGluZzogNXB4IDA7XHJcbiAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgIFxyXG4gICAgICAgICAgICAgIC5pdGVtLXJvdyB7XHJcbiAgICAgICAgICAgICAgICBkaXNwbGF5OiBmbGV4O1xyXG4gICAgICAgICAgICAgICAganVzdGlmeS1jb250ZW50OiBzcGFjZS1iZXR3ZWVuO1xyXG4gICAgICAgICAgICAgICAgbWFyZ2luOiA1cHggMDtcclxuICAgICAgICAgICAgICAgIGZvbnQtc2l6ZTogMTFweDtcclxuICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgXHJcbiAgICAgICAgICAgICAgLml0ZW0tbmFtZSB7XHJcbiAgICAgICAgICAgICAgICBmbGV4OiAxO1xyXG4gICAgICAgICAgICAgICAgcGFkZGluZy1yaWdodDogMTBweDtcclxuICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgXHJcbiAgICAgICAgICAgICAgLml0ZW0tcHJpY2Uge1xyXG4gICAgICAgICAgICAgICAgd2hpdGUtc3BhY2U6IG5vd3JhcDtcclxuICAgICAgICAgICAgICAgIGZvbnQtd2VpZ2h0OiBib2xkO1xyXG4gICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICBcclxuICAgICAgICAgICAgICAudG90YWxzIHtcclxuICAgICAgICAgICAgICAgIG1hcmdpbjogMTBweCAwO1xyXG4gICAgICAgICAgICAgICAgcGFkZGluZzogNXB4IDA7XHJcbiAgICAgICAgICAgICAgICBib3JkZXItdG9wOiAycHggc29saWQgIzAwMDtcclxuICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgXHJcbiAgICAgICAgICAgICAgLnRvdGFsLXJvdyB7XHJcbiAgICAgICAgICAgICAgICBkaXNwbGF5OiBmbGV4O1xyXG4gICAgICAgICAgICAgICAganVzdGlmeS1jb250ZW50OiBzcGFjZS1iZXR3ZWVuO1xyXG4gICAgICAgICAgICAgICAgbWFyZ2luOiA1cHggMDtcclxuICAgICAgICAgICAgICAgIGZvbnQtc2l6ZTogMTJweDtcclxuICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgXHJcbiAgICAgICAgICAgICAgLnRvdGFsLXJvdy5ncmFuZC10b3RhbCB7XHJcbiAgICAgICAgICAgICAgICBmb250LXNpemU6IDE0cHg7XHJcbiAgICAgICAgICAgICAgICBmb250LXdlaWdodDogYm9sZDtcclxuICAgICAgICAgICAgICAgIGJvcmRlci10b3A6IDFweCBkYXNoZWQgIzAwMDtcclxuICAgICAgICAgICAgICAgIHBhZGRpbmctdG9wOiA1cHg7XHJcbiAgICAgICAgICAgICAgICBtYXJnaW4tdG9wOiA1cHg7XHJcbiAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgIFxyXG4gICAgICAgICAgICAgIC5wYXltZW50LWluZm8ge1xyXG4gICAgICAgICAgICAgICAgbWFyZ2luOiAxMHB4IDA7XHJcbiAgICAgICAgICAgICAgICBwYWRkaW5nOiAxMHB4IDA7XHJcbiAgICAgICAgICAgICAgICBib3JkZXItdG9wOiAxcHggZGFzaGVkICMwMDA7XHJcbiAgICAgICAgICAgICAgICBib3JkZXItYm90dG9tOiAxcHggZGFzaGVkICMwMDA7XHJcbiAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgIFxyXG4gICAgICAgICAgICAgIC5mb290ZXIge1xyXG4gICAgICAgICAgICAgICAgdGV4dC1hbGlnbjogY2VudGVyO1xyXG4gICAgICAgICAgICAgICAgbWFyZ2luLXRvcDogMTVweDtcclxuICAgICAgICAgICAgICAgIGZvbnQtc2l6ZTogMTBweDtcclxuICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgXHJcbiAgICAgICAgICAgICAgLmJhcmNvZGUge1xyXG4gICAgICAgICAgICAgICAgdGV4dC1hbGlnbjogY2VudGVyO1xyXG4gICAgICAgICAgICAgICAgZm9udC1mYW1pbHk6ICdMaWJyZSBCYXJjb2RlIDEyOCcsIGN1cnNpdmU7XHJcbiAgICAgICAgICAgICAgICBmb250LXNpemU6IDQwcHg7XHJcbiAgICAgICAgICAgICAgICBtYXJnaW46IDEwcHggMDtcclxuICAgICAgICAgICAgICAgIGxldHRlci1zcGFjaW5nOiAwO1xyXG4gICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICBcclxuICAgICAgICAgICAgICAudGhhbmsteW91IHtcclxuICAgICAgICAgICAgICAgIHRleHQtYWxpZ246IGNlbnRlcjtcclxuICAgICAgICAgICAgICAgIGZvbnQtd2VpZ2h0OiBib2xkO1xyXG4gICAgICAgICAgICAgICAgbWFyZ2luOiAxMHB4IDA7XHJcbiAgICAgICAgICAgICAgICBmb250LXNpemU6IDEycHg7XHJcbiAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgIFxyXG4gICAgICAgICAgICAgIC5pbnN0cnVjdGlvbnMge1xyXG4gICAgICAgICAgICAgICAgZm9udC1zaXplOiAxMHB4O1xyXG4gICAgICAgICAgICAgICAgbWFyZ2luOiAxMHB4IDA7XHJcbiAgICAgICAgICAgICAgICBwYWRkaW5nOiA1cHg7XHJcbiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kOiAjZjVmNWY1O1xyXG4gICAgICAgICAgICAgICAgYm9yZGVyOiAxcHggc29saWQgI2RkZDtcclxuICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgXHJcbiAgICAgICAgICAgICAgLmxhYi1pbnN0cnVjdGlvbnMge1xyXG4gICAgICAgICAgICAgICAgYmFja2dyb3VuZDogI2ZmZjNjZDtcclxuICAgICAgICAgICAgICAgIGJvcmRlcjogMXB4IHNvbGlkICNmZmMxMDc7XHJcbiAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICAgIFxyXG4gICAgICAgICAgICAgIEBtZWRpYSBwcmludCB7XHJcbiAgICAgICAgICAgICAgICBib2R5IHtcclxuICAgICAgICAgICAgICAgICAgd2lkdGg6IDgwbW07XHJcbiAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgICAubm8tcHJpbnQge1xyXG4gICAgICAgICAgICAgICAgICBkaXNwbGF5OiBub25lICFpbXBvcnRhbnQ7XHJcbiAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICA8L3N0eWxlPlxyXG4gICAgICAgICAgPC9oZWFkPlxyXG4gICAgICAgICAgPGJvZHk+XHJcbiAgICAgICAgICAgICR7ZWxlbWVudC5pbm5lckhUTUx9XHJcbiAgICAgICAgICA8L2JvZHk+XHJcbiAgICAgICAgPC9odG1sPlxyXG4gICAgICBgKTtcclxuXHJcbiAgICAgIHByaW50V2luZG93LmRvY3VtZW50LmNsb3NlKCk7XHJcbiAgICAgIHByaW50V2luZG93LmZvY3VzKCk7XHJcblxyXG4gICAgICAvLyBXYWl0IGZvciBjb250ZW50IHRvIGxvYWRcclxuICAgICAgc2V0VGltZW91dCgoKSA9PiB7XHJcbiAgICAgICAgcHJpbnRXaW5kb3cucHJpbnQoKTtcclxuICAgICAgICBzZXRUaW1lb3V0KCgpID0+IHtcclxuICAgICAgICAgIHByaW50V2luZG93LmNsb3NlKCk7XHJcbiAgICAgICAgICByZXNvbHZlKCk7XHJcbiAgICAgICAgfSwgNTAwKTtcclxuICAgICAgfSwgMjUwKTtcclxuICAgIH0pO1xyXG4gIH07XHJcblxyXG4gIGNvbnN0IFJlY2VpcHRDb250ZW50ID0gKHsgY29weVR5cGUgfTogeyBjb3B5VHlwZTogJ3BhdGllbnQnIHwgJ2xhYicgfSkgPT4gKFxyXG4gICAgPGRpdiBjbGFzc05hbWU9XCJyZWNlaXB0XCI+XHJcbiAgICAgIHsvKiBIZWFkZXIgKi99XHJcbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiaGVhZGVyXCI+XHJcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJsb2dvXCI+8J+PpTwvZGl2PlxyXG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29tcGFueS1uYW1lXCI+SEFSQk9VUiBNRURJQ0FMPC9kaXY+XHJcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb21wYW55LW5hbWVcIj5ESUFHTk9TVElDPC9kaXY+XHJcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb21wYW55LWluZm9cIj4xMTQgRm91cmFoIEJheSBSb2FkPC9kaXY+XHJcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb21wYW55LWluZm9cIj5GcmVldG93biwgU2llcnJhIExlb25lPC9kaXY+XHJcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb21wYW55LWluZm9cIj5UZWw6IDA3NSA3NjY0NjEsIDAzMS01NTE4MTE8L2Rpdj5cclxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvbXBhbnktaW5mb1wiPm9nYmVuZWNhcmVmYXJtc2lnQGdtYWlsLmNvbTwvZGl2PlxyXG4gICAgICA8L2Rpdj5cclxuXHJcbiAgICAgIHsvKiBDb3B5IFR5cGUgQmFkZ2UgKi99XHJcbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29weS10eXBlXCI+XHJcbiAgICAgICAge2NvcHlUeXBlID09PSAncGF0aWVudCcgPyAn8J+TiyBQQVRJRU5UIENPUFknIDogJ/CflKwgTEFCIENPUFknfVxyXG4gICAgICA8L2Rpdj5cclxuXHJcbiAgICAgIHsvKiBSZWNlaXB0IEluZm8gKi99XHJcbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwic2VjdGlvblwiPlxyXG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiaW5mby1yb3dcIj5cclxuICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImluZm8tbGFiZWxcIj5SZWNlaXB0IE5vOjwvc3Bhbj5cclxuICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImluZm8tdmFsdWVcIj57cmVjZWlwdERhdGEucmVjZWlwdE51bWJlcn08L3NwYW4+XHJcbiAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJpbmZvLXJvd1wiPlxyXG4gICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiaW5mby1sYWJlbFwiPk9yZGVyIE5vOjwvc3Bhbj5cclxuICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImluZm8tdmFsdWVcIj57cmVjZWlwdERhdGEub3JkZXJOdW1iZXJ9PC9zcGFuPlxyXG4gICAgICAgIDwvZGl2PlxyXG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiaW5mby1yb3dcIj5cclxuICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImluZm8tbGFiZWxcIj5EYXRlOjwvc3Bhbj5cclxuICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImluZm8tdmFsdWVcIj57Zm9ybWF0KG5ldyBEYXRlKHJlY2VpcHREYXRhLnBheW1lbnREYXRlKSwgJ2RkL01NL3l5eXkgSEg6bW0nKX08L3NwYW4+XHJcbiAgICAgICAgPC9kaXY+XHJcbiAgICAgIDwvZGl2PlxyXG5cclxuICAgICAgey8qIFBhdGllbnQgSW5mbyAqL31cclxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJzZWN0aW9uXCI+XHJcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzZWN0aW9uLXRpdGxlXCI+UGF0aWVudCBJbmZvcm1hdGlvbjwvZGl2PlxyXG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiaW5mby1yb3dcIj5cclxuICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImluZm8tbGFiZWxcIj5OYW1lOjwvc3Bhbj5cclxuICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImluZm8tdmFsdWVcIj57cmVjZWlwdERhdGEucGF0aWVudE5hbWV9PC9zcGFuPlxyXG4gICAgICAgIDwvZGl2PlxyXG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiaW5mby1yb3dcIj5cclxuICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImluZm8tbGFiZWxcIj5QYXRpZW50IElEOjwvc3Bhbj5cclxuICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImluZm8tdmFsdWVcIj57cmVjZWlwdERhdGEucGF0aWVudElkfTwvc3Bhbj5cclxuICAgICAgICA8L2Rpdj5cclxuICAgICAgICB7cmVjZWlwdERhdGEucGF0aWVudFBob25lICYmIChcclxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiaW5mby1yb3dcIj5cclxuICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiaW5mby1sYWJlbFwiPlBob25lOjwvc3Bhbj5cclxuICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiaW5mby12YWx1ZVwiPntyZWNlaXB0RGF0YS5wYXRpZW50UGhvbmV9PC9zcGFuPlxyXG4gICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgKX1cclxuICAgICAgPC9kaXY+XHJcblxyXG4gICAgICB7LyogVGVzdHMvSXRlbXMgKi99XHJcbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiaXRlbXMtdGFibGVcIj5cclxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNlY3Rpb24tdGl0bGVcIj5UZXN0cyBPcmRlcmVkPC9kaXY+XHJcbiAgICAgICAge3JlY2VpcHREYXRhLnRlc3RzLm1hcCgodGVzdCwgaW5kZXgpID0+IChcclxuICAgICAgICAgIDxkaXYga2V5PXtpbmRleH0gY2xhc3NOYW1lPVwiaXRlbS1yb3dcIj5cclxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJpdGVtLW5hbWVcIj5cclxuICAgICAgICAgICAgICA8ZGl2IHN0eWxlPXt7IGZvbnRXZWlnaHQ6ICdib2xkJyB9fT57dGVzdC5jb2RlfTwvZGl2PlxyXG4gICAgICAgICAgICAgIDxkaXYgc3R5bGU9e3sgZm9udFNpemU6ICcxMHB4JyB9fT57dGVzdC5uYW1lfTwvZGl2PlxyXG4gICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJpdGVtLXByaWNlXCI+e2Zvcm1hdEN1cnJlbmN5KHRlc3QucHJpY2UpfTwvZGl2PlxyXG4gICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgKSl9XHJcbiAgICAgIDwvZGl2PlxyXG5cclxuICAgICAgey8qIFRvdGFscyAqL31cclxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJ0b3RhbHNcIj5cclxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInRvdGFsLXJvd1wiPlxyXG4gICAgICAgICAgPHNwYW4+U3VidG90YWw6PC9zcGFuPlxyXG4gICAgICAgICAgPHNwYW4+e2Zvcm1hdEN1cnJlbmN5KHJlY2VpcHREYXRhLnN1YnRvdGFsKX08L3NwYW4+XHJcbiAgICAgICAgPC9kaXY+XHJcbiAgICAgICAge3JlY2VpcHREYXRhLmRpc2NvdW50ID4gMCAmJiAoXHJcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInRvdGFsLXJvd1wiPlxyXG4gICAgICAgICAgICA8c3Bhbj5cclxuICAgICAgICAgICAgICBEaXNjb3VudCAoe3JlY2VpcHREYXRhLmRpc2NvdW50VHlwZSA9PT0gJ3BlcmNlbnRhZ2UnID8gYCR7cmVjZWlwdERhdGEuZGlzY291bnR9JWAgOiBmb3JtYXRDdXJyZW5jeShyZWNlaXB0RGF0YS5kaXNjb3VudCl9KTpcclxuICAgICAgICAgICAgPC9zcGFuPlxyXG4gICAgICAgICAgICA8c3Bhbj5cclxuICAgICAgICAgICAgICAte2Zvcm1hdEN1cnJlbmN5KFxyXG4gICAgICAgICAgICAgICAgcmVjZWlwdERhdGEuZGlzY291bnRUeXBlID09PSAncGVyY2VudGFnZSdcclxuICAgICAgICAgICAgICAgICAgPyAocmVjZWlwdERhdGEuc3VidG90YWwgKiByZWNlaXB0RGF0YS5kaXNjb3VudCkgLyAxMDBcclxuICAgICAgICAgICAgICAgICAgOiByZWNlaXB0RGF0YS5kaXNjb3VudFxyXG4gICAgICAgICAgICAgICl9XHJcbiAgICAgICAgICAgIDwvc3Bhbj5cclxuICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICl9XHJcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJ0b3RhbC1yb3cgZ3JhbmQtdG90YWxcIj5cclxuICAgICAgICAgIDxzcGFuPlRPVEFMOjwvc3Bhbj5cclxuICAgICAgICAgIDxzcGFuPntmb3JtYXRDdXJyZW5jeShyZWNlaXB0RGF0YS50b3RhbCl9PC9zcGFuPlxyXG4gICAgICAgIDwvZGl2PlxyXG4gICAgICA8L2Rpdj5cclxuXHJcbiAgICAgIHsvKiBQYXltZW50IEluZm8gKi99XHJcbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwicGF5bWVudC1pbmZvXCI+XHJcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJpbmZvLXJvd1wiPlxyXG4gICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiaW5mby1sYWJlbFwiPlBheW1lbnQgTWV0aG9kOjwvc3Bhbj5cclxuICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImluZm8tdmFsdWVcIiBzdHlsZT17eyB0ZXh0VHJhbnNmb3JtOiAndXBwZXJjYXNlJyB9fT5cclxuICAgICAgICAgICAge3JlY2VpcHREYXRhLnBheW1lbnRNZXRob2QucmVwbGFjZSgnLScsICcgJyl9XHJcbiAgICAgICAgICA8L3NwYW4+XHJcbiAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJpbmZvLXJvd1wiPlxyXG4gICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiaW5mby1sYWJlbFwiPkFtb3VudCBQYWlkOjwvc3Bhbj5cclxuICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImluZm8tdmFsdWVcIj57Zm9ybWF0Q3VycmVuY3kocmVjZWlwdERhdGEuYW1vdW50UGFpZCl9PC9zcGFuPlxyXG4gICAgICAgIDwvZGl2PlxyXG4gICAgICAgIHtyZWNlaXB0RGF0YS5hbW91bnRQYWlkID4gcmVjZWlwdERhdGEudG90YWwgJiYgKFxyXG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJpbmZvLXJvd1wiPlxyXG4gICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJpbmZvLWxhYmVsXCI+Q2hhbmdlOjwvc3Bhbj5cclxuICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiaW5mby12YWx1ZVwiPntmb3JtYXRDdXJyZW5jeShyZWNlaXB0RGF0YS5hbW91bnRQYWlkIC0gcmVjZWlwdERhdGEudG90YWwpfTwvc3Bhbj5cclxuICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgICl9XHJcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJpbmZvLXJvd1wiPlxyXG4gICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiaW5mby1sYWJlbFwiPkNhc2hpZXI6PC9zcGFuPlxyXG4gICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiaW5mby12YWx1ZVwiPntyZWNlaXB0RGF0YS5jYXNoaWVyfTwvc3Bhbj5cclxuICAgICAgICA8L2Rpdj5cclxuICAgICAgPC9kaXY+XHJcblxyXG4gICAgICB7LyogQ29sbGVjdGlvbiBJbmZvICovfVxyXG4gICAgICB7cmVjZWlwdERhdGEuY29sbGVjdGlvbkRhdGUgJiYgKFxyXG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic2VjdGlvblwiPlxyXG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzZWN0aW9uLXRpdGxlXCI+U2FtcGxlIENvbGxlY3Rpb248L2Rpdj5cclxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiaW5mby1yb3dcIj5cclxuICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiaW5mby1sYWJlbFwiPlNjaGVkdWxlZDo8L3NwYW4+XHJcbiAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImluZm8tdmFsdWVcIj57cmVjZWlwdERhdGEuY29sbGVjdGlvbkRhdGV9PC9zcGFuPlxyXG4gICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgPC9kaXY+XHJcbiAgICAgICl9XHJcblxyXG4gICAgICB7LyogSW5zdHJ1Y3Rpb25zIGJhc2VkIG9uIGNvcHkgdHlwZSAqL31cclxuICAgICAge2NvcHlUeXBlID09PSAncGF0aWVudCcgPyAoXHJcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJpbnN0cnVjdGlvbnNcIj5cclxuICAgICAgICAgIDxkaXYgc3R5bGU9e3sgZm9udFdlaWdodDogJ2JvbGQnLCBtYXJnaW5Cb3R0b206ICc1cHgnIH19PklNUE9SVEFOVCBJTlNUUlVDVElPTlM6PC9kaXY+XHJcbiAgICAgICAgICA8ZGl2PuKAoiBQbGVhc2UgYXJyaXZlIDE1IG1pbnV0ZXMgYmVmb3JlIHlvdXIgc2NoZWR1bGVkIHRpbWU8L2Rpdj5cclxuICAgICAgICAgIDxkaXY+4oCiIEJyaW5nIHRoaXMgcmVjZWlwdCBmb3Igc2FtcGxlIGNvbGxlY3Rpb248L2Rpdj5cclxuICAgICAgICAgIDxkaXY+4oCiIEZhc3RpbmcgbWF5IGJlIHJlcXVpcmVkIGZvciBzb21lIHRlc3RzPC9kaXY+XHJcbiAgICAgICAgICA8ZGl2PuKAoiBSZXN1bHRzIHdpbGwgYmUgcmVhZHkgd2l0aGluIDI0LTQ4IGhvdXJzPC9kaXY+XHJcbiAgICAgICAgICA8ZGl2PuKAoiBDb250YWN0IHVzIGZvciBhbnkgcXVlcmllczwvZGl2PlxyXG4gICAgICAgIDwvZGl2PlxyXG4gICAgICApIDogKFxyXG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiaW5zdHJ1Y3Rpb25zIGxhYi1pbnN0cnVjdGlvbnNcIj5cclxuICAgICAgICAgIDxkaXYgc3R5bGU9e3sgZm9udFdlaWdodDogJ2JvbGQnLCBtYXJnaW5Cb3R0b206ICc1cHgnIH19PkxBQiBURUNITklDSUFOIE5PVEVTOjwvZGl2PlxyXG4gICAgICAgICAgPGRpdj7igKIgVmVyaWZ5IHBhdGllbnQgSUQgYmVmb3JlIGNvbGxlY3Rpb248L2Rpdj5cclxuICAgICAgICAgIDxkaXY+4oCiIENoZWNrIHRlc3QgcmVxdWlyZW1lbnRzIGFuZCBwcmVwPC9kaXY+XHJcbiAgICAgICAgICA8ZGl2PuKAoiBMYWJlbCBzYW1wbGVzIHdpdGggb3JkZXIgbnVtYmVyPC9kaXY+XHJcbiAgICAgICAgICA8ZGl2PuKAoiBVcGRhdGUgc3lzdGVtIGFmdGVyIGNvbGxlY3Rpb248L2Rpdj5cclxuICAgICAgICAgIDxkaXY+4oCiIEhhbmRsZSBzYW1wbGVzIHBlciBwcm90b2NvbDwvZGl2PlxyXG4gICAgICAgIDwvZGl2PlxyXG4gICAgICApfVxyXG5cclxuICAgICAgey8qIEJhcmNvZGUgKi99XHJcbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiYmFyY29kZVwiPntyZWNlaXB0RGF0YS5vcmRlck51bWJlcn08L2Rpdj5cclxuXHJcbiAgICAgIHsvKiBGb290ZXIgKi99XHJcbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwidGhhbmsteW91XCI+VEhBTksgWU9VIEZPUiBDSE9PU0lORyBVUyE8L2Rpdj5cclxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJmb290ZXJcIj5cclxuICAgICAgICA8ZGl2Pk9wZW4gMjQvNyB8IE9uc2l0ZSAmIE9ubGluZSBBY2Nlc3M8L2Rpdj5cclxuICAgICAgICA8ZGl2PlRydXN0ZWQgYnkgQ2xpbmljcyAmIEhvc3BpdGFsczwvZGl2PlxyXG4gICAgICAgIDxkaXYgc3R5bGU9e3sgbWFyZ2luVG9wOiAnMTBweCcsIGZvbnRTaXplOiAnOXB4JyB9fT5cclxuICAgICAgICAgIFRoaXMgaXMgYSBjb21wdXRlci1nZW5lcmF0ZWQgcmVjZWlwdFxyXG4gICAgICAgIDwvZGl2PlxyXG4gICAgICAgIDxkaXYgc3R5bGU9e3sgZm9udFNpemU6ICc5cHgnIH19PlxyXG4gICAgICAgICAgUHJpbnRlZDoge2Zvcm1hdChuZXcgRGF0ZSgpLCAnZGQvTU0veXl5eSBISDptbTpzcycpfVxyXG4gICAgICAgIDwvZGl2PlxyXG4gICAgICA8L2Rpdj5cclxuICAgIDwvZGl2PlxyXG4gICk7XHJcblxyXG4gIHJldHVybiAoXHJcbiAgICA8ZGl2IGNsYXNzTmFtZT1cIm1pbi1oLXNjcmVlbiBiZy1ncmF5LTUwIHAtNFwiPlxyXG4gICAgICB7LyogQWN0aW9uIEJhciAqL31cclxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJtYXgtdy00eGwgbXgtYXV0byBtYi02XCI+XHJcbiAgICAgICAgPENhcmQgY2xhc3NOYW1lPVwicC00XCI+XHJcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGp1c3RpZnktYmV0d2VlblwiPlxyXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGdhcC00XCI+XHJcbiAgICAgICAgICAgICAgPEJ1dHRvbiB2YXJpYW50PVwib3V0bGluZVwiIG9uQ2xpY2s9eygpID0+IG5hdmlnYXRlKCcvcmVjZXB0aW9uL29yZGVycycpfT5cclxuICAgICAgICAgICAgICAgIDxBcnJvd0xlZnQgY2xhc3NOYW1lPVwidy00IGgtNCBtci0yXCIgLz5cclxuICAgICAgICAgICAgICAgIEJhY2sgdG8gT3JkZXJzXHJcbiAgICAgICAgICAgICAgPC9CdXR0b24+XHJcbiAgICAgICAgICAgICAgPGRpdj5cclxuICAgICAgICAgICAgICAgIDxoMiBjbGFzc05hbWU9XCJ0ZXh0LWxnIGZvbnQtc2VtaWJvbGRcIj5QYXltZW50IFJlY2VpcHQ8L2gyPlxyXG4gICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1zbSB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5cclxuICAgICAgICAgICAgICAgICAgT3JkZXI6IHtyZWNlaXB0RGF0YS5vcmRlck51bWJlcn1cclxuICAgICAgICAgICAgICAgIDwvcD5cclxuICAgICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIgZ2FwLTJcIj5cclxuICAgICAgICAgICAgICB7cHJpbnRDb3VudCA+IDAgJiYgKFxyXG4gICAgICAgICAgICAgICAgPEJhZGdlIHZhcmlhbnQ9XCJvdXRsaW5lXCIgY2xhc3NOYW1lPVwiYmctZ3JlZW4tNTAgdGV4dC1ncmVlbi03MDAgYm9yZGVyLWdyZWVuLTIwMFwiPlxyXG4gICAgICAgICAgICAgICAgICA8Q2hlY2sgY2xhc3NOYW1lPVwidy0zIGgtMyBtci0xXCIgLz5cclxuICAgICAgICAgICAgICAgICAge3ByaW50Q291bnR9IG9mIDIgcHJpbnRlZFxyXG4gICAgICAgICAgICAgICAgPC9CYWRnZT5cclxuICAgICAgICAgICAgICApfVxyXG4gICAgICAgICAgICAgIDxCdXR0b24gXHJcbiAgICAgICAgICAgICAgICBvbkNsaWNrPXtoYW5kbGVQcmludEJvdGh9XHJcbiAgICAgICAgICAgICAgICBkaXNhYmxlZD17aXNQcmludGluZ31cclxuICAgICAgICAgICAgICAgIHNpemU9XCJsZ1wiXHJcbiAgICAgICAgICAgICAgPlxyXG4gICAgICAgICAgICAgICAgPFByaW50ZXIgY2xhc3NOYW1lPVwidy00IGgtNCBtci0yXCIgLz5cclxuICAgICAgICAgICAgICAgIHtpc1ByaW50aW5nID8gJ1ByaW50aW5nLi4uJyA6ICdQcmludCBCb3RoIFJlY2VpcHRzJ31cclxuICAgICAgICAgICAgICA8L0J1dHRvbj5cclxuICAgICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICA8L0NhcmQ+XHJcbiAgICAgIDwvZGl2PlxyXG5cclxuICAgICAgey8qIFJlY2VpcHQgUHJldmlld3MgKi99XHJcbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwibWF4LXctNHhsIG14LWF1dG8gZ3JpZCBtZDpncmlkLWNvbHMtMiBnYXAtNlwiPlxyXG4gICAgICAgIHsvKiBQYXRpZW50IENvcHkgUHJldmlldyAqL31cclxuICAgICAgICA8Q2FyZCBjbGFzc05hbWU9XCJwLTZcIj5cclxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwibWItNCBmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWJldHdlZW5cIj5cclxuICAgICAgICAgICAgPGgzIGNsYXNzTmFtZT1cImZvbnQtc2VtaWJvbGQgdGV4dC1sZ1wiPlBhdGllbnQgQ29weSBQcmV2aWV3PC9oMz5cclxuICAgICAgICAgICAgPEJhZGdlPkNvcHkgMTwvQmFkZ2U+XHJcbiAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgIDxkaXYgXHJcbiAgICAgICAgICAgIHJlZj17cGF0aWVudFJlY2VpcHRSZWZ9XHJcbiAgICAgICAgICAgIGNsYXNzTmFtZT1cImJnLXdoaXRlIGJvcmRlci0yIGJvcmRlci1kYXNoZWQgYm9yZGVyLWdyYXktMzAwIHAtNCBmb250LW1vbm8gdGV4dC14c1wiXHJcbiAgICAgICAgICAgIHN0eWxlPXt7IHdpZHRoOiAnMzAycHgnLCBtYXJnaW46ICcwIGF1dG8nIH19XHJcbiAgICAgICAgICA+XHJcbiAgICAgICAgICAgIDxSZWNlaXB0Q29udGVudCBjb3B5VHlwZT1cInBhdGllbnRcIiAvPlxyXG4gICAgICAgICAgPC9kaXY+XHJcbiAgICAgICAgPC9DYXJkPlxyXG5cclxuICAgICAgICB7LyogTGFiIENvcHkgUHJldmlldyAqL31cclxuICAgICAgICA8Q2FyZCBjbGFzc05hbWU9XCJwLTZcIj5cclxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwibWItNCBmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWJldHdlZW5cIj5cclxuICAgICAgICAgICAgPGgzIGNsYXNzTmFtZT1cImZvbnQtc2VtaWJvbGQgdGV4dC1sZ1wiPkxhYiBDb3B5IFByZXZpZXc8L2gzPlxyXG4gICAgICAgICAgICA8QmFkZ2UgdmFyaWFudD1cInNlY29uZGFyeVwiPkNvcHkgMjwvQmFkZ2U+XHJcbiAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgIDxkaXYgXHJcbiAgICAgICAgICAgIHJlZj17bGFiUmVjZWlwdFJlZn1cclxuICAgICAgICAgICAgY2xhc3NOYW1lPVwiYmctd2hpdGUgYm9yZGVyLTIgYm9yZGVyLWRhc2hlZCBib3JkZXItZ3JheS0zMDAgcC00IGZvbnQtbW9ubyB0ZXh0LXhzXCJcclxuICAgICAgICAgICAgc3R5bGU9e3sgd2lkdGg6ICczMDJweCcsIG1hcmdpbjogJzAgYXV0bycgfX1cclxuICAgICAgICAgID5cclxuICAgICAgICAgICAgPFJlY2VpcHRDb250ZW50IGNvcHlUeXBlPVwibGFiXCIgLz5cclxuICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgIDwvQ2FyZD5cclxuICAgICAgPC9kaXY+XHJcblxyXG4gICAgICB7LyogUHJpbnQgSW5zdHJ1Y3Rpb25zICovfVxyXG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cIm1heC13LTR4bCBteC1hdXRvIG10LTZcIj5cclxuICAgICAgICA8Q2FyZCBjbGFzc05hbWU9XCJwLTQgYmctYmx1ZS01MCBib3JkZXItYmx1ZS0yMDBcIj5cclxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1zdGFydCBnYXAtM1wiPlxyXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInctOCBoLTggcm91bmRlZC1mdWxsIGJnLWJsdWUtMTAwIGZsZXggaXRlbXMtY2VudGVyIGp1c3RpZnktY2VudGVyIGZsZXgtc2hyaW5rLTBcIj5cclxuICAgICAgICAgICAgICA8UHJpbnRlciBjbGFzc05hbWU9XCJ3LTQgaC00IHRleHQtYmx1ZS02MDBcIiAvPlxyXG4gICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4LTFcIj5cclxuICAgICAgICAgICAgICA8aDQgY2xhc3NOYW1lPVwiZm9udC1zZW1pYm9sZCB0ZXh0LWJsdWUtOTAwIG1iLTJcIj5UaGVybWFsIFByaW50ZXIgU2V0dXA8L2g0PlxyXG4gICAgICAgICAgICAgIDx1bCBjbGFzc05hbWU9XCJ0ZXh0LXNtIHRleHQtYmx1ZS04MDAgc3BhY2UteS0xXCI+XHJcbiAgICAgICAgICAgICAgICA8bGk+4oCiIEVuc3VyZSB0aGVybWFsIHByaW50ZXIgaXMgY29ubmVjdGVkIGFuZCBwb3dlcmVkIG9uPC9saT5cclxuICAgICAgICAgICAgICAgIDxsaT7igKIgUGFwZXIgd2lkdGggc2hvdWxkIGJlIHNldCB0byA4MG1tPC9saT5cclxuICAgICAgICAgICAgICAgIDxsaT7igKIgQm90aCByZWNlaXB0cyB3aWxsIHByaW50IGF1dG9tYXRpY2FsbHkgaW4gc2VxdWVuY2U8L2xpPlxyXG4gICAgICAgICAgICAgICAgPGxpPuKAoiBQYXRpZW50IGNvcHkgcHJpbnRzIGZpcnN0LCBmb2xsb3dlZCBieSBsYWIgY29weTwvbGk+XHJcbiAgICAgICAgICAgICAgICA8bGk+4oCiIEdpdmUgcGF0aWVudCBjb3B5IHRvIHRoZSBwYXRpZW50LCBrZWVwIGxhYiBjb3B5IGZvciByZWNvcmRzPC9saT5cclxuICAgICAgICAgICAgICA8L3VsPlxyXG4gICAgICAgICAgICA8L2Rpdj5cclxuICAgICAgICAgIDwvZGl2PlxyXG4gICAgICAgIDwvQ2FyZD5cclxuICAgICAgPC9kaXY+XHJcbiAgICA8L2Rpdj5cclxuICApO1xyXG59XHJcbiJdLCJuYW1lcyI6WyJ1c2VTdGF0ZSIsInVzZVJlZiIsInVzZVBhcmFtcyIsInVzZU5hdmlnYXRlIiwiQnV0dG9uIiwiQ2FyZCIsIkJhZGdlIiwiUHJpbnRlciIsIkNoZWNrIiwiQXJyb3dMZWZ0IiwiTG9hZGVyMiIsInRvYXN0IiwiZm9ybWF0IiwidXNlQXV0aCIsInVzZU9yZGVyIiwiZ2V0UGF0aWVudE5hbWUiLCJQYXltZW50UmVjZWlwdCIsIm9yZGVySWQiLCJuYXZpZ2F0ZSIsInByb2ZpbGUiLCJkYXRhIiwib3JkZXIiLCJpc0xvYWRpbmciLCJwYXRpZW50UmVjZWlwdFJlZiIsImxhYlJlY2VpcHRSZWYiLCJpc1ByaW50aW5nIiwic2V0SXNQcmludGluZyIsInByaW50Q291bnQiLCJzZXRQcmludENvdW50IiwicmVjZWlwdERhdGEiLCJyZWNlaXB0TnVtYmVyIiwiRGF0ZSIsIm9yZGVyX251bWJlciIsInNwbGl0IiwicG9wIiwib3JkZXJOdW1iZXIiLCJwYXRpZW50TmFtZSIsInBhdGllbnRJZCIsInBhdGllbnQiLCJwYXRpZW50cyIsInBhdGllbnRfaWQiLCJwYXRpZW50UGhvbmUiLCJwaG9uZSIsInVuZGVmaW5lZCIsInRlc3RzIiwib3JkZXJfdGVzdHMiLCJtYXAiLCJvdCIsImNvZGUiLCJ0ZXN0X2NhdGFsb2ciLCJuYW1lIiwicHJpY2UiLCJzdWJ0b3RhbCIsImRpc2NvdW50IiwiZGlzY291bnRUeXBlIiwiZGlzY291bnRfdHlwZSIsInRvdGFsIiwiYW1vdW50UGFpZCIsInBheW1lbnRNZXRob2QiLCJwYXltZW50X21ldGhvZCIsInBheW1lbnREYXRlIiwiY3JlYXRlZF9hdCIsImNhc2hpZXIiLCJmdWxsX25hbWUiLCJjb2xsZWN0aW9uRGF0ZSIsImNvbGxlY3RlZF9hdCIsImRpdiIsImNsYXNzTmFtZSIsImgyIiwicCIsIm9uQ2xpY2siLCJmb3JtYXRDdXJyZW5jeSIsImFtb3VudCIsInRvTG9jYWxlU3RyaW5nIiwiaGFuZGxlUHJpbnRCb3RoIiwicHJpbnRSZWNlaXB0IiwiY3VycmVudCIsIlByb21pc2UiLCJyZXNvbHZlIiwic2V0VGltZW91dCIsInN1Y2Nlc3MiLCJlcnJvciIsImNvbnNvbGUiLCJlbGVtZW50IiwiY29weVR5cGUiLCJyZWplY3QiLCJFcnJvciIsInByaW50V2luZG93Iiwid2luZG93Iiwib3BlbiIsImRvY3VtZW50Iiwid3JpdGUiLCJpbm5lckhUTUwiLCJjbG9zZSIsImZvY3VzIiwicHJpbnQiLCJSZWNlaXB0Q29udGVudCIsInNwYW4iLCJ0ZXN0IiwiaW5kZXgiLCJzdHlsZSIsImZvbnRXZWlnaHQiLCJmb250U2l6ZSIsInRleHRUcmFuc2Zvcm0iLCJyZXBsYWNlIiwibWFyZ2luQm90dG9tIiwibWFyZ2luVG9wIiwidmFyaWFudCIsImRpc2FibGVkIiwic2l6ZSIsImgzIiwicmVmIiwid2lkdGgiLCJtYXJnaW4iLCJoNCIsInVsIiwibGkiXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OztBQUFBLFNBQVNBLFFBQVEsRUFBRUMsTUFBTSxRQUFtQixRQUFRO0FBQ3BELFNBQVNDLFNBQVMsRUFBRUMsV0FBVyxRQUFRLG1CQUFtQjtBQUMxRCxTQUFTQyxNQUFNLFFBQVEseUJBQXlCO0FBQ2hELFNBQVNDLElBQUksUUFBUSx1QkFBdUI7QUFDNUMsU0FBU0MsS0FBSyxRQUFRLHdCQUF3QjtBQUM5QyxTQUFTQyxPQUFPLEVBQUVDLEtBQUssRUFBRUMsU0FBUyxFQUFFQyxPQUFPLFFBQVEsZUFBZTtBQUNsRSxTQUFTQyxLQUFLLFFBQVEsU0FBUztBQUMvQixTQUFTQyxNQUFNLFFBQVEsV0FBVztBQUNsQyxTQUFTQyxPQUFPLFFBQVEsd0JBQXdCO0FBQ2hELFNBQVNDLFFBQVEsUUFBUSxvQkFBb0I7QUFDN0MsU0FBU0MsY0FBYyxRQUFRLHVCQUF1QjtBQXdCdEQsZUFBZSxTQUFTQzs7SUFDdEIsTUFBTSxFQUFFQyxPQUFPLEVBQUUsR0FBR2Y7SUFDcEIsTUFBTWdCLFdBQVdmO0lBQ2pCLE1BQU0sRUFBRWdCLE9BQU8sRUFBRSxHQUFHTjtJQUNwQixNQUFNLEVBQUVPLE1BQU1DLEtBQUssRUFBRUMsU0FBUyxFQUFFLEdBQUdSLFNBQVNHO0lBQzVDLE1BQU1NLG9CQUFvQnRCLE9BQXVCO0lBQ2pELE1BQU11QixnQkFBZ0J2QixPQUF1QjtJQUM3QyxNQUFNLENBQUN3QixZQUFZQyxjQUFjLEdBQUcxQixTQUFTO0lBQzdDLE1BQU0sQ0FBQzJCLFlBQVlDLGNBQWMsR0FBRzVCLFNBQVM7SUFFN0MseUNBQXlDO0lBQ3pDLE1BQU02QixjQUFrQ1IsUUFBUTtRQUM5Q1MsZUFBZSxDQUFDLElBQUksRUFBRWxCLE9BQU8sSUFBSW1CLFFBQVEsWUFBWSxDQUFDLEVBQUVWLE1BQU1XLFlBQVksQ0FBQ0MsS0FBSyxDQUFDLEtBQUtDLEdBQUcsSUFBSTtRQUM3RkMsYUFBYWQsTUFBTVcsWUFBWTtRQUMvQkksYUFBYXJCLGVBQWVNO1FBQzVCZ0IsV0FBVyxBQUFDaEIsQ0FBQUEsTUFBTWlCLE9BQU8sSUFBSWpCLE1BQU1rQixRQUFRLEFBQUQsR0FBSUYsYUFBY2hCLENBQUFBLE1BQU1pQixPQUFPLElBQUlqQixNQUFNa0IsUUFBUSxBQUFELEdBQUlDLGNBQWM7UUFDNUdDLGNBQWMsQUFBQ3BCLENBQUFBLE1BQU1pQixPQUFPLElBQUlqQixNQUFNa0IsUUFBUSxBQUFELEdBQUlHLFNBQVNDO1FBQzFEQyxPQUFPLEFBQUN2QixDQUFBQSxNQUFNd0IsV0FBVyxJQUFJLEVBQUUsQUFBRCxFQUFHQyxHQUFHLENBQUMsQ0FBQ0MsS0FBYSxDQUFBO2dCQUNqREMsTUFBTUQsR0FBR0UsWUFBWSxFQUFFRCxRQUFRO2dCQUMvQkUsTUFBTUgsR0FBR0UsWUFBWSxFQUFFQyxRQUFRO2dCQUMvQkMsT0FBT0osR0FBR0ksS0FBSyxJQUFJO1lBQ3JCLENBQUE7UUFDQUMsVUFBVS9CLE1BQU0rQixRQUFRLElBQUk7UUFDNUJDLFVBQVVoQyxNQUFNZ0MsUUFBUSxJQUFJO1FBQzVCQyxjQUFjakMsTUFBTWtDLGFBQWEsSUFBSTtRQUNyQ0MsT0FBT25DLE1BQU1tQyxLQUFLLElBQUk7UUFDdEJDLFlBQVlwQyxNQUFNbUMsS0FBSyxJQUFJO1FBQzNCRSxlQUFlckMsTUFBTXNDLGNBQWMsSUFBSTtRQUN2Q0MsYUFBYXZDLE1BQU13QyxVQUFVO1FBQzdCQyxTQUFTM0MsU0FBUzRDLGFBQWE7UUFDL0JDLGdCQUFnQjNDLE1BQU00QyxZQUFZLEdBQUdyRCxPQUFPLElBQUltQixLQUFLVixNQUFNNEMsWUFBWSxHQUFHLHNCQUFzQnRCO0lBQ2xHLElBQUk7SUFFSixJQUFJckIsV0FBVztRQUNiLHFCQUNFLFFBQUM0QztZQUFJQyxXQUFVO3NCQUNiLGNBQUEsUUFBQ3pEO2dCQUFReUQsV0FBVTs7Ozs7Ozs7Ozs7SUFHekI7SUFFQSxJQUFJLENBQUM5QyxTQUFTLENBQUNRLGFBQWE7UUFDMUIscUJBQ0UsUUFBQ3FDO1lBQUlDLFdBQVU7c0JBQ2IsY0FBQSxRQUFDOUQ7Z0JBQUs4RCxXQUFVOztrQ0FDZCxRQUFDQzt3QkFBR0QsV0FBVTtrQ0FBNkI7Ozs7OztrQ0FDM0MsUUFBQ0U7d0JBQUVGLFdBQVU7a0NBQTZCOzs7Ozs7a0NBQzFDLFFBQUMvRDt3QkFBT2tFLFNBQVMsSUFBTXBELFNBQVM7OzBDQUM5QixRQUFDVDtnQ0FBVTBELFdBQVU7Ozs7Ozs0QkFBaUI7Ozs7Ozs7Ozs7Ozs7Ozs7OztJQU1oRDtJQUVBLE1BQU1JLGlCQUFpQixDQUFDQztRQUN0QixPQUFPLENBQUMsR0FBRyxFQUFFQSxPQUFPQyxjQUFjLElBQUk7SUFDeEM7SUFFQSxNQUFNQyxrQkFBa0I7UUFDdEJoRCxjQUFjO1FBRWQsSUFBSTtZQUNGLHFCQUFxQjtZQUNyQixNQUFNaUQsYUFBYXBELGtCQUFrQnFELE9BQU8sRUFBRTtZQUM5Q2hELGNBQWM7WUFFZCw2QkFBNkI7WUFDN0IsTUFBTSxJQUFJaUQsUUFBUUMsQ0FBQUEsVUFBV0MsV0FBV0QsU0FBUztZQUVqRCxpQkFBaUI7WUFDakIsTUFBTUgsYUFBYW5ELGNBQWNvRCxPQUFPLEVBQUU7WUFDMUNoRCxjQUFjO1lBRWRqQixNQUFNcUUsT0FBTyxDQUFDO1lBRWQsa0NBQWtDO1lBQ2xDRCxXQUFXO2dCQUNUN0QsU0FBUztZQUNYLEdBQUc7UUFDTCxFQUFFLE9BQU8rRCxPQUFPO1lBQ2R0RSxNQUFNc0UsS0FBSyxDQUFDO1lBQ1pDLFFBQVFELEtBQUssQ0FBQyxnQkFBZ0JBO1FBQ2hDLFNBQVU7WUFDUnZELGNBQWM7UUFDaEI7SUFDRjtJQUVBLE1BQU1pRCxlQUFlLENBQUNRLFNBQTZCQztRQUNqRCxPQUFPLElBQUlQLFFBQVEsQ0FBQ0MsU0FBU087WUFDM0IsSUFBSSxDQUFDRixTQUFTO2dCQUNaRSxPQUFPLElBQUlDLE1BQU07Z0JBQ2pCO1lBQ0Y7WUFFQSxNQUFNQyxjQUFjQyxPQUFPQyxJQUFJLENBQUMsSUFBSSxJQUFJO1lBQ3hDLElBQUksQ0FBQ0YsYUFBYTtnQkFDaEJGLE9BQU8sSUFBSUMsTUFBTTtnQkFDakI7WUFDRjtZQUVBQyxZQUFZRyxRQUFRLENBQUNDLEtBQUssQ0FBQyxDQUFDOzs7bUJBR2YsRUFBRVAsU0FBUyxHQUFHLEVBQUV2RCxZQUFZQyxhQUFhLENBQUM7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs0QkF5RGpDLEVBQUVzRCxhQUFhLGlCQUFpQixZQUFZLFVBQVU7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O1lBZ0l0RSxFQUFFRCxRQUFRUyxTQUFTLENBQUM7OztNQUcxQixDQUFDO1lBRURMLFlBQVlHLFFBQVEsQ0FBQ0csS0FBSztZQUMxQk4sWUFBWU8sS0FBSztZQUVqQiwyQkFBMkI7WUFDM0JmLFdBQVc7Z0JBQ1RRLFlBQVlRLEtBQUs7Z0JBQ2pCaEIsV0FBVztvQkFDVFEsWUFBWU0sS0FBSztvQkFDakJmO2dCQUNGLEdBQUc7WUFDTCxHQUFHO1FBQ0w7SUFDRjtJQUVBLE1BQU1rQixpQkFBaUIsQ0FBQyxFQUFFWixRQUFRLEVBQW1DLGlCQUNuRSxRQUFDbEI7WUFBSUMsV0FBVTs7OEJBRWIsUUFBQ0Q7b0JBQUlDLFdBQVU7O3NDQUNiLFFBQUNEOzRCQUFJQyxXQUFVO3NDQUFPOzs7Ozs7c0NBQ3RCLFFBQUNEOzRCQUFJQyxXQUFVO3NDQUFlOzs7Ozs7c0NBQzlCLFFBQUNEOzRCQUFJQyxXQUFVO3NDQUFlOzs7Ozs7c0NBQzlCLFFBQUNEOzRCQUFJQyxXQUFVO3NDQUFlOzs7Ozs7c0NBQzlCLFFBQUNEOzRCQUFJQyxXQUFVO3NDQUFlOzs7Ozs7c0NBQzlCLFFBQUNEOzRCQUFJQyxXQUFVO3NDQUFlOzs7Ozs7c0NBQzlCLFFBQUNEOzRCQUFJQyxXQUFVO3NDQUFlOzs7Ozs7Ozs7Ozs7OEJBSWhDLFFBQUNEO29CQUFJQyxXQUFVOzhCQUNaaUIsYUFBYSxZQUFZLG9CQUFvQjs7Ozs7OzhCQUloRCxRQUFDbEI7b0JBQUlDLFdBQVU7O3NDQUNiLFFBQUNEOzRCQUFJQyxXQUFVOzs4Q0FDYixRQUFDOEI7b0NBQUs5QixXQUFVOzhDQUFhOzs7Ozs7OENBQzdCLFFBQUM4QjtvQ0FBSzlCLFdBQVU7OENBQWN0QyxZQUFZQyxhQUFhOzs7Ozs7Ozs7Ozs7c0NBRXpELFFBQUNvQzs0QkFBSUMsV0FBVTs7OENBQ2IsUUFBQzhCO29DQUFLOUIsV0FBVTs4Q0FBYTs7Ozs7OzhDQUM3QixRQUFDOEI7b0NBQUs5QixXQUFVOzhDQUFjdEMsWUFBWU0sV0FBVzs7Ozs7Ozs7Ozs7O3NDQUV2RCxRQUFDK0I7NEJBQUlDLFdBQVU7OzhDQUNiLFFBQUM4QjtvQ0FBSzlCLFdBQVU7OENBQWE7Ozs7Ozs4Q0FDN0IsUUFBQzhCO29DQUFLOUIsV0FBVTs4Q0FBY3ZELE9BQU8sSUFBSW1CLEtBQUtGLFlBQVkrQixXQUFXLEdBQUc7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs4QkFLNUUsUUFBQ007b0JBQUlDLFdBQVU7O3NDQUNiLFFBQUNEOzRCQUFJQyxXQUFVO3NDQUFnQjs7Ozs7O3NDQUMvQixRQUFDRDs0QkFBSUMsV0FBVTs7OENBQ2IsUUFBQzhCO29DQUFLOUIsV0FBVTs4Q0FBYTs7Ozs7OzhDQUM3QixRQUFDOEI7b0NBQUs5QixXQUFVOzhDQUFjdEMsWUFBWU8sV0FBVzs7Ozs7Ozs7Ozs7O3NDQUV2RCxRQUFDOEI7NEJBQUlDLFdBQVU7OzhDQUNiLFFBQUM4QjtvQ0FBSzlCLFdBQVU7OENBQWE7Ozs7Ozs4Q0FDN0IsUUFBQzhCO29DQUFLOUIsV0FBVTs4Q0FBY3RDLFlBQVlRLFNBQVM7Ozs7Ozs7Ozs7Ozt3QkFFcERSLFlBQVlZLFlBQVksa0JBQ3ZCLFFBQUN5Qjs0QkFBSUMsV0FBVTs7OENBQ2IsUUFBQzhCO29DQUFLOUIsV0FBVTs4Q0FBYTs7Ozs7OzhDQUM3QixRQUFDOEI7b0NBQUs5QixXQUFVOzhDQUFjdEMsWUFBWVksWUFBWTs7Ozs7Ozs7Ozs7Ozs7Ozs7OzhCQU01RCxRQUFDeUI7b0JBQUlDLFdBQVU7O3NDQUNiLFFBQUNEOzRCQUFJQyxXQUFVO3NDQUFnQjs7Ozs7O3dCQUM5QnRDLFlBQVllLEtBQUssQ0FBQ0UsR0FBRyxDQUFDLENBQUNvRCxNQUFNQyxzQkFDNUIsUUFBQ2pDO2dDQUFnQkMsV0FBVTs7a0RBQ3pCLFFBQUNEO3dDQUFJQyxXQUFVOzswREFDYixRQUFDRDtnREFBSWtDLE9BQU87b0RBQUVDLFlBQVk7Z0RBQU87MERBQUlILEtBQUtsRCxJQUFJOzs7Ozs7MERBQzlDLFFBQUNrQjtnREFBSWtDLE9BQU87b0RBQUVFLFVBQVU7Z0RBQU87MERBQUlKLEtBQUtoRCxJQUFJOzs7Ozs7Ozs7Ozs7a0RBRTlDLFFBQUNnQjt3Q0FBSUMsV0FBVTtrREFBY0ksZUFBZTJCLEtBQUsvQyxLQUFLOzs7Ozs7OytCQUw5Q2dEOzs7Ozs7Ozs7Ozs4QkFXZCxRQUFDakM7b0JBQUlDLFdBQVU7O3NDQUNiLFFBQUNEOzRCQUFJQyxXQUFVOzs4Q0FDYixRQUFDOEI7OENBQUs7Ozs7Ozs4Q0FDTixRQUFDQTs4Q0FBTTFCLGVBQWUxQyxZQUFZdUIsUUFBUTs7Ozs7Ozs7Ozs7O3dCQUUzQ3ZCLFlBQVl3QixRQUFRLEdBQUcsbUJBQ3RCLFFBQUNhOzRCQUFJQyxXQUFVOzs4Q0FDYixRQUFDOEI7O3dDQUFLO3dDQUNPcEUsWUFBWXlCLFlBQVksS0FBSyxlQUFlLEdBQUd6QixZQUFZd0IsUUFBUSxDQUFDLENBQUMsQ0FBQyxHQUFHa0IsZUFBZTFDLFlBQVl3QixRQUFRO3dDQUFFOzs7Ozs7OzhDQUUzSCxRQUFDNEM7O3dDQUFLO3dDQUNGMUIsZUFDQTFDLFlBQVl5QixZQUFZLEtBQUssZUFDekIsQUFBQ3pCLFlBQVl1QixRQUFRLEdBQUd2QixZQUFZd0IsUUFBUSxHQUFJLE1BQ2hEeEIsWUFBWXdCLFFBQVE7Ozs7Ozs7Ozs7Ozs7c0NBS2hDLFFBQUNhOzRCQUFJQyxXQUFVOzs4Q0FDYixRQUFDOEI7OENBQUs7Ozs7Ozs4Q0FDTixRQUFDQTs4Q0FBTTFCLGVBQWUxQyxZQUFZMkIsS0FBSzs7Ozs7Ozs7Ozs7Ozs7Ozs7OzhCQUszQyxRQUFDVTtvQkFBSUMsV0FBVTs7c0NBQ2IsUUFBQ0Q7NEJBQUlDLFdBQVU7OzhDQUNiLFFBQUM4QjtvQ0FBSzlCLFdBQVU7OENBQWE7Ozs7Ozs4Q0FDN0IsUUFBQzhCO29DQUFLOUIsV0FBVTtvQ0FBYWlDLE9BQU87d0NBQUVHLGVBQWU7b0NBQVk7OENBQzlEMUUsWUFBWTZCLGFBQWEsQ0FBQzhDLE9BQU8sQ0FBQyxLQUFLOzs7Ozs7Ozs7Ozs7c0NBRzVDLFFBQUN0Qzs0QkFBSUMsV0FBVTs7OENBQ2IsUUFBQzhCO29DQUFLOUIsV0FBVTs4Q0FBYTs7Ozs7OzhDQUM3QixRQUFDOEI7b0NBQUs5QixXQUFVOzhDQUFjSSxlQUFlMUMsWUFBWTRCLFVBQVU7Ozs7Ozs7Ozs7Ozt3QkFFcEU1QixZQUFZNEIsVUFBVSxHQUFHNUIsWUFBWTJCLEtBQUssa0JBQ3pDLFFBQUNVOzRCQUFJQyxXQUFVOzs4Q0FDYixRQUFDOEI7b0NBQUs5QixXQUFVOzhDQUFhOzs7Ozs7OENBQzdCLFFBQUM4QjtvQ0FBSzlCLFdBQVU7OENBQWNJLGVBQWUxQyxZQUFZNEIsVUFBVSxHQUFHNUIsWUFBWTJCLEtBQUs7Ozs7Ozs7Ozs7OztzQ0FHM0YsUUFBQ1U7NEJBQUlDLFdBQVU7OzhDQUNiLFFBQUM4QjtvQ0FBSzlCLFdBQVU7OENBQWE7Ozs7Ozs4Q0FDN0IsUUFBQzhCO29DQUFLOUIsV0FBVTs4Q0FBY3RDLFlBQVlpQyxPQUFPOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Z0JBS3BEakMsWUFBWW1DLGNBQWMsa0JBQ3pCLFFBQUNFO29CQUFJQyxXQUFVOztzQ0FDYixRQUFDRDs0QkFBSUMsV0FBVTtzQ0FBZ0I7Ozs7OztzQ0FDL0IsUUFBQ0Q7NEJBQUlDLFdBQVU7OzhDQUNiLFFBQUM4QjtvQ0FBSzlCLFdBQVU7OENBQWE7Ozs7Ozs4Q0FDN0IsUUFBQzhCO29DQUFLOUIsV0FBVTs4Q0FBY3RDLFlBQVltQyxjQUFjOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Z0JBTTdEb0IsYUFBYSwwQkFDWixRQUFDbEI7b0JBQUlDLFdBQVU7O3NDQUNiLFFBQUNEOzRCQUFJa0MsT0FBTztnQ0FBRUMsWUFBWTtnQ0FBUUksY0FBYzs0QkFBTTtzQ0FBRzs7Ozs7O3NDQUN6RCxRQUFDdkM7c0NBQUk7Ozs7OztzQ0FDTCxRQUFDQTtzQ0FBSTs7Ozs7O3NDQUNMLFFBQUNBO3NDQUFJOzs7Ozs7c0NBQ0wsUUFBQ0E7c0NBQUk7Ozs7OztzQ0FDTCxRQUFDQTtzQ0FBSTs7Ozs7Ozs7Ozs7eUNBR1AsUUFBQ0E7b0JBQUlDLFdBQVU7O3NDQUNiLFFBQUNEOzRCQUFJa0MsT0FBTztnQ0FBRUMsWUFBWTtnQ0FBUUksY0FBYzs0QkFBTTtzQ0FBRzs7Ozs7O3NDQUN6RCxRQUFDdkM7c0NBQUk7Ozs7OztzQ0FDTCxRQUFDQTtzQ0FBSTs7Ozs7O3NDQUNMLFFBQUNBO3NDQUFJOzs7Ozs7c0NBQ0wsUUFBQ0E7c0NBQUk7Ozs7OztzQ0FDTCxRQUFDQTtzQ0FBSTs7Ozs7Ozs7Ozs7OzhCQUtULFFBQUNBO29CQUFJQyxXQUFVOzhCQUFXdEMsWUFBWU0sV0FBVzs7Ozs7OzhCQUdqRCxRQUFDK0I7b0JBQUlDLFdBQVU7OEJBQVk7Ozs7Ozs4QkFDM0IsUUFBQ0Q7b0JBQUlDLFdBQVU7O3NDQUNiLFFBQUNEO3NDQUFJOzs7Ozs7c0NBQ0wsUUFBQ0E7c0NBQUk7Ozs7OztzQ0FDTCxRQUFDQTs0QkFBSWtDLE9BQU87Z0NBQUVNLFdBQVc7Z0NBQVFKLFVBQVU7NEJBQU07c0NBQUc7Ozs7OztzQ0FHcEQsUUFBQ3BDOzRCQUFJa0MsT0FBTztnQ0FBRUUsVUFBVTs0QkFBTTs7Z0NBQUc7Z0NBQ3JCMUYsT0FBTyxJQUFJbUIsUUFBUTs7Ozs7Ozs7Ozs7Ozs7Ozs7OztJQU1yQyxxQkFDRSxRQUFDbUM7UUFBSUMsV0FBVTs7MEJBRWIsUUFBQ0Q7Z0JBQUlDLFdBQVU7MEJBQ2IsY0FBQSxRQUFDOUQ7b0JBQUs4RCxXQUFVOzhCQUNkLGNBQUEsUUFBQ0Q7d0JBQUlDLFdBQVU7OzBDQUNiLFFBQUNEO2dDQUFJQyxXQUFVOztrREFDYixRQUFDL0Q7d0NBQU91RyxTQUFRO3dDQUFVckMsU0FBUyxJQUFNcEQsU0FBUzs7MERBQ2hELFFBQUNUO2dEQUFVMEQsV0FBVTs7Ozs7OzRDQUFpQjs7Ozs7OztrREFHeEMsUUFBQ0Q7OzBEQUNDLFFBQUNFO2dEQUFHRCxXQUFVOzBEQUF3Qjs7Ozs7OzBEQUN0QyxRQUFDRTtnREFBRUYsV0FBVTs7b0RBQWdDO29EQUNuQ3RDLFlBQVlNLFdBQVc7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7MENBSXJDLFFBQUMrQjtnQ0FBSUMsV0FBVTs7b0NBQ1p4QyxhQUFhLG1CQUNaLFFBQUNyQjt3Q0FBTXFHLFNBQVE7d0NBQVV4QyxXQUFVOzswREFDakMsUUFBQzNEO2dEQUFNMkQsV0FBVTs7Ozs7OzRDQUNoQnhDOzRDQUFXOzs7Ozs7O2tEQUdoQixRQUFDdkI7d0NBQ0NrRSxTQUFTSTt3Q0FDVGtDLFVBQVVuRjt3Q0FDVm9GLE1BQUs7OzBEQUVMLFFBQUN0RztnREFBUTRELFdBQVU7Ozs7Ozs0Q0FDbEIxQyxhQUFhLGdCQUFnQjs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7MEJBUXhDLFFBQUN5QztnQkFBSUMsV0FBVTs7a0NBRWIsUUFBQzlEO3dCQUFLOEQsV0FBVTs7MENBQ2QsUUFBQ0Q7Z0NBQUlDLFdBQVU7O2tEQUNiLFFBQUMyQzt3Q0FBRzNDLFdBQVU7a0RBQXdCOzs7Ozs7a0RBQ3RDLFFBQUM3RDtrREFBTTs7Ozs7Ozs7Ozs7OzBDQUVULFFBQUM0RDtnQ0FDQzZDLEtBQUt4RjtnQ0FDTDRDLFdBQVU7Z0NBQ1ZpQyxPQUFPO29DQUFFWSxPQUFPO29DQUFTQyxRQUFRO2dDQUFTOzBDQUUxQyxjQUFBLFFBQUNqQjtvQ0FBZVosVUFBUzs7Ozs7Ozs7Ozs7Ozs7Ozs7a0NBSzdCLFFBQUMvRTt3QkFBSzhELFdBQVU7OzBDQUNkLFFBQUNEO2dDQUFJQyxXQUFVOztrREFDYixRQUFDMkM7d0NBQUczQyxXQUFVO2tEQUF3Qjs7Ozs7O2tEQUN0QyxRQUFDN0Q7d0NBQU1xRyxTQUFRO2tEQUFZOzs7Ozs7Ozs7Ozs7MENBRTdCLFFBQUN6QztnQ0FDQzZDLEtBQUt2RjtnQ0FDTDJDLFdBQVU7Z0NBQ1ZpQyxPQUFPO29DQUFFWSxPQUFPO29DQUFTQyxRQUFRO2dDQUFTOzBDQUUxQyxjQUFBLFFBQUNqQjtvQ0FBZVosVUFBUzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7MEJBTS9CLFFBQUNsQjtnQkFBSUMsV0FBVTswQkFDYixjQUFBLFFBQUM5RDtvQkFBSzhELFdBQVU7OEJBQ2QsY0FBQSxRQUFDRDt3QkFBSUMsV0FBVTs7MENBQ2IsUUFBQ0Q7Z0NBQUlDLFdBQVU7MENBQ2IsY0FBQSxRQUFDNUQ7b0NBQVE0RCxXQUFVOzs7Ozs7Ozs7OzswQ0FFckIsUUFBQ0Q7Z0NBQUlDLFdBQVU7O2tEQUNiLFFBQUMrQzt3Q0FBRy9DLFdBQVU7a0RBQW1DOzs7Ozs7a0RBQ2pELFFBQUNnRDt3Q0FBR2hELFdBQVU7OzBEQUNaLFFBQUNpRDswREFBRzs7Ozs7OzBEQUNKLFFBQUNBOzBEQUFHOzs7Ozs7MERBQ0osUUFBQ0E7MERBQUc7Ozs7OzswREFDSixRQUFDQTswREFBRzs7Ozs7OzBEQUNKLFFBQUNBOzBEQUFHOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O0FBUXBCO0dBempCd0JwRzs7UUFDRmQ7UUFDSEM7UUFDR1U7UUFDZUM7OztLQUpiRSJ9

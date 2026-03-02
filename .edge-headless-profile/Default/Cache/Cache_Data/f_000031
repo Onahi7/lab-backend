@@ -1,0 +1,1431 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/pages/reception/PaymentsPage.tsx");import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+
+let prevRefreshReg;
+let prevRefreshSig;
+
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react-swc can't detect preamble. Something is wrong."
+    );
+  }
+
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+
+import __vite__cjsImport2_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=27cfabb6"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime["jsxDEV"];
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=27cfabb6"; const useState = __vite__cjsImport3_react["useState"];
+import { RoleLayout } from "/src/components/layout/RoleLayout.tsx";
+import { useAuth } from "/src/context/AuthContext.tsx";
+import { useOrders, useAddPayment, usePaymentHistory, usePaymentStats, useDailyIncome } from "/src/hooks/useOrders.ts";
+import { Button } from "/src/components/ui/button.tsx";
+import { Input } from "/src/components/ui/input.tsx";
+import { Badge } from "/src/components/ui/badge.tsx";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "/src/components/ui/dialog.tsx";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "/src/components/ui/select.tsx";
+import { toast } from "/node_modules/.vite/deps/sonner.js?v=27cfabb6";
+import { Search, CreditCard, Banknote, Smartphone, Check, Loader2, TrendingUp, Calendar, History, Plus } from "/node_modules/.vite/deps/lucide-react.js?v=27cfabb6";
+import { format, subDays } from "/node_modules/.vite/deps/date-fns.js?v=27cfabb6";
+import { cn } from "/src/lib/utils.ts";
+export default function PaymentsPage() {
+    _s();
+    const { profile, primaryRole } = useAuth();
+    const currentRole = primaryRole === 'admin' ? 'admin' : 'receptionist';
+    const [paymentFilter, setPaymentFilter] = useState('pending');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedOrder, setSelectedOrder] = useState(null);
+    const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
+    const [paymentAmount, setPaymentAmount] = useState('');
+    const [showHistoryDialog, setShowHistoryDialog] = useState(false);
+    const [historyOrderId, setHistoryOrderId] = useState('');
+    const [dateRange, setDateRange] = useState('today');
+    const { data: orders, isLoading } = useOrders('all');
+    const addPayment = useAddPayment();
+    const { data: paymentHistory, isLoading: historyLoading } = usePaymentHistory(historyOrderId);
+    // Get date range for stats
+    const getDateRange = ()=>{
+        const end = new Date().toISOString();
+        let start = new Date();
+        switch(dateRange){
+            case 'today':
+                start.setHours(0, 0, 0, 0);
+                break;
+            case 'week':
+                start = subDays(start, 7);
+                break;
+            case 'month':
+                start = subDays(start, 30);
+                break;
+            default:
+                start.setHours(0, 0, 0, 0);
+        }
+        return {
+            start: start.toISOString(),
+            end
+        };
+    };
+    const { start, end } = getDateRange();
+    const { data: paymentStats } = usePaymentStats(start, end);
+    const { data: dailyIncome } = useDailyIncome(start, end);
+    const filteredOrders = Array.isArray(orders) ? orders.filter((order)=>{
+        // Filter by payment status
+        const paymentStatus = order.paymentStatus || order.payment_status;
+        if (paymentFilter !== 'all' && paymentStatus !== paymentFilter) return false;
+        // Filter by search
+        if (!searchTerm) return true;
+        const search = searchTerm.toLowerCase();
+        const orderNum = (order.orderNumber || order.order_number || '').toLowerCase();
+        const firstName = (order.patientId?.firstName || order.patients?.first_name || '').toLowerCase();
+        const lastName = (order.patientId?.lastName || order.patients?.last_name || '').toLowerCase();
+        return orderNum.includes(search) || firstName.includes(search) || lastName.includes(search);
+    }) : [];
+    const pendingTotal = Array.isArray(orders) ? orders.filter((o)=>[
+            'pending',
+            'partial'
+        ].includes(o.paymentStatus || o.payment_status || '')).reduce((sum, o)=>sum + Number(o.balance ?? Number(o.total || o.totalAmount || 0) - Number(o.amountPaid || 0)), 0) : 0;
+    const paidTodayTotal = Array.isArray(orders) ? orders.filter((o)=>{
+        const paymentStatus = o.paymentStatus || o.payment_status;
+        if (paymentStatus !== 'paid') return false;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return new Date(o.createdAt || o.created_at) >= today;
+    }).reduce((sum, o)=>sum + Number(o.amountPaid || o.total || o.totalAmount || 0), 0) : 0;
+    const handleProcessPayment = async ()=>{
+        if (!selectedOrder || !selectedPaymentMethod) return;
+        const orderId = selectedOrder.id || selectedOrder._id;
+        const orderTotal = Number(selectedOrder.total || selectedOrder.totalAmount || 0);
+        const alreadyPaid = Number(selectedOrder.amountPaid || 0);
+        const remaining = orderTotal - alreadyPaid;
+        const amount = parseFloat(paymentAmount) || remaining;
+        if (amount <= 0 || amount > remaining + 0.001) {
+            toast.error(`Amount must be between 0.01 and Le ${remaining.toLocaleString()}`);
+            return;
+        }
+        try {
+            await addPayment.mutateAsync({
+                orderId,
+                data: {
+                    amount,
+                    paymentMethod: selectedPaymentMethod
+                }
+            });
+            toast.success(`Payment of Le ${amount.toLocaleString()} recorded`);
+            setShowPaymentDialog(false);
+            setSelectedOrder(null);
+            setSelectedPaymentMethod(null);
+            setPaymentAmount('');
+        } catch (error) {
+            toast.error(error?.response?.data?.message || 'Failed to process payment');
+        }
+    };
+    return /*#__PURE__*/ _jsxDEV(RoleLayout, {
+        title: "Payments",
+        subtitle: "Process and track order payments",
+        role: currentRole,
+        userName: profile?.full_name,
+        children: [
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "flex items-center gap-3 mb-4",
+                children: [
+                    /*#__PURE__*/ _jsxDEV(Calendar, {
+                        className: "w-4 h-4 text-muted-foreground"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                        lineNumber: 126,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(Select, {
+                        value: dateRange,
+                        onValueChange: setDateRange,
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(SelectTrigger, {
+                                className: "w-48",
+                                children: /*#__PURE__*/ _jsxDEV(SelectValue, {}, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                    lineNumber: 129,
+                                    columnNumber: 13
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                lineNumber: 128,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV(SelectContent, {
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                        value: "today",
+                                        children: "Today"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                        lineNumber: 132,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                        value: "week",
+                                        children: "Last 7 Days"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                        lineNumber: 133,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                        value: "month",
+                                        children: "Last 30 Days"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                        lineNumber: 134,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                lineNumber: 131,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                        lineNumber: 127,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                lineNumber: 125,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "grid grid-cols-4 gap-4 mb-6",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg p-4",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-sm text-muted-foreground",
+                                children: "Outstanding Balance"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                lineNumber: 142,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-2xl font-bold text-amber-600",
+                                children: [
+                                    "Le ",
+                                    pendingTotal.toLocaleString()
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                lineNumber: 143,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-xs text-muted-foreground mt-1",
+                                children: "Pending & partial orders"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                lineNumber: 146,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                        lineNumber: 141,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg p-4",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-sm text-muted-foreground",
+                                children: [
+                                    "Collected (",
+                                    dateRange,
+                                    ")"
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                lineNumber: 151,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-2xl font-bold text-status-normal",
+                                children: [
+                                    "Le ",
+                                    (paymentStats?.paidRevenue || 0).toLocaleString()
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                lineNumber: 152,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-xs text-muted-foreground mt-1",
+                                children: [
+                                    paymentStats?.paidOrders || 0,
+                                    " orders"
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                lineNumber: 155,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                        lineNumber: 150,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg p-4",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-sm text-muted-foreground",
+                                children: "Total Revenue"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                lineNumber: 160,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-2xl font-bold",
+                                children: [
+                                    "Le ",
+                                    (paymentStats?.totalRevenue || 0).toLocaleString()
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                lineNumber: 161,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-xs text-muted-foreground mt-1",
+                                children: [
+                                    paymentStats?.totalOrders || 0,
+                                    " orders"
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                lineNumber: 164,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                        lineNumber: 159,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "bg-card border rounded-lg p-4",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-sm text-muted-foreground flex items-center gap-1",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(TrendingUp, {
+                                        className: "w-3 h-3"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                        lineNumber: 170,
+                                        columnNumber: 13
+                                    }, this),
+                                    "Avg Daily Income"
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                lineNumber: 169,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-2xl font-bold",
+                                children: [
+                                    "Le ",
+                                    dailyIncome && dailyIncome.length > 0 ? Math.round(dailyIncome.reduce((sum, day)=>sum + day.totalIncome, 0) / dailyIncome.length).toLocaleString() : '0'
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                lineNumber: 173,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-xs text-muted-foreground mt-1",
+                                children: [
+                                    dailyIncome?.length || 0,
+                                    " days"
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                lineNumber: 178,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                        lineNumber: 168,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                lineNumber: 140,
+                columnNumber: 7
+            }, this),
+            dailyIncome && dailyIncome.length > 0 && /*#__PURE__*/ _jsxDEV("div", {
+                className: "bg-card border rounded-lg p-4 mb-6",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("h3", {
+                        className: "font-semibold mb-4",
+                        children: "Daily Income Breakdown"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                        lineNumber: 187,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "space-y-2",
+                        children: dailyIncome.slice(0, 7).map((day, index)=>/*#__PURE__*/ _jsxDEV("div", {
+                                className: "flex items-center justify-between py-2 border-b last:border-0",
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                className: "font-medium",
+                                                children: format(new Date(day.date), 'MMM dd, yyyy')
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                lineNumber: 192,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                className: "text-xs text-muted-foreground",
+                                                children: [
+                                                    day.orderCount,
+                                                    " orders"
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                lineNumber: 193,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                        lineNumber: 191,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "text-right",
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("p", {
+                                                className: "font-bold",
+                                                children: [
+                                                    "Le ",
+                                                    day.totalIncome.toLocaleString()
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                lineNumber: 196,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("div", {
+                                                className: "flex gap-2 text-xs text-muted-foreground mt-1",
+                                                children: [
+                                                    day.cashPayments > 0 && /*#__PURE__*/ _jsxDEV("span", {
+                                                        children: [
+                                                            "Cash: Le ",
+                                                            day.cashPayments.toLocaleString()
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                        lineNumber: 198,
+                                                        columnNumber: 46
+                                                    }, this),
+                                                    day.orangeMoneyPayments > 0 && /*#__PURE__*/ _jsxDEV("span", {
+                                                        children: [
+                                                            "Orange Money: Le ",
+                                                            day.orangeMoneyPayments.toLocaleString()
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                        lineNumber: 199,
+                                                        columnNumber: 53
+                                                    }, this),
+                                                    day.afrimoneyPayments > 0 && /*#__PURE__*/ _jsxDEV("span", {
+                                                        children: [
+                                                            "Afrimoney: Le ",
+                                                            day.afrimoneyPayments.toLocaleString()
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                        lineNumber: 200,
+                                                        columnNumber: 51
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                lineNumber: 197,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                        lineNumber: 195,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, index, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                lineNumber: 190,
+                                columnNumber: 15
+                            }, this))
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                        lineNumber: 188,
+                        columnNumber: 11
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                lineNumber: 186,
+                columnNumber: 9
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "flex items-center gap-3 mb-6",
+                children: [
+                    /*#__PURE__*/ _jsxDEV("div", {
+                        className: "relative flex-1 max-w-md",
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(Search, {
+                                className: "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                lineNumber: 212,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV(Input, {
+                                placeholder: "Search orders...",
+                                className: "pl-10",
+                                value: searchTerm,
+                                onChange: (e)=>setSearchTerm(e.target.value)
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                lineNumber: 213,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                        lineNumber: 211,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ _jsxDEV(Select, {
+                        value: paymentFilter,
+                        onValueChange: setPaymentFilter,
+                        children: [
+                            /*#__PURE__*/ _jsxDEV(SelectTrigger, {
+                                className: "w-48",
+                                children: /*#__PURE__*/ _jsxDEV(SelectValue, {}, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                    lineNumber: 222,
+                                    columnNumber: 13
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                lineNumber: 221,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ _jsxDEV(SelectContent, {
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                        value: "all",
+                                        children: "All Payments"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                        lineNumber: 225,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                        value: "pending",
+                                        children: "Pending"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                        lineNumber: 226,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                        value: "paid",
+                                        children: "Paid"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                        lineNumber: 227,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV(SelectItem, {
+                                        value: "partial",
+                                        children: "Partial"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                        lineNumber: 228,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                lineNumber: 224,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                        lineNumber: 220,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                lineNumber: 210,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV("div", {
+                className: "bg-card border rounded-lg overflow-hidden",
+                children: isLoading ? /*#__PURE__*/ _jsxDEV("div", {
+                    className: "flex items-center justify-center py-12",
+                    children: /*#__PURE__*/ _jsxDEV(Loader2, {
+                        className: "w-6 h-6 animate-spin text-muted-foreground"
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                        lineNumber: 237,
+                        columnNumber: 13
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                    lineNumber: 236,
+                    columnNumber: 11
+                }, this) : /*#__PURE__*/ _jsxDEV("table", {
+                    className: "data-table",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV("thead", {
+                            children: /*#__PURE__*/ _jsxDEV("tr", {
+                                children: [
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Order #"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                        lineNumber: 243,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Patient"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                        lineNumber: 244,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Total"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                        lineNumber: 245,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Paid"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                        lineNumber: 246,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Balance"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                        lineNumber: 247,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Last Method"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                        lineNumber: 248,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Status"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                        lineNumber: 249,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ _jsxDEV("th", {
+                                        children: "Actions"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                        lineNumber: 250,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                lineNumber: 242,
+                                columnNumber: 15
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                            lineNumber: 241,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("tbody", {
+                            children: [
+                                filteredOrders?.map((order)=>{
+                                    const orderNum = order.orderNumber || order.order_number;
+                                    const firstName = order.patientId?.firstName || order.patients?.first_name;
+                                    const lastName = order.patientId?.lastName || order.patients?.last_name;
+                                    const createdAt = order.createdAt || order.created_at;
+                                    const total = order.total || order.totalAmount || 0;
+                                    const paymentMethod = order.paymentMethod || order.payment_method;
+                                    const paymentStatus = order.paymentStatus || order.payment_status;
+                                    const amountPaid = Number(order.amountPaid || 0);
+                                    const balance = Number(order.balance ?? Number(total) - amountPaid);
+                                    return /*#__PURE__*/ _jsxDEV("tr", {
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                className: "font-mono text-sm",
+                                                children: orderNum
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                lineNumber: 267,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                children: /*#__PURE__*/ _jsxDEV("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV("p", {
+                                                            className: "font-medium",
+                                                            children: [
+                                                                firstName,
+                                                                " ",
+                                                                lastName
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                            lineNumber: 270,
+                                                            columnNumber: 25
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("p", {
+                                                            className: "text-xs text-muted-foreground",
+                                                            children: format(new Date(createdAt), 'MMM dd, HH:mm')
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                            lineNumber: 271,
+                                                            columnNumber: 25
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                    lineNumber: 269,
+                                                    columnNumber: 23
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                lineNumber: 268,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                className: "font-bold",
+                                                children: [
+                                                    "Le ",
+                                                    Number(total).toLocaleString()
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                lineNumber: 276,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                className: "text-status-normal font-medium",
+                                                children: [
+                                                    "Le ",
+                                                    amountPaid.toLocaleString()
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                lineNumber: 277,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                className: cn(balance > 0 ? 'text-amber-600 font-medium' : 'text-muted-foreground'),
+                                                children: balance > 0 ? `Le ${balance.toLocaleString()}` : '-'
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                lineNumber: 278,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                className: "capitalize text-muted-foreground",
+                                                children: paymentMethod?.replace(/_/g, ' ') || '-'
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                lineNumber: 281,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                children: /*#__PURE__*/ _jsxDEV(Badge, {
+                                                    variant: "outline",
+                                                    className: cn(paymentStatus === 'paid' ? 'bg-status-normal/10 text-status-normal' : paymentStatus === 'partial' ? 'bg-amber-500/10 text-amber-600' : 'bg-status-warning/10 text-status-warning'),
+                                                    children: paymentStatus
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                    lineNumber: 285,
+                                                    columnNumber: 23
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                lineNumber: 284,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("td", {
+                                                children: /*#__PURE__*/ _jsxDEV("div", {
+                                                    className: "flex gap-1",
+                                                    children: [
+                                                        paymentStatus !== 'paid' && /*#__PURE__*/ _jsxDEV(Button, {
+                                                            size: "sm",
+                                                            onClick: ()=>{
+                                                                setSelectedOrder(order);
+                                                                setPaymentAmount('');
+                                                                setShowPaymentDialog(true);
+                                                            },
+                                                            children: [
+                                                                /*#__PURE__*/ _jsxDEV(Plus, {
+                                                                    className: "w-3 h-3 mr-1"
+                                                                }, void 0, false, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                                    lineNumber: 304,
+                                                                    columnNumber: 29
+                                                                }, this),
+                                                                "Pay"
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                            lineNumber: 296,
+                                                            columnNumber: 27
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV(Button, {
+                                                            variant: "ghost",
+                                                            size: "sm",
+                                                            title: "Payment history",
+                                                            onClick: ()=>{
+                                                                setHistoryOrderId(order.id || order._id || '');
+                                                                setShowHistoryDialog(true);
+                                                            },
+                                                            children: /*#__PURE__*/ _jsxDEV(History, {
+                                                                className: "w-3 h-3"
+                                                            }, void 0, false, {
+                                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                                lineNumber: 317,
+                                                                columnNumber: 27
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                            lineNumber: 308,
+                                                            columnNumber: 25
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                    lineNumber: 294,
+                                                    columnNumber: 23
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                lineNumber: 293,
+                                                columnNumber: 21
+                                            }, this)
+                                        ]
+                                    }, order.id || order._id, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                        lineNumber: 266,
+                                        columnNumber: 19
+                                    }, this);
+                                }),
+                                (!filteredOrders || filteredOrders.length === 0) && /*#__PURE__*/ _jsxDEV("tr", {
+                                    children: /*#__PURE__*/ _jsxDEV("td", {
+                                        colSpan: 9,
+                                        className: "text-center py-8 text-muted-foreground",
+                                        children: "No payments found"
+                                    }, void 0, false, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                        lineNumber: 326,
+                                        columnNumber: 19
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                    lineNumber: 325,
+                                    columnNumber: 17
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                            lineNumber: 253,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                    lineNumber: 240,
+                    columnNumber: 11
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                lineNumber: 234,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Dialog, {
+                open: showPaymentDialog,
+                onOpenChange: (open)=>{
+                    setShowPaymentDialog(open);
+                    if (!open) {
+                        setSelectedPaymentMethod(null);
+                        setPaymentAmount('');
+                    }
+                },
+                children: /*#__PURE__*/ _jsxDEV(DialogContent, {
+                    children: [
+                        /*#__PURE__*/ _jsxDEV(DialogHeader, {
+                            children: /*#__PURE__*/ _jsxDEV(DialogTitle, {
+                                children: "Record Payment"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                lineNumber: 340,
+                                columnNumber: 13
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                            lineNumber: 339,
+                            columnNumber: 11
+                        }, this),
+                        selectedOrder && /*#__PURE__*/ _jsxDEV("div", {
+                            className: "py-4",
+                            children: [
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "bg-muted rounded-lg p-4 mb-4",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            className: "flex justify-between mb-2",
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("span", {
+                                                    className: "text-muted-foreground",
+                                                    children: "Order"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                    lineNumber: 347,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("span", {
+                                                    className: "font-mono",
+                                                    children: selectedOrder.orderNumber || selectedOrder.order_number
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                    lineNumber: 348,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                            lineNumber: 346,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            className: "flex justify-between mb-2",
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("span", {
+                                                    className: "text-muted-foreground",
+                                                    children: "Patient"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                    lineNumber: 351,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("span", {
+                                                    children: [
+                                                        selectedOrder.patientId?.firstName || selectedOrder.patients?.first_name,
+                                                        ' ',
+                                                        selectedOrder.patientId?.lastName || selectedOrder.patients?.last_name
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                    lineNumber: 352,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                            lineNumber: 350,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            className: "flex justify-between mb-2",
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("span", {
+                                                    className: "text-muted-foreground",
+                                                    children: "Order Total"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                    lineNumber: 358,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("span", {
+                                                    className: "font-bold",
+                                                    children: [
+                                                        "Le ",
+                                                        Number(selectedOrder.total || selectedOrder.totalAmount || 0).toLocaleString()
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                    lineNumber: 359,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                            lineNumber: 357,
+                                            columnNumber: 17
+                                        }, this),
+                                        Number(selectedOrder.amountPaid || 0) > 0 && /*#__PURE__*/ _jsxDEV("div", {
+                                            className: "flex justify-between mb-2 text-status-normal",
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("span", {
+                                                    children: "Already Paid"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                    lineNumber: 363,
+                                                    columnNumber: 21
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("span", {
+                                                    children: [
+                                                        "Le ",
+                                                        Number(selectedOrder.amountPaid).toLocaleString()
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                    lineNumber: 364,
+                                                    columnNumber: 21
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                            lineNumber: 362,
+                                            columnNumber: 19
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            className: "flex justify-between font-bold text-lg pt-2 border-t mt-2 text-amber-600",
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("span", {
+                                                    children: "Remaining Balance"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                    lineNumber: 368,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("span", {
+                                                    children: [
+                                                        "Le ",
+                                                        (Number(selectedOrder.total || selectedOrder.totalAmount || 0) - Number(selectedOrder.amountPaid || 0)).toLocaleString()
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                    lineNumber: 369,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                            lineNumber: 367,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                    lineNumber: 345,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV("div", {
+                                    className: "space-y-4",
+                                    children: [
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            className: "space-y-1",
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("label", {
+                                                    className: "text-sm font-medium",
+                                                    children: "Amount to Pay"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                    lineNumber: 375,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV(Input, {
+                                                    type: "number",
+                                                    step: "0.01",
+                                                    min: "0.01",
+                                                    max: Number(selectedOrder.total || 0) - Number(selectedOrder.amountPaid || 0),
+                                                    placeholder: `Max: Le ${(Number(selectedOrder.total || 0) - Number(selectedOrder.amountPaid || 0)).toLocaleString()}`,
+                                                    value: paymentAmount,
+                                                    onChange: (e)=>setPaymentAmount(e.target.value)
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                    lineNumber: 376,
+                                                    columnNumber: 19
+                                                }, this),
+                                                parseFloat(paymentAmount) > 0 && parseFloat(paymentAmount) < Number(selectedOrder.total || 0) - Number(selectedOrder.amountPaid || 0) && /*#__PURE__*/ _jsxDEV("p", {
+                                                    className: "text-xs text-amber-600",
+                                                    children: [
+                                                        "Remaining credit after this: Le ",
+                                                        (Number(selectedOrder.total || 0) - Number(selectedOrder.amountPaid || 0) - parseFloat(paymentAmount)).toLocaleString()
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                    lineNumber: 386,
+                                                    columnNumber: 21
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                            lineNumber: 374,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV("div", {
+                                            className: "space-y-2",
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("label", {
+                                                    className: "text-sm font-medium",
+                                                    children: "Payment Method"
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                    lineNumber: 393,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("div", {
+                                                    className: "grid grid-cols-3 gap-3",
+                                                    children: [
+                                                        {
+                                                            id: 'cash',
+                                                            label: 'Cash',
+                                                            icon: Banknote
+                                                        },
+                                                        {
+                                                            id: 'orange_money',
+                                                            label: 'Orange Money',
+                                                            icon: Smartphone
+                                                        },
+                                                        {
+                                                            id: 'afrimoney',
+                                                            label: 'Afrimoney',
+                                                            icon: CreditCard
+                                                        }
+                                                    ].map((method)=>/*#__PURE__*/ _jsxDEV("button", {
+                                                            onClick: ()=>setSelectedPaymentMethod(method.id),
+                                                            className: cn('flex flex-col items-center gap-2 p-4 rounded-lg border transition-colors', selectedPaymentMethod === method.id ? 'border-primary bg-primary/5' : 'hover:bg-muted/50'),
+                                                            children: [
+                                                                /*#__PURE__*/ _jsxDEV(method.icon, {
+                                                                    className: "w-6 h-6"
+                                                                }, void 0, false, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                                    lineNumber: 410,
+                                                                    columnNumber: 25
+                                                                }, this),
+                                                                /*#__PURE__*/ _jsxDEV("span", {
+                                                                    className: "text-sm font-medium",
+                                                                    children: method.label
+                                                                }, void 0, false, {
+                                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                                    lineNumber: 411,
+                                                                    columnNumber: 25
+                                                                }, this)
+                                                            ]
+                                                        }, method.id, true, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                            lineNumber: 400,
+                                                            columnNumber: 23
+                                                        }, this))
+                                                }, void 0, false, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                    lineNumber: 394,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                            lineNumber: 392,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                    lineNumber: 373,
+                                    columnNumber: 15
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                            lineNumber: 344,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV(DialogFooter, {
+                            children: [
+                                /*#__PURE__*/ _jsxDEV(Button, {
+                                    variant: "outline",
+                                    onClick: ()=>setShowPaymentDialog(false),
+                                    children: "Cancel"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                    lineNumber: 421,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV(Button, {
+                                    onClick: handleProcessPayment,
+                                    disabled: !selectedPaymentMethod || addPayment.isPending,
+                                    children: [
+                                        addPayment.isPending && /*#__PURE__*/ _jsxDEV(Loader2, {
+                                            className: "w-4 h-4 mr-2 animate-spin"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                            lineNumber: 426,
+                                            columnNumber: 40
+                                        }, this),
+                                        /*#__PURE__*/ _jsxDEV(Check, {
+                                            className: "w-4 h-4 mr-2"
+                                        }, void 0, false, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                            lineNumber: 427,
+                                            columnNumber: 15
+                                        }, this),
+                                        "Confirm Payment"
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                    lineNumber: 422,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                            lineNumber: 420,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                    lineNumber: 338,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                lineNumber: 337,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Dialog, {
+                open: showHistoryDialog,
+                onOpenChange: setShowHistoryDialog,
+                children: /*#__PURE__*/ _jsxDEV(DialogContent, {
+                    className: "max-w-lg",
+                    children: [
+                        /*#__PURE__*/ _jsxDEV(DialogHeader, {
+                            children: /*#__PURE__*/ _jsxDEV(DialogTitle, {
+                                children: "Payment History"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                lineNumber: 438,
+                                columnNumber: 13
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                            lineNumber: 437,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV("div", {
+                            className: "py-2",
+                            children: historyLoading ? /*#__PURE__*/ _jsxDEV("div", {
+                                className: "flex justify-center py-8",
+                                children: /*#__PURE__*/ _jsxDEV(Loader2, {
+                                    className: "w-6 h-6 animate-spin text-muted-foreground"
+                                }, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                    lineNumber: 443,
+                                    columnNumber: 17
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                lineNumber: 442,
+                                columnNumber: 15
+                            }, this) : !paymentHistory || paymentHistory.length === 0 ? /*#__PURE__*/ _jsxDEV("p", {
+                                className: "text-center text-muted-foreground py-8",
+                                children: "No payments recorded yet"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                lineNumber: 446,
+                                columnNumber: 15
+                            }, this) : /*#__PURE__*/ _jsxDEV("div", {
+                                className: "space-y-3",
+                                children: [
+                                    paymentHistory.map((p, i)=>/*#__PURE__*/ _jsxDEV("div", {
+                                            className: "flex items-center justify-between p-3 bg-muted rounded-lg",
+                                            children: [
+                                                /*#__PURE__*/ _jsxDEV("div", {
+                                                    children: [
+                                                        /*#__PURE__*/ _jsxDEV("p", {
+                                                            className: "font-medium capitalize",
+                                                            children: p.paymentMethod?.replace(/_/g, ' ')
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                            lineNumber: 452,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ _jsxDEV("p", {
+                                                            className: "text-xs text-muted-foreground",
+                                                            children: [
+                                                                format(new Date(p.createdAt), 'MMM dd, yyyy HH:mm'),
+                                                                p.receivedBy?.fullName && ` · ${p.receivedBy.fullName}`
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                            lineNumber: 453,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        p.notes && /*#__PURE__*/ _jsxDEV("p", {
+                                                            className: "text-xs text-muted-foreground italic",
+                                                            children: p.notes
+                                                        }, void 0, false, {
+                                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                            lineNumber: 457,
+                                                            columnNumber: 35
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                    lineNumber: 451,
+                                                    columnNumber: 21
+                                                }, this),
+                                                /*#__PURE__*/ _jsxDEV("span", {
+                                                    className: "font-bold text-status-normal",
+                                                    children: [
+                                                        "Le ",
+                                                        Number(p.amount).toLocaleString()
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                    lineNumber: 459,
+                                                    columnNumber: 21
+                                                }, this)
+                                            ]
+                                        }, p._id || i, true, {
+                                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                            lineNumber: 450,
+                                            columnNumber: 19
+                                        }, this)),
+                                    /*#__PURE__*/ _jsxDEV("div", {
+                                        className: "flex justify-between pt-3 border-t font-bold",
+                                        children: [
+                                            /*#__PURE__*/ _jsxDEV("span", {
+                                                children: "Total Paid"
+                                            }, void 0, false, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                lineNumber: 463,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ _jsxDEV("span", {
+                                                children: [
+                                                    "Le ",
+                                                    paymentHistory.reduce((s, p)=>s + Number(p.amount), 0).toLocaleString()
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                                lineNumber: 464,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                        lineNumber: 462,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                lineNumber: 448,
+                                columnNumber: 15
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                            lineNumber: 440,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ _jsxDEV(DialogFooter, {
+                            children: /*#__PURE__*/ _jsxDEV(Button, {
+                                variant: "outline",
+                                onClick: ()=>setShowHistoryDialog(false),
+                                children: "Close"
+                            }, void 0, false, {
+                                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                                lineNumber: 470,
+                                columnNumber: 13
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                            lineNumber: 469,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                    lineNumber: 436,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+                lineNumber: 435,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx",
+        lineNumber: 118,
+        columnNumber: 5
+    }, this);
+}
+_s(PaymentsPage, "fHsVAR6CZiNEV3NKVA1v/husRpU=", false, function() {
+    return [
+        useAuth,
+        useOrders,
+        useAddPayment,
+        usePaymentHistory,
+        usePaymentStats,
+        useDailyIncome
+    ];
+});
+_c = PaymentsPage;
+var _c;
+$RefreshReg$(_c, "PaymentsPage");
+
+
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+
+
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/HP/Downloads/lab/frontend/src/pages/reception/PaymentsPage.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIlBheW1lbnRzUGFnZS50c3giXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgdXNlU3RhdGUgfSBmcm9tICdyZWFjdCc7XG5pbXBvcnQgeyBSb2xlTGF5b3V0IH0gZnJvbSAnQC9jb21wb25lbnRzL2xheW91dC9Sb2xlTGF5b3V0JztcbmltcG9ydCB7IHVzZUF1dGggfSBmcm9tICdAL2NvbnRleHQvQXV0aENvbnRleHQnO1xuaW1wb3J0IHsgdXNlT3JkZXJzLCB1c2VBZGRQYXltZW50LCB1c2VQYXltZW50SGlzdG9yeSwgdXNlUGF5bWVudFN0YXRzLCB1c2VEYWlseUluY29tZSB9IGZyb20gJ0AvaG9va3MvdXNlT3JkZXJzJztcbmltcG9ydCB7IEJ1dHRvbiB9IGZyb20gJ0AvY29tcG9uZW50cy91aS9idXR0b24nO1xuaW1wb3J0IHsgSW5wdXQgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvaW5wdXQnO1xuaW1wb3J0IHsgQmFkZ2UgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvYmFkZ2UnO1xuaW1wb3J0IHsgRGlhbG9nLCBEaWFsb2dDb250ZW50LCBEaWFsb2dIZWFkZXIsIERpYWxvZ1RpdGxlLCBEaWFsb2dGb290ZXIgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvZGlhbG9nJztcbmltcG9ydCB7IFNlbGVjdCwgU2VsZWN0Q29udGVudCwgU2VsZWN0SXRlbSwgU2VsZWN0VHJpZ2dlciwgU2VsZWN0VmFsdWUgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvc2VsZWN0JztcbmltcG9ydCB7IHRvYXN0IH0gZnJvbSAnc29ubmVyJztcbmltcG9ydCB7IFNlYXJjaCwgQ3JlZGl0Q2FyZCwgQmFua25vdGUsIFNtYXJ0cGhvbmUsIENoZWNrLCBMb2FkZXIyLCBSZWNlaXB0LCBUcmVuZGluZ1VwLCBDYWxlbmRhciwgSGlzdG9yeSwgUGx1cyB9IGZyb20gJ2x1Y2lkZS1yZWFjdCc7XG5pbXBvcnQgeyBmb3JtYXQsIHN1YkRheXMgfSBmcm9tICdkYXRlLWZucyc7XG5pbXBvcnQgeyBjbiB9IGZyb20gJ0AvbGliL3V0aWxzJztcbmltcG9ydCB0eXBlIHsgT3JkZXJXaXRoRGV0YWlscyB9IGZyb20gJ0AvaG9va3MvdXNlT3JkZXJzJztcblxuZXhwb3J0IGRlZmF1bHQgZnVuY3Rpb24gUGF5bWVudHNQYWdlKCkge1xuICBjb25zdCB7IHByb2ZpbGUsIHByaW1hcnlSb2xlIH0gPSB1c2VBdXRoKCk7XG4gIGNvbnN0IGN1cnJlbnRSb2xlID0gcHJpbWFyeVJvbGUgPT09ICdhZG1pbicgPyAnYWRtaW4nIDogJ3JlY2VwdGlvbmlzdCc7XG4gIGNvbnN0IFtwYXltZW50RmlsdGVyLCBzZXRQYXltZW50RmlsdGVyXSA9IHVzZVN0YXRlPHN0cmluZz4oJ3BlbmRpbmcnKTtcbiAgY29uc3QgW3NlYXJjaFRlcm0sIHNldFNlYXJjaFRlcm1dID0gdXNlU3RhdGUoJycpO1xuICBjb25zdCBbc2VsZWN0ZWRPcmRlciwgc2V0U2VsZWN0ZWRPcmRlcl0gPSB1c2VTdGF0ZTxPcmRlcldpdGhEZXRhaWxzIHwgbnVsbD4obnVsbCk7XG4gIGNvbnN0IFtzaG93UGF5bWVudERpYWxvZywgc2V0U2hvd1BheW1lbnREaWFsb2ddID0gdXNlU3RhdGUoZmFsc2UpO1xuICBjb25zdCBbc2VsZWN0ZWRQYXltZW50TWV0aG9kLCBzZXRTZWxlY3RlZFBheW1lbnRNZXRob2RdID0gdXNlU3RhdGU8c3RyaW5nIHwgbnVsbD4obnVsbCk7XG4gIGNvbnN0IFtwYXltZW50QW1vdW50LCBzZXRQYXltZW50QW1vdW50XSA9IHVzZVN0YXRlKCcnKTtcbiAgY29uc3QgW3Nob3dIaXN0b3J5RGlhbG9nLCBzZXRTaG93SGlzdG9yeURpYWxvZ10gPSB1c2VTdGF0ZShmYWxzZSk7XG4gIGNvbnN0IFtoaXN0b3J5T3JkZXJJZCwgc2V0SGlzdG9yeU9yZGVySWRdID0gdXNlU3RhdGU8c3RyaW5nPignJyk7XG4gIGNvbnN0IFtkYXRlUmFuZ2UsIHNldERhdGVSYW5nZV0gPSB1c2VTdGF0ZTxzdHJpbmc+KCd0b2RheScpO1xuICBcbiAgY29uc3QgeyBkYXRhOiBvcmRlcnMsIGlzTG9hZGluZyB9ID0gdXNlT3JkZXJzKCdhbGwnKTtcbiAgY29uc3QgYWRkUGF5bWVudCA9IHVzZUFkZFBheW1lbnQoKTtcbiAgY29uc3QgeyBkYXRhOiBwYXltZW50SGlzdG9yeSwgaXNMb2FkaW5nOiBoaXN0b3J5TG9hZGluZyB9ID0gdXNlUGF5bWVudEhpc3RvcnkoaGlzdG9yeU9yZGVySWQpO1xuICBcbiAgLy8gR2V0IGRhdGUgcmFuZ2UgZm9yIHN0YXRzXG4gIGNvbnN0IGdldERhdGVSYW5nZSA9ICgpID0+IHtcbiAgICBjb25zdCBlbmQgPSBuZXcgRGF0ZSgpLnRvSVNPU3RyaW5nKCk7XG4gICAgbGV0IHN0YXJ0ID0gbmV3IERhdGUoKTtcbiAgICBcbiAgICBzd2l0Y2ggKGRhdGVSYW5nZSkge1xuICAgICAgY2FzZSAndG9kYXknOlxuICAgICAgICBzdGFydC5zZXRIb3VycygwLCAwLCAwLCAwKTtcbiAgICAgICAgYnJlYWs7XG4gICAgICBjYXNlICd3ZWVrJzpcbiAgICAgICAgc3RhcnQgPSBzdWJEYXlzKHN0YXJ0LCA3KTtcbiAgICAgICAgYnJlYWs7XG4gICAgICBjYXNlICdtb250aCc6XG4gICAgICAgIHN0YXJ0ID0gc3ViRGF5cyhzdGFydCwgMzApO1xuICAgICAgICBicmVhaztcbiAgICAgIGRlZmF1bHQ6XG4gICAgICAgIHN0YXJ0LnNldEhvdXJzKDAsIDAsIDAsIDApO1xuICAgIH1cbiAgICBcbiAgICByZXR1cm4geyBzdGFydDogc3RhcnQudG9JU09TdHJpbmcoKSwgZW5kIH07XG4gIH07XG4gIFxuICBjb25zdCB7IHN0YXJ0LCBlbmQgfSA9IGdldERhdGVSYW5nZSgpO1xuICBjb25zdCB7IGRhdGE6IHBheW1lbnRTdGF0cyB9ID0gdXNlUGF5bWVudFN0YXRzKHN0YXJ0LCBlbmQpO1xuICBjb25zdCB7IGRhdGE6IGRhaWx5SW5jb21lIH0gPSB1c2VEYWlseUluY29tZShzdGFydCwgZW5kKTtcblxuICBjb25zdCBmaWx0ZXJlZE9yZGVycyA9IEFycmF5LmlzQXJyYXkob3JkZXJzKSA/IG9yZGVycy5maWx0ZXIob3JkZXIgPT4ge1xuICAgIC8vIEZpbHRlciBieSBwYXltZW50IHN0YXR1c1xuICAgIGNvbnN0IHBheW1lbnRTdGF0dXMgPSBvcmRlci5wYXltZW50U3RhdHVzIHx8IG9yZGVyLnBheW1lbnRfc3RhdHVzO1xuICAgIGlmIChwYXltZW50RmlsdGVyICE9PSAnYWxsJyAmJiBwYXltZW50U3RhdHVzICE9PSBwYXltZW50RmlsdGVyKSByZXR1cm4gZmFsc2U7XG4gICAgXG4gICAgLy8gRmlsdGVyIGJ5IHNlYXJjaFxuICAgIGlmICghc2VhcmNoVGVybSkgcmV0dXJuIHRydWU7XG4gICAgY29uc3Qgc2VhcmNoID0gc2VhcmNoVGVybS50b0xvd2VyQ2FzZSgpO1xuICAgIGNvbnN0IG9yZGVyTnVtID0gKG9yZGVyLm9yZGVyTnVtYmVyIHx8IG9yZGVyLm9yZGVyX251bWJlciB8fCAnJykudG9Mb3dlckNhc2UoKTtcbiAgICBjb25zdCBmaXJzdE5hbWUgPSAob3JkZXIucGF0aWVudElkPy5maXJzdE5hbWUgfHwgb3JkZXIucGF0aWVudHM/LmZpcnN0X25hbWUgfHwgJycpLnRvTG93ZXJDYXNlKCk7XG4gICAgY29uc3QgbGFzdE5hbWUgPSAob3JkZXIucGF0aWVudElkPy5sYXN0TmFtZSB8fCBvcmRlci5wYXRpZW50cz8ubGFzdF9uYW1lIHx8ICcnKS50b0xvd2VyQ2FzZSgpO1xuICAgIFxuICAgIHJldHVybiAoXG4gICAgICBvcmRlck51bS5pbmNsdWRlcyhzZWFyY2gpIHx8XG4gICAgICBmaXJzdE5hbWUuaW5jbHVkZXMoc2VhcmNoKSB8fFxuICAgICAgbGFzdE5hbWUuaW5jbHVkZXMoc2VhcmNoKVxuICAgICk7XG4gIH0pIDogW107XG5cbiAgY29uc3QgcGVuZGluZ1RvdGFsID0gQXJyYXkuaXNBcnJheShvcmRlcnMpID8gb3JkZXJzXG4gICAgLmZpbHRlcihvID0+IFsncGVuZGluZycsICdwYXJ0aWFsJ10uaW5jbHVkZXMoby5wYXltZW50U3RhdHVzIHx8IG8ucGF5bWVudF9zdGF0dXMgfHwgJycpKVxuICAgIC5yZWR1Y2UoKHN1bSwgbykgPT4gc3VtICsgTnVtYmVyKG8uYmFsYW5jZSA/PyAoTnVtYmVyKG8udG90YWwgfHwgby50b3RhbEFtb3VudCB8fCAwKSAtIE51bWJlcihvLmFtb3VudFBhaWQgfHwgMCkpKSwgMCkgOiAwO1xuXG4gIGNvbnN0IHBhaWRUb2RheVRvdGFsID0gQXJyYXkuaXNBcnJheShvcmRlcnMpID8gb3JkZXJzXG4gICAgLmZpbHRlcihvID0+IHtcbiAgICAgIGNvbnN0IHBheW1lbnRTdGF0dXMgPSBvLnBheW1lbnRTdGF0dXMgfHwgby5wYXltZW50X3N0YXR1cztcbiAgICAgIGlmIChwYXltZW50U3RhdHVzICE9PSAncGFpZCcpIHJldHVybiBmYWxzZTtcbiAgICAgIGNvbnN0IHRvZGF5ID0gbmV3IERhdGUoKTtcbiAgICAgIHRvZGF5LnNldEhvdXJzKDAsIDAsIDAsIDApO1xuICAgICAgcmV0dXJuIG5ldyBEYXRlKG8uY3JlYXRlZEF0IHx8IG8uY3JlYXRlZF9hdCkgPj0gdG9kYXk7XG4gICAgfSlcbiAgICAucmVkdWNlKChzdW0sIG8pID0+IHN1bSArIE51bWJlcihvLmFtb3VudFBhaWQgfHwgby50b3RhbCB8fCBvLnRvdGFsQW1vdW50IHx8IDApLCAwKSA6IDA7XG5cbiAgY29uc3QgaGFuZGxlUHJvY2Vzc1BheW1lbnQgPSBhc3luYyAoKSA9PiB7XG4gICAgaWYgKCFzZWxlY3RlZE9yZGVyIHx8ICFzZWxlY3RlZFBheW1lbnRNZXRob2QpIHJldHVybjtcbiAgICBjb25zdCBvcmRlcklkID0gc2VsZWN0ZWRPcmRlci5pZCB8fCBzZWxlY3RlZE9yZGVyLl9pZDtcbiAgICBjb25zdCBvcmRlclRvdGFsID0gTnVtYmVyKHNlbGVjdGVkT3JkZXIudG90YWwgfHwgc2VsZWN0ZWRPcmRlci50b3RhbEFtb3VudCB8fCAwKTtcbiAgICBjb25zdCBhbHJlYWR5UGFpZCA9IE51bWJlcihzZWxlY3RlZE9yZGVyLmFtb3VudFBhaWQgfHwgMCk7XG4gICAgY29uc3QgcmVtYWluaW5nID0gb3JkZXJUb3RhbCAtIGFscmVhZHlQYWlkO1xuICAgIGNvbnN0IGFtb3VudCA9IHBhcnNlRmxvYXQocGF5bWVudEFtb3VudCkgfHwgcmVtYWluaW5nO1xuXG4gICAgaWYgKGFtb3VudCA8PSAwIHx8IGFtb3VudCA+IHJlbWFpbmluZyArIDAuMDAxKSB7XG4gICAgICB0b2FzdC5lcnJvcihgQW1vdW50IG11c3QgYmUgYmV0d2VlbiAwLjAxIGFuZCBMZSAke3JlbWFpbmluZy50b0xvY2FsZVN0cmluZygpfWApO1xuICAgICAgcmV0dXJuO1xuICAgIH1cblxuICAgIHRyeSB7XG4gICAgICBhd2FpdCBhZGRQYXltZW50Lm11dGF0ZUFzeW5jKHsgb3JkZXJJZCwgZGF0YTogeyBhbW91bnQsIHBheW1lbnRNZXRob2Q6IHNlbGVjdGVkUGF5bWVudE1ldGhvZCB9IH0pO1xuICAgICAgdG9hc3Quc3VjY2VzcyhgUGF5bWVudCBvZiBMZSAke2Ftb3VudC50b0xvY2FsZVN0cmluZygpfSByZWNvcmRlZGApO1xuICAgICAgc2V0U2hvd1BheW1lbnREaWFsb2coZmFsc2UpO1xuICAgICAgc2V0U2VsZWN0ZWRPcmRlcihudWxsKTtcbiAgICAgIHNldFNlbGVjdGVkUGF5bWVudE1ldGhvZChudWxsKTtcbiAgICAgIHNldFBheW1lbnRBbW91bnQoJycpO1xuICAgIH0gY2F0Y2ggKGVycm9yOiBhbnkpIHtcbiAgICAgIHRvYXN0LmVycm9yKGVycm9yPy5yZXNwb25zZT8uZGF0YT8ubWVzc2FnZSB8fCAnRmFpbGVkIHRvIHByb2Nlc3MgcGF5bWVudCcpO1xuICAgIH1cbiAgfTtcblxuICByZXR1cm4gKFxuICAgIDxSb2xlTGF5b3V0IFxuICAgICAgdGl0bGU9XCJQYXltZW50c1wiIFxuICAgICAgc3VidGl0bGU9XCJQcm9jZXNzIGFuZCB0cmFjayBvcmRlciBwYXltZW50c1wiXG4gICAgICByb2xlPXtjdXJyZW50Um9sZSBhcyBhbnl9XG4gICAgICB1c2VyTmFtZT17cHJvZmlsZT8uZnVsbF9uYW1lfVxuICAgID5cbiAgICAgIHsvKiBEYXRlIFJhbmdlIEZpbHRlciAqL31cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIgZ2FwLTMgbWItNFwiPlxuICAgICAgICA8Q2FsZW5kYXIgY2xhc3NOYW1lPVwidy00IGgtNCB0ZXh0LW11dGVkLWZvcmVncm91bmRcIiAvPlxuICAgICAgICA8U2VsZWN0IHZhbHVlPXtkYXRlUmFuZ2V9IG9uVmFsdWVDaGFuZ2U9e3NldERhdGVSYW5nZX0+XG4gICAgICAgICAgPFNlbGVjdFRyaWdnZXIgY2xhc3NOYW1lPVwidy00OFwiPlxuICAgICAgICAgICAgPFNlbGVjdFZhbHVlIC8+XG4gICAgICAgICAgPC9TZWxlY3RUcmlnZ2VyPlxuICAgICAgICAgIDxTZWxlY3RDb250ZW50PlxuICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJ0b2RheVwiPlRvZGF5PC9TZWxlY3RJdGVtPlxuICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJ3ZWVrXCI+TGFzdCA3IERheXM8L1NlbGVjdEl0ZW0+XG4gICAgICAgICAgICA8U2VsZWN0SXRlbSB2YWx1ZT1cIm1vbnRoXCI+TGFzdCAzMCBEYXlzPC9TZWxlY3RJdGVtPlxuICAgICAgICAgIDwvU2VsZWN0Q29udGVudD5cbiAgICAgICAgPC9TZWxlY3Q+XG4gICAgICA8L2Rpdj5cblxuICAgICAgey8qIFN1bW1hcnkgQ2FyZHMgKi99XG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImdyaWQgZ3JpZC1jb2xzLTQgZ2FwLTQgbWItNlwiPlxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImJnLWNhcmQgYm9yZGVyIHJvdW5kZWQtbGcgcC00XCI+XG4gICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1zbSB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5PdXRzdGFuZGluZyBCYWxhbmNlPC9wPlxuICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtMnhsIGZvbnQtYm9sZCB0ZXh0LWFtYmVyLTYwMFwiPlxuICAgICAgICAgICAgTGUge3BlbmRpbmdUb3RhbC50b0xvY2FsZVN0cmluZygpfVxuICAgICAgICAgIDwvcD5cbiAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LXhzIHRleHQtbXV0ZWQtZm9yZWdyb3VuZCBtdC0xXCI+XG4gICAgICAgICAgICBQZW5kaW5nICZhbXA7IHBhcnRpYWwgb3JkZXJzXG4gICAgICAgICAgPC9wPlxuICAgICAgICA8L2Rpdj5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJiZy1jYXJkIGJvcmRlciByb3VuZGVkLWxnIHAtNFwiPlxuICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc20gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+Q29sbGVjdGVkICh7ZGF0ZVJhbmdlfSk8L3A+XG4gICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC0yeGwgZm9udC1ib2xkIHRleHQtc3RhdHVzLW5vcm1hbFwiPlxuICAgICAgICAgICAgTGUgeyhwYXltZW50U3RhdHM/LnBhaWRSZXZlbnVlIHx8IDApLnRvTG9jYWxlU3RyaW5nKCl9XG4gICAgICAgICAgPC9wPlxuICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQteHMgdGV4dC1tdXRlZC1mb3JlZ3JvdW5kIG10LTFcIj5cbiAgICAgICAgICAgIHtwYXltZW50U3RhdHM/LnBhaWRPcmRlcnMgfHwgMH0gb3JkZXJzXG4gICAgICAgICAgPC9wPlxuICAgICAgICA8L2Rpdj5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJiZy1jYXJkIGJvcmRlciByb3VuZGVkLWxnIHAtNFwiPlxuICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc20gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+VG90YWwgUmV2ZW51ZTwvcD5cbiAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LTJ4bCBmb250LWJvbGRcIj5cbiAgICAgICAgICAgIExlIHsocGF5bWVudFN0YXRzPy50b3RhbFJldmVudWUgfHwgMCkudG9Mb2NhbGVTdHJpbmcoKX1cbiAgICAgICAgICA8L3A+XG4gICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC14cyB0ZXh0LW11dGVkLWZvcmVncm91bmQgbXQtMVwiPlxuICAgICAgICAgICAge3BheW1lbnRTdGF0cz8udG90YWxPcmRlcnMgfHwgMH0gb3JkZXJzXG4gICAgICAgICAgPC9wPlxuICAgICAgICA8L2Rpdj5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJiZy1jYXJkIGJvcmRlciByb3VuZGVkLWxnIHAtNFwiPlxuICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc20gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kIGZsZXggaXRlbXMtY2VudGVyIGdhcC0xXCI+XG4gICAgICAgICAgICA8VHJlbmRpbmdVcCBjbGFzc05hbWU9XCJ3LTMgaC0zXCIgLz5cbiAgICAgICAgICAgIEF2ZyBEYWlseSBJbmNvbWVcbiAgICAgICAgICA8L3A+XG4gICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC0yeGwgZm9udC1ib2xkXCI+XG4gICAgICAgICAgICBMZSB7ZGFpbHlJbmNvbWUgJiYgZGFpbHlJbmNvbWUubGVuZ3RoID4gMCBcbiAgICAgICAgICAgICAgPyBNYXRoLnJvdW5kKGRhaWx5SW5jb21lLnJlZHVjZSgoc3VtOiBudW1iZXIsIGRheTogYW55KSA9PiBzdW0gKyBkYXkudG90YWxJbmNvbWUsIDApIC8gZGFpbHlJbmNvbWUubGVuZ3RoKS50b0xvY2FsZVN0cmluZygpXG4gICAgICAgICAgICAgIDogJzAnfVxuICAgICAgICAgIDwvcD5cbiAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LXhzIHRleHQtbXV0ZWQtZm9yZWdyb3VuZCBtdC0xXCI+XG4gICAgICAgICAgICB7ZGFpbHlJbmNvbWU/Lmxlbmd0aCB8fCAwfSBkYXlzXG4gICAgICAgICAgPC9wPlxuICAgICAgICA8L2Rpdj5cbiAgICAgIDwvZGl2PlxuXG4gICAgICB7LyogRGFpbHkgSW5jb21lIEJyZWFrZG93biAqL31cbiAgICAgIHtkYWlseUluY29tZSAmJiBkYWlseUluY29tZS5sZW5ndGggPiAwICYmIChcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJiZy1jYXJkIGJvcmRlciByb3VuZGVkLWxnIHAtNCBtYi02XCI+XG4gICAgICAgICAgPGgzIGNsYXNzTmFtZT1cImZvbnQtc2VtaWJvbGQgbWItNFwiPkRhaWx5IEluY29tZSBCcmVha2Rvd248L2gzPlxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0yXCI+XG4gICAgICAgICAgICB7ZGFpbHlJbmNvbWUuc2xpY2UoMCwgNykubWFwKChkYXk6IGFueSwgaW5kZXg6IG51bWJlcikgPT4gKFxuICAgICAgICAgICAgICA8ZGl2IGtleT17aW5kZXh9IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGp1c3RpZnktYmV0d2VlbiBweS0yIGJvcmRlci1iIGxhc3Q6Ym9yZGVyLTBcIj5cbiAgICAgICAgICAgICAgICA8ZGl2PlxuICAgICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwiZm9udC1tZWRpdW1cIj57Zm9ybWF0KG5ldyBEYXRlKGRheS5kYXRlKSwgJ01NTSBkZCwgeXl5eScpfTwvcD5cbiAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQteHMgdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+e2RheS5vcmRlckNvdW50fSBvcmRlcnM8L3A+XG4gICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJ0ZXh0LXJpZ2h0XCI+XG4gICAgICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJmb250LWJvbGRcIj5MZSB7ZGF5LnRvdGFsSW5jb21lLnRvTG9jYWxlU3RyaW5nKCl9PC9wPlxuICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGdhcC0yIHRleHQteHMgdGV4dC1tdXRlZC1mb3JlZ3JvdW5kIG10LTFcIj5cbiAgICAgICAgICAgICAgICAgICAge2RheS5jYXNoUGF5bWVudHMgPiAwICYmIDxzcGFuPkNhc2g6IExlIHtkYXkuY2FzaFBheW1lbnRzLnRvTG9jYWxlU3RyaW5nKCl9PC9zcGFuPn1cbiAgICAgICAgICAgICAgICAgICAge2RheS5vcmFuZ2VNb25leVBheW1lbnRzID4gMCAmJiA8c3Bhbj5PcmFuZ2UgTW9uZXk6IExlIHtkYXkub3JhbmdlTW9uZXlQYXltZW50cy50b0xvY2FsZVN0cmluZygpfTwvc3Bhbj59XG4gICAgICAgICAgICAgICAgICAgIHtkYXkuYWZyaW1vbmV5UGF5bWVudHMgPiAwICYmIDxzcGFuPkFmcmltb25leTogTGUge2RheS5hZnJpbW9uZXlQYXltZW50cy50b0xvY2FsZVN0cmluZygpfTwvc3Bhbj59XG4gICAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICApKX1cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgPC9kaXY+XG4gICAgICApfVxuXG4gICAgICB7LyogRmlsdGVycyAqL31cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIgZ2FwLTMgbWItNlwiPlxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInJlbGF0aXZlIGZsZXgtMSBtYXgtdy1tZFwiPlxuICAgICAgICAgIDxTZWFyY2ggY2xhc3NOYW1lPVwiYWJzb2x1dGUgbGVmdC0zIHRvcC0xLzIgLXRyYW5zbGF0ZS15LTEvMiB3LTQgaC00IHRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiIC8+XG4gICAgICAgICAgPElucHV0IFxuICAgICAgICAgICAgcGxhY2Vob2xkZXI9XCJTZWFyY2ggb3JkZXJzLi4uXCIgXG4gICAgICAgICAgICBjbGFzc05hbWU9XCJwbC0xMFwiXG4gICAgICAgICAgICB2YWx1ZT17c2VhcmNoVGVybX1cbiAgICAgICAgICAgIG9uQ2hhbmdlPXtlID0+IHNldFNlYXJjaFRlcm0oZS50YXJnZXQudmFsdWUpfVxuICAgICAgICAgIC8+XG4gICAgICAgIDwvZGl2PlxuICAgICAgICA8U2VsZWN0IHZhbHVlPXtwYXltZW50RmlsdGVyfSBvblZhbHVlQ2hhbmdlPXtzZXRQYXltZW50RmlsdGVyfT5cbiAgICAgICAgICA8U2VsZWN0VHJpZ2dlciBjbGFzc05hbWU9XCJ3LTQ4XCI+XG4gICAgICAgICAgICA8U2VsZWN0VmFsdWUgLz5cbiAgICAgICAgICA8L1NlbGVjdFRyaWdnZXI+XG4gICAgICAgICAgPFNlbGVjdENvbnRlbnQ+XG4gICAgICAgICAgICA8U2VsZWN0SXRlbSB2YWx1ZT1cImFsbFwiPkFsbCBQYXltZW50czwvU2VsZWN0SXRlbT5cbiAgICAgICAgICAgIDxTZWxlY3RJdGVtIHZhbHVlPVwicGVuZGluZ1wiPlBlbmRpbmc8L1NlbGVjdEl0ZW0+XG4gICAgICAgICAgICA8U2VsZWN0SXRlbSB2YWx1ZT1cInBhaWRcIj5QYWlkPC9TZWxlY3RJdGVtPlxuICAgICAgICAgICAgPFNlbGVjdEl0ZW0gdmFsdWU9XCJwYXJ0aWFsXCI+UGFydGlhbDwvU2VsZWN0SXRlbT5cbiAgICAgICAgICA8L1NlbGVjdENvbnRlbnQ+XG4gICAgICAgIDwvU2VsZWN0PlxuICAgICAgPC9kaXY+XG5cbiAgICAgIHsvKiBQYXltZW50cyBUYWJsZSAqL31cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiYmctY2FyZCBib3JkZXIgcm91bmRlZC1sZyBvdmVyZmxvdy1oaWRkZW5cIj5cbiAgICAgICAge2lzTG9hZGluZyA/IChcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGp1c3RpZnktY2VudGVyIHB5LTEyXCI+XG4gICAgICAgICAgICA8TG9hZGVyMiBjbGFzc05hbWU9XCJ3LTYgaC02IGFuaW1hdGUtc3BpbiB0ZXh0LW11dGVkLWZvcmVncm91bmRcIiAvPlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICApIDogKFxuICAgICAgICAgIDx0YWJsZSBjbGFzc05hbWU9XCJkYXRhLXRhYmxlXCI+XG4gICAgICAgICAgICA8dGhlYWQ+XG4gICAgICAgICAgICAgIDx0cj5cbiAgICAgICAgICAgICAgICA8dGg+T3JkZXIgIzwvdGg+XG4gICAgICAgICAgICAgICAgPHRoPlBhdGllbnQ8L3RoPlxuICAgICAgICAgICAgICAgIDx0aD5Ub3RhbDwvdGg+XG4gICAgICAgICAgICAgICAgPHRoPlBhaWQ8L3RoPlxuICAgICAgICAgICAgICAgIDx0aD5CYWxhbmNlPC90aD5cbiAgICAgICAgICAgICAgICA8dGg+TGFzdCBNZXRob2Q8L3RoPlxuICAgICAgICAgICAgICAgIDx0aD5TdGF0dXM8L3RoPlxuICAgICAgICAgICAgICAgIDx0aD5BY3Rpb25zPC90aD5cbiAgICAgICAgICAgICAgPC90cj5cbiAgICAgICAgICAgIDwvdGhlYWQ+XG4gICAgICAgICAgICA8dGJvZHk+XG4gICAgICAgICAgICAgIHtmaWx0ZXJlZE9yZGVycz8ubWFwKG9yZGVyID0+IHtcbiAgICAgICAgICAgICAgICBjb25zdCBvcmRlck51bSA9IG9yZGVyLm9yZGVyTnVtYmVyIHx8IG9yZGVyLm9yZGVyX251bWJlcjtcbiAgICAgICAgICAgICAgICBjb25zdCBmaXJzdE5hbWUgPSBvcmRlci5wYXRpZW50SWQ/LmZpcnN0TmFtZSB8fCBvcmRlci5wYXRpZW50cz8uZmlyc3RfbmFtZTtcbiAgICAgICAgICAgICAgICBjb25zdCBsYXN0TmFtZSA9IG9yZGVyLnBhdGllbnRJZD8ubGFzdE5hbWUgfHwgb3JkZXIucGF0aWVudHM/Lmxhc3RfbmFtZTtcbiAgICAgICAgICAgICAgICBjb25zdCBjcmVhdGVkQXQgPSBvcmRlci5jcmVhdGVkQXQgfHwgb3JkZXIuY3JlYXRlZF9hdDtcbiAgICAgICAgICAgICAgICBjb25zdCB0b3RhbCA9IG9yZGVyLnRvdGFsIHx8IG9yZGVyLnRvdGFsQW1vdW50IHx8IDA7XG4gICAgICAgICAgICAgICAgY29uc3QgcGF5bWVudE1ldGhvZCA9IG9yZGVyLnBheW1lbnRNZXRob2QgfHwgb3JkZXIucGF5bWVudF9tZXRob2Q7XG4gICAgICAgICAgICAgICAgY29uc3QgcGF5bWVudFN0YXR1cyA9IG9yZGVyLnBheW1lbnRTdGF0dXMgfHwgb3JkZXIucGF5bWVudF9zdGF0dXM7XG4gICAgICAgICAgICAgICAgY29uc3QgYW1vdW50UGFpZCA9IE51bWJlcihvcmRlci5hbW91bnRQYWlkIHx8IDApO1xuICAgICAgICAgICAgICAgIGNvbnN0IGJhbGFuY2UgPSBOdW1iZXIob3JkZXIuYmFsYW5jZSA/PyAoTnVtYmVyKHRvdGFsKSAtIGFtb3VudFBhaWQpKTtcbiAgICAgICAgICAgICAgICBcbiAgICAgICAgICAgICAgICByZXR1cm4gKFxuICAgICAgICAgICAgICAgICAgPHRyIGtleT17b3JkZXIuaWQgfHwgb3JkZXIuX2lkfT5cbiAgICAgICAgICAgICAgICAgICAgPHRkIGNsYXNzTmFtZT1cImZvbnQtbW9ubyB0ZXh0LXNtXCI+e29yZGVyTnVtfTwvdGQ+XG4gICAgICAgICAgICAgICAgICAgIDx0ZD5cbiAgICAgICAgICAgICAgICAgICAgICA8ZGl2PlxuICAgICAgICAgICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwiZm9udC1tZWRpdW1cIj57Zmlyc3ROYW1lfSB7bGFzdE5hbWV9PC9wPlxuICAgICAgICAgICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC14cyB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5cbiAgICAgICAgICAgICAgICAgICAgICAgICAge2Zvcm1hdChuZXcgRGF0ZShjcmVhdGVkQXQpLCAnTU1NIGRkLCBISDptbScpfVxuICAgICAgICAgICAgICAgICAgICAgICAgPC9wPlxuICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICAgICAgICA8L3RkPlxuICAgICAgICAgICAgICAgICAgICA8dGQgY2xhc3NOYW1lPVwiZm9udC1ib2xkXCI+TGUge051bWJlcih0b3RhbCkudG9Mb2NhbGVTdHJpbmcoKX08L3RkPlxuICAgICAgICAgICAgICAgICAgICA8dGQgY2xhc3NOYW1lPVwidGV4dC1zdGF0dXMtbm9ybWFsIGZvbnQtbWVkaXVtXCI+TGUge2Ftb3VudFBhaWQudG9Mb2NhbGVTdHJpbmcoKX08L3RkPlxuICAgICAgICAgICAgICAgICAgICA8dGQgY2xhc3NOYW1lPXtjbihiYWxhbmNlID4gMCA/ICd0ZXh0LWFtYmVyLTYwMCBmb250LW1lZGl1bScgOiAndGV4dC1tdXRlZC1mb3JlZ3JvdW5kJyl9PlxuICAgICAgICAgICAgICAgICAgICAgIHtiYWxhbmNlID4gMCA/IGBMZSAke2JhbGFuY2UudG9Mb2NhbGVTdHJpbmcoKX1gIDogJy0nfVxuICAgICAgICAgICAgICAgICAgICA8L3RkPlxuICAgICAgICAgICAgICAgICAgICA8dGQgY2xhc3NOYW1lPVwiY2FwaXRhbGl6ZSB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5cbiAgICAgICAgICAgICAgICAgICAgICB7cGF5bWVudE1ldGhvZD8ucmVwbGFjZSgvXy9nLCAnICcpIHx8ICctJ31cbiAgICAgICAgICAgICAgICAgICAgPC90ZD5cbiAgICAgICAgICAgICAgICAgICAgPHRkPlxuICAgICAgICAgICAgICAgICAgICAgIDxCYWRnZSB2YXJpYW50PVwib3V0bGluZVwiIGNsYXNzTmFtZT17Y24oXG4gICAgICAgICAgICAgICAgICAgICAgICBwYXltZW50U3RhdHVzID09PSAncGFpZCcgPyAnYmctc3RhdHVzLW5vcm1hbC8xMCB0ZXh0LXN0YXR1cy1ub3JtYWwnIDpcbiAgICAgICAgICAgICAgICAgICAgICAgIHBheW1lbnRTdGF0dXMgPT09ICdwYXJ0aWFsJyA/ICdiZy1hbWJlci01MDAvMTAgdGV4dC1hbWJlci02MDAnIDpcbiAgICAgICAgICAgICAgICAgICAgICAgICdiZy1zdGF0dXMtd2FybmluZy8xMCB0ZXh0LXN0YXR1cy13YXJuaW5nJ1xuICAgICAgICAgICAgICAgICAgICAgICl9PlxuICAgICAgICAgICAgICAgICAgICAgICAge3BheW1lbnRTdGF0dXN9XG4gICAgICAgICAgICAgICAgICAgICAgPC9CYWRnZT5cbiAgICAgICAgICAgICAgICAgICAgPC90ZD5cbiAgICAgICAgICAgICAgICAgICAgPHRkPlxuICAgICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBnYXAtMVwiPlxuICAgICAgICAgICAgICAgICAgICAgICAge3BheW1lbnRTdGF0dXMgIT09ICdwYWlkJyAmJiAoXG4gICAgICAgICAgICAgICAgICAgICAgICAgIDxCdXR0b25cbiAgICAgICAgICAgICAgICAgICAgICAgICAgICBzaXplPVwic21cIlxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIG9uQ2xpY2s9eygpID0+IHtcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNldFNlbGVjdGVkT3JkZXIob3JkZXIpO1xuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc2V0UGF5bWVudEFtb3VudCgnJyk7XG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzZXRTaG93UGF5bWVudERpYWxvZyh0cnVlKTtcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICB9fVxuICAgICAgICAgICAgICAgICAgICAgICAgICA+XG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgPFBsdXMgY2xhc3NOYW1lPVwidy0zIGgtMyBtci0xXCIgLz5cbiAgICAgICAgICAgICAgICAgICAgICAgICAgICBQYXlcbiAgICAgICAgICAgICAgICAgICAgICAgICAgPC9CdXR0b24+XG4gICAgICAgICAgICAgICAgICAgICAgICApfVxuICAgICAgICAgICAgICAgICAgICAgICAgPEJ1dHRvblxuICAgICAgICAgICAgICAgICAgICAgICAgICB2YXJpYW50PVwiZ2hvc3RcIlxuICAgICAgICAgICAgICAgICAgICAgICAgICBzaXplPVwic21cIlxuICAgICAgICAgICAgICAgICAgICAgICAgICB0aXRsZT1cIlBheW1lbnQgaGlzdG9yeVwiXG4gICAgICAgICAgICAgICAgICAgICAgICAgIG9uQ2xpY2s9eygpID0+IHtcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICBzZXRIaXN0b3J5T3JkZXJJZChvcmRlci5pZCB8fCBvcmRlci5faWQgfHwgJycpO1xuICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNldFNob3dIaXN0b3J5RGlhbG9nKHRydWUpO1xuICAgICAgICAgICAgICAgICAgICAgICAgICB9fVxuICAgICAgICAgICAgICAgICAgICAgICAgPlxuICAgICAgICAgICAgICAgICAgICAgICAgICA8SGlzdG9yeSBjbGFzc05hbWU9XCJ3LTMgaC0zXCIgLz5cbiAgICAgICAgICAgICAgICAgICAgICAgIDwvQnV0dG9uPlxuICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICAgICAgICA8L3RkPlxuICAgICAgICAgICAgICAgICAgPC90cj5cbiAgICAgICAgICAgICAgICApO1xuICAgICAgICAgICAgICB9KX1cbiAgICAgICAgICAgICAgeyghZmlsdGVyZWRPcmRlcnMgfHwgZmlsdGVyZWRPcmRlcnMubGVuZ3RoID09PSAwKSAmJiAoXG4gICAgICAgICAgICAgICAgPHRyPlxuICAgICAgICAgICAgICAgICAgPHRkIGNvbFNwYW49ezl9IGNsYXNzTmFtZT1cInRleHQtY2VudGVyIHB5LTggdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+XG4gICAgICAgICAgICAgICAgICAgIE5vIHBheW1lbnRzIGZvdW5kXG4gICAgICAgICAgICAgICAgICA8L3RkPlxuICAgICAgICAgICAgICAgIDwvdHI+XG4gICAgICAgICAgICAgICl9XG4gICAgICAgICAgICA8L3Rib2R5PlxuICAgICAgICAgIDwvdGFibGU+XG4gICAgICAgICl9XG4gICAgICA8L2Rpdj5cblxuICAgICAgey8qIFBheW1lbnQgRGlhbG9nICovfVxuICAgICAgPERpYWxvZyBvcGVuPXtzaG93UGF5bWVudERpYWxvZ30gb25PcGVuQ2hhbmdlPXtvcGVuID0+IHsgc2V0U2hvd1BheW1lbnREaWFsb2cob3Blbik7IGlmICghb3BlbikgeyBzZXRTZWxlY3RlZFBheW1lbnRNZXRob2QobnVsbCk7IHNldFBheW1lbnRBbW91bnQoJycpOyB9IH19PlxuICAgICAgICA8RGlhbG9nQ29udGVudD5cbiAgICAgICAgICA8RGlhbG9nSGVhZGVyPlxuICAgICAgICAgICAgPERpYWxvZ1RpdGxlPlJlY29yZCBQYXltZW50PC9EaWFsb2dUaXRsZT5cbiAgICAgICAgICA8L0RpYWxvZ0hlYWRlcj5cbiAgICAgICAgICBcbiAgICAgICAgICB7c2VsZWN0ZWRPcmRlciAmJiAoXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInB5LTRcIj5cbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJiZy1tdXRlZCByb3VuZGVkLWxnIHAtNCBtYi00XCI+XG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGp1c3RpZnktYmV0d2VlbiBtYi0yXCI+XG4gICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJ0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5PcmRlcjwvc3Bhbj5cbiAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImZvbnQtbW9ub1wiPntzZWxlY3RlZE9yZGVyLm9yZGVyTnVtYmVyIHx8IHNlbGVjdGVkT3JkZXIub3JkZXJfbnVtYmVyfTwvc3Bhbj5cbiAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXgganVzdGlmeS1iZXR3ZWVuIG1iLTJcIj5cbiAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPlBhdGllbnQ8L3NwYW4+XG4gICAgICAgICAgICAgICAgICA8c3Bhbj5cbiAgICAgICAgICAgICAgICAgICAge3NlbGVjdGVkT3JkZXIucGF0aWVudElkPy5maXJzdE5hbWUgfHwgc2VsZWN0ZWRPcmRlci5wYXRpZW50cz8uZmlyc3RfbmFtZX17JyAnfVxuICAgICAgICAgICAgICAgICAgICB7c2VsZWN0ZWRPcmRlci5wYXRpZW50SWQ/Lmxhc3ROYW1lIHx8IHNlbGVjdGVkT3JkZXIucGF0aWVudHM/Lmxhc3RfbmFtZX1cbiAgICAgICAgICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXgganVzdGlmeS1iZXR3ZWVuIG1iLTJcIj5cbiAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPk9yZGVyIFRvdGFsPC9zcGFuPlxuICAgICAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiZm9udC1ib2xkXCI+TGUge051bWJlcihzZWxlY3RlZE9yZGVyLnRvdGFsIHx8IHNlbGVjdGVkT3JkZXIudG90YWxBbW91bnQgfHwgMCkudG9Mb2NhbGVTdHJpbmcoKX08L3NwYW4+XG4gICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICAge051bWJlcihzZWxlY3RlZE9yZGVyLmFtb3VudFBhaWQgfHwgMCkgPiAwICYmIChcbiAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBqdXN0aWZ5LWJldHdlZW4gbWItMiB0ZXh0LXN0YXR1cy1ub3JtYWxcIj5cbiAgICAgICAgICAgICAgICAgICAgPHNwYW4+QWxyZWFkeSBQYWlkPC9zcGFuPlxuICAgICAgICAgICAgICAgICAgICA8c3Bhbj5MZSB7TnVtYmVyKHNlbGVjdGVkT3JkZXIuYW1vdW50UGFpZCkudG9Mb2NhbGVTdHJpbmcoKX08L3NwYW4+XG4gICAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICApfVxuICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBqdXN0aWZ5LWJldHdlZW4gZm9udC1ib2xkIHRleHQtbGcgcHQtMiBib3JkZXItdCBtdC0yIHRleHQtYW1iZXItNjAwXCI+XG4gICAgICAgICAgICAgICAgICA8c3Bhbj5SZW1haW5pbmcgQmFsYW5jZTwvc3Bhbj5cbiAgICAgICAgICAgICAgICAgIDxzcGFuPkxlIHsoTnVtYmVyKHNlbGVjdGVkT3JkZXIudG90YWwgfHwgc2VsZWN0ZWRPcmRlci50b3RhbEFtb3VudCB8fCAwKSAtIE51bWJlcihzZWxlY3RlZE9yZGVyLmFtb3VudFBhaWQgfHwgMCkpLnRvTG9jYWxlU3RyaW5nKCl9PC9zcGFuPlxuICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICA8L2Rpdj5cblxuICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNwYWNlLXktNFwiPlxuICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0xXCI+XG4gICAgICAgICAgICAgICAgICA8bGFiZWwgY2xhc3NOYW1lPVwidGV4dC1zbSBmb250LW1lZGl1bVwiPkFtb3VudCB0byBQYXk8L2xhYmVsPlxuICAgICAgICAgICAgICAgICAgPElucHV0XG4gICAgICAgICAgICAgICAgICAgIHR5cGU9XCJudW1iZXJcIlxuICAgICAgICAgICAgICAgICAgICBzdGVwPVwiMC4wMVwiXG4gICAgICAgICAgICAgICAgICAgIG1pbj1cIjAuMDFcIlxuICAgICAgICAgICAgICAgICAgICBtYXg9e051bWJlcihzZWxlY3RlZE9yZGVyLnRvdGFsIHx8IDApIC0gTnVtYmVyKHNlbGVjdGVkT3JkZXIuYW1vdW50UGFpZCB8fCAwKX1cbiAgICAgICAgICAgICAgICAgICAgcGxhY2Vob2xkZXI9e2BNYXg6IExlICR7KE51bWJlcihzZWxlY3RlZE9yZGVyLnRvdGFsIHx8IDApIC0gTnVtYmVyKHNlbGVjdGVkT3JkZXIuYW1vdW50UGFpZCB8fCAwKSkudG9Mb2NhbGVTdHJpbmcoKX1gfVxuICAgICAgICAgICAgICAgICAgICB2YWx1ZT17cGF5bWVudEFtb3VudH1cbiAgICAgICAgICAgICAgICAgICAgb25DaGFuZ2U9e2UgPT4gc2V0UGF5bWVudEFtb3VudChlLnRhcmdldC52YWx1ZSl9XG4gICAgICAgICAgICAgICAgICAvPlxuICAgICAgICAgICAgICAgICAge3BhcnNlRmxvYXQocGF5bWVudEFtb3VudCkgPiAwICYmIHBhcnNlRmxvYXQocGF5bWVudEFtb3VudCkgPCAoTnVtYmVyKHNlbGVjdGVkT3JkZXIudG90YWwgfHwgMCkgLSBOdW1iZXIoc2VsZWN0ZWRPcmRlci5hbW91bnRQYWlkIHx8IDApKSAmJiAoXG4gICAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQteHMgdGV4dC1hbWJlci02MDBcIj5cbiAgICAgICAgICAgICAgICAgICAgICBSZW1haW5pbmcgY3JlZGl0IGFmdGVyIHRoaXM6IExlIHsoTnVtYmVyKHNlbGVjdGVkT3JkZXIudG90YWwgfHwgMCkgLSBOdW1iZXIoc2VsZWN0ZWRPcmRlci5hbW91bnRQYWlkIHx8IDApIC0gcGFyc2VGbG9hdChwYXltZW50QW1vdW50KSkudG9Mb2NhbGVTdHJpbmcoKX1cbiAgICAgICAgICAgICAgICAgICAgPC9wPlxuICAgICAgICAgICAgICAgICAgKX1cbiAgICAgICAgICAgICAgICA8L2Rpdj5cblxuICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0yXCI+XG4gICAgICAgICAgICAgICAgICA8bGFiZWwgY2xhc3NOYW1lPVwidGV4dC1zbSBmb250LW1lZGl1bVwiPlBheW1lbnQgTWV0aG9kPC9sYWJlbD5cbiAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZ3JpZCBncmlkLWNvbHMtMyBnYXAtM1wiPlxuICAgICAgICAgICAgICAgICAgICB7W1xuICAgICAgICAgICAgICAgICAgICAgIHsgaWQ6ICdjYXNoJywgbGFiZWw6ICdDYXNoJywgaWNvbjogQmFua25vdGUgfSxcbiAgICAgICAgICAgICAgICAgICAgICB7IGlkOiAnb3JhbmdlX21vbmV5JywgbGFiZWw6ICdPcmFuZ2UgTW9uZXknLCBpY29uOiBTbWFydHBob25lIH0sXG4gICAgICAgICAgICAgICAgICAgICAgeyBpZDogJ2Fmcmltb25leScsIGxhYmVsOiAnQWZyaW1vbmV5JywgaWNvbjogQ3JlZGl0Q2FyZCB9LFxuICAgICAgICAgICAgICAgICAgICBdLm1hcChtZXRob2QgPT4gKFxuICAgICAgICAgICAgICAgICAgICAgIDxidXR0b25cbiAgICAgICAgICAgICAgICAgICAgICAgIGtleT17bWV0aG9kLmlkfVxuICAgICAgICAgICAgICAgICAgICAgICAgb25DbGljaz17KCkgPT4gc2V0U2VsZWN0ZWRQYXltZW50TWV0aG9kKG1ldGhvZC5pZCl9XG4gICAgICAgICAgICAgICAgICAgICAgICBjbGFzc05hbWU9e2NuKFxuICAgICAgICAgICAgICAgICAgICAgICAgICAnZmxleCBmbGV4LWNvbCBpdGVtcy1jZW50ZXIgZ2FwLTIgcC00IHJvdW5kZWQtbGcgYm9yZGVyIHRyYW5zaXRpb24tY29sb3JzJyxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgc2VsZWN0ZWRQYXltZW50TWV0aG9kID09PSBtZXRob2QuaWRcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICA/ICdib3JkZXItcHJpbWFyeSBiZy1wcmltYXJ5LzUnXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgOiAnaG92ZXI6YmctbXV0ZWQvNTAnXG4gICAgICAgICAgICAgICAgICAgICAgICApfVxuICAgICAgICAgICAgICAgICAgICAgID5cbiAgICAgICAgICAgICAgICAgICAgICAgIDxtZXRob2QuaWNvbiBjbGFzc05hbWU9XCJ3LTYgaC02XCIgLz5cbiAgICAgICAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInRleHQtc20gZm9udC1tZWRpdW1cIj57bWV0aG9kLmxhYmVsfTwvc3Bhbj5cbiAgICAgICAgICAgICAgICAgICAgICA8L2J1dHRvbj5cbiAgICAgICAgICAgICAgICAgICAgKSl9XG4gICAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICApfVxuXG4gICAgICAgICAgPERpYWxvZ0Zvb3Rlcj5cbiAgICAgICAgICAgIDxCdXR0b24gdmFyaWFudD1cIm91dGxpbmVcIiBvbkNsaWNrPXsoKSA9PiBzZXRTaG93UGF5bWVudERpYWxvZyhmYWxzZSl9PkNhbmNlbDwvQnV0dG9uPlxuICAgICAgICAgICAgPEJ1dHRvblxuICAgICAgICAgICAgICBvbkNsaWNrPXtoYW5kbGVQcm9jZXNzUGF5bWVudH1cbiAgICAgICAgICAgICAgZGlzYWJsZWQ9eyFzZWxlY3RlZFBheW1lbnRNZXRob2QgfHwgYWRkUGF5bWVudC5pc1BlbmRpbmd9XG4gICAgICAgICAgICA+XG4gICAgICAgICAgICAgIHthZGRQYXltZW50LmlzUGVuZGluZyAmJiA8TG9hZGVyMiBjbGFzc05hbWU9XCJ3LTQgaC00IG1yLTIgYW5pbWF0ZS1zcGluXCIgLz59XG4gICAgICAgICAgICAgIDxDaGVjayBjbGFzc05hbWU9XCJ3LTQgaC00IG1yLTJcIiAvPlxuICAgICAgICAgICAgICBDb25maXJtIFBheW1lbnRcbiAgICAgICAgICAgIDwvQnV0dG9uPlxuICAgICAgICAgIDwvRGlhbG9nRm9vdGVyPlxuICAgICAgICA8L0RpYWxvZ0NvbnRlbnQ+XG4gICAgICA8L0RpYWxvZz5cblxuICAgICAgey8qIFBheW1lbnQgSGlzdG9yeSBEaWFsb2cgKi99XG4gICAgICA8RGlhbG9nIG9wZW49e3Nob3dIaXN0b3J5RGlhbG9nfSBvbk9wZW5DaGFuZ2U9e3NldFNob3dIaXN0b3J5RGlhbG9nfT5cbiAgICAgICAgPERpYWxvZ0NvbnRlbnQgY2xhc3NOYW1lPVwibWF4LXctbGdcIj5cbiAgICAgICAgICA8RGlhbG9nSGVhZGVyPlxuICAgICAgICAgICAgPERpYWxvZ1RpdGxlPlBheW1lbnQgSGlzdG9yeTwvRGlhbG9nVGl0bGU+XG4gICAgICAgICAgPC9EaWFsb2dIZWFkZXI+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJweS0yXCI+XG4gICAgICAgICAgICB7aGlzdG9yeUxvYWRpbmcgPyAoXG4gICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBqdXN0aWZ5LWNlbnRlciBweS04XCI+XG4gICAgICAgICAgICAgICAgPExvYWRlcjIgY2xhc3NOYW1lPVwidy02IGgtNiBhbmltYXRlLXNwaW4gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCIgLz5cbiAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICApIDogIXBheW1lbnRIaXN0b3J5IHx8IHBheW1lbnRIaXN0b3J5Lmxlbmd0aCA9PT0gMCA/IChcbiAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1jZW50ZXIgdGV4dC1tdXRlZC1mb3JlZ3JvdW5kIHB5LThcIj5ObyBwYXltZW50cyByZWNvcmRlZCB5ZXQ8L3A+XG4gICAgICAgICAgICApIDogKFxuICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNwYWNlLXktM1wiPlxuICAgICAgICAgICAgICAgIHtwYXltZW50SGlzdG9yeS5tYXAoKHA6IGFueSwgaTogbnVtYmVyKSA9PiAoXG4gICAgICAgICAgICAgICAgICA8ZGl2IGtleT17cC5faWQgfHwgaX0gY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIganVzdGlmeS1iZXR3ZWVuIHAtMyBiZy1tdXRlZCByb3VuZGVkLWxnXCI+XG4gICAgICAgICAgICAgICAgICAgIDxkaXY+XG4gICAgICAgICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwiZm9udC1tZWRpdW0gY2FwaXRhbGl6ZVwiPntwLnBheW1lbnRNZXRob2Q/LnJlcGxhY2UoL18vZywgJyAnKX08L3A+XG4gICAgICAgICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC14cyB0ZXh0LW11dGVkLWZvcmVncm91bmRcIj5cbiAgICAgICAgICAgICAgICAgICAgICAgIHtmb3JtYXQobmV3IERhdGUocC5jcmVhdGVkQXQpLCAnTU1NIGRkLCB5eXl5IEhIOm1tJyl9XG4gICAgICAgICAgICAgICAgICAgICAgICB7cC5yZWNlaXZlZEJ5Py5mdWxsTmFtZSAmJiBgIMK3ICR7cC5yZWNlaXZlZEJ5LmZ1bGxOYW1lfWB9XG4gICAgICAgICAgICAgICAgICAgICAgPC9wPlxuICAgICAgICAgICAgICAgICAgICAgIHtwLm5vdGVzICYmIDxwIGNsYXNzTmFtZT1cInRleHQteHMgdGV4dC1tdXRlZC1mb3JlZ3JvdW5kIGl0YWxpY1wiPntwLm5vdGVzfTwvcD59XG4gICAgICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJmb250LWJvbGQgdGV4dC1zdGF0dXMtbm9ybWFsXCI+TGUge051bWJlcihwLmFtb3VudCkudG9Mb2NhbGVTdHJpbmcoKX08L3NwYW4+XG4gICAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICApKX1cbiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXgganVzdGlmeS1iZXR3ZWVuIHB0LTMgYm9yZGVyLXQgZm9udC1ib2xkXCI+XG4gICAgICAgICAgICAgICAgICA8c3Bhbj5Ub3RhbCBQYWlkPC9zcGFuPlxuICAgICAgICAgICAgICAgICAgPHNwYW4+TGUge3BheW1lbnRIaXN0b3J5LnJlZHVjZSgoczogbnVtYmVyLCBwOiBhbnkpID0+IHMgKyBOdW1iZXIocC5hbW91bnQpLCAwKS50b0xvY2FsZVN0cmluZygpfTwvc3Bhbj5cbiAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICApfVxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDxEaWFsb2dGb290ZXI+XG4gICAgICAgICAgICA8QnV0dG9uIHZhcmlhbnQ9XCJvdXRsaW5lXCIgb25DbGljaz17KCkgPT4gc2V0U2hvd0hpc3RvcnlEaWFsb2coZmFsc2UpfT5DbG9zZTwvQnV0dG9uPlxuICAgICAgICAgIDwvRGlhbG9nRm9vdGVyPlxuICAgICAgICA8L0RpYWxvZ0NvbnRlbnQ+XG4gICAgICA8L0RpYWxvZz5cbiAgICA8L1JvbGVMYXlvdXQ+XG4gICk7XG59XG4iXSwibmFtZXMiOlsidXNlU3RhdGUiLCJSb2xlTGF5b3V0IiwidXNlQXV0aCIsInVzZU9yZGVycyIsInVzZUFkZFBheW1lbnQiLCJ1c2VQYXltZW50SGlzdG9yeSIsInVzZVBheW1lbnRTdGF0cyIsInVzZURhaWx5SW5jb21lIiwiQnV0dG9uIiwiSW5wdXQiLCJCYWRnZSIsIkRpYWxvZyIsIkRpYWxvZ0NvbnRlbnQiLCJEaWFsb2dIZWFkZXIiLCJEaWFsb2dUaXRsZSIsIkRpYWxvZ0Zvb3RlciIsIlNlbGVjdCIsIlNlbGVjdENvbnRlbnQiLCJTZWxlY3RJdGVtIiwiU2VsZWN0VHJpZ2dlciIsIlNlbGVjdFZhbHVlIiwidG9hc3QiLCJTZWFyY2giLCJDcmVkaXRDYXJkIiwiQmFua25vdGUiLCJTbWFydHBob25lIiwiQ2hlY2siLCJMb2FkZXIyIiwiVHJlbmRpbmdVcCIsIkNhbGVuZGFyIiwiSGlzdG9yeSIsIlBsdXMiLCJmb3JtYXQiLCJzdWJEYXlzIiwiY24iLCJQYXltZW50c1BhZ2UiLCJwcm9maWxlIiwicHJpbWFyeVJvbGUiLCJjdXJyZW50Um9sZSIsInBheW1lbnRGaWx0ZXIiLCJzZXRQYXltZW50RmlsdGVyIiwic2VhcmNoVGVybSIsInNldFNlYXJjaFRlcm0iLCJzZWxlY3RlZE9yZGVyIiwic2V0U2VsZWN0ZWRPcmRlciIsInNob3dQYXltZW50RGlhbG9nIiwic2V0U2hvd1BheW1lbnREaWFsb2ciLCJzZWxlY3RlZFBheW1lbnRNZXRob2QiLCJzZXRTZWxlY3RlZFBheW1lbnRNZXRob2QiLCJwYXltZW50QW1vdW50Iiwic2V0UGF5bWVudEFtb3VudCIsInNob3dIaXN0b3J5RGlhbG9nIiwic2V0U2hvd0hpc3RvcnlEaWFsb2ciLCJoaXN0b3J5T3JkZXJJZCIsInNldEhpc3RvcnlPcmRlcklkIiwiZGF0ZVJhbmdlIiwic2V0RGF0ZVJhbmdlIiwiZGF0YSIsIm9yZGVycyIsImlzTG9hZGluZyIsImFkZFBheW1lbnQiLCJwYXltZW50SGlzdG9yeSIsImhpc3RvcnlMb2FkaW5nIiwiZ2V0RGF0ZVJhbmdlIiwiZW5kIiwiRGF0ZSIsInRvSVNPU3RyaW5nIiwic3RhcnQiLCJzZXRIb3VycyIsInBheW1lbnRTdGF0cyIsImRhaWx5SW5jb21lIiwiZmlsdGVyZWRPcmRlcnMiLCJBcnJheSIsImlzQXJyYXkiLCJmaWx0ZXIiLCJvcmRlciIsInBheW1lbnRTdGF0dXMiLCJwYXltZW50X3N0YXR1cyIsInNlYXJjaCIsInRvTG93ZXJDYXNlIiwib3JkZXJOdW0iLCJvcmRlck51bWJlciIsIm9yZGVyX251bWJlciIsImZpcnN0TmFtZSIsInBhdGllbnRJZCIsInBhdGllbnRzIiwiZmlyc3RfbmFtZSIsImxhc3ROYW1lIiwibGFzdF9uYW1lIiwiaW5jbHVkZXMiLCJwZW5kaW5nVG90YWwiLCJvIiwicmVkdWNlIiwic3VtIiwiTnVtYmVyIiwiYmFsYW5jZSIsInRvdGFsIiwidG90YWxBbW91bnQiLCJhbW91bnRQYWlkIiwicGFpZFRvZGF5VG90YWwiLCJ0b2RheSIsImNyZWF0ZWRBdCIsImNyZWF0ZWRfYXQiLCJoYW5kbGVQcm9jZXNzUGF5bWVudCIsIm9yZGVySWQiLCJpZCIsIl9pZCIsIm9yZGVyVG90YWwiLCJhbHJlYWR5UGFpZCIsInJlbWFpbmluZyIsImFtb3VudCIsInBhcnNlRmxvYXQiLCJlcnJvciIsInRvTG9jYWxlU3RyaW5nIiwibXV0YXRlQXN5bmMiLCJwYXltZW50TWV0aG9kIiwic3VjY2VzcyIsInJlc3BvbnNlIiwibWVzc2FnZSIsInRpdGxlIiwic3VidGl0bGUiLCJyb2xlIiwidXNlck5hbWUiLCJmdWxsX25hbWUiLCJkaXYiLCJjbGFzc05hbWUiLCJ2YWx1ZSIsIm9uVmFsdWVDaGFuZ2UiLCJwIiwicGFpZFJldmVudWUiLCJwYWlkT3JkZXJzIiwidG90YWxSZXZlbnVlIiwidG90YWxPcmRlcnMiLCJsZW5ndGgiLCJNYXRoIiwicm91bmQiLCJkYXkiLCJ0b3RhbEluY29tZSIsImgzIiwic2xpY2UiLCJtYXAiLCJpbmRleCIsImRhdGUiLCJvcmRlckNvdW50IiwiY2FzaFBheW1lbnRzIiwic3BhbiIsIm9yYW5nZU1vbmV5UGF5bWVudHMiLCJhZnJpbW9uZXlQYXltZW50cyIsInBsYWNlaG9sZGVyIiwib25DaGFuZ2UiLCJlIiwidGFyZ2V0IiwidGFibGUiLCJ0aGVhZCIsInRyIiwidGgiLCJ0Ym9keSIsInBheW1lbnRfbWV0aG9kIiwidGQiLCJyZXBsYWNlIiwidmFyaWFudCIsInNpemUiLCJvbkNsaWNrIiwiY29sU3BhbiIsIm9wZW4iLCJvbk9wZW5DaGFuZ2UiLCJsYWJlbCIsInR5cGUiLCJzdGVwIiwibWluIiwibWF4IiwiaWNvbiIsIm1ldGhvZCIsImJ1dHRvbiIsImRpc2FibGVkIiwiaXNQZW5kaW5nIiwiaSIsInJlY2VpdmVkQnkiLCJmdWxsTmFtZSIsIm5vdGVzIiwicyJdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O0FBQUEsU0FBU0EsUUFBUSxRQUFRLFFBQVE7QUFDakMsU0FBU0MsVUFBVSxRQUFRLGlDQUFpQztBQUM1RCxTQUFTQyxPQUFPLFFBQVEsd0JBQXdCO0FBQ2hELFNBQVNDLFNBQVMsRUFBRUMsYUFBYSxFQUFFQyxpQkFBaUIsRUFBRUMsZUFBZSxFQUFFQyxjQUFjLFFBQVEsb0JBQW9CO0FBQ2pILFNBQVNDLE1BQU0sUUFBUSx5QkFBeUI7QUFDaEQsU0FBU0MsS0FBSyxRQUFRLHdCQUF3QjtBQUM5QyxTQUFTQyxLQUFLLFFBQVEsd0JBQXdCO0FBQzlDLFNBQVNDLE1BQU0sRUFBRUMsYUFBYSxFQUFFQyxZQUFZLEVBQUVDLFdBQVcsRUFBRUMsWUFBWSxRQUFRLHlCQUF5QjtBQUN4RyxTQUFTQyxNQUFNLEVBQUVDLGFBQWEsRUFBRUMsVUFBVSxFQUFFQyxhQUFhLEVBQUVDLFdBQVcsUUFBUSx5QkFBeUI7QUFDdkcsU0FBU0MsS0FBSyxRQUFRLFNBQVM7QUFDL0IsU0FBU0MsTUFBTSxFQUFFQyxVQUFVLEVBQUVDLFFBQVEsRUFBRUMsVUFBVSxFQUFFQyxLQUFLLEVBQUVDLE9BQU8sRUFBV0MsVUFBVSxFQUFFQyxRQUFRLEVBQUVDLE9BQU8s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

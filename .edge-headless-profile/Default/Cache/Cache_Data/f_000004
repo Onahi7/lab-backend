@@ -1,0 +1,1128 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/App.tsx");import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+
+let prevRefreshReg;
+let prevRefreshSig;
+
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react-swc can't detect preamble. Something is wrong."
+    );
+  }
+
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/HP/Downloads/lab/frontend/src/App.tsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+
+import __vite__cjsImport2_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=27cfabb6"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime["jsxDEV"];
+var _s = $RefreshSig$();
+import { Toaster } from "/src/components/ui/toaster.tsx";
+import { Toaster as Sonner } from "/src/components/ui/sonner.tsx";
+import { TooltipProvider } from "/src/components/ui/tooltip.tsx";
+import { QueryClient, QueryClientProvider } from "/node_modules/.vite/deps/@tanstack_react-query.js?v=27cfabb6";
+import { BrowserRouter, Routes, Route, Navigate } from "/node_modules/.vite/deps/react-router-dom.js?v=27cfabb6";
+import { AuthProvider, useAuth } from "/src/context/AuthContext.tsx";
+import { WebSocketProvider } from "/src/context/WebSocketContext.tsx";
+import { ConnectionStatus } from "/src/components/ConnectionStatus.tsx";
+import { RoleGuard } from "/src/components/auth/RoleGuard.tsx";
+import { Loader2 } from "/node_modules/.vite/deps/lucide-react.js?v=27cfabb6";
+// Pages
+import Login from "/src/pages/Login.tsx";
+import NotFound from "/src/pages/NotFound.tsx";
+// Reception Pages
+import ReceptionDashboard from "/src/pages/reception/ReceptionDashboard.tsx";
+import PatientDetails from "/src/pages/reception/PatientDetails.tsx";
+import RegisterPatient from "/src/pages/reception/RegisterPatient.tsx";
+import NewOrder from "/src/pages/reception/NewOrder.tsx";
+import PatientsPage from "/src/pages/reception/PatientsPage.tsx";
+import OrdersPage from "/src/pages/reception/OrdersPage.tsx";
+import PaymentsPage from "/src/pages/reception/PaymentsPage.tsx";
+import DailyReconciliation from "/src/pages/reception/DailyReconciliation.tsx";
+import PaymentReceipt from "/src/pages/reception/PaymentReceipt.tsx";
+import PaymentDemo from "/src/pages/reception/PaymentDemo.tsx";
+import QuickResultEntry from "/src/pages/reception/QuickResultEntry.tsx";
+import LabDashboardPage from "/src/pages/lab/LabDashboardPage.tsx";
+import EnterManualResults from "/src/pages/lab/EnterManualResults.tsx";
+import ResultVerification from "/src/pages/lab/ResultVerification.tsx";
+import QCDataEntry from "/src/pages/lab/QCDataEntry.tsx";
+import CollectSamplesPage from "/src/pages/lab/CollectSamplesPage.tsx";
+import EnterResultsPage from "/src/pages/lab/EnterResultsPage.tsx";
+import ResultsPage from "/src/pages/lab/ResultsPage.tsx";
+import EditableResultReport from "/src/pages/lab/EditableResultReport.tsx";
+import LabReportPage from "/src/pages/lab/LabReportPage.tsx";
+import PublicLabReportPage from "/src/pages/lab/PublicLabReportPage.tsx?t=1772409753566";
+import MatchResults from "/src/pages/lab/MatchResults.tsx";
+// Admin Pages
+import CommunicationLogs from "/src/pages/admin/CommunicationLogs.tsx";
+import AdminDashboard from "/src/pages/admin/AdminDashboard.tsx";
+import UserManagementPage from "/src/pages/admin/UserManagementPage.tsx";
+import Reports from "/src/pages/admin/Reports.tsx";
+import TestCatalogManagement from "/src/pages/admin/TestCatalogManagement.tsx";
+import ReconciliationReview from "/src/pages/admin/ReconciliationReview.tsx";
+import AuditLogViewer from "/src/pages/admin/AuditLogViewer.tsx";
+import ReportTemplateEditor from "/src/pages/admin/ReportTemplateEditor.tsx";
+// Shared Pages
+import Machines from "/src/pages/Machines.tsx";
+import Settings from "/src/pages/Settings.tsx";
+const queryClient = new QueryClient();
+function AppRoutes() {
+    _s();
+    const { isAuthenticated, isLoading, primaryRole } = useAuth();
+    if (isLoading) {
+        return /*#__PURE__*/ _jsxDEV("div", {
+            className: "min-h-screen flex items-center justify-center bg-background",
+            children: /*#__PURE__*/ _jsxDEV(Loader2, {
+                className: "w-8 h-8 animate-spin text-primary"
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 69,
+                columnNumber: 9
+            }, this)
+        }, void 0, false, {
+            fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+            lineNumber: 68,
+            columnNumber: 7
+        }, this);
+    }
+    const getDefaultRoute = ()=>{
+        if (!isAuthenticated || !primaryRole) return '/login';
+        switch(primaryRole){
+            case 'admin':
+                return '/admin';
+            case 'lab_tech':
+                return '/lab';
+            case 'receptionist':
+                return '/reception';
+            default:
+                return '/login';
+        }
+    };
+    return /*#__PURE__*/ _jsxDEV(Routes, {
+        children: [
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/login",
+                element: isAuthenticated && primaryRole ? /*#__PURE__*/ _jsxDEV(Navigate, {
+                    to: getDefaultRoute(),
+                    replace: true
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 89,
+                    columnNumber: 11
+                }, this) : /*#__PURE__*/ _jsxDEV(Login, {}, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 90,
+                    columnNumber: 13
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 87,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/reception",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'receptionist',
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(ReceptionDashboard, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 95,
+                        columnNumber: 61
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 95,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 94,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/reception/register",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'receptionist',
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(RegisterPatient, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 98,
+                        columnNumber: 61
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 98,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 97,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/reception/patients",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'receptionist',
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(PatientsPage, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 101,
+                        columnNumber: 61
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 101,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 100,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/reception/patients/:id",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'receptionist',
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(PatientDetails, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 104,
+                        columnNumber: 61
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 104,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 103,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/reception/new-order",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'receptionist',
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(NewOrder, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 107,
+                        columnNumber: 61
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 107,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 106,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/reception/orders",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'receptionist',
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(OrdersPage, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 110,
+                        columnNumber: 61
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 110,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 109,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/reception/payments",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'receptionist',
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(PaymentsPage, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 113,
+                        columnNumber: 61
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 113,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 112,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/reception/reconciliation",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'receptionist',
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(DailyReconciliation, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 116,
+                        columnNumber: 61
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 116,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 115,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/reception/results",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'receptionist',
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(ResultsPage, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 119,
+                        columnNumber: 61
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 119,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 118,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/reception/enter-results",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'receptionist',
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(QuickResultEntry, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 122,
+                        columnNumber: 61
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 122,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 121,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/reception/receipt/:orderId",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'receptionist',
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(PaymentReceipt, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 125,
+                        columnNumber: 61
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 125,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 124,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/reception/payment-demo",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'receptionist',
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(PaymentDemo, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 128,
+                        columnNumber: 61
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 128,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 127,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/lab",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'lab_tech',
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(LabDashboardPage, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 133,
+                        columnNumber: 57
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 133,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 132,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/lab/match-results",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'lab_tech',
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(MatchResults, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 136,
+                        columnNumber: 57
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 136,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 135,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/lab/pending",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'lab_tech',
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(CollectSamplesPage, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 139,
+                        columnNumber: 57
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 139,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 138,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/lab/collect",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'lab_tech',
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(CollectSamplesPage, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 142,
+                        columnNumber: 57
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 142,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 141,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/lab/processing",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'lab_tech',
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(EnterResultsPage, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 145,
+                        columnNumber: 57
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 145,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 144,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/lab/enter-results",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'lab_tech',
+                        'admin',
+                        'receptionist'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(EnterManualResults, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 148,
+                        columnNumber: 73
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 148,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 147,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/lab/results",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'lab_tech',
+                        'admin',
+                        'receptionist'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(ResultsPage, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 151,
+                        columnNumber: 73
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 151,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 150,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/lab/patients",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'lab_tech',
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(PatientsPage, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 154,
+                        columnNumber: 57
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 154,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 153,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/lab/verify-results",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'lab_tech',
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(ResultVerification, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 157,
+                        columnNumber: 57
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 157,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 156,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/lab/qc",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'lab_tech',
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(QCDataEntry, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 160,
+                        columnNumber: 57
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 160,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 159,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/lab/machines",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'lab_tech',
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(Machines, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 163,
+                        columnNumber: 57
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 163,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 162,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/lab/result-report/:id?",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'lab_tech',
+                        'admin',
+                        'receptionist'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(EditableResultReport, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 166,
+                        columnNumber: 73
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 166,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 165,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/lab/reports/:orderId",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'lab_tech',
+                        'admin',
+                        'receptionist'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(LabReportPage, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 169,
+                        columnNumber: 73
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 169,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 168,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/public/lab/reports/:orderId",
+                element: /*#__PURE__*/ _jsxDEV(PublicLabReportPage, {}, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 171,
+                    columnNumber: 59
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 171,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/admin",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(AdminDashboard, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 175,
+                        columnNumber: 45
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 175,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 174,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/admin/users",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(UserManagementPage, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 178,
+                        columnNumber: 45
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 178,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 177,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/admin/reports",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(Reports, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 181,
+                        columnNumber: 45
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 181,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 180,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/admin/test-catalog",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(TestCatalogManagement, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 184,
+                        columnNumber: 45
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 184,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 183,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/admin/communication-logs",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(CommunicationLogs, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 187,
+                        columnNumber: 45
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 187,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 186,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/admin/audit-logs",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(AuditLogViewer, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 190,
+                        columnNumber: 45
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 190,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 189,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/admin/reconciliation",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(ReconciliationReview, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 193,
+                        columnNumber: 45
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 193,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 192,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/admin/report-template",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(ReportTemplateEditor, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 196,
+                        columnNumber: 45
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 196,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 195,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/admin/patients",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(PatientsPage, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 199,
+                        columnNumber: 45
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 199,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 198,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/admin/orders",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(OrdersPage, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 202,
+                        columnNumber: 45
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 202,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 201,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/admin/results",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(ResultsPage, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 205,
+                        columnNumber: 45
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 205,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 204,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/admin/machines",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(Machines, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 208,
+                        columnNumber: 45
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 208,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 207,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/admin/payments",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(PaymentsPage, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 211,
+                        columnNumber: 45
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 211,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 210,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/admin/settings",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(Settings, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 214,
+                        columnNumber: 45
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 214,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 213,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/admin/logs",
+                element: /*#__PURE__*/ _jsxDEV(RoleGuard, {
+                    allowedRoles: [
+                        'admin'
+                    ],
+                    children: /*#__PURE__*/ _jsxDEV(CommunicationLogs, {}, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 217,
+                        columnNumber: 45
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 217,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 216,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "/",
+                element: /*#__PURE__*/ _jsxDEV(Navigate, {
+                    to: getDefaultRoute(),
+                    replace: true
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 221,
+                    columnNumber: 32
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 221,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ _jsxDEV(Route, {
+                path: "*",
+                element: /*#__PURE__*/ _jsxDEV(NotFound, {}, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 224,
+                    columnNumber: 32
+                }, this)
+            }, void 0, false, {
+                fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                lineNumber: 224,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+        lineNumber: 85,
+        columnNumber: 5
+    }, this);
+}
+_s(AppRoutes, "wDmP/mZ4WtRgC3Lyn9Ew9WwaSwA=", false, function() {
+    return [
+        useAuth
+    ];
+});
+_c = AppRoutes;
+const App = ()=>/*#__PURE__*/ _jsxDEV(QueryClientProvider, {
+        client: queryClient,
+        children: /*#__PURE__*/ _jsxDEV(TooltipProvider, {
+            children: [
+                /*#__PURE__*/ _jsxDEV(Toaster, {}, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 232,
+                    columnNumber: 7
+                }, this),
+                /*#__PURE__*/ _jsxDEV(Sonner, {}, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 233,
+                    columnNumber: 7
+                }, this),
+                /*#__PURE__*/ _jsxDEV(BrowserRouter, {
+                    future: {
+                        v7_startTransition: true,
+                        v7_relativeSplatPath: true
+                    },
+                    children: /*#__PURE__*/ _jsxDEV(AuthProvider, {
+                        children: /*#__PURE__*/ _jsxDEV(WebSocketProvider, {
+                            children: [
+                                /*#__PURE__*/ _jsxDEV(ConnectionStatus, {}, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                                    lineNumber: 242,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ _jsxDEV(AppRoutes, {}, void 0, false, {
+                                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                                    lineNumber: 243,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                            lineNumber: 241,
+                            columnNumber: 11
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                        lineNumber: 240,
+                        columnNumber: 9
+                    }, this)
+                }, void 0, false, {
+                    fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+                    lineNumber: 234,
+                    columnNumber: 7
+                }, this)
+            ]
+        }, void 0, true, {
+            fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+            lineNumber: 231,
+            columnNumber: 5
+        }, this)
+    }, void 0, false, {
+        fileName: "C:/Users/HP/Downloads/lab/frontend/src/App.tsx",
+        lineNumber: 230,
+        columnNumber: 3
+    }, this);
+_c1 = App;
+export default App;
+var _c, _c1;
+$RefreshReg$(_c, "AppRoutes");
+$RefreshReg$(_c1, "App");
+
+
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+
+
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/HP/Downloads/lab/frontend/src/App.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/HP/Downloads/lab/frontend/src/App.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIkFwcC50c3giXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgVG9hc3RlciB9IGZyb20gXCJAL2NvbXBvbmVudHMvdWkvdG9hc3RlclwiO1xuaW1wb3J0IHsgVG9hc3RlciBhcyBTb25uZXIgfSBmcm9tIFwiQC9jb21wb25lbnRzL3VpL3Nvbm5lclwiO1xuaW1wb3J0IHsgVG9vbHRpcFByb3ZpZGVyIH0gZnJvbSBcIkAvY29tcG9uZW50cy91aS90b29sdGlwXCI7XG5pbXBvcnQgeyBRdWVyeUNsaWVudCwgUXVlcnlDbGllbnRQcm92aWRlciB9IGZyb20gXCJAdGFuc3RhY2svcmVhY3QtcXVlcnlcIjtcbmltcG9ydCB7IEJyb3dzZXJSb3V0ZXIsIFJvdXRlcywgUm91dGUsIE5hdmlnYXRlIH0gZnJvbSBcInJlYWN0LXJvdXRlci1kb21cIjtcbmltcG9ydCB7IEF1dGhQcm92aWRlciwgdXNlQXV0aCB9IGZyb20gXCIuL2NvbnRleHQvQXV0aENvbnRleHRcIjtcbmltcG9ydCB7IFdlYlNvY2tldFByb3ZpZGVyIH0gZnJvbSBcIi4vY29udGV4dC9XZWJTb2NrZXRDb250ZXh0XCI7XG5pbXBvcnQgeyBDb25uZWN0aW9uU3RhdHVzIH0gZnJvbSBcIi4vY29tcG9uZW50cy9Db25uZWN0aW9uU3RhdHVzXCI7XG5pbXBvcnQgeyBSb2xlR3VhcmQgfSBmcm9tIFwiLi9jb21wb25lbnRzL2F1dGgvUm9sZUd1YXJkXCI7XG5pbXBvcnQgeyBMb2FkZXIyIH0gZnJvbSBcImx1Y2lkZS1yZWFjdFwiO1xuXG4vLyBQYWdlc1xuaW1wb3J0IExvZ2luIGZyb20gXCIuL3BhZ2VzL0xvZ2luXCI7XG5pbXBvcnQgTm90Rm91bmQgZnJvbSBcIi4vcGFnZXMvTm90Rm91bmRcIjtcblxuLy8gUmVjZXB0aW9uIFBhZ2VzXG5pbXBvcnQgUmVjZXB0aW9uRGFzaGJvYXJkIGZyb20gXCIuL3BhZ2VzL3JlY2VwdGlvbi9SZWNlcHRpb25EYXNoYm9hcmRcIjtcbmltcG9ydCBQYXRpZW50RGV0YWlscyBmcm9tIFwiLi9wYWdlcy9yZWNlcHRpb24vUGF0aWVudERldGFpbHNcIjtcbmltcG9ydCBSZWdpc3RlclBhdGllbnQgZnJvbSBcIi4vcGFnZXMvcmVjZXB0aW9uL1JlZ2lzdGVyUGF0aWVudFwiO1xuaW1wb3J0IE5ld09yZGVyIGZyb20gXCIuL3BhZ2VzL3JlY2VwdGlvbi9OZXdPcmRlclwiO1xuaW1wb3J0IFBhdGllbnRzUGFnZSBmcm9tIFwiLi9wYWdlcy9yZWNlcHRpb24vUGF0aWVudHNQYWdlXCI7XG5pbXBvcnQgT3JkZXJzUGFnZSBmcm9tIFwiLi9wYWdlcy9yZWNlcHRpb24vT3JkZXJzUGFnZVwiO1xuaW1wb3J0IFBheW1lbnRzUGFnZSBmcm9tIFwiLi9wYWdlcy9yZWNlcHRpb24vUGF5bWVudHNQYWdlXCI7XG5pbXBvcnQgRGFpbHlSZWNvbmNpbGlhdGlvbiBmcm9tIFwiLi9wYWdlcy9yZWNlcHRpb24vRGFpbHlSZWNvbmNpbGlhdGlvblwiO1xuaW1wb3J0IFBheW1lbnRSZWNlaXB0IGZyb20gXCIuL3BhZ2VzL3JlY2VwdGlvbi9QYXltZW50UmVjZWlwdFwiO1xuaW1wb3J0IFBheW1lbnREZW1vIGZyb20gXCIuL3BhZ2VzL3JlY2VwdGlvbi9QYXltZW50RGVtb1wiO1xuaW1wb3J0IFF1aWNrUmVzdWx0RW50cnkgZnJvbSBcIi4vcGFnZXMvcmVjZXB0aW9uL1F1aWNrUmVzdWx0RW50cnlcIjtcblxuLy8gTGFiIFBhZ2VzXG5pbXBvcnQgTGFiRGFzaGJvYXJkIGZyb20gXCIuL3BhZ2VzL2xhYi9MYWJEYXNoYm9hcmRcIjtcbmltcG9ydCBMYWJEYXNoYm9hcmRQYWdlIGZyb20gXCIuL3BhZ2VzL2xhYi9MYWJEYXNoYm9hcmRQYWdlXCI7XG5pbXBvcnQgRW50ZXJNYW51YWxSZXN1bHRzIGZyb20gXCIuL3BhZ2VzL2xhYi9FbnRlck1hbnVhbFJlc3VsdHNcIjtcbmltcG9ydCBSZXN1bHRWZXJpZmljYXRpb24gZnJvbSBcIi4vcGFnZXMvbGFiL1Jlc3VsdFZlcmlmaWNhdGlvblwiO1xuaW1wb3J0IFFDRGF0YUVudHJ5IGZyb20gXCIuL3BhZ2VzL2xhYi9RQ0RhdGFFbnRyeVwiO1xuaW1wb3J0IENvbGxlY3RTYW1wbGVzIGZyb20gXCIuL3BhZ2VzL2xhYi9Db2xsZWN0U2FtcGxlc1wiO1xuaW1wb3J0IENvbGxlY3RTYW1wbGVzUGFnZSBmcm9tIFwiLi9wYWdlcy9sYWIvQ29sbGVjdFNhbXBsZXNQYWdlXCI7XG5pbXBvcnQgRW50ZXJSZXN1bHRzIGZyb20gXCIuL3BhZ2VzL2xhYi9FbnRlclJlc3VsdHNcIjtcbmltcG9ydCBFbnRlclJlc3VsdHNQYWdlIGZyb20gXCIuL3BhZ2VzL2xhYi9FbnRlclJlc3VsdHNQYWdlXCI7XG5pbXBvcnQgUmVzdWx0c1BhZ2UgZnJvbSBcIi4vcGFnZXMvbGFiL1Jlc3VsdHNQYWdlXCI7XG5pbXBvcnQgRWRpdGFibGVSZXN1bHRSZXBvcnQgZnJvbSBcIi4vcGFnZXMvbGFiL0VkaXRhYmxlUmVzdWx0UmVwb3J0XCI7XG5pbXBvcnQgTGFiUmVwb3J0UGFnZSBmcm9tIFwiLi9wYWdlcy9sYWIvTGFiUmVwb3J0UGFnZVwiO1xuaW1wb3J0IFB1YmxpY0xhYlJlcG9ydFBhZ2UgZnJvbSBcIi4vcGFnZXMvbGFiL1B1YmxpY0xhYlJlcG9ydFBhZ2VcIjtcbmltcG9ydCBNYXRjaFJlc3VsdHMgZnJvbSBcIi4vcGFnZXMvbGFiL01hdGNoUmVzdWx0c1wiO1xuXG4vLyBBZG1pbiBQYWdlc1xuaW1wb3J0IENvbW11bmljYXRpb25Mb2dzIGZyb20gXCIuL3BhZ2VzL2FkbWluL0NvbW11bmljYXRpb25Mb2dzXCI7XG5pbXBvcnQgQWRtaW5EYXNoYm9hcmQgZnJvbSBcIi4vcGFnZXMvYWRtaW4vQWRtaW5EYXNoYm9hcmRcIjtcbmltcG9ydCBVc2VyTWFuYWdlbWVudCBmcm9tIFwiLi9wYWdlcy9hZG1pbi9Vc2VyTWFuYWdlbWVudFwiO1xuaW1wb3J0IFVzZXJNYW5hZ2VtZW50UGFnZSBmcm9tIFwiLi9wYWdlcy9hZG1pbi9Vc2VyTWFuYWdlbWVudFBhZ2VcIjtcbmltcG9ydCBSZXBvcnRzIGZyb20gXCIuL3BhZ2VzL2FkbWluL1JlcG9ydHNcIjtcbmltcG9ydCBUZXN0Q2F0YWxvZyBmcm9tIFwiLi9wYWdlcy9hZG1pbi9UZXN0Q2F0YWxvZ1wiO1xuaW1wb3J0IFRlc3RDYXRhbG9nTWFuYWdlbWVudCBmcm9tIFwiLi9wYWdlcy9hZG1pbi9UZXN0Q2F0YWxvZ01hbmFnZW1lbnRcIjtcbmltcG9ydCBSZWNvbmNpbGlhdGlvblJldmlldyBmcm9tIFwiLi9wYWdlcy9hZG1pbi9SZWNvbmNpbGlhdGlvblJldmlld1wiO1xuaW1wb3J0IEF1ZGl0TG9nVmlld2VyIGZyb20gXCIuL3BhZ2VzL2FkbWluL0F1ZGl0TG9nVmlld2VyXCI7XG5pbXBvcnQgUmVwb3J0VGVtcGxhdGVFZGl0b3IgZnJvbSBcIi4vcGFnZXMvYWRtaW4vUmVwb3J0VGVtcGxhdGVFZGl0b3JcIjtcblxuLy8gU2hhcmVkIFBhZ2VzXG5pbXBvcnQgTWFjaGluZXMgZnJvbSBcIi4vcGFnZXMvTWFjaGluZXNcIjtcbmltcG9ydCBTZXR0aW5ncyBmcm9tIFwiLi9wYWdlcy9TZXR0aW5nc1wiO1xuXG5jb25zdCBxdWVyeUNsaWVudCA9IG5ldyBRdWVyeUNsaWVudCgpO1xuXG5mdW5jdGlvbiBBcHBSb3V0ZXMoKSB7XG4gIGNvbnN0IHsgaXNBdXRoZW50aWNhdGVkLCBpc0xvYWRpbmcsIHByaW1hcnlSb2xlIH0gPSB1c2VBdXRoKCk7XG5cbiAgaWYgKGlzTG9hZGluZykge1xuICAgIHJldHVybiAoXG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cIm1pbi1oLXNjcmVlbiBmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWNlbnRlciBiZy1iYWNrZ3JvdW5kXCI+XG4gICAgICAgIDxMb2FkZXIyIGNsYXNzTmFtZT1cInctOCBoLTggYW5pbWF0ZS1zcGluIHRleHQtcHJpbWFyeVwiIC8+XG4gICAgICA8L2Rpdj5cbiAgICApO1xuICB9XG5cbiAgY29uc3QgZ2V0RGVmYXVsdFJvdXRlID0gKCkgPT4ge1xuICAgIGlmICghaXNBdXRoZW50aWNhdGVkIHx8ICFwcmltYXJ5Um9sZSkgcmV0dXJuICcvbG9naW4nO1xuICAgIHN3aXRjaCAocHJpbWFyeVJvbGUpIHtcbiAgICAgIGNhc2UgJ2FkbWluJzogcmV0dXJuICcvYWRtaW4nO1xuICAgICAgY2FzZSAnbGFiX3RlY2gnOiByZXR1cm4gJy9sYWInO1xuICAgICAgY2FzZSAncmVjZXB0aW9uaXN0JzogcmV0dXJuICcvcmVjZXB0aW9uJztcbiAgICAgIGRlZmF1bHQ6IHJldHVybiAnL2xvZ2luJztcbiAgICB9XG4gIH07XG5cbiAgcmV0dXJuIChcbiAgICA8Um91dGVzPlxuICAgICAgey8qIFB1YmxpYyBSb3V0ZXMgKi99XG4gICAgICA8Um91dGUgcGF0aD1cIi9sb2dpblwiIGVsZW1lbnQ9e1xuICAgICAgICBpc0F1dGhlbnRpY2F0ZWQgJiYgcHJpbWFyeVJvbGUgPyAoXG4gICAgICAgICAgPE5hdmlnYXRlIHRvPXtnZXREZWZhdWx0Um91dGUoKX0gcmVwbGFjZSAvPlxuICAgICAgICApIDogPExvZ2luIC8+XG4gICAgICB9IC8+XG5cbiAgICAgIHsvKiBSZWNlcHRpb24gUm91dGVzICovfVxuICAgICAgPFJvdXRlIHBhdGg9XCIvcmVjZXB0aW9uXCIgZWxlbWVudD17XG4gICAgICAgIDxSb2xlR3VhcmQgYWxsb3dlZFJvbGVzPXtbJ3JlY2VwdGlvbmlzdCcsICdhZG1pbiddfT48UmVjZXB0aW9uRGFzaGJvYXJkIC8+PC9Sb2xlR3VhcmQ+XG4gICAgICB9IC8+XG4gICAgICA8Um91dGUgcGF0aD1cIi9yZWNlcHRpb24vcmVnaXN0ZXJcIiBlbGVtZW50PXtcbiAgICAgICAgPFJvbGVHdWFyZCBhbGxvd2VkUm9sZXM9e1sncmVjZXB0aW9uaXN0JywgJ2FkbWluJ119PjxSZWdpc3RlclBhdGllbnQgLz48L1JvbGVHdWFyZD5cbiAgICAgIH0gLz5cbiAgICAgIDxSb3V0ZSBwYXRoPVwiL3JlY2VwdGlvbi9wYXRpZW50c1wiIGVsZW1lbnQ9e1xuICAgICAgICA8Um9sZUd1YXJkIGFsbG93ZWRSb2xlcz17WydyZWNlcHRpb25pc3QnLCAnYWRtaW4nXX0+PFBhdGllbnRzUGFnZSAvPjwvUm9sZUd1YXJkPlxuICAgICAgfSAvPlxuICAgICAgPFJvdXRlIHBhdGg9XCIvcmVjZXB0aW9uL3BhdGllbnRzLzppZFwiIGVsZW1lbnQ9e1xuICAgICAgICA8Um9sZUd1YXJkIGFsbG93ZWRSb2xlcz17WydyZWNlcHRpb25pc3QnLCAnYWRtaW4nXX0+PFBhdGllbnREZXRhaWxzIC8+PC9Sb2xlR3VhcmQ+XG4gICAgICB9IC8+XG4gICAgICA8Um91dGUgcGF0aD1cIi9yZWNlcHRpb24vbmV3LW9yZGVyXCIgZWxlbWVudD17XG4gICAgICAgIDxSb2xlR3VhcmQgYWxsb3dlZFJvbGVzPXtbJ3JlY2VwdGlvbmlzdCcsICdhZG1pbiddfT48TmV3T3JkZXIgLz48L1JvbGVHdWFyZD5cbiAgICAgIH0gLz5cbiAgICAgIDxSb3V0ZSBwYXRoPVwiL3JlY2VwdGlvbi9vcmRlcnNcIiBlbGVtZW50PXtcbiAgICAgICAgPFJvbGVHdWFyZCBhbGxvd2VkUm9sZXM9e1sncmVjZXB0aW9uaXN0JywgJ2FkbWluJ119PjxPcmRlcnNQYWdlIC8+PC9Sb2xlR3VhcmQ+XG4gICAgICB9IC8+XG4gICAgICA8Um91dGUgcGF0aD1cIi9yZWNlcHRpb24vcGF5bWVudHNcIiBlbGVtZW50PXtcbiAgICAgICAgPFJvbGVHdWFyZCBhbGxvd2VkUm9sZXM9e1sncmVjZXB0aW9uaXN0JywgJ2FkbWluJ119PjxQYXltZW50c1BhZ2UgLz48L1JvbGVHdWFyZD5cbiAgICAgIH0gLz5cbiAgICAgIDxSb3V0ZSBwYXRoPVwiL3JlY2VwdGlvbi9yZWNvbmNpbGlhdGlvblwiIGVsZW1lbnQ9e1xuICAgICAgICA8Um9sZUd1YXJkIGFsbG93ZWRSb2xlcz17WydyZWNlcHRpb25pc3QnLCAnYWRtaW4nXX0+PERhaWx5UmVjb25jaWxpYXRpb24gLz48L1JvbGVHdWFyZD5cbiAgICAgIH0gLz5cbiAgICAgIDxSb3V0ZSBwYXRoPVwiL3JlY2VwdGlvbi9yZXN1bHRzXCIgZWxlbWVudD17XG4gICAgICAgIDxSb2xlR3VhcmQgYWxsb3dlZFJvbGVzPXtbJ3JlY2VwdGlvbmlzdCcsICdhZG1pbiddfT48UmVzdWx0c1BhZ2UgLz48L1JvbGVHdWFyZD5cbiAgICAgIH0gLz5cbiAgICAgIDxSb3V0ZSBwYXRoPVwiL3JlY2VwdGlvbi9lbnRlci1yZXN1bHRzXCIgZWxlbWVudD17XG4gICAgICAgIDxSb2xlR3VhcmQgYWxsb3dlZFJvbGVzPXtbJ3JlY2VwdGlvbmlzdCcsICdhZG1pbiddfT48UXVpY2tSZXN1bHRFbnRyeSAvPjwvUm9sZUd1YXJkPlxuICAgICAgfSAvPlxuICAgICAgPFJvdXRlIHBhdGg9XCIvcmVjZXB0aW9uL3JlY2VpcHQvOm9yZGVySWRcIiBlbGVtZW50PXtcbiAgICAgICAgPFJvbGVHdWFyZCBhbGxvd2VkUm9sZXM9e1sncmVjZXB0aW9uaXN0JywgJ2FkbWluJ119PjxQYXltZW50UmVjZWlwdCAvPjwvUm9sZUd1YXJkPlxuICAgICAgfSAvPlxuICAgICAgPFJvdXRlIHBhdGg9XCIvcmVjZXB0aW9uL3BheW1lbnQtZGVtb1wiIGVsZW1lbnQ9e1xuICAgICAgICA8Um9sZUd1YXJkIGFsbG93ZWRSb2xlcz17WydyZWNlcHRpb25pc3QnLCAnYWRtaW4nXX0+PFBheW1lbnREZW1vIC8+PC9Sb2xlR3VhcmQ+XG4gICAgICB9IC8+XG5cbiAgICAgIHsvKiBMYWIgUm91dGVzICovfVxuICAgICAgPFJvdXRlIHBhdGg9XCIvbGFiXCIgZWxlbWVudD17XG4gICAgICAgIDxSb2xlR3VhcmQgYWxsb3dlZFJvbGVzPXtbJ2xhYl90ZWNoJywgJ2FkbWluJ119PjxMYWJEYXNoYm9hcmRQYWdlIC8+PC9Sb2xlR3VhcmQ+XG4gICAgICB9IC8+XG4gICAgICA8Um91dGUgcGF0aD1cIi9sYWIvbWF0Y2gtcmVzdWx0c1wiIGVsZW1lbnQ9e1xuICAgICAgICA8Um9sZUd1YXJkIGFsbG93ZWRSb2xlcz17WydsYWJfdGVjaCcsICdhZG1pbiddfT48TWF0Y2hSZXN1bHRzIC8+PC9Sb2xlR3VhcmQ+XG4gICAgICB9IC8+XG4gICAgICA8Um91dGUgcGF0aD1cIi9sYWIvcGVuZGluZ1wiIGVsZW1lbnQ9e1xuICAgICAgICA8Um9sZUd1YXJkIGFsbG93ZWRSb2xlcz17WydsYWJfdGVjaCcsICdhZG1pbiddfT48Q29sbGVjdFNhbXBsZXNQYWdlIC8+PC9Sb2xlR3VhcmQ+XG4gICAgICB9IC8+XG4gICAgICA8Um91dGUgcGF0aD1cIi9sYWIvY29sbGVjdFwiIGVsZW1lbnQ9e1xuICAgICAgICA8Um9sZUd1YXJkIGFsbG93ZWRSb2xlcz17WydsYWJfdGVjaCcsICdhZG1pbiddfT48Q29sbGVjdFNhbXBsZXNQYWdlIC8+PC9Sb2xlR3VhcmQ+XG4gICAgICB9IC8+XG4gICAgICA8Um91dGUgcGF0aD1cIi9sYWIvcHJvY2Vzc2luZ1wiIGVsZW1lbnQ9e1xuICAgICAgICA8Um9sZUd1YXJkIGFsbG93ZWRSb2xlcz17WydsYWJfdGVjaCcsICdhZG1pbiddfT48RW50ZXJSZXN1bHRzUGFnZSAvPjwvUm9sZUd1YXJkPlxuICAgICAgfSAvPlxuICAgICAgPFJvdXRlIHBhdGg9XCIvbGFiL2VudGVyLXJlc3VsdHNcIiBlbGVtZW50PXtcbiAgICAgICAgPFJvbGVHdWFyZCBhbGxvd2VkUm9sZXM9e1snbGFiX3RlY2gnLCAnYWRtaW4nLCAncmVjZXB0aW9uaXN0J119PjxFbnRlck1hbnVhbFJlc3VsdHMgLz48L1JvbGVHdWFyZD5cbiAgICAgIH0gLz5cbiAgICAgIDxSb3V0ZSBwYXRoPVwiL2xhYi9yZXN1bHRzXCIgZWxlbWVudD17XG4gICAgICAgIDxSb2xlR3VhcmQgYWxsb3dlZFJvbGVzPXtbJ2xhYl90ZWNoJywgJ2FkbWluJywgJ3JlY2VwdGlvbmlzdCddfT48UmVzdWx0c1BhZ2UgLz48L1JvbGVHdWFyZD5cbiAgICAgIH0gLz5cbiAgICAgIDxSb3V0ZSBwYXRoPVwiL2xhYi9wYXRpZW50c1wiIGVsZW1lbnQ9e1xuICAgICAgICA8Um9sZUd1YXJkIGFsbG93ZWRSb2xlcz17WydsYWJfdGVjaCcsICdhZG1pbiddfT48UGF0aWVudHNQYWdlIC8+PC9Sb2xlR3VhcmQ+XG4gICAgICB9IC8+XG4gICAgICA8Um91dGUgcGF0aD1cIi9sYWIvdmVyaWZ5LXJlc3VsdHNcIiBlbGVtZW50PXtcbiAgICAgICAgPFJvbGVHdWFyZCBhbGxvd2VkUm9sZXM9e1snbGFiX3RlY2gnLCAnYWRtaW4nXX0+PFJlc3VsdFZlcmlmaWNhdGlvbiAvPjwvUm9sZUd1YXJkPlxuICAgICAgfSAvPlxuICAgICAgPFJvdXRlIHBhdGg9XCIvbGFiL3FjXCIgZWxlbWVudD17XG4gICAgICAgIDxSb2xlR3VhcmQgYWxsb3dlZFJvbGVzPXtbJ2xhYl90ZWNoJywgJ2FkbWluJ119PjxRQ0RhdGFFbnRyeSAvPjwvUm9sZUd1YXJkPlxuICAgICAgfSAvPlxuICAgICAgPFJvdXRlIHBhdGg9XCIvbGFiL21hY2hpbmVzXCIgZWxlbWVudD17XG4gICAgICAgIDxSb2xlR3VhcmQgYWxsb3dlZFJvbGVzPXtbJ2xhYl90ZWNoJywgJ2FkbWluJ119PjxNYWNoaW5lcyAvPjwvUm9sZUd1YXJkPlxuICAgICAgfSAvPlxuICAgICAgPFJvdXRlIHBhdGg9XCIvbGFiL3Jlc3VsdC1yZXBvcnQvOmlkP1wiIGVsZW1lbnQ9e1xuICAgICAgICA8Um9sZUd1YXJkIGFsbG93ZWRSb2xlcz17WydsYWJfdGVjaCcsICdhZG1pbicsICdyZWNlcHRpb25pc3QnXX0+PEVkaXRhYmxlUmVzdWx0UmVwb3J0IC8+PC9Sb2xlR3VhcmQ+XG4gICAgICB9IC8+XG4gICAgICA8Um91dGUgcGF0aD1cIi9sYWIvcmVwb3J0cy86b3JkZXJJZFwiIGVsZW1lbnQ9e1xuICAgICAgICA8Um9sZUd1YXJkIGFsbG93ZWRSb2xlcz17WydsYWJfdGVjaCcsICdhZG1pbicsICdyZWNlcHRpb25pc3QnXX0+PExhYlJlcG9ydFBhZ2UgLz48L1JvbGVHdWFyZD5cbiAgICAgIH0gLz5cbiAgICAgIDxSb3V0ZSBwYXRoPVwiL3B1YmxpYy9sYWIvcmVwb3J0cy86b3JkZXJJZFwiIGVsZW1lbnQ9ezxQdWJsaWNMYWJSZXBvcnRQYWdlIC8+fSAvPlxuXG4gICAgICB7LyogQWRtaW4gUm91dGVzICovfVxuICAgICAgPFJvdXRlIHBhdGg9XCIvYWRtaW5cIiBlbGVtZW50PXtcbiAgICAgICAgPFJvbGVHdWFyZCBhbGxvd2VkUm9sZXM9e1snYWRtaW4nXX0+PEFkbWluRGFzaGJvYXJkIC8+PC9Sb2xlR3VhcmQ+XG4gICAgICB9IC8+XG4gICAgICA8Um91dGUgcGF0aD1cIi9hZG1pbi91c2Vyc1wiIGVsZW1lbnQ9e1xuICAgICAgICA8Um9sZUd1YXJkIGFsbG93ZWRSb2xlcz17WydhZG1pbiddfT48VXNlck1hbmFnZW1lbnRQYWdlIC8+PC9Sb2xlR3VhcmQ+XG4gICAgICB9IC8+XG4gICAgICA8Um91dGUgcGF0aD1cIi9hZG1pbi9yZXBvcnRzXCIgZWxlbWVudD17XG4gICAgICAgIDxSb2xlR3VhcmQgYWxsb3dlZFJvbGVzPXtbJ2FkbWluJ119PjxSZXBvcnRzIC8+PC9Sb2xlR3VhcmQ+XG4gICAgICB9IC8+XG4gICAgICA8Um91dGUgcGF0aD1cIi9hZG1pbi90ZXN0LWNhdGFsb2dcIiBlbGVtZW50PXtcbiAgICAgICAgPFJvbGVHdWFyZCBhbGxvd2VkUm9sZXM9e1snYWRtaW4nXX0+PFRlc3RDYXRhbG9nTWFuYWdlbWVudCAvPjwvUm9sZUd1YXJkPlxuICAgICAgfSAvPlxuICAgICAgPFJvdXRlIHBhdGg9XCIvYWRtaW4vY29tbXVuaWNhdGlvbi1sb2dzXCIgZWxlbWVudD17XG4gICAgICAgIDxSb2xlR3VhcmQgYWxsb3dlZFJvbGVzPXtbJ2FkbWluJ119PjxDb21tdW5pY2F0aW9uTG9ncyAvPjwvUm9sZUd1YXJkPlxuICAgICAgfSAvPlxuICAgICAgPFJvdXRlIHBhdGg9XCIvYWRtaW4vYXVkaXQtbG9nc1wiIGVsZW1lbnQ9e1xuICAgICAgICA8Um9sZUd1YXJkIGFsbG93ZWRSb2xlcz17WydhZG1pbiddfT48QXVkaXRMb2dWaWV3ZXIgLz48L1JvbGVHdWFyZD5cbiAgICAgIH0gLz5cbiAgICAgIDxSb3V0ZSBwYXRoPVwiL2FkbWluL3JlY29uY2lsaWF0aW9uXCIgZWxlbWVudD17XG4gICAgICAgIDxSb2xlR3VhcmQgYWxsb3dlZFJvbGVzPXtbJ2FkbWluJ119PjxSZWNvbmNpbGlhdGlvblJldmlldyAvPjwvUm9sZUd1YXJkPlxuICAgICAgfSAvPlxuICAgICAgPFJvdXRlIHBhdGg9XCIvYWRtaW4vcmVwb3J0LXRlbXBsYXRlXCIgZWxlbWVudD17XG4gICAgICAgIDxSb2xlR3VhcmQgYWxsb3dlZFJvbGVzPXtbJ2FkbWluJ119PjxSZXBvcnRUZW1wbGF0ZUVkaXRvciAvPjwvUm9sZUd1YXJkPlxuICAgICAgfSAvPlxuICAgICAgPFJvdXRlIHBhdGg9XCIvYWRtaW4vcGF0aWVudHNcIiBlbGVtZW50PXtcbiAgICAgICAgPFJvbGVHdWFyZCBhbGxvd2VkUm9sZXM9e1snYWRtaW4nXX0+PFBhdGllbnRzUGFnZSAvPjwvUm9sZUd1YXJkPlxuICAgICAgfSAvPlxuICAgICAgPFJvdXRlIHBhdGg9XCIvYWRtaW4vb3JkZXJzXCIgZWxlbWVudD17XG4gICAgICAgIDxSb2xlR3VhcmQgYWxsb3dlZFJvbGVzPXtbJ2FkbWluJ119PjxPcmRlcnNQYWdlIC8+PC9Sb2xlR3VhcmQ+XG4gICAgICB9IC8+XG4gICAgICA8Um91dGUgcGF0aD1cIi9hZG1pbi9yZXN1bHRzXCIgZWxlbWVudD17XG4gICAgICAgIDxSb2xlR3VhcmQgYWxsb3dlZFJvbGVzPXtbJ2FkbWluJ119PjxSZXN1bHRzUGFnZSAvPjwvUm9sZUd1YXJkPlxuICAgICAgfSAvPlxuICAgICAgPFJvdXRlIHBhdGg9XCIvYWRtaW4vbWFjaGluZXNcIiBlbGVtZW50PXtcbiAgICAgICAgPFJvbGVHdWFyZCBhbGxvd2VkUm9sZXM9e1snYWRtaW4nXX0+PE1hY2hpbmVzIC8+PC9Sb2xlR3VhcmQ+XG4gICAgICB9IC8+XG4gICAgICA8Um91dGUgcGF0aD1cIi9hZG1pbi9wYXltZW50c1wiIGVsZW1lbnQ9e1xuICAgICAgICA8Um9sZUd1YXJkIGFsbG93ZWRSb2xlcz17WydhZG1pbiddfT48UGF5bWVudHNQYWdlIC8+PC9Sb2xlR3VhcmQ+XG4gICAgICB9IC8+XG4gICAgICA8Um91dGUgcGF0aD1cIi9hZG1pbi9zZXR0aW5nc1wiIGVsZW1lbnQ9e1xuICAgICAgICA8Um9sZUd1YXJkIGFsbG93ZWRSb2xlcz17WydhZG1pbiddfT48U2V0dGluZ3MgLz48L1JvbGVHdWFyZD5cbiAgICAgIH0gLz5cbiAgICAgIDxSb3V0ZSBwYXRoPVwiL2FkbWluL2xvZ3NcIiBlbGVtZW50PXtcbiAgICAgICAgPFJvbGVHdWFyZCBhbGxvd2VkUm9sZXM9e1snYWRtaW4nXX0+PENvbW11bmljYXRpb25Mb2dzIC8+PC9Sb2xlR3VhcmQ+XG4gICAgICB9IC8+XG5cbiAgICAgIHsvKiBEZWZhdWx0IFJvdXRlIC0gUmVkaXJlY3QgYmFzZWQgb24gYXV0aCBzdGF0ZSAqL31cbiAgICAgIDxSb3V0ZSBwYXRoPVwiL1wiIGVsZW1lbnQ9ezxOYXZpZ2F0ZSB0bz17Z2V0RGVmYXVsdFJvdXRlKCl9IHJlcGxhY2UgLz59IC8+XG5cbiAgICAgIHsvKiA0MDQgKi99XG4gICAgICA8Um91dGUgcGF0aD1cIipcIiBlbGVtZW50PXs8Tm90Rm91bmQgLz59IC8+XG4gICAgPC9Sb3V0ZXM+XG4gICk7XG59XG5cbmNvbnN0IEFwcCA9ICgpID0+IChcbiAgPFF1ZXJ5Q2xpZW50UHJvdmlkZXIgY2xpZW50PXtxdWVyeUNsaWVudH0+XG4gICAgPFRvb2x0aXBQcm92aWRlcj5cbiAgICAgIDxUb2FzdGVyIC8+XG4gICAgICA8U29ubmVyIC8+XG4gICAgICA8QnJvd3NlclJvdXRlclxuICAgICAgICBmdXR1cmU9e3tcbiAgICAgICAgICB2N19zdGFydFRyYW5zaXRpb246IHRydWUsXG4gICAgICAgICAgdjdfcmVsYXRpdmVTcGxhdFBhdGg6IHRydWUsXG4gICAgICAgIH19XG4gICAgICA+XG4gICAgICAgIDxBdXRoUHJvdmlkZXI+XG4gICAgICAgICAgPFdlYlNvY2tldFByb3ZpZGVyPlxuICAgICAgICAgICAgPENvbm5lY3Rpb25TdGF0dXMgLz5cbiAgICAgICAgICAgIDxBcHBSb3V0ZXMgLz5cbiAgICAgICAgICA8L1dlYlNvY2tldFByb3ZpZGVyPlxuICAgICAgICA8L0F1dGhQcm92aWRlcj5cbiAgICAgIDwvQnJvd3NlclJvdXRlcj5cbiAgICA8L1Rvb2x0aXBQcm92aWRlcj5cbiAgPC9RdWVyeUNsaWVudFByb3ZpZGVyPlxuKTtcblxuZXhwb3J0IGRlZmF1bHQgQXBwO1xuIl0sIm5hbWVzIjpbIlRvYXN0ZXIiLCJTb25uZXIiLCJUb29sdGlwUHJvdmlkZXIiLCJRdWVyeUNsaWVudCIsIlF1ZXJ5Q2xpZW50UHJvdmlkZXIiLCJCcm93c2VyUm91dGVyIiwiUm91dGVzIiwiUm91dGUiLCJOYXZpZ2F0ZSIsIkF1dGhQcm92aWRlciIsInVzZUF1dGgiLCJXZWJTb2NrZXRQcm92aWRlciIsIkNvbm5lY3Rpb25TdGF0dXMiLCJSb2xlR3VhcmQiLCJMb2FkZXIyIiwiTG9naW4iLCJOb3RGb3VuZCIsIlJlY2VwdGlvbkRhc2hib2FyZCIsIlBhdGllbnREZXRhaWxzIiwiUmVnaXN0ZXJQYXRpZW50IiwiTmV3T3JkZXIiLCJQYXRpZW50c1BhZ2UiLCJPcmRlcnNQYWdlIiwiUGF5bWVudHNQYWdlIiwiRGFpbHlSZWNvbmNpbGlhdGlvbiIsIlBheW1lbnRSZWNlaXB0IiwiUGF5bWVudERlbW8iLCJRdWlja1Jlc3VsdEVudHJ5IiwiTGFiRGFzaGJvYXJkUGFnZSIsIkVudGVyTWFudWFsUmVzdWx0cyIsIlJlc3VsdFZlcmlmaWNhdGlvbiIsIlFDRGF0YUVudHJ5IiwiQ29sbGVjdFNhbXBsZXNQYWdlIiwiRW50ZXJSZXN1bHRzUGFnZSIsIlJlc3VsdHNQYWdlIiwiRWRpdGFibGVSZXN1bHRSZXBvcnQiLCJMYWJSZXBvcnRQYWdlIiwiUHVibGljTGFiUmVwb3J0UGFnZSIsIk1hdGNoUmVzdWx0cyIsIkNvbW11bmljYXRpb25Mb2dzIiwiQWRtaW5EYXNoYm9hcmQiLCJVc2VyTWFuYWdlbWVudFBhZ2UiLCJSZXBvcnRzIiwiVGVzdENhdGFsb2dNYW5hZ2VtZW50IiwiUmVjb25jaWxpYXRpb25SZXZpZXciLCJBdWRpdExvZ1ZpZXdlciIsIlJlcG9ydFRlbXBsYXRlRWRpdG9yIiwiTWFjaGluZXMiLCJTZXR0aW5ncyIsInF1ZXJ5Q2xpZW50IiwiQXBwUm91dGVzIiwiaXNBdXRoZW50aWNhdGVkIiwiaXNMb2FkaW5nIiwicHJpbWFyeVJvbGUiLCJkaXYiLCJjbGFzc05hbWUiLCJnZXREZWZhdWx0Um91dGUiLCJwYXRoIiwiZWxlbWVudCIsInRvIiwicmVwbGFjZSIsImFsbG93ZWRSb2xlcyIsIkFwcCIsImNsaWVudCIsImZ1dHVyZSIsInY3X3N0YXJ0VHJhbnNpdGlvbiIsInY3X3JlbGF0aXZlU3BsYXRQYXRoIl0sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7QUFBQSxTQUFTQSxPQUFPLFFBQVEsMEJBQTBCO0FBQ2xELFNBQVNBLFdBQVdDLE1BQU0sUUFBUSx5QkFBeUI7QUFDM0QsU0FBU0MsZUFBZSxRQUFRLDBCQUEwQjtBQUMxRCxTQUFTQyxXQUFXLEVBQUVDLG1CQUFtQixRQUFRLHdCQUF3QjtBQUN6RSxTQUFTQyxhQUFhLEVBQUVDLE1BQU0sRUFBRUMsS0FBSyxFQUFFQyxRQUFRLFFBQVEsbUJBQW1CO0FBQzFFLFNBQVNDLFlBQVksRUFBRUMsT0FBTyxRQUFRLHdCQUF3QjtBQUM5RCxTQUFTQyxpQkFBaUIsUUFBUSw2QkFBNkI7QUFDL0QsU0FBU0MsZ0JBQWdCLFFBQVEsZ0NBQWdDO0FBQ2pFLFNBQVNDLFNBQVMsUUFBUSw4QkFBOEI7QUFDeEQsU0FBU0MsT0FBTyxRQUFRLGVBQWU7QUFFdkMsUUFBUTtBQUNSLE9BQU9DLFdBQVcsZ0JBQWdCO0FBQ2xDLE9BQU9DLGNBQWMsbUJBQW1CO0FBRXhDLGtCQUFrQjtBQUNsQixPQUFPQyx3QkFBd0IsdUNBQXVDO0FBQ3RFLE9BQU9DLG9CQUFvQixtQ0FBbUM7QUFDOUQsT0FBT0MscUJBQXFCLG9DQUFvQztBQUNoRSxPQUFPQyxjQUFjLDZCQUE2QjtBQUNsRCxPQUFPQyxrQkFBa0IsaUNBQWlDO0FBQzFELE9BQU9DLGdCQUFnQiwrQkFBK0I7QUFDdEQsT0FBT0Msa0JBQWtCLGlDQUFpQztBQUMxRCxPQUFPQyx5QkFBeUIsd0NBQXdDO0FBQ3hFLE9BQU9DLG9CQUFvQixtQ0FBbUM7QUFDOUQsT0FBT0MsaUJBQWlCLGdDQUFnQztBQUN4RCxPQUFPQyxzQkFBc0IscUNBQXFDO0FBSWxFLE9BQU9DLHNCQUFzQiwrQkFBK0I7QUFDNUQsT0FBT0Msd0JBQXdCLGlDQUFpQztBQUNoRSxPQUFPQyx3QkFBd0IsaUNBQWlDO0FBQ2hFLE9BQU9DLGlCQUFpQiwwQkFBMEI7QUFFbEQsT0FBT0Msd0JBQXdCLGlDQUFpQztBQUVoRSxPQUFPQyxzQkFBc0IsK0JBQStCO0FBQzVELE9BQU9DLGlCQUFpQiwwQkFBMEI7QUFDbEQsT0FBT0MsMEJBQTBCLG1DQUFtQztBQUNwRSxPQUFPQyxtQkFBbUIsNEJBQTRCO0FBQ3RELE9BQU9DLHlCQUF5QixrQ0FBa0M7QUFDbEUsT0FBT0Msa0JBQWtCLDJCQUEyQjtBQUVwRCxjQUFjO0FBQ2QsT0FBT0MsdUJBQXVCLGtDQUFrQztBQUNoRSxPQUFPQyxvQkFBb0IsK0JBQStCO0FBRTFELE9BQU9DLHdCQUF3QixtQ0FBbUM7QUFDbEUsT0FBT0MsYUFBYSx3QkFBd0I7QUFFNUMsT0FBT0MsMkJBQTJCLHNDQUFzQztBQUN4RSxPQUFPQywwQkFBMEIscUNBQXFDO0FBQ3RFLE9BQU9DLG9CQUFvQiwrQkFBK0I7QUFDMUQsT0FBT0MsMEJBQTBCLHFDQUFxQztBQUV0RSxlQUFlO0FBQ2YsT0FBT0MsY0FBYyxtQkFBbUI7QUFDeEMsT0FBT0MsY0FBYyxtQkFBbUI7QUFFeEMsTUFBTUMsY0FBYyxJQUFJOUM7QUFFeEIsU0FBUytDOztJQUNQLE1BQU0sRUFBRUMsZUFBZSxFQUFFQyxTQUFTLEVBQUVDLFdBQVcsRUFBRSxHQUFHM0M7SUFFcEQsSUFBSTBDLFdBQVc7UUFDYixxQkFDRSxRQUFDRTtZQUFJQyxXQUFVO3NCQUNiLGNBQUEsUUFBQ3pDO2dCQUFReUMsV0FBVTs7Ozs7Ozs7Ozs7SUFHekI7SUFFQSxNQUFNQyxrQkFBa0I7UUFDdEIsSUFBSSxDQUFDTCxtQkFBbUIsQ0FBQ0UsYUFBYSxPQUFPO1FBQzdDLE9BQVFBO1lBQ04sS0FBSztnQkFBUyxPQUFPO1lBQ3JCLEtBQUs7Z0JBQVksT0FBTztZQUN4QixLQUFLO2dCQUFnQixPQUFPO1lBQzVCO2dCQUFTLE9BQU87UUFDbEI7SUFDRjtJQUVBLHFCQUNFLFFBQUMvQzs7MEJBRUMsUUFBQ0M7Z0JBQU1rRCxNQUFLO2dCQUFTQyxTQUNuQlAsbUJBQW1CRSw0QkFDakIsUUFBQzdDO29CQUFTbUQsSUFBSUg7b0JBQW1CSSxPQUFPOzs7Ozt5Q0FDdEMsUUFBQzdDOzs7Ozs7Ozs7OzBCQUlQLFFBQUNSO2dCQUFNa0QsTUFBSztnQkFBYUMsdUJBQ3ZCLFFBQUM3QztvQkFBVWdELGNBQWM7d0JBQUM7d0JBQWdCO3FCQUFROzhCQUFFLGNBQUEsUUFBQzVDOzs7Ozs7Ozs7Ozs7Ozs7MEJBRXZELFFBQUNWO2dCQUFNa0QsTUFBSztnQkFBc0JDLHVCQUNoQyxRQUFDN0M7b0JBQVVnRCxjQUFjO3dCQUFDO3dCQUFnQjtxQkFBUTs4QkFBRSxjQUFBLFFBQUMxQzs7Ozs7Ozs7Ozs7Ozs7OzBCQUV2RCxRQUFDWjtnQkFBTWtELE1BQUs7Z0JBQXNCQyx1QkFDaEMsUUFBQzdDO29CQUFVZ0QsY0FBYzt3QkFBQzt3QkFBZ0I7cUJBQVE7OEJBQUUsY0FBQSxRQUFDeEM7Ozs7Ozs7Ozs7Ozs7OzswQkFFdkQsUUFBQ2Q7Z0JBQU1rRCxNQUFLO2dCQUEwQkMsdUJBQ3BDLFFBQUM3QztvQkFBVWdELGNBQWM7d0JBQUM7d0JBQWdCO3FCQUFROzhCQUFFLGNBQUEsUUFBQzNDOzs7Ozs7Ozs7Ozs7Ozs7MEJBRXZELFFBQUNYO2dCQUFNa0QsTUFBSztnQkFBdUJDLHVCQUNqQyxRQUFDN0M7b0JBQVVnRCxjQUFjO3dCQUFDO3dCQUFnQjtxQkFBUTs4QkFBRSxjQUFBLFFBQUN6Qzs7Ozs7Ozs7Ozs7Ozs7OzBCQUV2RCxRQUFDYjtnQkFBTWtELE1BQUs7Z0JBQW9CQyx1QkFDOUIsUUFBQzdDO29CQUFVZ0QsY0FBYzt3QkFBQzt3QkFBZ0I7cUJBQVE7OEJBQUUsY0FBQSxRQUFDdkM7Ozs7Ozs7Ozs7Ozs7OzswQkFFdkQsUUFBQ2Y7Z0JBQU1rRCxNQUFLO2dCQUFzQkMsdUJBQ2hDLFFBQUM3QztvQkFBVWdELGNBQWM7d0JBQUM7d0JBQWdCO3FCQUFROzhCQUFFLGNBQUEsUUFBQ3RDOzs7Ozs7Ozs7Ozs7Ozs7MEJBRXZELFFBQUNoQjtnQkFBTWtELE1BQUs7Z0JBQTRCQyx1QkFDdEMsUUFBQzdDO29CQUFVZ0QsY0FBYzt3QkFBQzt3QkFBZ0I7cUJBQVE7OEJBQUUsY0FBQSxRQUFDckM7Ozs7Ozs7Ozs7Ozs7OzswQkFFdkQsUUFBQ2pCO2dCQUFNa0QsTUFBSztnQkFBcUJDLHVCQUMvQixRQUFDN0M7b0JBQVVnRCxjQUFjO3dCQUFDO3dCQUFnQjtxQkFBUTs4QkFBRSxjQUFBLFFBQUMzQjs7Ozs7Ozs7Ozs7Ozs7OzBCQUV2RCxRQUFDM0I7Z0JBQU1rRCxNQUFLO2dCQUEyQkMsdUJBQ3JDLFFBQUM3QztvQkFBVWdELGNBQWM7d0JBQUM7d0JBQWdCO3FCQUFROzhCQUFFLGNBQUEsUUFBQ2xDOzs7Ozs7Ozs7Ozs7Ozs7MEJBRXZELFFBQUNwQjtnQkFBTWtELE1BQUs7Z0JBQThCQyx1QkFDeEMsUUFBQzdDO29CQUFVZ0QsY0FBYzt3QkFBQzt3QkFBZ0I7cUJBQVE7OEJBQUUsY0FBQSxRQUFDcEM7Ozs7Ozs7Ozs7Ozs7OzswQkFFdkQsUUFBQ2xCO2dCQUFNa0QsTUFBSztnQkFBMEJDLHVCQUNwQyxRQUFDN0M7b0JBQVVnRCxjQUFjO3dCQUFDO3dCQUFnQjtxQkFBUTs4QkFBRSxjQUFBLFFBQUNuQzs7Ozs7Ozs7Ozs7Ozs7OzBCQUl2RCxRQUFDbkI7Z0JBQU1rRCxNQUFLO2dCQUFPQyx1QkFDakIsUUFBQzdDO29CQUFVZ0QsY0FBYzt3QkFBQzt3QkFBWTtxQkFBUTs4QkFBRSxjQUFBLFFBQUNqQzs7Ozs7Ozs7Ozs7Ozs7OzBCQUVuRCxRQUFDckI7Z0JBQU1rRCxNQUFLO2dCQUFxQkMsdUJBQy9CLFFBQUM3QztvQkFBVWdELGNBQWM7d0JBQUM7d0JBQVk7cUJBQVE7OEJBQUUsY0FBQSxRQUFDdkI7Ozs7Ozs7Ozs7Ozs7OzswQkFFbkQsUUFBQy9CO2dCQUFNa0QsTUFBSztnQkFBZUMsdUJBQ3pCLFFBQUM3QztvQkFBVWdELGNBQWM7d0JBQUM7d0JBQVk7cUJBQVE7OEJBQUUsY0FBQSxRQUFDN0I7Ozs7Ozs7Ozs7Ozs7OzswQkFFbkQsUUFBQ3pCO2dCQUFNa0QsTUFBSztnQkFBZUMsdUJBQ3pCLFFBQUM3QztvQkFBVWdELGNBQWM7d0JBQUM7d0JBQVk7cUJBQVE7OEJBQUUsY0FBQSxRQUFDN0I7Ozs7Ozs7Ozs7Ozs7OzswQkFFbkQsUUFBQ3pCO2dCQUFNa0QsTUFBSztnQkFBa0JDLHVCQUM1QixRQUFDN0M7b0JBQVVnRCxjQUFjO3dCQUFDO3dCQUFZO3FCQUFROzhCQUFFLGNBQUEsUUFBQzVCOzs7Ozs7Ozs7Ozs7Ozs7MEJBRW5ELFFBQUMxQjtnQkFBTWtELE1BQUs7Z0JBQXFCQyx1QkFDL0IsUUFBQzdDO29CQUFVZ0QsY0FBYzt3QkFBQzt3QkFBWTt3QkFBUztxQkFBZTs4QkFBRSxjQUFBLFFBQUNoQzs7Ozs7Ozs7Ozs7Ozs7OzBCQUVuRSxRQUFDdEI7Z0JBQU1rRCxNQUFLO2dCQUFlQyx1QkFDekIsUUFBQzdDO29CQUFVZ0QsY0FBYzt3QkFBQzt3QkFBWTt3QkFBUztxQkFBZTs4QkFBRSxjQUFBLFFBQUMzQjs7Ozs7Ozs7Ozs7Ozs7OzBCQUVuRSxRQUFDM0I7Z0JBQU1rRCxNQUFLO2dCQUFnQkMsdUJBQzFCLFFBQUM3QztvQkFBVWdELGNBQWM7d0JBQUM7d0JBQVk7cUJBQVE7OEJBQUUsY0FBQSxRQUFDeEM7Ozs7Ozs7Ozs7Ozs7OzswQkFFbkQsUUFBQ2Q7Z0JBQU1rRCxNQUFLO2dCQUFzQkMsdUJBQ2hDLFFBQUM3QztvQkFBVWdELGNBQWM7d0JBQUM7d0JBQVk7cUJBQVE7OEJBQUUsY0FBQSxRQUFDL0I7Ozs7Ozs7Ozs7Ozs7OzswQkFFbkQsUUFBQ3ZCO2dCQUFNa0QsTUFBSztnQkFBVUMsdUJBQ3BCLFFBQUM3QztvQkFBVWdELGNBQWM7d0JBQUM7d0JBQVk7cUJBQVE7OEJBQUUsY0FBQSxRQUFDOUI7Ozs7Ozs7Ozs7Ozs7OzswQkFFbkQsUUFBQ3hCO2dCQUFNa0QsTUFBSztnQkFBZ0JDLHVCQUMxQixRQUFDN0M7b0JBQVVnRCxjQUFjO3dCQUFDO3dCQUFZO3FCQUFROzhCQUFFLGNBQUEsUUFBQ2Q7Ozs7Ozs7Ozs7Ozs7OzswQkFFbkQsUUFBQ3hDO2dCQUFNa0QsTUFBSztnQkFBMEJDLHVCQUNwQyxRQUFDN0M7b0JBQVVnRCxjQUFjO3dCQUFDO3dCQUFZO3dCQUFTO3FCQUFlOzhCQUFFLGNBQUEsUUFBQzFCOzs7Ozs7Ozs7Ozs7Ozs7MEJBRW5FLFFBQUM1QjtnQkFBTWtELE1BQUs7Z0JBQXdCQyx1QkFDbEMsUUFBQzdDO29CQUFVZ0QsY0FBYzt3QkFBQzt3QkFBWTt3QkFBUztxQkFBZTs4QkFBRSxjQUFBLFFBQUN6Qjs7Ozs7Ozs7Ozs7Ozs7OzBCQUVuRSxRQUFDN0I7Z0JBQU1rRCxNQUFLO2dCQUErQkMsdUJBQVMsUUFBQ3JCOzs7Ozs7Ozs7OzBCQUdyRCxRQUFDOUI7Z0JBQU1rRCxNQUFLO2dCQUFTQyx1QkFDbkIsUUFBQzdDO29CQUFVZ0QsY0FBYzt3QkFBQztxQkFBUTs4QkFBRSxjQUFBLFFBQUNyQjs7Ozs7Ozs7Ozs7Ozs7OzBCQUV2QyxRQUFDakM7Z0JBQU1rRCxNQUFLO2dCQUFlQyx1QkFDekIsUUFBQzdDO29CQUFVZ0QsY0FBYzt3QkFBQztxQkFBUTs4QkFBRSxjQUFBLFFBQUNwQjs7Ozs7Ozs7Ozs7Ozs7OzBCQUV2QyxRQUFDbEM7Z0JBQU1rRCxNQUFLO2dCQUFpQkMsdUJBQzNCLFFBQUM3QztvQkFBVWdELGNBQWM7d0JBQUM7cUJBQVE7OEJBQUUsY0FBQSxRQUFDbkI7Ozs7Ozs7Ozs7Ozs7OzswQkFFdkMsUUFBQ25DO2dCQUFNa0QsTUFBSztnQkFBc0JDLHVCQUNoQyxRQUFDN0M7b0JBQVVnRCxjQUFjO3dCQUFDO3FCQUFROzhCQUFFLGNBQUEsUUFBQ2xCOzs7Ozs7Ozs7Ozs7Ozs7MEJBRXZDLFFBQUNwQztnQkFBTWtELE1BQUs7Z0JBQTRCQyx1QkFDdEMsUUFBQzdDO29CQUFVZ0QsY0FBYzt3QkFBQztxQkFBUTs4QkFBRSxjQUFBLFFBQUN0Qjs7Ozs7Ozs7Ozs7Ozs7OzBCQUV2QyxRQUFDaEM7Z0JBQU1rRCxNQUFLO2dCQUFvQkMsdUJBQzlCLFFBQUM3QztvQkFBVWdELGNBQWM7d0JBQUM7cUJBQVE7OEJBQUUsY0FBQSxRQUFDaEI7Ozs7Ozs7Ozs7Ozs7OzswQkFFdkMsUUFBQ3RDO2dCQUFNa0QsTUFBSztnQkFBd0JDLHVCQUNsQyxRQUFDN0M7b0JBQVVnRCxjQUFjO3dCQUFDO3FCQUFROzhCQUFFLGNBQUEsUUFBQ2pCOzs7Ozs7Ozs7Ozs7Ozs7MEJBRXZDLFFBQUNyQztnQkFBTWtELE1BQUs7Z0JBQXlCQyx1QkFDbkMsUUFBQzdDO29CQUFVZ0QsY0FBYzt3QkFBQztxQkFBUTs4QkFBRSxjQUFBLFFBQUNmOzs7Ozs7Ozs7Ozs7Ozs7MEJBRXZDLFFBQUN2QztnQkFBTWtELE1BQUs7Z0JBQWtCQyx1QkFDNUIsUUFBQzdDO29CQUFVZ0QsY0FBYzt3QkFBQztxQkFBUTs4QkFBRSxjQUFBLFFBQUN4Qzs7Ozs7Ozs7Ozs7Ozs7OzBCQUV2QyxRQUFDZDtnQkFBTWtELE1BQUs7Z0JBQWdCQyx1QkFDMUIsUUFBQzdDO29CQUFVZ0QsY0FBYzt3QkFBQztxQkFBUTs4QkFBRSxjQUFBLFFBQUN2Qzs7Ozs7Ozs7Ozs7Ozs7OzBCQUV2QyxRQUFDZjtnQkFBTWtELE1BQUs7Z0JBQWlCQyx1QkFDM0IsUUFBQzdDO29CQUFVZ0QsY0FBYzt3QkFBQztxQkFBUTs4QkFBRSxjQUFBLFFBQUMzQjs7Ozs7Ozs7Ozs7Ozs7OzBCQUV2QyxRQUFDM0I7Z0JBQU1rRCxNQUFLO2dCQUFrQkMsdUJBQzVCLFFBQUM3QztvQkFBVWdELGNBQWM7d0JBQUM7cUJBQVE7OEJBQUUsY0FBQSxRQUFDZDs7Ozs7Ozs7Ozs7Ozs7OzBCQUV2QyxRQUFDeEM7Z0JBQU1rRCxNQUFLO2dCQUFrQkMsdUJBQzVCLFFBQUM3QztvQkFBVWdELGNBQWM7d0JBQUM7cUJBQVE7OEJBQUUsY0FBQSxRQUFDdEM7Ozs7Ozs7Ozs7Ozs7OzswQkFFdkMsUUFBQ2hCO2dCQUFNa0QsTUFBSztnQkFBa0JDLHVCQUM1QixRQUFDN0M7b0JBQVVnRCxjQUFjO3dCQUFDO3FCQUFROzhCQUFFLGNBQUEsUUFBQ2I7Ozs7Ozs7Ozs7Ozs7OzswQkFFdkMsUUFBQ3pDO2dCQUFNa0QsTUFBSztnQkFBY0MsdUJBQ3hCLFFBQUM3QztvQkFBVWdELGNBQWM7d0JBQUM7cUJBQVE7OEJBQUUsY0FBQSxRQUFDdEI7Ozs7Ozs7Ozs7Ozs7OzswQkFJdkMsUUFBQ2hDO2dCQUFNa0QsTUFBSztnQkFBSUMsdUJBQVMsUUFBQ2xEO29CQUFTbUQsSUFBSUg7b0JBQW1CSSxPQUFPOzs7Ozs7Ozs7OzswQkFHakUsUUFBQ3JEO2dCQUFNa0QsTUFBSztnQkFBSUMsdUJBQVMsUUFBQzFDOzs7Ozs7Ozs7Ozs7Ozs7O0FBR2hDO0dBcEtTa0M7O1FBQzZDeEM7OztLQUQ3Q3dDO0FBc0tULE1BQU1ZLE1BQU0sa0JBQ1YsUUFBQzFEO1FBQW9CMkQsUUFBUWQ7a0JBQzNCLGNBQUEsUUFBQy9DOzs4QkFDQyxRQUFDRjs7Ozs7OEJBQ0QsUUFBQ0M7Ozs7OzhCQUNELFFBQUNJO29CQUNDMkQsUUFBUTt3QkFDTkMsb0JBQW9CO3dCQUNwQkMsc0JBQXNCO29CQUN4Qjs4QkFFQSxjQUFBLFFBQUN6RDtrQ0FDQyxjQUFBLFFBQUNFOzs4Q0FDQyxRQUFDQzs7Ozs7OENBQ0QsUUFBQ3NDOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OztNQWRQWTtBQXNCTixlQUFlQSxJQUFJIn0=

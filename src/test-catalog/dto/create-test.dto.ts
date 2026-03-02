@@ -1,7 +1,59 @@
-import { IsString, IsEnum, IsNumber, IsOptional, IsBoolean, Min } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsBoolean,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+  ValidateNested,
+} from 'class-validator';
 import { TestCategoryEnum } from '../../database/schemas/test-catalog.schema';
 import { SampleTypeEnum } from '../../database/schemas/sample.schema';
-import { Types } from 'mongoose';
+
+class ReferenceRangeItemDto {
+  @IsString()
+  @IsOptional()
+  ageGroup?: string;
+
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  ageMin?: number;
+
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  ageMax?: number;
+
+  @IsEnum(['M', 'F', 'all'])
+  @IsOptional()
+  gender?: 'M' | 'F' | 'all';
+
+  @IsBoolean()
+  @IsOptional()
+  pregnancy?: boolean;
+
+  @IsString()
+  @IsOptional()
+  condition?: string;
+
+  @IsString()
+  range: string;
+
+  @IsString()
+  @IsOptional()
+  unit?: string;
+
+  @IsString()
+  @IsOptional()
+  criticalLow?: string;
+
+  @IsString()
+  @IsOptional()
+  criticalHigh?: string;
+}
 
 export class CreateTestDto {
   @IsString()
@@ -27,6 +79,12 @@ export class CreateTestDto {
   @IsString()
   @IsOptional()
   referenceRange?: string;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ReferenceRangeItemDto)
+  @IsOptional()
+  referenceRanges?: ReferenceRangeItemDto[];
 
   @IsNumber()
   @IsOptional()
