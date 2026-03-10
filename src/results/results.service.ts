@@ -248,16 +248,15 @@ export class ResultsService {
       this.resultModel
         .find(query)
         .populate('orderId', 'orderNumber patientId')
-        .populate('resultedBy', 'fullName email')
-        .populate('verifiedBy', 'fullName email')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
+        .lean()
         .exec(),
       this.resultModel.countDocuments(query).exec(),
     ]);
 
-    return { results, total, page, limit };
+    return { results: results as unknown as Result[], total, page, limit };
   }
 
   /**

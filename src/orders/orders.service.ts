@@ -108,9 +108,15 @@ export class OrdersService {
     // Generate order number
     const orderNumber = await this.generateOrderNumber();
 
-    // Determine initial payment amounts
-    const initialAmount = createOrderDto.initialPaymentAmount ?? (createOrderDto.paymentMethod ? total : 0);
-    const amountPaid = createOrderDto.paymentMethod ? Math.min(initialAmount, total) : 0;
+    // Determine initial payment amounts (split payments take precedence)
+    let amountPaid = 0;
+    if (createOrderDto.initialPayments && createOrderDto.initialPayments.length > 0) {
+      const requestedTotal = createOrderDto.initialPayments.reduce((s, p) => s + p.amount, 0);
+      amountPaid = Math.min(Math.round(requestedTotal * 100) / 100, total);
+    } else if (createOrderDto.paymentMethod) {
+      const initialAmount = createOrderDto.initialPaymentAmount ?? total;
+      amountPaid = Math.min(Math.round(initialAmount * 100) / 100, total);
+    }
     const balance = Math.round((total - amountPaid) * 100) / 100;
     let paymentStatus = PaymentStatusEnum.PENDING;
     if (amountPaid >= total) paymentStatus = PaymentStatusEnum.PAID;
@@ -131,6 +137,7 @@ export class OrdersService {
       amountPaid,
       balance,
       notes: createOrderDto.notes,
+      referredByDoctor: createOrderDto.referredByDoctor,
       orderedBy: userId ? new Types.ObjectId(userId) : undefined,
     });
 
@@ -152,8 +159,20 @@ export class OrdersService {
 
     await this.orderTestModel.insertMany(orderTests);
 
-    // Record initial payment if any
-    if (createOrderDto.paymentMethod && amountPaid > 0) {
+    // Record initial payments (supports split payments)
+    if (createOrderDto.initialPayments && createOrderDto.initialPayments.length > 0 && amountPaid > 0) {
+      for (const p of createOrderDto.initialPayments) {
+        if (p.amount > 0) {
+          await this.paymentModel.create({
+            orderId: savedOrder._id,
+            amount: Math.round(p.amount * 100) / 100,
+            paymentMethod: p.paymentMethod,
+            receivedBy: userId ? new Types.ObjectId(userId) : undefined,
+            notes: `Initial payment for order ${orderNumber}`,
+          });
+        }
+      }
+    } else if (createOrderDto.paymentMethod && amountPaid > 0) {
       await this.paymentModel.create({
         orderId: savedOrder._id,
         amount: amountPaid,
@@ -202,17 +221,15 @@ export class OrdersService {
       this.orderModel
         .find(query)
         .populate('patientId', 'patientId firstName lastName age gender')
-        .populate('orderedBy', 'fullName email')
-        .populate('collectedBy', 'fullName email')
-        .populate('cancelledBy', 'fullName email')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
+        .lean()
         .exec(),
       this.orderModel.countDocuments(query).exec(),
     ]);
 
-    return { data, total, page, limit };
+    return { data: data as unknown as Order[], total, page, limit };
   }
 
   /**
@@ -459,78 +476,76 @@ export class OrdersService {
   }
 
   /**
-   * Get payment statistics
+   * Get payment statistics — aggregates from Payment collection for accurate split-payment reporting
    */
   async getPaymentStats(startDate?: string, endDate?: string) {
-    const query: any = {};
+    const orderQuery: any = {};
+    const paymentQuery: any = {};
 
     if (startDate || endDate) {
-      query.createdAt = {};
-      if (startDate) {
-        query.createdAt.$gte = new Date(startDate);
-      }
-      if (endDate) {
-        query.createdAt.$lte = new Date(endDate);
-      }
+      const dateFilter: any = {};
+      if (startDate) dateFilter.$gte = new Date(startDate);
+      if (endDate) dateFilter.$lte = new Date(endDate);
+      orderQuery.createdAt = dateFilter;
+      paymentQuery.createdAt = dateFilter;
     }
 
-    const [totalOrders, paidOrders, pendingOrders, totalRevenue, paidRevenue] =
+    const [totalOrders, paidOrders, pendingOrders, totalRevenue, collectedByMethod] =
       await Promise.all([
-        this.orderModel.countDocuments(query),
+        this.orderModel.countDocuments(orderQuery),
         this.orderModel.countDocuments({
-          ...query,
+          ...orderQuery,
           paymentStatus: PaymentStatusEnum.PAID,
         }),
         this.orderModel.countDocuments({
-          ...query,
+          ...orderQuery,
           paymentStatus: PaymentStatusEnum.PENDING,
         }),
         this.orderModel.aggregate([
-          { $match: query },
+          { $match: orderQuery },
           { $group: { _id: null, total: { $sum: '$total' } } },
         ]),
-        this.orderModel.aggregate([
-          {
-            $match: {
-              ...query,
-              paymentStatus: PaymentStatusEnum.PAID,
-            },
-          },
-          { $group: { _id: null, total: { $sum: '$total' } } },
+        this.paymentModel.aggregate([
+          { $match: paymentQuery },
+          { $group: { _id: '$paymentMethod', total: { $sum: '$amount' } } },
         ]),
       ]);
 
+    const methodTotals: Record<string, number> = { cash: 0, orange_money: 0, afrimoney: 0 };
+    let paidRevenue = 0;
+    for (const m of collectedByMethod) {
+      if (m._id in methodTotals) methodTotals[m._id] = m.total;
+      paidRevenue += m.total;
+    }
+
+    const totalRev = totalRevenue[0]?.total || 0;
     return {
       totalOrders,
       paidOrders,
       pendingOrders,
-      totalRevenue: totalRevenue[0]?.total || 0,
-      paidRevenue: paidRevenue[0]?.total || 0,
-      pendingRevenue: (totalRevenue[0]?.total || 0) - (paidRevenue[0]?.total || 0),
+      totalRevenue: totalRev,
+      paidRevenue,
+      pendingRevenue: totalRev - paidRevenue,
+      cashCollected: methodTotals.cash,
+      orangeMoneyCollected: methodTotals.orange_money,
+      afrimoneyCollected: methodTotals.afrimoney,
     };
   }
 
   /**
-   * Get daily income breakdown
+   * Get daily income breakdown — aggregates from Payment collection for accurate split-payment reporting
    */
   async getDailyIncome(startDate?: string, endDate?: string) {
-    const query: any = {
-      paymentStatus: { $in: [PaymentStatusEnum.PAID, PaymentStatusEnum.PARTIAL] },
-      amountPaid: { $gt: 0 },
-    };
+    const matchQuery: any = {};
 
     if (startDate || endDate) {
-      query.createdAt = {};
-      if (startDate) {
-        query.createdAt.$gte = new Date(startDate);
-      }
-      if (endDate) {
-        query.createdAt.$lte = new Date(endDate);
-      }
+      matchQuery.createdAt = {};
+      if (startDate) matchQuery.createdAt.$gte = new Date(startDate);
+      if (endDate) matchQuery.createdAt.$lte = new Date(endDate);
     }
 
-    const dailyIncome = await this.orderModel.aggregate([
-      { $match: query },
+    const dailyIncome = await this.paymentModel.aggregate([
+      { $match: matchQuery },
       {
         $group: {
           _id: {
@@ -539,22 +554,16 @@ export class OrdersService {
             day: { $dayOfMonth: '$createdAt' },
           },
           date: { $first: '$createdAt' },
-          totalIncome: { $sum: '$amountPaid' },
-          orderCount: { $sum: 1 },
+          totalIncome: { $sum: '$amount' },
+          paymentCount: { $sum: 1 },
           cashPayments: {
-            $sum: {
-              $cond: [{ $eq: ['$paymentMethod', 'cash'] }, '$amountPaid', 0],
-            },
+            $sum: { $cond: [{ $eq: ['$paymentMethod', 'cash'] }, '$amount', 0] },
           },
           orangeMoneyPayments: {
-            $sum: {
-              $cond: [{ $eq: ['$paymentMethod', 'orange_money'] }, '$amountPaid', 0],
-            },
+            $sum: { $cond: [{ $eq: ['$paymentMethod', 'orange_money'] }, '$amount', 0] },
           },
           afrimoneyPayments: {
-            $sum: {
-              $cond: [{ $eq: ['$paymentMethod', 'afrimoney'] }, '$amountPaid', 0],
-            },
+            $sum: { $cond: [{ $eq: ['$paymentMethod', 'afrimoney'] }, '$amount', 0] },
           },
         },
       },
@@ -562,6 +571,47 @@ export class OrdersService {
     ]);
 
     return dailyIncome;
+  }
+
+  /**
+   * Get outstanding balances — orders with pending or partial payment status
+   */
+  async getOutstandingBalances() {
+    const orders = await this.orderModel
+      .find({
+        paymentStatus: { $in: [PaymentStatusEnum.PENDING, PaymentStatusEnum.PARTIAL] },
+        status: { $ne: OrderStatusEnum.CANCELLED },
+      })
+      .populate('patientId', 'firstName lastName')
+      .sort({ createdAt: -1 })
+      .lean()
+      .exec();
+
+    const partialOrders = orders.filter((o) => o.paymentStatus === PaymentStatusEnum.PARTIAL);
+    const pendingOrders = orders.filter((o) => o.paymentStatus === PaymentStatusEnum.PENDING);
+
+    const partialBalance = partialOrders.reduce((sum, o) => sum + (o.balance || 0), 0);
+    const pendingBalance = pendingOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+
+    return {
+      orders: orders.map((o) => ({
+        _id: o._id,
+        orderNumber: o.orderNumber,
+        paymentStatus: o.paymentStatus,
+        total: o.total,
+        amountPaid: o.amountPaid,
+        balance: o.balance,
+        createdAt: o.createdAt,
+        patientId: o.patientId,
+      })),
+      summary: {
+        partialCount: partialOrders.length,
+        pendingCount: pendingOrders.length,
+        partialBalance,
+        pendingBalance,
+        totalOutstanding: partialBalance + pendingBalance,
+      },
+    };
   }
 
   /**
@@ -608,7 +658,6 @@ export class OrdersService {
     // Update order totals
     order.amountPaid = Math.round((order.amountPaid + addPaymentDto.amount) * 100) / 100;
     order.balance = Math.round((order.total - order.amountPaid) * 100) / 100;
-    order.paymentMethod = addPaymentDto.paymentMethod as any;
 
     if (order.amountPaid >= order.total) {
       order.paymentStatus = PaymentStatusEnum.PAID;

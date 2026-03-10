@@ -193,6 +193,7 @@ export class ReportsService {
 
     // Build order info DTO
     const orderingPhysician = order.orderedBy as any;
+    const referredByDoctor = (order as any).referredByDoctor;
     const orderInfo: OrderInfoDto = {
       orderNumber: order.orderNumber,
       orderDate: order.createdAt,
@@ -200,9 +201,9 @@ export class ReportsService {
       receivedAt: order.createdAt, // Using createdAt as received date
       reportedAt: order.completedAt || new Date(),
       priority: order.priority,
-      orderingPhysician: orderingPhysician
+      orderingPhysician: referredByDoctor || (orderingPhysician
         ? `${orderingPhysician.firstName} ${orderingPhysician.lastName}`
-        : undefined,
+        : undefined),
     };
 
     // Build result items with test catalog info

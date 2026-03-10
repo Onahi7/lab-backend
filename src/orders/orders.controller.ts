@@ -76,6 +76,12 @@ export class OrdersController {
     return this.ordersService.getDailyIncome(startDate, endDate);
   }
 
+  @Get('stats/outstanding')
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.RECEPTIONIST)
+  async getOutstandingBalances() {
+    return this.ordersService.getOutstandingBalances();
+  }
+
   @Get(':id')
   @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH, UserRoleEnum.RECEPTIONIST)
   async findOne(@Param('id') id: string) {

@@ -115,11 +115,12 @@ export class PatientsService {
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
+        .lean()
         .exec(),
       this.patientModel.countDocuments(query).exec(),
     ]);
 
-    return { data, total, page, limit };
+    return { data: data as unknown as Patient[], total, page, limit };
   }
 
   /**

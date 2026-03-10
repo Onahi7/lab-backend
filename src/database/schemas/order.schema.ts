@@ -82,6 +82,9 @@ export class Order extends Document {
   @Prop()
   notes?: string;
 
+  @Prop()
+  referredByDoctor?: string;
+
   @Prop({ type: Types.ObjectId, ref: 'Profile' })
   orderedBy?: Types.ObjectId;
 

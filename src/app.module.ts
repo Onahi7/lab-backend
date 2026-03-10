@@ -21,6 +21,7 @@ import { ReportsModule } from './reports/reports.module';
 import { RealtimeModule } from './realtime/realtime.module';
 import { ReconciliationModule } from './reconciliation/reconciliation.module';
 import { ReportTemplatesModule } from './report-templates/report-templates.module';
+import { SettingsModule } from './settings/settings.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
@@ -56,6 +57,7 @@ import { AuditLoggingInterceptor } from './common/interceptors/audit-logging.int
     RealtimeModule,
     ReconciliationModule,
     ReportTemplatesModule,
+    SettingsModule,
   ],
   controllers: [AppController],
   providers: [

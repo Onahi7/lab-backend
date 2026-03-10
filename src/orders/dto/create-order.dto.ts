@@ -38,9 +38,22 @@ export class OrderTestDto {
   panelName?: string;
 }
 
+export class InitialPaymentDto {
+  @IsEnum(PaymentMethodEnum)
+  paymentMethod: PaymentMethodEnum;
+
+  @IsNumber()
+  @Min(0.01)
+  amount: number;
+}
+
 export class CreateOrderDto {
   @IsString()
   patientId: string;
+
+  @IsOptional()
+  @IsString()
+  referredByDoctor?: string;
 
   @IsArray()
   @ArrayMinSize(1)
@@ -60,6 +73,7 @@ export class CreateOrderDto {
   @IsEnum(DiscountTypeEnum)
   discountType?: DiscountTypeEnum;
 
+  /** Legacy single-method support — use initialPayments[] for split payments */
   @IsOptional()
   @IsEnum(PaymentMethodEnum)
   paymentMethod?: PaymentMethodEnum;
@@ -68,6 +82,13 @@ export class CreateOrderDto {
   @IsNumber()
   @Min(0)
   initialPaymentAmount?: number;
+
+  /** Split payment rows — when provided, takes precedence over paymentMethod */
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => InitialPaymentDto)
+  initialPayments?: InitialPaymentDto[];
 
   @IsOptional()
   @IsString()

@@ -115,7 +115,7 @@ async function adjustCatalogFromPanels() {
   const lipidComponents = [
     { code: 'CHOL', price: 80 },
     { code: 'TG', price: 80 },
-    { code: 'HDL', price: 200 },
+    { code: 'HDL', price: 120 },
     { code: 'LDL', price: 150 }
   ];
   

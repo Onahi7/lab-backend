@@ -29,12 +29,13 @@ async function seedTestPanels() {
   const panels = [];
 
   // ==================== FBC (FULL BLOOD COUNT) ====================
+  // Order matches Zybio ZS-2 analyzer top-to-bottom output
   const fbcTests = [
-    'HB', 'HCT', 'RBC', 'WBC', 'PLT',
-    'MCV', 'MCH', 'MCHC', 'RDWCV', 'RDWSD',
-    'NEUT', 'LYMPH', 'MONO', 'EOS', 'BASO',
-    'NEUTA', 'LYMPHA', 'MONOA', 'EOSA', 'BASOA',
-    'MPV', 'PDW', 'PLTCT', 'PLCR', 'PLCC',
+    'WBC',
+    'NEUTA', 'LYMPHA', 'MONOA', 'EOSA', 'BASOA',   // absolute # counts
+    'NEUT',  'LYMPH',  'MONO',  'EOS',  'BASO',    // differential %
+    'RBC', 'HB', 'HCT', 'MCV', 'MCH', 'MCHC', 'RDWCV', 'RDWSD',
+    'PLT', 'MPV', 'PDW', 'PLTCT', 'PLCC', 'PLCR',
   ];
   const fbcTestItems = [];
   
