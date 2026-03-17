@@ -3,74 +3,64 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Settings, SettingsDocument } from './settings.schema';
 
-const PRINTER_SETTINGS_KEY = 'printer_settings';
-
-interface ThermalSettings {
-  enabled: boolean;
-  copies: number;
-  autoPrintOnPayment: boolean;
-}
-
-interface A4Settings {
-  enabled: boolean;
-  copies: number;
-  paperSize: string;
-  orientation: string;
-  autoPrintOnResult: boolean;
-}
-
-export interface PrinterSettingsDoc {
-  thermal: ThermalSettings;
-  a4: A4Settings;
-}
-
-const DEFAULT_PRINTER_SETTINGS: PrinterSettingsDoc = {
-  thermal: {
-    enabled: true,
-    copies: 2,
-    autoPrintOnPayment: true,
-  },
-  a4: {
-    enabled: true,
-    copies: 1,
-    paperSize: 'A4',
-    orientation: 'portrait',
-    autoPrintOnResult: false,
-  },
-};
-
 @Injectable()
 export class SettingsService {
   constructor(
     @InjectModel(Settings.name)
-    private readonly settingsModel: Model<SettingsDocument>,
+    private settingsModel: Model<SettingsDocument>,
   ) {}
 
-  async getPrinterSettings(): Promise<PrinterSettingsDoc> {
-    const doc = await this.settingsModel
-      .findOne({ key: PRINTER_SETTINGS_KEY })
-      .lean()
-      .exec();
-    return doc ? (doc.value as PrinterSettingsDoc) : DEFAULT_PRINTER_SETTINGS;
+  async getSetting(key: string): Promise<any> {
+    const setting = await this.settingsModel.findOne({ key }).exec();
+    if (!setting) {
+      return null;
+    }
+    return {
+      key: setting.key,
+      value: setting.value,
+      description: setting.description,
+      updatedAt: (setting as any).updatedAt,
+    };
   }
 
-  async updatePrinterSettings(
-    patch: Partial<PrinterSettingsDoc>,
-  ): Promise<PrinterSettingsDoc> {
-    const current = await this.getPrinterSettings();
-    const merged: PrinterSettingsDoc = {
-      thermal: { ...current.thermal, ...(patch.thermal ?? {}) },
-      a4: { ...current.a4, ...(patch.a4 ?? {}) },
-    };
+  async getAllSettings(): Promise<any[]> {
+    const settings = await this.settingsModel.find().exec();
+    return settings.map((setting) => ({
+      key: setting.key,
+      value: setting.value,
+      description: setting.description,
+      updatedAt: (setting as any).updatedAt,
+    }));
+  }
 
-    await this.settingsModel
+  async updateSetting(
+    key: string,
+    value: any,
+    updatedBy?: string,
+    description?: string,
+  ): Promise<any> {
+    const setting = await this.settingsModel
       .findOneAndUpdate(
-        { key: PRINTER_SETTINGS_KEY },
-        { $set: { value: merged } },
+        { key },
+        {
+          key,
+          value,
+          description,
+          updatedBy,
+        },
         { upsert: true, new: true },
       )
       .exec();
 
-    return merged;
+    return {
+      key: setting.key,
+      value: setting.value,
+      description: setting.description,
+      updatedAt: (setting as any).updatedAt,
+    };
+  }
+
+  async deleteSetting(key: string): Promise<void> {
+    await this.settingsModel.deleteOne({ key }).exec();
   }
 }

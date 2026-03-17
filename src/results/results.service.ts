@@ -171,24 +171,12 @@ export class ResultsService {
       isReceptionistEntry ? undefined : createResultDto.referenceRange,
     );
 
-    if (isReceptionistEntry) {
-      if (!this.isNumericReferenceRange(resolvedReferenceRange)) {
-        throw new BadRequestException(
-          'Receptionist quick entry is only allowed for tests with numeric reference ranges',
-        );
-      }
-
-      if (!this.isNumericValue(createResultDto.value)) {
-        throw new BadRequestException(
-          'Receptionist quick entry only accepts numeric result values',
-        );
-      }
-    }
-
     // Calculate flag if not provided
     const flag =
-      (isReceptionistEntry ? undefined : createResultDto.flag) ||
+      createResultDto.flag ||
       this.calculateFlag(createResultDto.value, resolvedReferenceRange);
+
+    const userObjectId = userId ? new Types.ObjectId(userId) : undefined;
 
     const result = new this.resultModel({
       ...createResultDto,
@@ -198,9 +186,11 @@ export class ResultsService {
         : undefined,
       referenceRange: resolvedReferenceRange,
       flag,
-      status: ResultStatusEnum.PRELIMINARY,
+      status: ResultStatusEnum.VERIFIED, // Auto-verify all results
       resultedAt: new Date(),
-      resultedBy: userId ? new Types.ObjectId(userId) : undefined,
+      resultedBy: userObjectId,
+      verifiedAt: new Date(), // Set verification timestamp
+      verifiedBy: userObjectId, // Set verifier to the same user who entered it
     });
 
     const savedResult = await result.save();

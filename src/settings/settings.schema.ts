@@ -3,13 +3,19 @@ import { Document } from 'mongoose';
 
 export type SettingsDocument = Settings & Document;
 
-@Schema({ collection: 'settings', timestamps: true })
+@Schema({ timestamps: true })
 export class Settings {
   @Prop({ required: true, unique: true })
   key: string;
 
   @Prop({ type: Object, required: true })
-  value: Record<string, any>;
+  value: any;
+
+  @Prop()
+  description?: string;
+
+  @Prop()
+  updatedBy?: string;
 }
 
 export const SettingsSchema = SchemaFactory.createForClass(Settings);
