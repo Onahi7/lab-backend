@@ -15,6 +15,14 @@ export class CreateResultDto {
   @IsString()
   testName: string;
 
+  @IsOptional()
+  @IsString()
+  panelCode?: string;
+
+  @IsOptional()
+  @IsString()
+  panelName?: string;
+
   @IsString()
   value: string;
 

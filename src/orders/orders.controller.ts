@@ -95,7 +95,7 @@ export class OrdersController {
   }
 
   @Patch(':id')
-  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.RECEPTIONIST)
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.RECEPTIONIST, UserRoleEnum.LAB_TECH)
   async update(
     @Param('id') id: string,
     @Body() updateOrderDto: UpdateOrderDto,

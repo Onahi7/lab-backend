@@ -39,6 +39,19 @@ export class ResultsController {
   }
 
   /**
+   * Create multiple results in bulk (much faster)
+   * POST /results/bulk
+   * Requires: lab_tech, receptionist, or admin role
+   */
+  @Post('bulk')
+  @Roles(UserRoleEnum.LAB_TECH, UserRoleEnum.RECEPTIONIST, UserRoleEnum.ADMIN)
+  createBulk(@Body() createResultDtos: CreateResultDto[], @Request() req: any) {
+    const userId = req.user?.userId;
+    const userRoles = req.user?.roles || [];
+    return this.resultsService.createBulk(createResultDtos, userId, userRoles);
+  }
+
+  /**
    * Get all results with optional filters
    * GET /results?orderId=xxx&testCode=xxx&status=xxx&flag=xxx&page=1&limit=10
    * Requires: authenticated user

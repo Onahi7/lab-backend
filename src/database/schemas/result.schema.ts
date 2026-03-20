@@ -29,6 +29,12 @@ export class Result extends Document {
   @Prop({ required: true })
   testName: string;
 
+  @Prop()
+  panelCode?: string;
+
+  @Prop()
+  panelName?: string;
+
   @Prop({ required: true })
   value: string;
 
@@ -83,3 +89,5 @@ ResultSchema.index({ orderId: 1 });
 ResultSchema.index({ testCode: 1 });
 ResultSchema.index({ status: 1 });
 ResultSchema.index({ flag: 1 });
+// Unique compound index to prevent duplicate results for the same test in an order
+ResultSchema.index({ orderId: 1, testCode: 1 }, { unique: true });

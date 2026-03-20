@@ -202,6 +202,60 @@ export class ResultsService {
   }
 
   /**
+   * Create multiple results in bulk (much faster than individual creates)
+   */
+  async createBulk(
+    createResultDtos: CreateResultDto[],
+    userId?: string,
+    userRoles: string[] = [],
+  ): Promise<Result[]> {
+    if (!createResultDtos || createResultDtos.length === 0) {
+      return [];
+    }
+
+    const isReceptionistEntry = userRoles.includes(UserRoleEnum.RECEPTIONIST);
+    const userObjectId = userId ? new Types.ObjectId(userId) : undefined;
+    const now = new Date();
+
+    // Prepare all results for bulk insert
+    const resultsToInsert = await Promise.all(
+      createResultDtos.map(async (dto) => {
+        const orderObjectId = new Types.ObjectId(dto.orderId);
+        const resolvedReferenceRange = await this.resolveReferenceRangeForResult(
+          orderObjectId,
+          dto.testCode,
+          isReceptionistEntry ? undefined : dto.referenceRange,
+        );
+
+        const flag = dto.flag || this.calculateFlag(dto.value, resolvedReferenceRange);
+
+        return {
+          ...dto,
+          orderId: orderObjectId,
+          orderTestId: dto.orderTestId ? new Types.ObjectId(dto.orderTestId) : undefined,
+          referenceRange: resolvedReferenceRange,
+          flag,
+          status: ResultStatusEnum.VERIFIED,
+          resultedAt: now,
+          resultedBy: userObjectId,
+          verifiedAt: now,
+          verifiedBy: userObjectId,
+        };
+      })
+    );
+
+    // Bulk insert all results at once
+    const savedResults = await this.resultModel.insertMany(resultsToInsert);
+
+    // Emit real-time events for all results
+    savedResults.forEach(result => {
+      this.realtimeGateway.notifyResultCreated(result);
+    });
+
+    return savedResults;
+  }
+
+  /**
    * Find all results with optional filters
    */
   async findAll(filters?: {
