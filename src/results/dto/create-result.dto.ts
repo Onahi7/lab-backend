@@ -23,6 +23,10 @@ export class CreateResultDto {
   @IsString()
   panelName?: string;
 
+  @IsOptional()
+  @IsString()
+  category?: string;
+
   @IsString()
   value: string;
 

@@ -98,4 +98,21 @@ export class CreateTestDto {
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @IsString()
+  @IsOptional()
+  panelCode?: string;
+
+  @IsString()
+  @IsOptional()
+  panelName?: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  linkedTests?: string[];
 }

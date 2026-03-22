@@ -78,14 +78,14 @@ export class TestCatalogController {
 
   @Patch(':id/activate')
   @UseGuards(RolesGuard)
-  @Roles(UserRoleEnum.ADMIN)
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH)
   async activateTest(@Param('id') id: string) {
     return this.testCatalogService.activateTest(id);
   }
 
   @Patch(':id/deactivate')
   @UseGuards(RolesGuard)
-  @Roles(UserRoleEnum.ADMIN)
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH)
   async deactivateTest(@Param('id') id: string) {
     return this.testCatalogService.deactivateTest(id);
   }

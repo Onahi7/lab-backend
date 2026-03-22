@@ -35,6 +35,9 @@ export class Result extends Document {
   @Prop()
   panelName?: string;
 
+  @Prop()
+  category?: string;
+
   @Prop({ required: true })
   value: string;
 

@@ -10,6 +10,7 @@ import { Order, OrderStatusEnum, PaymentStatusEnum } from '../database/schemas/o
 import { OrderTest } from '../database/schemas/order-test.schema';
 import { IdSequence } from '../database/schemas/id-sequence.schema';
 import { Payment } from '../database/schemas/payment.schema';
+import { TestCatalog } from '../database/schemas/test-catalog.schema';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { CancelOrderDto } from './dto/cancel-order.dto';
@@ -25,6 +26,7 @@ export class OrdersService {
     @InjectModel(OrderTest.name) private orderTestModel: Model<OrderTest>,
     @InjectModel(IdSequence.name) private idSequenceModel: Model<IdSequence>,
     @InjectModel(Payment.name) private paymentModel: Model<Payment>,
+    @InjectModel(TestCatalog.name) private testCatalogModel: Model<TestCatalog>,
     private realtimeGateway: RealtimeGateway,
   ) {}
 
@@ -81,6 +83,44 @@ export class OrdersService {
 
     // Round to 2 decimal places
     return Math.round(total * 100) / 100;
+  }
+
+  /**
+   * Expand tests to include linked tests (e.g., CRP automatically includes HSCRP)
+   */
+  private async expandLinkedTests(tests: any[]): Promise<any[]> {
+    const expandedTests = [...tests];
+    const addedTestCodes = new Set(tests.map(t => t.testCode));
+
+    for (const test of tests) {
+      // Look up the test in catalog to check for linked tests
+      const catalogTest = await this.testCatalogModel.findOne({ code: test.testCode }).lean();
+      
+      if (catalogTest?.linkedTests && catalogTest.linkedTests.length > 0) {
+        for (const linkedTestCode of catalogTest.linkedTests) {
+          // Only add if not already in the order
+          if (!addedTestCodes.has(linkedTestCode)) {
+            const linkedTest = await this.testCatalogModel.findOne({ code: linkedTestCode }).lean();
+            
+            if (linkedTest) {
+              expandedTests.push({
+                testId: linkedTest._id.toString(),
+                testCode: linkedTest.code,
+                testName: linkedTest.name,
+                panelCode: linkedTest.panelCode,
+                panelName: linkedTest.panelName,
+                category: linkedTest.category,
+                price: 0, // Linked tests are included free
+              });
+              addedTestCodes.add(linkedTestCode);
+              this.logger.log(`Auto-added linked test: ${linkedTestCode} for ${test.testCode}`);
+            }
+          }
+        }
+      }
+    }
+
+    return expandedTests;
   }
 
   /**
@@ -143,8 +183,11 @@ export class OrdersService {
 
     const savedOrder = await order.save();
 
+    // Expand tests to include linked tests (e.g., CRP automatically includes HSCRP)
+    const expandedTests = await this.expandLinkedTests(createOrderDto.tests);
+
     // Create order tests
-    const orderTests = createOrderDto.tests.map((test) => ({
+    const orderTests = expandedTests.map((test) => ({
       orderId: savedOrder._id,
       testId: Types.ObjectId.isValid(test.testId)
         ? new Types.ObjectId(test.testId)
@@ -153,6 +196,7 @@ export class OrdersService {
       testName: test.testName,
       panelCode: test.panelCode,
       panelName: test.panelName,
+      category: test.category,
       price: test.price,
       status: 'pending',
     }));

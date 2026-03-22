@@ -6,6 +6,7 @@ export enum TestCategoryEnum {
   HEMATOLOGY = 'hematology',
   CHEMISTRY = 'chemistry',
   IMMUNOASSAY = 'immunoassay',
+  SEROLOGY = 'serology',
   URINALYSIS = 'urinalysis',
   MICROBIOLOGY = 'microbiology',
   OTHER = 'other',
@@ -61,6 +62,15 @@ export class TestCatalog extends Document {
 
   @Prop()
   description?: string;
+
+  @Prop()
+  panelCode?: string;
+
+  @Prop()
+  panelName?: string;
+
+  @Prop({ type: [String] })
+  linkedTests?: string[]; // Test codes that should be automatically included (e.g., CRP includes HSCRP)
 
   createdAt: Date;
   updatedAt: Date;

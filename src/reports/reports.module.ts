@@ -10,6 +10,7 @@ import { Patient, PatientSchema } from '../database/schemas/patient.schema';
 import { TestCatalog, TestCatalogSchema } from '../database/schemas/test-catalog.schema';
 import { Profile, ProfileSchema } from '../database/schemas/profile.schema';
 import { OrderTest, OrderTestSchema } from '../database/schemas/order-test.schema';
+import { PanelInterpretation, PanelInterpretationSchema } from '../database/schemas/panel-interpretation.schema';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { OrderTest, OrderTestSchema } from '../database/schemas/order-test.schem
       { name: TestCatalog.name, schema: TestCatalogSchema },
       { name: Profile.name, schema: ProfileSchema },
       { name: OrderTest.name, schema: OrderTestSchema },
+      { name: PanelInterpretation.name, schema: PanelInterpretationSchema },
     ]),
   ],
   controllers: [ReportsController],

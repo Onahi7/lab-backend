@@ -10,6 +10,7 @@ import { Patient, GenderEnum } from '../database/schemas/patient.schema';
 import { TestCatalog, TestCategoryEnum } from '../database/schemas/test-catalog.schema';
 import { Profile } from '../database/schemas/profile.schema';
 import { OrderTest } from '../database/schemas/order-test.schema';
+import { PanelInterpretation } from '../database/schemas/panel-interpretation.schema';
 import { resolveReferenceRange } from '../common/utils/reference-range-resolver';
 import { ResultCategoryDto } from './dto/result-category.dto';
 import { ResultItemDto } from './dto/result-item.dto';
@@ -39,6 +40,8 @@ export class ReportsService {
     private profileModel: Model<Profile>,
     @InjectModel(OrderTest.name)
     private orderTestModel: Model<OrderTest>,
+    @InjectModel(PanelInterpretation.name)
+    private panelInterpretationModel: Model<PanelInterpretation>,
     private configService: ConfigService,
   ) {}
 
@@ -359,12 +362,25 @@ export class ReportsService {
       generatedBy: userId || 'system',
     };
 
+    // Fetch panel interpretations for this order
+    const panelInterpretations = await this.panelInterpretationModel
+      .find({ orderId: new Types.ObjectId(orderId) })
+      .exec();
+
     // Return complete report DTO
     return {
       reportMetadata,
       patientInfo,
       orderInfo,
       resultsByCategory,
+      panelInterpretations: panelInterpretations.map(interp => ({
+        panelCode: interp.panelCode,
+        panelName: interp.panelName,
+        wbcMessage: interp.wbcMessage,
+        rbcMessage: interp.rbcMessage,
+        pltMessage: interp.pltMessage,
+        generalMessage: interp.generalMessage,
+      })),
       verificationInfo,
       laboratoryInfo,
     };
@@ -449,13 +465,14 @@ export class ReportsService {
     const displayNames: Record<TestCategoryEnum, string> = {
       [TestCategoryEnum.CHEMISTRY]: 'CLINICAL CHEMISTRY',
       [TestCategoryEnum.HEMATOLOGY]: 'HEMATOLOGY',
-      [TestCategoryEnum.IMMUNOASSAY]: 'SEROLOGY',
-      [TestCategoryEnum.URINALYSIS]: 'Urinalysis',
+      [TestCategoryEnum.IMMUNOASSAY]: 'IMMUNOASSAY',
+      [TestCategoryEnum.SEROLOGY]: 'SEROLOGY',
+      [TestCategoryEnum.URINALYSIS]: 'URINALYSIS',
       [TestCategoryEnum.MICROBIOLOGY]: 'MICROBIOLOGY',
       [TestCategoryEnum.OTHER]: 'OTHER TESTS',
     };
 
-    return displayNames[category] || category;
+    return displayNames[category] || category.toUpperCase();
   }
 
   /**
