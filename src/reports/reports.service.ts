@@ -334,12 +334,8 @@ export class ReportsService {
     const resultedByProfile = firstResult.resultedBy as any;
 
     const verificationInfo: VerificationInfoDto = {
-      performedBy: resultedByProfile
-        ? `${resultedByProfile.firstName} ${resultedByProfile.lastName}`
-        : undefined,
-      verifiedBy: verifiedByProfile
-        ? `${verifiedByProfile.firstName} ${verifiedByProfile.lastName}`
-        : undefined,
+      performedBy: resultedByProfile?.fullName || undefined,
+      verifiedBy: verifiedByProfile?.fullName || undefined,
       verifiedAt: firstResult.verifiedAt,
     };
 
