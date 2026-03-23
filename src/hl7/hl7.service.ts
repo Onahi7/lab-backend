@@ -584,10 +584,13 @@ export class Hl7Service {
     const order = await this.orderModel
       .findById(orderId)
       .populate('patientId')
-      .exec() as (Order & { patientId: Patient }) | null;
+      .exec();
     if (!order) {
       throw new BadRequestException('Order not found');
     }
+
+    const populatedOrder = order as any;
+    const patient = populatedOrder.patientId as Patient;
 
     // Get order tests
     const tests = await this.orderTestModel
@@ -600,9 +603,9 @@ export class Hl7Service {
     // Generate message based on machine protocol
     let message: string;
     if (machine.protocol === 'HL7') {
-      message = this.generateHL7OrderMessage(order, tests);
+      message = this.generateHL7OrderMessage(populatedOrder, tests);
     } else if (machine.protocol === 'ASTM' || machine.protocol === 'LIS2_A2') {
-      message = this.generateASTMOrderMessage(order, tests);
+      message = this.generateASTMOrderMessage(populatedOrder, tests);
     } else {
       throw new BadRequestException(`Protocol ${machine.protocol} does not support outbound orders`);
     }

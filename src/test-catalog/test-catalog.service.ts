@@ -64,37 +64,48 @@ export class TestCatalogService {
   }
 
   async findActiveTestsAndPanels(): Promise<any[]> {
-    // Get active tests
     const tests = await this.testCatalogModel
       .find({ isActive: true })
       .populate('machineId', 'name manufacturer model')
       .sort({ category: 1, name: 1 })
       .exec();
 
-    // Get active panels
     const panels = await this.testPanelModel
       .find({ isActive: true })
       .sort({ name: 1 })
       .exec();
 
-    // Transform panels to match test structure for frontend compatibility
+    const panelTestCodes = panels.flatMap(p =>
+      (p.tests || []).map((t: any) => t.testCode),
+    );
+    const activeTestCodes = new Set(tests.map(t => t.code));
+    const missingCodes = panelTestCodes.filter(c => c && !activeTestCodes.has(c));
+
+    let panelComponentTests: TestCatalog[] = [];
+    if (missingCodes.length > 0) {
+      panelComponentTests = await this.testCatalogModel
+        .find({ code: { $in: missingCodes }, isActive: false })
+        .populate('machineId', 'name manufacturer model')
+        .sort({ category: 1, name: 1 })
+        .exec();
+    }
+
     const transformedPanels = panels.map(panel => ({
       _id: panel._id,
       id: panel._id.toString(),
       code: panel.code,
       name: panel.name,
-      category: 'panel', // Special category for panels
+      category: 'panel',
       price: panel.price,
       isActive: panel.isActive,
       description: panel.description,
-      sampleType: 'blood', // Default for panels
-      turnaroundTime: 180, // Default for panels
-      isPanel: true, // Flag to identify panels
-      tests: panel.tests, // Include component tests
+      sampleType: 'blood',
+      turnaroundTime: 180,
+      isPanel: true,
+      tests: panel.tests,
     }));
 
-    // Combine and return
-    return [...tests, ...transformedPanels];
+    return [...tests, ...panelComponentTests, ...transformedPanels];
   }
 
   async findTestById(id: string): Promise<TestCatalog> {

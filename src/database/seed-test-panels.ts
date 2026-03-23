@@ -60,7 +60,7 @@ async function seedTestPanels() {
   });
 
   // ==================== ELECTROLYTE PANEL ====================
-  const electTests = ['NA', 'K', 'CL', 'HCO3'];
+  const electTests = ['K', 'NA', 'CL', 'ICA', 'NCA', 'TCA'];
   const electTestItems = [];
   
   for (const code of electTests) {
@@ -77,8 +77,8 @@ async function seedTestPanels() {
   panels.push({
     code: 'ELEC',
     name: 'Electrolyte Panel',
-    description: 'Basic electrolyte panel - Sodium, Potassium, Chloride, CO2',
-    price: 140,
+    description: 'Complete electrolyte panel - K, Na, Cl, iCa, nCa, TCa',
+    price: 210,
     isActive: true,
     tests: electTestItems,
   });

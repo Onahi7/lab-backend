@@ -318,7 +318,7 @@ export class PatientsService {
     // Get all orders for this patient
     const Order = this.patientModel.db.model('Order');
     const orders = await Order.find({ patientId: new Types.ObjectId(patientId) }).exec();
-    const orderIds = orders.map(order => order._id);
+    const orderIds = orders.map((order: any) => order._id);
 
     // Get all results for these orders
     const Result = this.patientModel.db.model('Result');

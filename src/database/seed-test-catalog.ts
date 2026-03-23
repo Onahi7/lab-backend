@@ -808,6 +808,19 @@ async function seedTestCatalog() {
 
     // ==================== ELECTROLYTES (CBS-50) ====================
     {
+      code: 'K',
+      name: 'Potassium',
+      category: 'chemistry',
+      price: 35,
+      sampleType: 'blood',
+      turnaroundTime: 120,
+      isActive: true,
+      unit: 'mmol/L',
+      referenceRanges: [
+        { ageGroup: 'All ages', ageMin: 0, gender: 'all', range: '3.5-5.2', unit: 'mmol/L', criticalLow: '2.5', criticalHigh: '6.5' },
+      ],
+    },
+    {
       code: 'NA',
       name: 'Sodium',
       category: 'chemistry',
@@ -821,19 +834,6 @@ async function seedTestCatalog() {
       ],
     },
     {
-      code: 'K',
-      name: 'Potassium',
-      category: 'chemistry',
-      price: 35,
-      sampleType: 'blood',
-      turnaroundTime: 120,
-      isActive: true,
-      unit: 'mmol/L',
-      referenceRanges: [
-        { ageGroup: 'All ages', ageMin: 0, gender: 'all', range: '3.5-5.1', unit: 'mmol/L', criticalLow: '2.5', criticalHigh: '6.5' },
-      ],
-    },
-    {
       code: 'CL',
       name: 'Chloride',
       category: 'chemistry',
@@ -843,25 +843,12 @@ async function seedTestCatalog() {
       isActive: true,
       unit: 'mmol/L',
       referenceRanges: [
-        { ageGroup: 'All ages', ageMin: 0, gender: 'all', range: '98-107', unit: 'mmol/L', criticalLow: '80', criticalHigh: '115' },
+        { ageGroup: 'All ages', ageMin: 0, gender: 'all', range: '96-108', unit: 'mmol/L', criticalLow: '80', criticalHigh: '115' },
       ],
     },
     {
-      code: 'CA',
-      name: 'Calcium',
-      category: 'chemistry',
-      price: 35,
-      sampleType: 'blood',
-      turnaroundTime: 120,
-      isActive: true,
-      unit: 'mg/dL',
-      referenceRanges: [
-        { ageGroup: 'All ages', ageMin: 0, gender: 'all', range: '8.5-10.5', unit: 'mg/dL', criticalLow: '7.0', criticalHigh: '13.0' },
-      ],
-    },
-    {
-      code: 'HCO3',
-      name: 'Bicarbonate',
+      code: 'ICA',
+      name: 'Ionized Calcium',
       category: 'chemistry',
       price: 35,
       sampleType: 'blood',
@@ -869,18 +856,44 @@ async function seedTestCatalog() {
       isActive: true,
       unit: 'mmol/L',
       referenceRanges: [
-        { ageGroup: 'All ages', ageMin: 0, gender: 'all', range: '22-29', unit: 'mmol/L', criticalLow: '15', criticalHigh: '40' },
+        { ageGroup: 'All ages', ageMin: 0, gender: 'all', range: '1.05-1.35', unit: 'mmol/L', criticalLow: '0.8', criticalHigh: '1.5' },
+      ],
+    },
+    {
+      code: 'NCA',
+      name: 'Non-ionized Calcium',
+      category: 'chemistry',
+      price: 35,
+      sampleType: 'blood',
+      turnaroundTime: 120,
+      isActive: true,
+      unit: 'mmol/L',
+      referenceRanges: [
+        { ageGroup: 'All ages', ageMin: 0, gender: 'all', range: '1.05-1.35', unit: 'mmol/L', criticalLow: '0.8', criticalHigh: '1.5' },
+      ],
+    },
+    {
+      code: 'TCA',
+      name: 'Total Calcium',
+      category: 'chemistry',
+      price: 35,
+      sampleType: 'blood',
+      turnaroundTime: 120,
+      isActive: true,
+      unit: 'mmol/L',
+      referenceRanges: [
+        { ageGroup: 'All ages', ageMin: 0, gender: 'all', range: '2.08-2.60', unit: 'mmol/L', criticalLow: '1.5', criticalHigh: '3.0' },
       ],
     },
     {
       code: 'ELEC',
       name: 'Electrolyte Panel',
       category: 'chemistry',
-      price: 140,
+      price: 210,
       sampleType: 'blood',
       turnaroundTime: 120,
       isActive: true,
-      description: 'Complete electrolyte panel',
+      description: 'Complete electrolyte panel - K, Na, Cl, iCa, nCa, TCa',
     },
 
     // ==================== POCT TESTS (WONDFO FINECARE FIA) ====================
