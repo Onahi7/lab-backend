@@ -39,12 +39,25 @@ async function bootstrap() {
     origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
       // Allow requests with no origin (Electron file://, mobile apps, curl)
       if (!origin) return callback(null, true);
+      
       // Allow configured origin (e.g. http://localhost:5173)
       if (origin === corsOrigin) return callback(null, true);
+      
       // Allow any LAN/localhost origin (192.168.x.x, 10.x.x.x, 172.16-31.x.x)
       if (/^https?:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)(:\d+)?$/.test(origin)) {
         return callback(null, true);
       }
+      
+      // Allow Cloudflare Workers domains (*.workers.dev)
+      if (/^https:\/\/[a-zA-Z0-9-]+\.[a-zA-Z0-9-]+\.workers\.dev$/.test(origin)) {
+        return callback(null, true);
+      }
+      
+      // Allow Cloudflare Pages domains (*.pages.dev)
+      if (/^https:\/\/[a-zA-Z0-9-]+\.pages\.dev$/.test(origin)) {
+        return callback(null, true);
+      }
+      
       callback(null, false);
     },
     credentials: configService.get('cors.credentials'),
@@ -53,7 +66,7 @@ async function bootstrap() {
     exposedHeaders: ['X-Total-Count', 'X-Page', 'X-Per-Page'],
     maxAge: 3600,
   });
-  logger.log(`CORS enabled for origin: ${corsOrigin} + LAN`);
+  logger.log(`CORS enabled for origin: ${corsOrigin} + LAN + Cloudflare`);
 
   // Enable global validation pipe
   app.useGlobalPipes(

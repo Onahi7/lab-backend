@@ -13,7 +13,27 @@ import { JwtService } from '@nestjs/jwt';
 
 @WebSocketGateway({
   cors: {
-    origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+      // Allow requests with no origin
+      if (!origin) return callback(null, true);
+      
+      // Allow configured origin
+      const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173';
+      if (origin === corsOrigin) return callback(null, true);
+      
+      // Allow LAN/localhost
+      if (/^https?:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)(:\d+)?$/.test(origin)) {
+        return callback(null, true);
+      }
+      
+      // Allow Cloudflare Workers/Pages
+      if (/^https:\/\/[a-zA-Z0-9-]+\.[a-zA-Z0-9-]+\.workers\.dev$/.test(origin) || 
+          /^https:\/\/[a-zA-Z0-9-]+\.pages\.dev$/.test(origin)) {
+        return callback(null, true);
+      }
+      
+      callback(null, false);
+    },
     credentials: true,
   },
   namespace: '/realtime',
