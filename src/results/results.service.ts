@@ -203,6 +203,7 @@ export class ResultsService {
 
   /**
    * Create multiple results in bulk (much faster than individual creates)
+   * Uses upsert to handle existing results
    */
   async createBulk(
     createResultDtos: CreateResultDto[],
@@ -217,8 +218,8 @@ export class ResultsService {
     const userObjectId = userId ? new Types.ObjectId(userId) : undefined;
     const now = new Date();
 
-    // Prepare all results for bulk insert
-    const resultsToInsert = await Promise.all(
+    // Prepare all results for bulk operation
+    const bulkOps = await Promise.all(
       createResultDtos.map(async (dto) => {
         const orderObjectId = new Types.ObjectId(dto.orderId);
         const resolvedReferenceRange = await this.resolveReferenceRangeForResult(
@@ -229,7 +230,7 @@ export class ResultsService {
 
         const flag = dto.flag || this.calculateFlag(dto.value, resolvedReferenceRange);
 
-        return {
+        const resultData = {
           ...dto,
           orderId: orderObjectId,
           orderTestId: dto.orderTestId ? new Types.ObjectId(dto.orderTestId) : undefined,
@@ -241,11 +242,29 @@ export class ResultsService {
           verifiedAt: now,
           verifiedBy: userObjectId,
         };
+
+        // Use updateOne with upsert to handle existing results
+        return {
+          updateOne: {
+            filter: { orderId: orderObjectId, testCode: dto.testCode },
+            update: { $set: resultData },
+            upsert: true,
+          },
+        };
       })
     );
 
-    // Bulk insert all results at once
-    const savedResults = await this.resultModel.insertMany(resultsToInsert);
+    // Execute bulk write operation
+    await this.resultModel.bulkWrite(bulkOps);
+
+    // Fetch the saved results to return them
+    const orderIds = [...new Set(createResultDtos.map(dto => dto.orderId))];
+    const testCodes = createResultDtos.map(dto => dto.testCode);
+    
+    const savedResults = await this.resultModel.find({
+      orderId: { $in: orderIds.map(id => new Types.ObjectId(id)) },
+      testCode: { $in: testCodes },
+    }).exec();
 
     // Emit real-time events for all results
     savedResults.forEach(result => {
