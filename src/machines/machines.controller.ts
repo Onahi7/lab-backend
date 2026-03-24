@@ -25,7 +25,7 @@ export class MachinesController {
   constructor(private readonly machinesService: MachinesService) {}
 
   @Post()
-  @Roles(UserRoleEnum.ADMIN)
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH)
   async create(@Body() createMachineDto: CreateMachineDto) {
     return this.machinesService.create(createMachineDto);
   }
@@ -52,7 +52,7 @@ export class MachinesController {
   }
 
   @Patch(':id')
-  @Roles(UserRoleEnum.ADMIN)
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH)
   async update(
     @Param('id') id: string,
     @Body() updateMachineDto: UpdateMachineDto,
