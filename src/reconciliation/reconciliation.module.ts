@@ -7,12 +7,14 @@ import {
   CashReconciliationSchema,
 } from '../database/schemas/cash-reconciliation.schema';
 import { Order, OrderSchema } from '../database/schemas/order.schema';
+import { Expenditure, ExpenditureSchema } from '../database/schemas/expenditure.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: CashReconciliation.name, schema: CashReconciliationSchema },
       { name: Order.name, schema: OrderSchema },
+      { name: Expenditure.name, schema: ExpenditureSchema },
     ]),
   ],
   controllers: [ReconciliationController],

@@ -28,7 +28,7 @@ export class Expenditure extends Document {
   })
   category: ExpenseCategoryEnum;
 
-  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  @Prop({ type: Types.ObjectId, ref: 'Profile', required: true })
   recordedBy: Types.ObjectId;
 
   @Prop({ required: true })
@@ -53,7 +53,7 @@ export class Expenditure extends Document {
   @Prop()
   flagReason?: string;
 
-  @Prop({ type: Types.ObjectId, ref: 'User' })
+  @Prop({ type: Types.ObjectId, ref: 'Profile' })
   flaggedBy?: Types.ObjectId;
 
   @Prop()

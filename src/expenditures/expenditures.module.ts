@@ -6,11 +6,13 @@ import {
   Expenditure,
   ExpenditureSchema,
 } from '../database/schemas/expenditure.schema';
+import { Profile, ProfileSchema } from '../database/schemas/profile.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Expenditure.name, schema: ExpenditureSchema },
+      { name: Profile.name, schema: ProfileSchema },
     ]),
   ],
   controllers: [ExpendituresController],

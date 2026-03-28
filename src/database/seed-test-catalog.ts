@@ -681,9 +681,7 @@ async function seedTestCatalog() {
       isActive: true,
       unit: 'mg/dL',
       referenceRanges: [
-        { ageGroup: 'Desirable', ageMin: 18, gender: 'all', range: '<150', unit: 'mg/dL' },
-        { ageGroup: 'Borderline High', ageMin: 18, gender: 'all', range: '150-199', unit: 'mg/dL' },
-        { ageGroup: 'High', ageMin: 18, gender: 'all', range: '≥200', unit: 'mg/dL' },
+        { ageGroup: 'Adult', ageMin: 18, gender: 'all', range: '0-204', unit: 'mg/dL', criticalHigh: '500' },
       ],
     },
     {
@@ -914,8 +912,8 @@ async function seedTestCatalog() {
       ],
     },
     {
-      code: 'HSCR',
-      name: 'High Sensitivity CRP',
+      code: 'HSCRP',
+      name: 'hs CRP',
       category: 'immunoassay',
       price: 350,
       sampleType: 'blood',

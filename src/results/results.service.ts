@@ -171,6 +171,12 @@ export class ResultsService {
       isReceptionistEntry ? undefined : createResultDto.referenceRange,
     );
 
+    // Fetch subcategory from test catalog
+    const testCatalog = await this.testCatalogModel
+      .findOne({ code: createResultDto.testCode })
+      .select('subcategory')
+      .lean();
+
     // Calculate flag if not provided
     const flag =
       createResultDto.flag ||
@@ -185,6 +191,7 @@ export class ResultsService {
         ? new Types.ObjectId(createResultDto.orderTestId)
         : undefined,
       referenceRange: resolvedReferenceRange,
+      subcategory: testCatalog?.subcategory,
       flag,
       status: ResultStatusEnum.VERIFIED, // Auto-verify all results
       resultedAt: new Date(),
@@ -218,6 +225,17 @@ export class ResultsService {
     const userObjectId = userId ? new Types.ObjectId(userId) : undefined;
     const now = new Date();
 
+    // Fetch all subcategories in one query for efficiency
+    const testCodes = [...new Set(createResultDtos.map(dto => dto.testCode))];
+    const testCatalogs = await this.testCatalogModel
+      .find({ code: { $in: testCodes } })
+      .select('code subcategory')
+      .lean();
+    
+    const subcategoryMap = new Map(
+      testCatalogs.map(tc => [tc.code, tc.subcategory])
+    );
+
     // Prepare all results for bulk operation
     const bulkOps = await Promise.all(
       createResultDtos.map(async (dto) => {
@@ -235,6 +253,7 @@ export class ResultsService {
           orderId: orderObjectId,
           orderTestId: dto.orderTestId ? new Types.ObjectId(dto.orderTestId) : undefined,
           referenceRange: resolvedReferenceRange,
+          subcategory: subcategoryMap.get(dto.testCode),
           flag,
           status: ResultStatusEnum.VERIFIED,
           resultedAt: now,
@@ -259,11 +278,11 @@ export class ResultsService {
 
     // Fetch the saved results to return them
     const orderIds = [...new Set(createResultDtos.map(dto => dto.orderId))];
-    const testCodes = createResultDtos.map(dto => dto.testCode);
+    const savedTestCodes = createResultDtos.map(dto => dto.testCode);
     
     const savedResults = await this.resultModel.find({
       orderId: { $in: orderIds.map(id => new Types.ObjectId(id)) },
-      testCode: { $in: testCodes },
+      testCode: { $in: savedTestCodes },
     }).exec();
 
     // Emit real-time events for all results

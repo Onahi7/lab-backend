@@ -69,6 +69,9 @@ export class TestCatalog extends Document {
   @Prop()
   panelName?: string;
 
+  @Prop()
+  subcategory?: string; // For organizing tests within a panel (e.g., urinalysis: Physical, Dipstick, Microscopic)
+
   @Prop({ type: [String] })
   linkedTests?: string[]; // Test codes that should be automatically included (e.g., CRP includes HSCRP)
 

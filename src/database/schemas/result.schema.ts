@@ -38,6 +38,9 @@ export class Result extends Document {
   @Prop()
   category?: string;
 
+  @Prop()
+  subcategory?: string; // For organizing tests within a panel (e.g., urinalysis: Physical, Dipstick, Microscopic)
+
   @Prop({ required: true })
   value: string;
 
