@@ -279,7 +279,7 @@ export class OrdersService {
   /**
    * Find order by ID
    */
-  async findOne(id: string): Promise<Order> {
+  async findOne(id: string): Promise<any> {
     if (!Types.ObjectId.isValid(id)) {
       throw new NotFoundException(`Order with ID ${id} not found`);
     }
@@ -290,13 +290,20 @@ export class OrdersService {
       .populate('orderedBy', 'fullName email')
       .populate('collectedBy', 'fullName email')
       .populate('cancelledBy', 'fullName email')
+      .lean()
       .exec();
 
     if (!order) {
       throw new NotFoundException(`Order with ID ${id} not found`);
     }
 
-    return order;
+    const orderTests = await this.orderTestModel
+      .find({ orderId: new Types.ObjectId(id) })
+      .populate('testId')
+      .lean()
+      .exec();
+
+    return { ...order, order_tests: orderTests };
   }
 
   /**

@@ -142,7 +142,7 @@ export class Hl7Controller {
 
   @Post('restart-listener/:machineId')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRoleEnum.ADMIN)
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH)
   async restartListener(@Param('machineId') machineId: string) {
     await this.tcpListenerService.restartListener(machineId);
     return { success: true, message: 'TCP listener restarted' };

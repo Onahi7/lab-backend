@@ -43,8 +43,13 @@ async function bootstrap() {
       // Allow configured origin (e.g. http://localhost:5173)
       if (origin === corsOrigin) return callback(null, true);
       
-      // Allow any LAN/localhost origin (192.168.x.x, 10.x.x.x, 172.16-31.x.x)
-      if (/^https?:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)(:\d+)?$/.test(origin)) {
+      // Allow any localhost/127.0.0.1 with any port (for development)
+      if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+        return callback(null, true);
+      }
+      
+      // Allow any LAN origin (192.168.x.x, 10.x.x.x, 172.16-31.x.x)
+      if (/^https?:\/\/(192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)(:\d+)?$/.test(origin)) {
         return callback(null, true);
       }
       
@@ -66,7 +71,7 @@ async function bootstrap() {
     exposedHeaders: ['X-Total-Count', 'X-Page', 'X-Per-Page'],
     maxAge: 3600,
   });
-  logger.log(`CORS enabled for origin: ${corsOrigin} + LAN + Cloudflare`);
+  logger.log(`CORS enabled for origin: ${corsOrigin} + localhost (all ports) + LAN + Cloudflare`);
 
   // Enable global validation pipe
   app.useGlobalPipes(
