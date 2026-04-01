@@ -10,7 +10,8 @@ import {
   CashReconciliation,
   ReconciliationStatusEnum,
 } from '../database/schemas/cash-reconciliation.schema';
-import { Order, PaymentStatusEnum, PaymentMethodEnum } from '../database/schemas/order.schema';
+import { Order, PaymentStatusEnum } from '../database/schemas/order.schema';
+import { Payment } from '../database/schemas/payment.schema';
 import { Expenditure } from '../database/schemas/expenditure.schema';
 import { CreateReconciliationDto } from './dto/create-reconciliation.dto';
 import { ReviewReconciliationDto } from './dto/review-reconciliation.dto';
@@ -24,6 +25,8 @@ export class ReconciliationService {
     private reconciliationModel: Model<CashReconciliation>,
     @InjectModel(Order.name)
     private orderModel: Model<Order>,
+    @InjectModel(Payment.name)
+    private paymentModel: Model<Payment>,
     @InjectModel(Expenditure.name)
     private expenditureModel: Model<Expenditure>,
   ) {}
@@ -34,24 +37,21 @@ export class ReconciliationService {
     const endOfDay = new Date(date);
     endOfDay.setHours(23, 59, 59, 999);
 
-    // Get all paid orders for the day
-    const orders = await this.orderModel
-      .find({
-        createdAt: { $gte: startOfDay, $lte: endOfDay },
-        paymentStatus: PaymentStatusEnum.PAID,
-      })
+    // Use Payment model (same source as getDailyIncome) for gross collected
+    const payments = await this.paymentModel
+      .find({ createdAt: { $gte: startOfDay, $lte: endOfDay } })
       .exec();
 
-    // Calculate income by payment method
-    const incomeCash = orders
-      .filter((o) => o.paymentMethod === PaymentMethodEnum.CASH)
-      .reduce((sum, o) => sum + o.total, 0);
-    const incomeOrangeMoney = orders
-      .filter((o) => o.paymentMethod === PaymentMethodEnum.ORANGE_MONEY)
-      .reduce((sum, o) => sum + o.total, 0);
-    const incomeAfrimoney = orders
-      .filter((o) => o.paymentMethod === PaymentMethodEnum.AFRIMONEY)
-      .reduce((sum, o) => sum + o.total, 0);
+    // Gross collected by payment method
+    const incomeCash = payments
+      .filter((p) => p.paymentMethod === 'cash')
+      .reduce((sum, p) => sum + p.amount, 0);
+    const incomeOrangeMoney = payments
+      .filter((p) => p.paymentMethod === 'orange_money')
+      .reduce((sum, p) => sum + p.amount, 0);
+    const incomeAfrimoney = payments
+      .filter((p) => p.paymentMethod === 'afrimoney')
+      .reduce((sum, p) => sum + p.amount, 0);
 
     // Get all expenditures for the day
     const expenditures = await this.expenditureModel
@@ -72,7 +72,7 @@ export class ReconciliationService {
       .reduce((sum, e) => sum + e.amount, 0);
     const totalExpenditures = expenditures.reduce((sum, exp) => sum + exp.amount, 0);
 
-    // Expected cash at hand = income per method minus expenditures paid via that method
+    // Expected = gross collected per method minus expenditures per method
     const expectedCash = incomeCash - cashExpenditures;
     const expectedOrangeMoney = incomeOrangeMoney - orangeExpenditures;
     const expectedAfrimoney = incomeAfrimoney - afriExpenditures;
@@ -81,6 +81,9 @@ export class ReconciliationService {
     const allOrders = await this.orderModel
       .find({ createdAt: { $gte: startOfDay, $lte: endOfDay } })
       .exec();
+    const paidOrders = allOrders.filter(
+      (o) => o.paymentStatus === PaymentStatusEnum.PAID,
+    );
 
     return {
       expectedCash,
@@ -88,8 +91,8 @@ export class ReconciliationService {
       expectedAfrimoney,
       expectedTotal: expectedCash + expectedOrangeMoney + expectedAfrimoney,
       totalOrders: allOrders.length,
-      paidOrders: orders.length,
-      pendingOrders: allOrders.length - orders.length,
+      paidOrders: paidOrders.length,
+      pendingOrders: allOrders.length - paidOrders.length,
       totalExpenditures,
       incomeCash,
       incomeOrangeMoney,
