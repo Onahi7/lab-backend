@@ -60,14 +60,22 @@ export class ReconciliationService {
       })
       .exec();
 
-    // Calculate total expenditures (all come from cash)
+    // Deduct expenditures per payment method
+    const cashExpenditures = expenditures
+      .filter((e) => e.paymentMethod === 'cash')
+      .reduce((sum, e) => sum + e.amount, 0);
+    const orangeExpenditures = expenditures
+      .filter((e) => e.paymentMethod === 'orange_money')
+      .reduce((sum, e) => sum + e.amount, 0);
+    const afriExpenditures = expenditures
+      .filter((e) => e.paymentMethod === 'afrimoney')
+      .reduce((sum, e) => sum + e.amount, 0);
     const totalExpenditures = expenditures.reduce((sum, exp) => sum + exp.amount, 0);
 
-    // Expected amounts = Income - Expenditures
-    // Expenditures are subtracted from cash only
-    const expectedCash = incomeCash - totalExpenditures;
-    const expectedOrangeMoney = incomeOrangeMoney;
-    const expectedAfrimoney = incomeAfrimoney;
+    // Expected cash at hand = income per method minus expenditures paid via that method
+    const expectedCash = incomeCash - cashExpenditures;
+    const expectedOrangeMoney = incomeOrangeMoney - orangeExpenditures;
+    const expectedAfrimoney = incomeAfrimoney - afriExpenditures;
 
     // Get order counts
     const allOrders = await this.orderModel
@@ -118,10 +126,11 @@ export class ReconciliationService {
       actualOrangeMoney: createDto.actualOrangeMoney,
       actualAfrimoney: createDto.actualAfrimoney,
       actualTotal,
-      cashVariance: createDto.actualCash - expected.expectedCash,
-      orangeMoneyVariance: createDto.actualOrangeMoney - expected.expectedOrangeMoney,
-      afrimoneyVariance: createDto.actualAfrimoney - expected.expectedAfrimoney,
-      totalVariance: actualTotal - expected.expectedTotal,
+      // Variance = expected − actual (positive = shortage, negative = surplus)
+      cashVariance: expected.expectedCash - createDto.actualCash,
+      orangeMoneyVariance: expected.expectedOrangeMoney - createDto.actualOrangeMoney,
+      afrimoneyVariance: expected.expectedAfrimoney - createDto.actualAfrimoney,
+      totalVariance: expected.expectedTotal - actualTotal,
       totalOrders: expected.totalOrders,
       paidOrders: expected.paidOrders,
       pendingOrders: expected.pendingOrders,

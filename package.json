@@ -46,6 +46,8 @@
     "update:test-results": "ts-node -r tsconfig-paths/register src/database/update-test-results.ts",
     "fix:urine-protein": "ts-node -r tsconfig-paths/register src/database/fix-urine-protein-category.ts",
     "fix:madinatu-urine": "ts-node -r tsconfig-paths/register src/database/fix-madinatu-urine-protein.ts",
+    "check:today-orders": "ts-node -r tsconfig-paths/register src/database/check-today-orders.ts",
+    "check:reconciliation": "ts-node -r tsconfig-paths/register src/database/check-reconciliation.ts",
     "check:tests": "node check-test-parameters.js",
     "check:tests:json": "node check-test-parameters-json.js",
     "sample:fbc:api": "node fbc-api-sample.js",
