@@ -764,4 +764,19 @@ export class OrdersService {
       .sort({ createdAt: 1 })
       .exec();
   }
+
+  async remove(id: string): Promise<void> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new NotFoundException(`Order with ID ${id} not found`);
+    }
+    const order = await this.orderModel.findById(id).exec();
+    if (!order) {
+      throw new NotFoundException(`Order with ID ${id} not found`);
+    }
+    // Delete associated order tests and payments
+    await this.orderTestModel.deleteMany({ orderId: new Types.ObjectId(id) }).exec();
+    await this.paymentModel.deleteMany({ orderId: new Types.ObjectId(id) }).exec();
+    await this.orderModel.findByIdAndDelete(id).exec();
+    this.logger.log(`Order ${id} and its associated tests/payments deleted`);
+  }
 }

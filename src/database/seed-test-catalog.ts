@@ -616,13 +616,7 @@ async function seedTestCatalog() {
       isActive: true,
       unit: 'mg/dL',
       referenceRanges: [
-        { ageGroup: 'Infant (0-1 year)', ageMin: 0, ageMax: 1, gender: 'all', range: '0.2-0.4', unit: 'mg/dL' },
-        { ageGroup: 'Child (1-12 years)', ageMin: 1, ageMax: 12, gender: 'all', range: '0.3-0.7', unit: 'mg/dL' },
-        { ageGroup: 'Adolescent (12-18 years)', ageMin: 12, ageMax: 18, gender: 'all', range: '0.5-1.0', unit: 'mg/dL' },
-        { ageGroup: 'Adult Male', ageMin: 18, ageMax: 65, gender: 'M', range: '0.7-1.3', unit: 'mg/dL', criticalHigh: '5.0' },
-        { ageGroup: 'Adult Female', ageMin: 18, ageMax: 65, gender: 'F', range: '0.6-1.1', unit: 'mg/dL', criticalHigh: '5.0' },
-        { ageGroup: 'Elderly Male', ageMin: 65, gender: 'M', range: '0.8-1.3', unit: 'mg/dL' },
-        { ageGroup: 'Elderly Female', ageMin: 65, gender: 'F', range: '0.6-1.2', unit: 'mg/dL' },
+        { ageGroup: 'All ages', ageMin: 0, gender: 'all', range: '0.4-1.10', unit: 'mg/dL', criticalHigh: '5.0' },
       ],
     },
     {
@@ -635,9 +629,7 @@ async function seedTestCatalog() {
       isActive: true,
       unit: 'mg/dL',
       referenceRanges: [
-        { ageGroup: 'Child', ageMin: 0, ageMax: 18, gender: 'all', range: '5-18', unit: 'mg/dL' },
-        { ageGroup: 'Adult', ageMin: 18, ageMax: 65, gender: 'all', range: '7-20', unit: 'mg/dL' },
-        { ageGroup: 'Elderly', ageMin: 65, gender: 'all', range: '8-23', unit: 'mg/dL' },
+        { ageGroup: 'All ages', ageMin: 0, gender: 'all', range: '10.2-49.8', unit: 'mg/dL' },
       ],
     },
     {
@@ -650,10 +642,7 @@ async function seedTestCatalog() {
       isActive: true,
       unit: 'mg/dL',
       referenceRanges: [
-        { ageGroup: 'Child', ageMin: 0, ageMax: 18, gender: 'all', range: '2.0-5.5', unit: 'mg/dL' },
-        { ageGroup: 'Adult Male', ageMin: 18, gender: 'M', range: '3.5-7.2', unit: 'mg/dL' },
-        { ageGroup: 'Adult Female (premenopausal)', ageMin: 18, ageMax: 50, gender: 'F', range: '2.6-6.0', unit: 'mg/dL' },
-        { ageGroup: 'Adult Female (postmenopausal)', ageMin: 50, gender: 'F', range: '3.5-7.2', unit: 'mg/dL' },
+        { ageGroup: 'All ages', ageMin: 0, gender: 'all', range: '2.35-7.0', unit: 'mg/dL' },
       ],
     },
     {
@@ -688,7 +677,7 @@ async function seedTestCatalog() {
       code: 'HDL',
       name: 'HDL Cholesterol',
       category: 'chemistry',
-      price: 200,
+      price: 120,
       sampleType: 'blood',
       turnaroundTime: 120,
       isActive: true,
@@ -1386,11 +1375,9 @@ async function seedTestCatalog() {
       sampleType: 'urine',
       turnaroundTime: 60,
       isActive: true,
-      unit: 'mg/24h',
+      description: 'Urine protein dipstick test',
       referenceRanges: [
-        { ageGroup: 'Normal', ageMin: 0, gender: 'all', range: '<150', unit: 'mg/24h' },
-        { ageGroup: 'Microalbuminuria', ageMin: 0, gender: 'all', range: '30-300', unit: 'mg/24h' },
-        { ageGroup: 'Proteinuria', ageMin: 0, gender: 'all', range: '>300', unit: 'mg/24h' },
+        { ageGroup: 'Normal', ageMin: 0, gender: 'all', range: 'Negative', unit: 'qualitative' },
       ],
     },
     {

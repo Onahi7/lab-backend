@@ -1,5 +1,6 @@
 import {
   Controller,
+  Delete,
   Get,
   Post,
   Body,
@@ -134,5 +135,12 @@ export class OrdersController {
   @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH, UserRoleEnum.RECEPTIONIST)
   async getPaymentHistory(@Param('id') id: string) {
     return this.ordersService.getPaymentHistory(id);
+  }
+
+  @Delete(':id')
+  @Roles(UserRoleEnum.ADMIN)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async remove(@Param('id') id: string) {
+    return this.ordersService.remove(id);
   }
 }

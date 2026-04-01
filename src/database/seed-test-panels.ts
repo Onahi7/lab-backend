@@ -150,7 +150,7 @@ async function seedTestPanels() {
     code: 'LIPID',
     name: 'Lipid Profile',
     description: 'Complete lipid panel - Total Cholesterol, Triglycerides, HDL, LDL, VLDL',
-    price: 660, // Sum: CHOL(80) + TG(80) + HDL(200) + LDL(150) + VLDL(150)
+    price: 430, // Sum: CHOL(80) + TG(80) + HDL(120) + LDL(150)
     isActive: true,
     tests: lipidTestItems,
   });
