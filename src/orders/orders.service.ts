@@ -21,6 +21,17 @@ import { RealtimeGateway } from '../realtime/realtime.gateway';
 export class OrdersService {
   private readonly logger = new Logger(OrdersService.name);
 
+  private getEffectiveLinkedTests(testCode: string, configuredLinkedTests?: string[]): string[] {
+    const linked = new Set((configuredLinkedTests || []).map((code) => code.toUpperCase()));
+
+    // Safety fallback: CRP should always include HSCRP for result entry/report workflows.
+    if ((testCode || '').toUpperCase() === 'CRP') {
+      linked.add('HSCRP');
+    }
+
+    return Array.from(linked);
+  }
+
   constructor(
     @InjectModel(Order.name) private orderModel: Model<Order>,
     @InjectModel(OrderTest.name) private orderTestModel: Model<OrderTest>,
@@ -90,18 +101,24 @@ export class OrdersService {
    */
   private async expandLinkedTests(tests: any[]): Promise<any[]> {
     const expandedTests = [...tests];
-    const addedTestCodes = new Set(tests.map(t => t.testCode));
+    const addedTestCodes = new Set(
+      tests.map((t) => (t.testCode || '').toUpperCase()).filter(Boolean),
+    );
 
     for (const test of tests) {
       // Look up the test in catalog to check for linked tests
       const catalogTest = await this.testCatalogModel.findOne({ code: test.testCode }).lean();
-      
-      if (catalogTest?.linkedTests && catalogTest.linkedTests.length > 0) {
-        for (const linkedTestCode of catalogTest.linkedTests) {
+
+      const linkedTests = this.getEffectiveLinkedTests(test.testCode, catalogTest?.linkedTests);
+
+      if (linkedTests.length > 0) {
+        for (const linkedTestCode of linkedTests) {
+          const normalizedLinkedCode = (linkedTestCode || '').toUpperCase();
+
           // Only add if not already in the order
-          if (!addedTestCodes.has(linkedTestCode)) {
-            const linkedTest = await this.testCatalogModel.findOne({ code: linkedTestCode }).lean();
-            
+          if (!addedTestCodes.has(normalizedLinkedCode)) {
+            const linkedTest = await this.testCatalogModel.findOne({ code: normalizedLinkedCode }).lean();
+
             if (linkedTest) {
               expandedTests.push({
                 testId: linkedTest._id.toString(),
@@ -112,8 +129,8 @@ export class OrdersService {
                 category: linkedTest.category,
                 price: 0, // Linked tests are included free
               });
-              addedTestCodes.add(linkedTestCode);
-              this.logger.log(`Auto-added linked test: ${linkedTestCode} for ${test.testCode}`);
+              addedTestCodes.add(normalizedLinkedCode);
+              this.logger.log(`Auto-added linked test: ${normalizedLinkedCode} for ${test.testCode}`);
             }
           }
         }

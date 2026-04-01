@@ -34,6 +34,7 @@
     "check:order-tests": "ts-node -r tsconfig-paths/register src/database/check-order-tests.ts",
     "check:electrolytes": "ts-node -r tsconfig-paths/register src/database/check-electrolyte-panels.ts",
     "check:patient-ages": "ts-node -r tsconfig-paths/register src/database/check-patient-ages.ts",
+    "fix:crp-hscrp-link": "ts-node -r tsconfig-paths/register src/database/fix-crp-hscrp-link.ts",
     "fix:electrolyte": "ts-node -r tsconfig-paths/register src/database/fix-electrolyte-duplicate.ts",
     "remove:u-protein": "ts-node -r tsconfig-paths/register src/database/remove-u-protein.ts",
     "check:tests": "node check-test-parameters.js",

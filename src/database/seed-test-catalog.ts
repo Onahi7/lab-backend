@@ -899,6 +899,7 @@ async function seedTestCatalog() {
       code: 'CRP',
       name: 'C-Reactive Protein',
       category: 'immunoassay',
+      linkedTests: ['HSCRP'],
       price: 190,
       sampleType: 'blood',
       turnaroundTime: 30,
