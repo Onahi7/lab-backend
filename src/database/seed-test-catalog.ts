@@ -1268,16 +1268,16 @@ async function seedTestCatalog() {
       ],
     },
 
-    // ==================== MICROBIOLOGY ====================
+    // ==================== SEROLOGY ====================
     {
       code: 'HPYLORI',
-      name: 'H. Pylori Stool Antigen',
-      category: 'microbiology',
+      name: 'H. Pylori Rapid Test',
+      category: 'serology',
       price: 100,
-      sampleType: 'stool',
-      turnaroundTime: 60,
+      sampleType: 'blood',
+      turnaroundTime: 30,
       isActive: true,
-      description: 'Helicobacter pylori antigen detection',
+      description: 'Helicobacter pylori antibody rapid test',
     },
     {
       code: 'HPYLORI_IA',
@@ -1297,7 +1297,7 @@ async function seedTestCatalog() {
     {
       code: 'MALARIA',
       name: 'Malaria RDT',
-      category: 'microbiology',
+      category: 'serology',
       price: 50,
       sampleType: 'blood',
       turnaroundTime: 30,
@@ -1307,7 +1307,7 @@ async function seedTestCatalog() {
     {
       code: 'HIV',
       name: 'HIV Rapid Test',
-      category: 'microbiology',
+      category: 'serology',
       price: 100,
       sampleType: 'blood',
       turnaroundTime: 30,
@@ -1317,7 +1317,7 @@ async function seedTestCatalog() {
     {
       code: 'HBSAG',
       name: 'Hepatitis B Surface Antigen',
-      category: 'microbiology',
+      category: 'serology',
       price: 50,
       sampleType: 'blood',
       turnaroundTime: 30,
@@ -1327,7 +1327,7 @@ async function seedTestCatalog() {
     {
       code: 'HCV',
       name: 'Hepatitis C Antibody',
-      category: 'microbiology',
+      category: 'serology',
       price: 70,
       sampleType: 'blood',
       turnaroundTime: 30,
@@ -1336,8 +1336,8 @@ async function seedTestCatalog() {
     },
     {
       code: 'WIDAL',
-      name: 'Widal Test',
-      category: 'microbiology',
+      name: 'Widal Test (Typhoid)',
+      category: 'serology',
       price: 80,
       sampleType: 'blood',
       turnaroundTime: 120,
@@ -1346,13 +1346,25 @@ async function seedTestCatalog() {
     },
     {
       code: 'VDRL',
-      name: 'VDRL',
-      category: 'microbiology',
+      name: 'VDRL (Syphilis)',
+      category: 'serology',
       price: 60,
       sampleType: 'blood',
-      turnaroundTime: 120,
+      turnaroundTime: 30,
       isActive: true,
       description: 'Syphilis screening test',
+    },
+
+    // ==================== MICROBIOLOGY ====================
+    {
+      code: 'HPAG',
+      name: 'H. Pylori Antigen (Stool)',
+      category: 'microbiology',
+      price: 150,
+      sampleType: 'stool',
+      turnaroundTime: 60,
+      isActive: true,
+      description: 'Helicobacter pylori stool antigen detection',
     },
 
     // ==================== URINALYSIS ====================
@@ -2075,11 +2087,11 @@ async function seedTestCatalog() {
       description: 'Sickle cell disease screening test',
     },
 
-    // ==================== ADDITIONAL SEROLOGY TESTS ====================
+    // ==================== MORE SEROLOGY TESTS ====================
     {
       code: 'GONORRHEA',
       name: 'Gonorrhea Test',
-      category: 'microbiology',
+      category: 'serology',
       price: 150,
       sampleType: 'swab',
       turnaroundTime: 60,
@@ -2089,7 +2101,7 @@ async function seedTestCatalog() {
     {
       code: 'CHLAMYDIA',
       name: 'Chlamydia Test',
-      category: 'microbiology',
+      category: 'serology',
       price: 150,
       sampleType: 'swab',
       turnaroundTime: 60,
@@ -2099,7 +2111,7 @@ async function seedTestCatalog() {
     {
       code: 'HSV',
       name: 'Herpes Simplex Virus',
-      category: 'microbiology',
+      category: 'serology',
       price: 150,
       sampleType: 'blood',
       turnaroundTime: 60,
@@ -2109,7 +2121,7 @@ async function seedTestCatalog() {
     {
       code: 'HIVP24',
       name: 'HIV P24 Antigen',
-      category: 'microbiology',
+      category: 'serology',
       price: 150,
       sampleType: 'blood',
       turnaroundTime: 30,

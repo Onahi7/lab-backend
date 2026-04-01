@@ -23,6 +23,11 @@ import { LaboratoryInfoDto } from './dto/laboratory-info.dto';
 
 @Injectable()
 export class ReportsService {
+  private static readonly TEST_CODE_ALIASES: Record<string, string[]> = {
+    HSCRP: ['HSCR'],
+    HSCR: ['HSCRP'],
+  };
+
   constructor(
     @InjectModel(Order.name)
     private orderModel: Model<Order>,
@@ -134,6 +139,9 @@ export class ReportsService {
         if (code) {
           catalogCodes.add(code);
           catalogCodes.add(code.toUpperCase());
+          for (const lookupToken of this.getLookupTokens(code)) {
+            catalogCodes.add(lookupToken);
+          }
         }
       }
     }
@@ -144,6 +152,9 @@ export class ReportsService {
         if (code) {
           catalogCodes.add(code);
           catalogCodes.add(code.toUpperCase());
+          for (const lookupToken of this.getLookupTokens(code)) {
+            catalogCodes.add(lookupToken);
+          }
         }
       }
     }
@@ -173,9 +184,10 @@ export class ReportsService {
     for (const testCatalogEntry of testCatalogEntries) {
       testCatalogById.set(testCatalogEntry._id.toString(), testCatalogEntry);
 
-      const normalizedCatalogCode = this.normalizeLookupToken(testCatalogEntry.code);
-      if (normalizedCatalogCode && !testCatalogByNormalizedCode.has(normalizedCatalogCode)) {
-        testCatalogByNormalizedCode.set(normalizedCatalogCode, testCatalogEntry);
+      for (const lookupToken of this.getLookupTokens(testCatalogEntry.code)) {
+        if (!testCatalogByNormalizedCode.has(lookupToken)) {
+          testCatalogByNormalizedCode.set(lookupToken, testCatalogEntry);
+        }
       }
     }
 
@@ -319,7 +331,10 @@ export class ReportsService {
         isAmended,
         amendmentReason: result.amendmentReason,
         displayOrder,
-        category: testInfo?.category || TestCategoryEnum.OTHER,
+        category:
+          testInfo?.category ||
+          this.resolveResultCategory(result.category) ||
+          TestCategoryEnum.OTHER,
       } as any);
     }
 
@@ -388,6 +403,36 @@ export class ReportsService {
     }
 
     return value.replace(/\s+/g, '').toUpperCase();
+  }
+
+  private getLookupTokens(value?: string): string[] {
+    const normalized = this.normalizeLookupToken(value);
+    if (!normalized) {
+      return [];
+    }
+
+    const aliases = ReportsService.TEST_CODE_ALIASES[normalized] || [];
+    return [normalized, ...aliases];
+  }
+
+  private resolveResultCategory(category?: string): TestCategoryEnum | undefined {
+    const normalized = (category || '').trim().toLowerCase().replace(/\s+/g, '_');
+    if (!normalized) {
+      return undefined;
+    }
+
+    const categoryMap: Record<string, TestCategoryEnum> = {
+      chemistry: TestCategoryEnum.CHEMISTRY,
+      hematology: TestCategoryEnum.HEMATOLOGY,
+      immunoassay: TestCategoryEnum.IMMUNOASSAY,
+      serology: TestCategoryEnum.SEROLOGY,
+      urinalysis: TestCategoryEnum.URINALYSIS,
+      microbiology: TestCategoryEnum.MICROBIOLOGY,
+      other: TestCategoryEnum.OTHER,
+      other_tests: TestCategoryEnum.OTHER,
+    };
+
+    return categoryMap[normalized];
   }
 
   /**
