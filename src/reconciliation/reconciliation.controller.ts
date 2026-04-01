@@ -27,6 +27,12 @@ export class ReconciliationController {
     return this.reconciliationService.getExpectedAmounts(new Date(date));
   }
 
+  @Get('daily-report/:date')
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.RECEPTIONIST)
+  async getDailyReport(@Param('date') date: string) {
+    return this.reconciliationService.getDailyReport(new Date(date));
+  }
+
   @Post()
   @Roles(UserRoleEnum.RECEPTIONIST)
   async create(

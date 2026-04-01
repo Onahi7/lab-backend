@@ -12,6 +12,7 @@ import {
 } from '../database/schemas/cash-reconciliation.schema';
 import { Order, PaymentStatusEnum } from '../database/schemas/order.schema';
 import { Payment } from '../database/schemas/payment.schema';
+import { OrderTest } from '../database/schemas/order-test.schema';
 import { Expenditure } from '../database/schemas/expenditure.schema';
 import { CreateReconciliationDto } from './dto/create-reconciliation.dto';
 import { ReviewReconciliationDto } from './dto/review-reconciliation.dto';
@@ -27,6 +28,8 @@ export class ReconciliationService {
     private orderModel: Model<Order>,
     @InjectModel(Payment.name)
     private paymentModel: Model<Payment>,
+    @InjectModel(OrderTest.name)
+    private orderTestModel: Model<OrderTest>,
     @InjectModel(Expenditure.name)
     private expenditureModel: Model<Expenditure>,
   ) {}
@@ -206,5 +209,134 @@ export class ReconciliationService {
     return this.reconciliationModel
       .countDocuments({ status: ReconciliationStatusEnum.PENDING })
       .exec();
+  }
+
+  async getDailyReport(date: Date) {
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    // 1. Orders
+    const orders = await this.orderModel
+      .find({ createdAt: { $gte: startOfDay, $lte: endOfDay } })
+      .lean();
+
+    const totalOrders = orders.length;
+    const paidOrders = orders.filter(o => o.paymentStatus === PaymentStatusEnum.PAID);
+    const totalSubtotal = orders.reduce((s, o) => s + (o.subtotal || 0), 0);
+    const totalDiscounts = orders.reduce((s, o) => s + (o.discount || 0), 0);
+    const totalBilled = orders.reduce((s, o) => s + (o.total || 0), 0);
+
+    // 2. Tests done (from OrderTest)
+    const orderTests = await this.orderTestModel
+      .find({ createdAt: { $gte: startOfDay, $lte: endOfDay } })
+      .lean();
+
+    const totalTestsDone = orderTests.length;
+    const completedTests = orderTests.filter(t => t.status === 'completed' || t.status === 'verified').length;
+    const pendingTests = orderTests.filter(t => t.status === 'pending' || t.status === 'in_progress').length;
+
+    // 3. Payments (actual money received)
+    const payments = await this.paymentModel
+      .find({ createdAt: { $gte: startOfDay, $lte: endOfDay } })
+      .lean();
+
+    const cashCollected = payments
+      .filter(p => p.paymentMethod === 'cash')
+      .reduce((s, p) => s + p.amount, 0);
+    const orangeCollected = payments
+      .filter(p => p.paymentMethod === 'orange_money')
+      .reduce((s, p) => s + p.amount, 0);
+    const afriCollected = payments
+      .filter(p => p.paymentMethod === 'afrimoney')
+      .reduce((s, p) => s + p.amount, 0);
+    const totalCollected = cashCollected + orangeCollected + afriCollected;
+
+    // 4. Expenditures
+    const expenditures = await this.expenditureModel
+      .find({ expenditureDate: { $gte: startOfDay, $lte: endOfDay } })
+      .lean();
+
+    const cashExpenditure = expenditures
+      .filter(e => e.paymentMethod === 'cash')
+      .reduce((s, e) => s + e.amount, 0);
+    const orangeExpenditure = expenditures
+      .filter(e => e.paymentMethod === 'orange_money')
+      .reduce((s, e) => s + e.amount, 0);
+    const afriExpenditure = expenditures
+      .filter(e => e.paymentMethod === 'afrimoney')
+      .reduce((s, e) => s + e.amount, 0);
+    const totalExpenditure = expenditures.reduce((s, e) => s + e.amount, 0);
+
+    // 5. Net expected per method
+    const netExpectedCash = cashCollected - cashExpenditure;
+    const netExpectedOrange = orangeCollected - orangeExpenditure;
+    const netExpectedAfri = afriCollected - afriExpenditure;
+    const netExpectedTotal = totalCollected - totalExpenditure;
+
+    // 6. Reconciliation (if submitted)
+    const reconciliation = await this.reconciliationModel
+      .findOne({ reconciliationDate: { $gte: startOfDay, $lte: endOfDay } })
+      .populate('submittedBy', 'fullName')
+      .lean();
+
+    let submitted = null;
+    if (reconciliation) {
+      submitted = {
+        actualCash: reconciliation.actualCash,
+        actualOrangeMoney: reconciliation.actualOrangeMoney,
+        actualAfrimoney: reconciliation.actualAfrimoney,
+        actualTotal: reconciliation.actualTotal,
+        cashVariance: reconciliation.cashVariance,
+        orangeMoneyVariance: reconciliation.orangeMoneyVariance,
+        afrimoneyVariance: reconciliation.afrimoneyVariance,
+        totalVariance: reconciliation.totalVariance,
+        status: reconciliation.status,
+        submittedBy: (reconciliation.submittedBy as any)?.fullName || 'Unknown',
+      };
+    }
+
+    return {
+      date: startOfDay.toISOString(),
+      orders: {
+        total: totalOrders,
+        paid: paidOrders.length,
+        pending: totalOrders - paidOrders.length,
+        subtotal: totalSubtotal,
+        discounts: totalDiscounts,
+        billed: totalBilled,
+      },
+      tests: {
+        total: totalTestsDone,
+        completed: completedTests,
+        pending: pendingTests,
+      },
+      income: {
+        cash: cashCollected,
+        orangeMoney: orangeCollected,
+        afrimoney: afriCollected,
+        total: totalCollected,
+      },
+      expenditures: {
+        cash: cashExpenditure,
+        orangeMoney: orangeExpenditure,
+        afrimoney: afriExpenditure,
+        total: totalExpenditure,
+        items: expenditures.map(e => ({
+          description: e.description,
+          amount: e.amount,
+          paymentMethod: e.paymentMethod,
+          category: (e as any).category,
+        })),
+      },
+      netExpected: {
+        cash: netExpectedCash,
+        orangeMoney: netExpectedOrange,
+        afrimoney: netExpectedAfri,
+        total: netExpectedTotal,
+      },
+      reconciliation: submitted,
+    };
   }
 }
