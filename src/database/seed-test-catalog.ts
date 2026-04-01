@@ -736,11 +736,11 @@ async function seedTestCatalog() {
       sampleType: 'blood',
       turnaroundTime: 120,
       isActive: true,
-      unit: 'mg/dL',
+      unit: 'mmol/L',
       referenceRanges: [
-        { ageGroup: 'Normal', ageMin: 18, gender: 'all', range: '70-100', unit: 'mg/dL', criticalLow: '50', criticalHigh: '500' },
-        { ageGroup: 'Prediabetes', ageMin: 18, gender: 'all', range: '100-125', unit: 'mg/dL' },
-        { ageGroup: 'Diabetes', ageMin: 18, gender: 'all', range: '≥126', unit: 'mg/dL' },
+        { ageGroup: 'Normal', ageMin: 18, gender: 'all', range: '3.5-5.9', unit: 'mmol/L', criticalLow: '2.8', criticalHigh: '27.8' },
+        { ageGroup: 'Prediabetes', ageMin: 18, gender: 'all', range: '5.6-6.9', unit: 'mmol/L' },
+        { ageGroup: 'Diabetes', ageMin: 18, gender: 'all', range: '≥7.0', unit: 'mmol/L' },
       ],
     },
     {
@@ -751,11 +751,11 @@ async function seedTestCatalog() {
       sampleType: 'blood',
       turnaroundTime: 60,
       isActive: true,
-      unit: 'mg/dL',
+      unit: 'mmol/L',
       referenceRanges: [
-        { ageGroup: 'Normal', ageMin: 18, gender: 'all', range: '<140', unit: 'mg/dL', criticalLow: '50', criticalHigh: '500' },
-        { ageGroup: 'Prediabetes', ageMin: 18, gender: 'all', range: '140-199', unit: 'mg/dL' },
-        { ageGroup: 'Diabetes', ageMin: 18, gender: 'all', range: '≥200', unit: 'mg/dL' },
+        { ageGroup: 'Normal', ageMin: 18, gender: 'all', range: '<7.8', unit: 'mmol/L', criticalLow: '2.8', criticalHigh: '27.8' },
+        { ageGroup: 'Prediabetes', ageMin: 18, gender: 'all', range: '7.8-11.0', unit: 'mmol/L' },
+        { ageGroup: 'Diabetes', ageMin: 18, gender: 'all', range: '≥11.1', unit: 'mmol/L' },
       ],
     },
     {
@@ -1336,13 +1336,13 @@ async function seedTestCatalog() {
     },
     {
       code: 'WIDAL',
-      name: 'Widal Test (Typhoid)',
+      name: 'Typhoid (IgM/IgG)',
       category: 'serology',
       price: 80,
       sampleType: 'blood',
-      turnaroundTime: 120,
+      turnaroundTime: 30,
       isActive: true,
-      description: 'Typhoid fever antibody test',
+      description: 'Typhoid rapid strip test — reports S. typhi IgM and IgG separately',
     },
     {
       code: 'VDRL',

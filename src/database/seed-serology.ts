@@ -106,13 +106,13 @@ async function seedSerology() {
     },
     {
       code: 'WIDAL',
-      name: 'Widal Test (Typhoid)',
+      name: 'Typhoid (IgM/IgG)',
       category: 'serology',
       price: 80,
       sampleType: 'blood',
-      turnaroundTime: 120,
+      turnaroundTime: 30,
       isActive: true,
-      description: 'Typhoid fever antibody test — titered result',
+      description: 'Typhoid rapid strip test — reports S. typhi IgM and IgG separately',
     },
     {
       code: 'HIVP24',
