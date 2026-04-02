@@ -200,6 +200,7 @@ export class ReportsService {
       patientId: patient.patientNumber || patient._id.toString(),
       fullName: `${patient.firstName} ${patient.lastName}`,
       age: patientAge,
+      ageUnit: patient.ageUnit,
       gender: patient.gender,
       mrn: patient.medicalRecordNumber,
       phone: patient.phone,

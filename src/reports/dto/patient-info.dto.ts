@@ -11,6 +11,10 @@ export class PatientInfoDto {
   @IsNumber()
   age: number;
 
+  @IsOptional()
+  @IsString()
+  ageUnit?: string;
+
   @IsEnum(GenderEnum)
   gender: GenderEnum;
 
