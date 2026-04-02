@@ -32,6 +32,7 @@
     "seed:machines": "ts-node -r tsconfig-paths/register src/database/seed-machines.ts",
     "fix:catalog": "ts-node -r tsconfig-paths/register src/database/fix-catalog-and-panels.ts",
     "update:rft": "ts-node -r tsconfig-paths/register src/database/update-rft-panel.ts",
+    "update:elec": "ts-node -r tsconfig-paths/register src/database/update-elec-panel.ts",
     "adjust:catalog": "ts-node -r tsconfig-paths/register src/database/adjust-catalog-from-panels.ts",
     "seed:all": "npm run seed:catalog && npm run seed:panels && npm run adjust:catalog",
     "reset:data": "ts-node -r tsconfig-paths/register src/database/reset-transactional-data.ts",

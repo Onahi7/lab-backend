@@ -14,6 +14,7 @@ import { Order, PaymentStatusEnum } from '../database/schemas/order.schema';
 import { Payment } from '../database/schemas/payment.schema';
 import { OrderTest } from '../database/schemas/order-test.schema';
 import { Expenditure } from '../database/schemas/expenditure.schema';
+import { Patient } from '../database/schemas/patient.schema';
 import { CreateReconciliationDto } from './dto/create-reconciliation.dto';
 import { ReviewReconciliationDto } from './dto/review-reconciliation.dto';
 
@@ -32,6 +33,8 @@ export class ReconciliationService {
     private orderTestModel: Model<OrderTest>,
     @InjectModel(Expenditure.name)
     private expenditureModel: Model<Expenditure>,
+    @InjectModel(Patient.name)
+    private patientModel: Model<Patient>,
   ) {}
 
   async getExpectedAmounts(date: Date) {
@@ -237,6 +240,33 @@ export class ReconciliationService {
     const completedTests = orderTests.filter(t => t.status === 'completed' || t.status === 'verified').length;
     const pendingTests = orderTests.filter(t => t.status === 'pending' || t.status === 'in_progress').length;
 
+    // Test breakdown: count by panel (if part of panel) or individual test code
+    const testBreakdownMap = new Map<string, number>();
+    for (const ot of orderTests) {
+      const key = ot.panelCode || ot.testCode;
+      testBreakdownMap.set(key, (testBreakdownMap.get(key) || 0) + 1);
+    }
+    // De-duplicate panel counts: each panel should count once per order (not per test in panel)
+    // We need to count unique (orderId, panelCode) pairs for panels, and individual tests otherwise
+    const panelOrderCounts = new Map<string, Set<string>>();
+    const standaloneTestBreakdown = new Map<string, number>();
+    for (const ot of orderTests) {
+      if (ot.panelCode) {
+        if (!panelOrderCounts.has(ot.panelCode)) panelOrderCounts.set(ot.panelCode, new Set());
+        panelOrderCounts.get(ot.panelCode)!.add(ot.orderId.toString());
+      } else {
+        standaloneTestBreakdown.set(ot.testCode, (standaloneTestBreakdown.get(ot.testCode) || 0) + 1);
+      }
+    }
+    const testBreakdown: Array<{ name: string; count: number }> = [];
+    panelOrderCounts.forEach((orderIds, panelCode) => {
+      testBreakdown.push({ name: panelCode, count: orderIds.size });
+    });
+    standaloneTestBreakdown.forEach((count, code) => {
+      testBreakdown.push({ name: code, count });
+    });
+    testBreakdown.sort((a, b) => b.count - a.count);
+
     // 3. Payments (actual money received)
     const payments = await this.paymentModel
       .find({ createdAt: { $gte: startOfDay, $lte: endOfDay } })
@@ -311,6 +341,7 @@ export class ReconciliationService {
         total: totalTestsDone,
         completed: completedTests,
         pending: pendingTests,
+        breakdown: testBreakdown,
       },
       income: {
         cash: cashCollected,
@@ -337,6 +368,118 @@ export class ReconciliationService {
         total: netExpectedTotal,
       },
       reconciliation: submitted,
+    };
+  }
+
+  async getDoctorReferralReport(params: { startDate?: Date; endDate?: Date; doctor?: string }) {
+    const filter: any = { referredByDoctor: { $exists: true, $nin: [null, ''] } };
+
+    if (params.startDate || params.endDate) {
+      filter.createdAt = {};
+      if (params.startDate) {
+        const s = new Date(params.startDate);
+        s.setHours(0, 0, 0, 0);
+        filter.createdAt.$gte = s;
+      }
+      if (params.endDate) {
+        const e = new Date(params.endDate);
+        e.setHours(23, 59, 59, 999);
+        filter.createdAt.$lte = e;
+      }
+    }
+
+    if (params.doctor) {
+      filter.referredByDoctor = { $regex: params.doctor, $options: 'i' };
+    }
+
+    const orders = await this.orderModel
+      .find(filter)
+      .sort({ createdAt: -1 })
+      .lean();
+
+    if (orders.length === 0) return { rows: [], summary: { totalOrders: 0, totalBilled: 0, totalDiscount: 0, totalPaid: 0, doctors: [] } };
+
+    // Fetch all order tests for the matching orders in one query
+    const orderIds = orders.map(o => o._id);
+    const orderTests = await this.orderTestModel
+      .find({ orderId: { $in: orderIds } })
+      .lean();
+
+    const testsByOrder = new Map<string, typeof orderTests>();
+    for (const ot of orderTests) {
+      const key = ot.orderId.toString();
+      if (!testsByOrder.has(key)) testsByOrder.set(key, []);
+      testsByOrder.get(key)!.push(ot);
+    }
+
+    // Fetch patients
+    const patientIds = [...new Set(orders.map(o => o.patientId.toString()))];
+    const patients = await this.patientModel
+      .find({ _id: { $in: patientIds.map(id => new Types.ObjectId(id)) } })
+      .lean();
+    const patientMap = new Map(patients.map(p => [p._id.toString(), p]));
+
+    // Build rows
+    const rows = orders.map(order => {
+      const patient = patientMap.get(order.patientId.toString());
+      const patientName = patient
+        ? `${patient.firstName} ${patient.lastName}`
+        : 'Unknown';
+
+      const tests = testsByOrder.get(order._id.toString()) || [];
+      // Summarise: panels (deduplicated by panelCode) + standalone tests
+      const panelsSeen = new Set<string>();
+      const testLabels: string[] = [];
+      for (const t of tests) {
+        if (t.panelCode) {
+          if (!panelsSeen.has(t.panelCode)) {
+            panelsSeen.add(t.panelCode);
+            testLabels.push(t.panelCode);
+          }
+        } else {
+          testLabels.push(t.testCode);
+        }
+      }
+
+      return {
+        orderNumber: order.orderNumber,
+        date: order.createdAt,
+        patientName,
+        doctor: order.referredByDoctor || '',
+        tests: testLabels.join(', '),
+        subtotal: order.subtotal || 0,
+        discount: order.discount || 0,
+        total: order.total || 0,
+        amountPaid: order.amountPaid || 0,
+        paymentStatus: order.paymentStatus,
+      };
+    });
+
+    // Summary per doctor
+    const doctorMap = new Map<string, { orders: number; billed: number; discount: number; paid: number }>();
+    for (const row of rows) {
+      const key = row.doctor;
+      if (!doctorMap.has(key)) doctorMap.set(key, { orders: 0, billed: 0, discount: 0, paid: 0 });
+      const d = doctorMap.get(key)!;
+      d.orders += 1;
+      d.billed += row.total;
+      d.discount += row.discount;
+      d.paid += row.amountPaid;
+    }
+
+    const doctors = Array.from(doctorMap.entries())
+      .map(([name, stats]) => ({ name, ...stats }))
+      .sort((a, b) => b.orders - a.orders);
+
+    return {
+      rows,
+      summary: {
+        totalOrders: rows.length,
+        totalBilled: rows.reduce((s, r) => s + r.total, 0),
+        totalDiscount: rows.reduce((s, r) => s + r.discount, 0),
+        totalPaid: rows.reduce((s, r) => s + r.amountPaid, 0),
+        doctors,
+      },
     };
   }
 }

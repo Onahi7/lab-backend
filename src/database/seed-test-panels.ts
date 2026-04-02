@@ -60,7 +60,7 @@ async function seedTestPanels() {
   });
 
   // ==================== ELECTROLYTE PANEL ====================
-  const electTests = ['K', 'NA', 'CL', 'ICA', 'NCA', 'TCA'];
+  const electTests = ['K', 'NA', 'CL', 'ICA', 'NCA', 'TCA', 'TCO2', 'PH'];
   const electTestItems = [];
   
   for (const code of electTests) {
@@ -77,8 +77,8 @@ async function seedTestPanels() {
   panels.push({
     code: 'ELEC',
     name: 'Electrolyte Panel',
-    description: 'Complete electrolyte panel - K, Na, Cl, iCa, nCa, TCa',
-    price: 210,
+    description: 'Complete electrolyte panel - K, Na, Cl, iCa, nCa, TCa, TCO2, Blood pH',
+    price: 190,
     isActive: true,
     tests: electTestItems,
   });

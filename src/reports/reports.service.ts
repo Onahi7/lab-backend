@@ -299,9 +299,9 @@ export class ReportsService {
 
       const testCode = orderTest?.testCode || result.testCode;
       const testName =
+        testInfo?.name ||
         (result.testName && result.testName.trim()) ||
         orderTest?.testName ||
-        testInfo?.name ||
         testCode;
       
       const resultedByProfile = result.resultedBy as any;

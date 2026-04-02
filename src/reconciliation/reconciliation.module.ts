@@ -10,6 +10,7 @@ import { Order, OrderSchema } from '../database/schemas/order.schema';
 import { Expenditure, ExpenditureSchema } from '../database/schemas/expenditure.schema';
 import { Payment, PaymentSchema } from '../database/schemas/payment.schema';
 import { OrderTest, OrderTestSchema } from '../database/schemas/order-test.schema';
+import { Patient, PatientSchema } from '../database/schemas/patient.schema';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { OrderTest, OrderTestSchema } from '../database/schemas/order-test.schem
       { name: Expenditure.name, schema: ExpenditureSchema },
       { name: Payment.name, schema: PaymentSchema },
       { name: OrderTest.name, schema: OrderTestSchema },
+      { name: Patient.name, schema: PatientSchema },
     ]),
   ],
   controllers: [ReconciliationController],

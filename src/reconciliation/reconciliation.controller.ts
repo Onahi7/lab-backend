@@ -33,6 +33,20 @@ export class ReconciliationController {
     return this.reconciliationService.getDailyReport(new Date(date));
   }
 
+  @Get('doctor-referral-report')
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.RECEPTIONIST)
+  async getDoctorReferralReport(
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+    @Query('doctor') doctor?: string,
+  ) {
+    return this.reconciliationService.getDoctorReferralReport({
+      startDate: startDate ? new Date(startDate) : undefined,
+      endDate: endDate ? new Date(endDate) : undefined,
+      doctor,
+    });
+  }
+
   @Post()
   @Roles(UserRoleEnum.RECEPTIONIST)
   async create(

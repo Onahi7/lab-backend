@@ -141,6 +141,48 @@ async function seedElectrolytes() {
           },
         ],
       },
+      {
+        code: 'TCO2',
+        name: 'Total Carbon Dioxide',
+        category: 'chemistry',
+        price: 35,
+        sampleType: 'blood',
+        turnaroundTime: 120,
+        isActive: true,
+        unit: 'mmol/L',
+        referenceRanges: [
+          {
+            ageGroup: 'All ages',
+            ageMin: 0,
+            gender: 'all',
+            range: '22-28',
+            unit: 'mmol/L',
+            criticalLow: '15',
+            criticalHigh: '40',
+          },
+        ],
+      },
+      {
+        code: 'PH',
+        name: 'Blood pH',
+        category: 'chemistry',
+        price: 35,
+        sampleType: 'blood',
+        turnaroundTime: 120,
+        isActive: true,
+        unit: 'pH',
+        referenceRanges: [
+          {
+            ageGroup: 'All ages',
+            ageMin: 0,
+            gender: 'all',
+            range: '7.35-7.45',
+            unit: 'pH',
+            criticalLow: '7.20',
+            criticalHigh: '7.60',
+          },
+        ],
+      },
     ];
 
     console.log('📋 Creating/Updating Electrolyte Tests:');
@@ -161,21 +203,25 @@ async function seedElectrolytes() {
     // ==================== ELECTROLYTE PANEL ====================
     console.log('\n📦 Creating Electrolyte Panel:');
 
-    // Get all electrolyte test IDs
-    const testCodes = ['K', 'NA', 'CL', 'ICA', 'NCA', 'TCA'];
+    // Get all electrolyte test IDs (ordered as expected on panel)
+    const testCodes = ['K', 'NA', 'CL', 'ICA', 'NCA', 'TCA', 'TCO2', 'PH'];
     const tests = await testCatalogModel.find({ code: { $in: testCodes } }).exec();
-    
-    const panelTests = tests.map(test => ({
-      testId: test._id,
-      testCode: test.code,
-      testName: test.name,
-    }));
+
+    // Preserve order from testCodes array
+    const panelTests = testCodes
+      .map(code => tests.find(t => t.code === code))
+      .filter(Boolean)
+      .map(test => ({
+        testId: test!._id,
+        testCode: test!.code,
+        testName: test!.name,
+      }));
 
     const panel = {
       code: 'ELEC',
       name: 'Electrolyte Panel',
-      description: 'Complete electrolyte panel - K, Na, Cl, iCa, nCa, TCa',
-      price: 210, // 6 tests × 35 = 210
+      description: 'Complete electrolyte panel - K, Na, Cl, iCa, nCa, TCa, TCO2, Blood pH',
+      price: 190,
       isActive: true,
       tests: panelTests,
     };
@@ -202,10 +248,10 @@ async function seedElectrolytes() {
       console.log(`   ✅ Panel found in database`);
       console.log(`   Tests count: ${savedPanel.tests?.length || 0}`);
       
-      if (savedPanel.tests && savedPanel.tests.length === 6) {
-        console.log(`   ✅ All 6 tests present`);
+      if (savedPanel.tests && savedPanel.tests.length === 8) {
+        console.log(`   ✅ All 8 tests present`);
       } else {
-        console.log(`   ⚠️  Expected 6 tests, found ${savedPanel.tests?.length || 0}`);
+        console.log(`   ⚠️  Expected 8 tests, found ${savedPanel.tests?.length || 0}`);
       }
     } else {
       console.log(`   ❌ Panel not found in database`);
