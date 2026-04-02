@@ -310,6 +310,20 @@ export class ReportsService {
       // Determine if this result is amended
       const isAmended = result.status === ResultStatusEnum.AMENDED;
 
+      // Determine category, inferring urinalysis for "Urine *" tests miscategorised as other
+      const resolvedCategory = (() => {
+        const cat =
+          testInfo?.category ||
+          this.resolveResultCategory(result.category);
+        if (!cat || cat === TestCategoryEnum.OTHER) {
+          const nameLower = testName.toLowerCase();
+          if (nameLower.startsWith('urine ') || nameLower === 'urine') {
+            return TestCategoryEnum.URINALYSIS;
+          }
+        }
+        return cat || TestCategoryEnum.OTHER;
+      })();
+
       resultItems.push({
         testCode,
         testName,
@@ -331,10 +345,8 @@ export class ReportsService {
         isAmended,
         amendmentReason: result.amendmentReason,
         displayOrder,
-        category:
-          testInfo?.category ||
-          this.resolveResultCategory(result.category) ||
-          TestCategoryEnum.OTHER,
+        subcategory: result.subcategory || testInfo?.subcategory,
+        category: resolvedCategory,
       } as any);
     }
 

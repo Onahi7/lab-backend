@@ -43,4 +43,8 @@ export class ResultItemDto {
   @IsOptional()
   @IsString()
   amendmentReason?: string;
+
+  @IsOptional()
+  @IsString()
+  subcategory?: string;
 }
