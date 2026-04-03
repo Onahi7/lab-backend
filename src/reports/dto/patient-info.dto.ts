@@ -12,6 +12,10 @@ export class PatientInfoDto {
   age: number;
 
   @IsOptional()
+  @IsNumber()
+  ageValue?: number;
+
+  @IsOptional()
   @IsString()
   ageUnit?: string;
 
