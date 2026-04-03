@@ -26,6 +26,9 @@ export class ReportsService {
   private static readonly TEST_CODE_ALIASES: Record<string, string[]> = {
     HSCRP: ['HSCR'],
     HSCR: ['HSCRP'],
+    UPROTEIN: ['URINEPROTEIN', 'UPRO'],
+    URINEPROTEIN: ['UPROTEIN', 'UPRO'],
+    UPRO: ['UPROTEIN', 'URINEPROTEIN'],
   };
 
   constructor(
@@ -312,14 +315,30 @@ export class ReportsService {
       // Determine if this result is amended
       const isAmended = result.status === ResultStatusEnum.AMENDED;
 
-      // Determine category, inferring urinalysis for "Urine *" tests miscategorised as other
+      // Determine category, inferring urinalysis for urine-coded tests miscategorised as other
       const resolvedCategory = (() => {
         const cat =
           testInfo?.category ||
           this.resolveResultCategory(result.category);
+
         if (!cat || cat === TestCategoryEnum.OTHER) {
+          const normalizedCode = this.normalizeLookupToken(testCode);
+          const normalizedSubcategory = this.normalizeLookupToken(
+            result.subcategory || testInfo?.subcategory,
+          );
           const nameLower = testName.toLowerCase();
-          if (nameLower.startsWith('urine ') || nameLower === 'urine') {
+
+          const isUrineByName = nameLower.startsWith('urine ') || nameLower === 'urine';
+          const isUrineByCode =
+            normalizedCode.startsWith('URINE') ||
+            normalizedCode === 'UPROTEIN' ||
+            normalizedCode === 'UPRO';
+          const isUrineBySubcategory =
+            normalizedSubcategory === 'DIPSTICKCHEMICAL' ||
+            normalizedSubcategory === 'MICROSCOPIC' ||
+            normalizedSubcategory === 'PHYSICALEXAMINATION';
+
+          if (isUrineByName || isUrineByCode || isUrineBySubcategory) {
             return TestCategoryEnum.URINALYSIS;
           }
         }
@@ -416,7 +435,7 @@ export class ReportsService {
       return '';
     }
 
-    return value.replace(/\s+/g, '').toUpperCase();
+    return value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
   }
 
   private getLookupTokens(value?: string): string[] {
