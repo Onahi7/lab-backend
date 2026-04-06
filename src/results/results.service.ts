@@ -617,28 +617,25 @@ export class ResultsService {
       originalResult.unit,
     );
 
-    // Create new result with amended data
-    const amendedResult = new this.resultModel({
-      orderId: originalResult.orderId,
-      orderTestId: originalResult.orderTestId,
-      testCode: originalResult.testCode,
-      testName: originalResult.testName,
-      value: normalizedNewValue,
-      unit: normalizedUnit,
-      referenceRange: normalizedReferenceRange,
-      flag: this.calculateFlag(
-        normalizedNewValue,
-        normalizedReferenceRange,
-      ),
-      status: ResultStatusEnum.AMENDED,
-      comments: originalResult.comments,
-      resultedAt: new Date(),
-      resultedBy: userId ? new Types.ObjectId(userId) : undefined,
-      amendedFrom: originalResult._id,
-      amendmentReason: amendResultDto.reason,
-    });
+    // Amend in place to avoid duplicate-key conflicts with the unique
+    // orderId+testCode index while preserving amendment metadata.
+    originalResult.value = normalizedNewValue;
+    originalResult.unit = normalizedUnit;
+    originalResult.referenceRange = normalizedReferenceRange;
+    originalResult.flag = this.calculateFlag(
+      normalizedNewValue,
+      normalizedReferenceRange,
+    );
+    originalResult.status = ResultStatusEnum.AMENDED;
+    originalResult.resultedAt = new Date();
+    originalResult.resultedBy = userId ? new Types.ObjectId(userId) : undefined;
+    originalResult.amendmentReason = amendResultDto.reason;
 
-    return amendedResult.save();
+    if (!originalResult.amendedFrom) {
+      originalResult.amendedFrom = originalResult._id;
+    }
+
+    return originalResult.save();
   }
 
   /**
