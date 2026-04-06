@@ -18,6 +18,8 @@ import { resolveReferenceRange } from '../common/utils/reference-range-resolver'
 
 @Injectable()
 export class ResultsService {
+  private static readonly MCHC_TEST_CODE = 'MCHC';
+
   constructor(
     @InjectModel(Result.name) private resultModel: Model<Result>,
     @InjectModel(Order.name) private orderModel: Model<Order>,
@@ -26,13 +28,92 @@ export class ResultsService {
     private realtimeGateway: RealtimeGateway,
   ) {}
 
+  private isMchcTest(testCode?: string): boolean {
+    return (testCode || '').trim().toUpperCase() === ResultsService.MCHC_TEST_CODE;
+  }
+
+  private formatScaledNumericValue(numericValue: number): string {
+    if (!Number.isFinite(numericValue)) {
+      return '';
+    }
+
+    return parseFloat(numericValue.toFixed(1)).toString();
+  }
+
+  private normalizeMchcValue(testCode: string, rawValue?: string): string | undefined {
+    if (rawValue === undefined || rawValue === null) {
+      return rawValue;
+    }
+
+    const value = String(rawValue).trim();
+    if (!value || !this.isMchcTest(testCode)) {
+      return value;
+    }
+
+    const numericValue = parseFloat(value);
+    if (Number.isNaN(numericValue)) {
+      return value;
+    }
+
+    const normalizedValue = numericValue > 100 ? numericValue / 10 : numericValue;
+    return this.formatScaledNumericValue(normalizedValue);
+  }
+
+  private normalizeMchcRange(testCode: string, rawRange?: string): string | undefined {
+    if (rawRange === undefined || rawRange === null) {
+      return rawRange;
+    }
+
+    const range = String(rawRange).trim();
+    if (!range || !this.isMchcTest(testCode)) {
+      return range;
+    }
+
+    const sanitizedRange = range.replace(/\bg\s*\/\s*(?:d)?l\b/gi, '').trim();
+
+    const rangeMatch = sanitizedRange.match(/^(-?\d*\.?\d+)\s*(?:-|–)\s*(-?\d*\.?\d+)$/);
+    if (rangeMatch) {
+      const low = parseFloat(rangeMatch[1]);
+      const high = parseFloat(rangeMatch[2]);
+      const normalizedLow = low > 100 ? low / 10 : low;
+      const normalizedHigh = high > 100 ? high / 10 : high;
+      return `${this.formatScaledNumericValue(normalizedLow)}-${this.formatScaledNumericValue(normalizedHigh)}`;
+    }
+
+    const thresholdMatch = sanitizedRange.match(/^(<=|>=|<|>|≤|≥)\s*(-?\d*\.?\d+)$/);
+    if (thresholdMatch) {
+      const operator = thresholdMatch[1];
+      const threshold = parseFloat(thresholdMatch[2]);
+      const normalizedThreshold = threshold > 100 ? threshold / 10 : threshold;
+      return `${operator} ${this.formatScaledNumericValue(normalizedThreshold)}`;
+    }
+
+    return sanitizedRange.replace(/-?\d*\.?\d+/g, (token) => {
+      const numericValue = parseFloat(token);
+      if (Number.isNaN(numericValue)) {
+        return token;
+      }
+
+      const normalizedValue = numericValue > 100 ? numericValue / 10 : numericValue;
+      return this.formatScaledNumericValue(normalizedValue);
+    });
+  }
+
+  private normalizeMchcUnit(testCode: string, rawUnit?: string): string | undefined {
+    if (this.isMchcTest(testCode)) {
+      return 'g/dL';
+    }
+
+    return rawUnit;
+  }
+
   private async resolveReferenceRangeForResult(
     orderId: Types.ObjectId,
     testCode: string,
     explicitReferenceRange?: string,
   ): Promise<string | undefined> {
     if (explicitReferenceRange) {
-      return explicitReferenceRange;
+      return this.normalizeMchcRange(testCode, explicitReferenceRange);
     }
 
     const order = await this.orderModel
@@ -53,12 +134,14 @@ export class ResultsService {
       return undefined;
     }
 
-    return resolveReferenceRange({
+    const resolvedReferenceRange = resolveReferenceRange({
       age: patient.age,
       gender: patient.gender as any,
       referenceRanges: testCatalog.referenceRanges,
       simpleReferenceRange: testCatalog.referenceRange,
     });
+
+    return this.normalizeMchcRange(testCode, resolvedReferenceRange);
   }
 
   /**
@@ -72,7 +155,13 @@ export class ResultsService {
       return ResultFlagEnum.NORMAL;
     }
 
-    const numericValue = parseFloat(value);
+    const trimmedValue = String(value || '').trim();
+    const comparisonValueMatch = trimmedValue.match(/^([<>]=?|≤|≥)\s*(-?\d*\.?\d+)$/);
+    const numericValue = comparisonValueMatch
+      ? parseFloat(comparisonValueMatch[2])
+      : parseFloat(trimmedValue);
+    const comparisonOperator = comparisonValueMatch ? comparisonValueMatch[1] : null;
+
     if (isNaN(numericValue)) {
       return ResultFlagEnum.NORMAL;
     }
@@ -83,43 +172,60 @@ export class ResultsService {
     if (rangeMatch) {
       const low = parseFloat(rangeMatch[1]);
       const high = parseFloat(rangeMatch[2]);
+      let effectiveValue = numericValue;
+
+      if (comparisonOperator === '>' || comparisonOperator === '>=' || comparisonOperator === '≥') {
+        effectiveValue = numericValue + 0.001;
+      } else if (comparisonOperator === '<' || comparisonOperator === '<=' || comparisonOperator === '≤') {
+        effectiveValue = numericValue - 0.001;
+      }
 
       // Define critical thresholds (30% beyond normal range)
       const range = high - low;
       const criticalLowThreshold = low - range * 0.3;
       const criticalHighThreshold = high + range * 0.3;
 
-      if (numericValue < criticalLowThreshold) {
+      if (effectiveValue < criticalLowThreshold) {
         return ResultFlagEnum.CRITICAL_LOW;
-      } else if (numericValue < low) {
+      } else if (effectiveValue < low) {
         return ResultFlagEnum.LOW;
-      } else if (numericValue > criticalHighThreshold) {
+      } else if (effectiveValue > criticalHighThreshold) {
         return ResultFlagEnum.CRITICAL_HIGH;
-      } else if (numericValue > high) {
+      } else if (effectiveValue > high) {
         return ResultFlagEnum.HIGH;
       } else {
         return ResultFlagEnum.NORMAL;
       }
     }
 
-    // Handle "< X" format
-    const lessThanMatch = referenceRange.match(/<\s*(\d+\.?\d*)/);
-    if (lessThanMatch) {
-      const threshold = parseFloat(lessThanMatch[1]);
-      if (numericValue >= threshold) {
-        return ResultFlagEnum.HIGH;
-      }
-      return ResultFlagEnum.NORMAL;
-    }
+    // Handle threshold formats: "< X", "<= X", "> X", ">= X"
+    const thresholdMatch = referenceRange.match(/^\s*(<=|>=|<|>|≤|≥)\s*(\d+\.?\d*)\s*$/);
+    if (thresholdMatch) {
+      const rangeOperator = thresholdMatch[1];
+      const threshold = parseFloat(thresholdMatch[2]);
+      const rangeIsUpperBound = rangeOperator === '<' || rangeOperator === '<=' || rangeOperator === '≤';
 
-    // Handle "> X" format
-    const greaterThanMatch = referenceRange.match(/>\s*(\d+\.?\d*)/);
-    if (greaterThanMatch) {
-      const threshold = parseFloat(greaterThanMatch[1]);
-      if (numericValue <= threshold) {
+      if (rangeIsUpperBound) {
+        if (comparisonOperator === '>' || comparisonOperator === '>=' || comparisonOperator === '≥') {
+          return ResultFlagEnum.HIGH;
+        }
+
+        if (comparisonOperator === '<' || comparisonOperator === '<=' || comparisonOperator === '≤') {
+          return ResultFlagEnum.NORMAL;
+        }
+
+        return numericValue >= threshold ? ResultFlagEnum.HIGH : ResultFlagEnum.NORMAL;
+      }
+
+      if (comparisonOperator === '<' || comparisonOperator === '<=' || comparisonOperator === '≤') {
         return ResultFlagEnum.LOW;
       }
-      return ResultFlagEnum.NORMAL;
+
+      if (comparisonOperator === '>' || comparisonOperator === '>=' || comparisonOperator === '≥') {
+        return ResultFlagEnum.NORMAL;
+      }
+
+      return numericValue <= threshold ? ResultFlagEnum.LOW : ResultFlagEnum.NORMAL;
     }
 
     return ResultFlagEnum.NORMAL;
@@ -174,23 +280,37 @@ export class ResultsService {
     // Fetch subcategory from test catalog
     const testCatalog = await this.testCatalogModel
       .findOne({ code: createResultDto.testCode })
-      .select('subcategory')
+      .select('subcategory unit')
       .lean();
+
+    const normalizedValue =
+      this.normalizeMchcValue(createResultDto.testCode, createResultDto.value) ||
+      createResultDto.value;
+    const normalizedReferenceRange = this.normalizeMchcRange(
+      createResultDto.testCode,
+      resolvedReferenceRange,
+    );
+    const normalizedUnit = this.normalizeMchcUnit(
+      createResultDto.testCode,
+      createResultDto.unit || testCatalog?.unit,
+    );
 
     // Calculate flag if not provided
     const flag =
       createResultDto.flag ||
-      this.calculateFlag(createResultDto.value, resolvedReferenceRange);
+      this.calculateFlag(normalizedValue, normalizedReferenceRange);
 
     const userObjectId = userId ? new Types.ObjectId(userId) : undefined;
 
     const result = new this.resultModel({
       ...createResultDto,
+      value: normalizedValue,
+      unit: normalizedUnit,
       orderId: orderObjectId,
       orderTestId: createResultDto.orderTestId
         ? new Types.ObjectId(createResultDto.orderTestId)
         : undefined,
-      referenceRange: resolvedReferenceRange,
+      referenceRange: normalizedReferenceRange,
       subcategory: testCatalog?.subcategory,
       flag,
       status: ResultStatusEnum.VERIFIED, // Auto-verify all results
@@ -229,11 +349,15 @@ export class ResultsService {
     const testCodes = [...new Set(createResultDtos.map(dto => dto.testCode))];
     const testCatalogs = await this.testCatalogModel
       .find({ code: { $in: testCodes } })
-      .select('code subcategory')
+      .select('code subcategory unit')
       .lean();
     
     const subcategoryMap = new Map(
       testCatalogs.map(tc => [tc.code, tc.subcategory])
+    );
+
+    const unitMap = new Map(
+      testCatalogs.map(tc => [tc.code, tc.unit])
     );
 
     // Prepare all results for bulk operation
@@ -246,13 +370,26 @@ export class ResultsService {
           isReceptionistEntry ? undefined : dto.referenceRange,
         );
 
-        const flag = dto.flag || this.calculateFlag(dto.value, resolvedReferenceRange);
+        const normalizedValue =
+          this.normalizeMchcValue(dto.testCode, dto.value) || dto.value;
+        const normalizedReferenceRange = this.normalizeMchcRange(
+          dto.testCode,
+          resolvedReferenceRange,
+        );
+        const normalizedUnit = this.normalizeMchcUnit(
+          dto.testCode,
+          dto.unit || unitMap.get(dto.testCode),
+        );
+
+        const flag = dto.flag || this.calculateFlag(normalizedValue, normalizedReferenceRange);
 
         const resultData = {
           ...dto,
+          value: normalizedValue,
+          unit: normalizedUnit,
           orderId: orderObjectId,
           orderTestId: dto.orderTestId ? new Types.ObjectId(dto.orderTestId) : undefined,
-          referenceRange: resolvedReferenceRange,
+          referenceRange: normalizedReferenceRange,
           subcategory: subcategoryMap.get(dto.testCode),
           flag,
           status: ResultStatusEnum.VERIFIED,
@@ -381,13 +518,35 @@ export class ResultsService {
       throw new NotFoundException(`Result with ID ${id} not found`);
     }
 
+    if (this.isMchcTest(result.testCode)) {
+      if (updateResultDto.value !== undefined) {
+        updateResultDto.value =
+          this.normalizeMchcValue(result.testCode, updateResultDto.value) ||
+          updateResultDto.value;
+      }
+
+      if (updateResultDto.referenceRange !== undefined) {
+        updateResultDto.referenceRange =
+          this.normalizeMchcRange(result.testCode, updateResultDto.referenceRange) ||
+          updateResultDto.referenceRange;
+      }
+
+      updateResultDto.unit = this.normalizeMchcUnit(
+        result.testCode,
+        updateResultDto.unit || result.unit,
+      );
+    }
+
     // Recalculate flag if value or reference range changed
     if (updateResultDto.value || updateResultDto.referenceRange) {
-      const value = updateResultDto.value || result.value;
-      const referenceRange =
+      const currentValue =
+        this.normalizeMchcValue(result.testCode, result.value) || result.value;
+      const value = updateResultDto.value || currentValue;
+      const resolvedReferenceRange =
         updateResultDto.referenceRange ||
         result.referenceRange ||
         (await this.resolveReferenceRangeForResult(result.orderId, result.testCode));
+      const referenceRange = this.normalizeMchcRange(result.testCode, resolvedReferenceRange);
 
       if (!updateResultDto.referenceRange && referenceRange && !result.referenceRange) {
         updateResultDto.referenceRange = referenceRange;
@@ -446,18 +605,30 @@ export class ResultsService {
       throw new NotFoundException(`Result with ID ${id} not found`);
     }
 
+    const normalizedNewValue =
+      this.normalizeMchcValue(originalResult.testCode, amendResultDto.newValue) ||
+      amendResultDto.newValue;
+    const normalizedReferenceRange = this.normalizeMchcRange(
+      originalResult.testCode,
+      originalResult.referenceRange,
+    );
+    const normalizedUnit = this.normalizeMchcUnit(
+      originalResult.testCode,
+      originalResult.unit,
+    );
+
     // Create new result with amended data
     const amendedResult = new this.resultModel({
       orderId: originalResult.orderId,
       orderTestId: originalResult.orderTestId,
       testCode: originalResult.testCode,
       testName: originalResult.testName,
-      value: amendResultDto.newValue,
-      unit: originalResult.unit,
-      referenceRange: originalResult.referenceRange,
+      value: normalizedNewValue,
+      unit: normalizedUnit,
+      referenceRange: normalizedReferenceRange,
       flag: this.calculateFlag(
-        amendResultDto.newValue,
-        originalResult.referenceRange,
+        normalizedNewValue,
+        normalizedReferenceRange,
       ),
       status: ResultStatusEnum.AMENDED,
       comments: originalResult.comments,

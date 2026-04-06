@@ -39,6 +39,7 @@ interface ParsedASTMMessage {
 @Injectable()
 export class Hl7Service {
   private readonly logger = new Logger(Hl7Service.name);
+  private static readonly MCHC_TEST_CODE = 'MCHC';
 
   constructor(
     @InjectModel(CommunicationLog.name)
@@ -54,6 +55,84 @@ export class Hl7Service {
     @InjectModel(Patient.name)
     private patientModel: Model<Patient>,
   ) {}
+
+  private isMchcTest(testCode?: string): boolean {
+    return (testCode || '').trim().toUpperCase() === Hl7Service.MCHC_TEST_CODE;
+  }
+
+  private formatScaledNumericValue(numericValue: number): string {
+    if (!Number.isFinite(numericValue)) {
+      return '';
+    }
+
+    return parseFloat(numericValue.toFixed(1)).toString();
+  }
+
+  private normalizeMchcValue(rawValue?: string): string | undefined {
+    if (rawValue === undefined || rawValue === null) {
+      return rawValue;
+    }
+
+    const value = String(rawValue).trim();
+    if (!value) {
+      return value;
+    }
+
+    const numericValue = parseFloat(value);
+    if (Number.isNaN(numericValue)) {
+      return value;
+    }
+
+    const normalizedValue = numericValue > 100 ? numericValue / 10 : numericValue;
+    return this.formatScaledNumericValue(normalizedValue);
+  }
+
+  private normalizeMchcRange(rawRange?: string): string | undefined {
+    if (rawRange === undefined || rawRange === null) {
+      return rawRange;
+    }
+
+    const range = String(rawRange).trim();
+    if (!range) {
+      return range;
+    }
+
+    const sanitizedRange = range.replace(/\bg\s*\/\s*(?:d)?l\b/gi, '').trim();
+
+    const rangeMatch = sanitizedRange.match(/^(-?\d*\.?\d+)\s*(?:-|–)\s*(-?\d*\.?\d+)$/);
+    if (rangeMatch) {
+      const low = parseFloat(rangeMatch[1]);
+      const high = parseFloat(rangeMatch[2]);
+      const normalizedLow = low > 100 ? low / 10 : low;
+      const normalizedHigh = high > 100 ? high / 10 : high;
+      return `${this.formatScaledNumericValue(normalizedLow)}-${this.formatScaledNumericValue(normalizedHigh)}`;
+    }
+
+    return sanitizedRange.replace(/-?\d*\.?\d+/g, (token) => {
+      const numericValue = parseFloat(token);
+      if (Number.isNaN(numericValue)) {
+        return token;
+      }
+
+      const normalizedValue = numericValue > 100 ? numericValue / 10 : numericValue;
+      return this.formatScaledNumericValue(normalizedValue);
+    });
+  }
+
+  private normalizeMchcAnalyzerResult<T extends { testCode?: string; value?: string; unit?: string; referenceRange?: string }>(
+    result: T,
+  ): T {
+    if (!this.isMchcTest(result.testCode)) {
+      return result;
+    }
+
+    return {
+      ...result,
+      value: this.normalizeMchcValue(result.value),
+      unit: 'g/dL',
+      referenceRange: this.normalizeMchcRange(result.referenceRange),
+    };
+  }
 
   /**
    * Parse HL7 message
@@ -82,7 +161,7 @@ export class Hl7Service {
         parsed.orderId = fields[2] || fields[3] || '';
       } else if (segmentType === 'OBX') {
         // Observation Result
-        const result = {
+        const rawResult = {
           testCode: fields[3]?.split('^')[0] || '',
           testName: fields[3]?.split('^')[1] || '',
           value: fields[5] || '',
@@ -90,6 +169,7 @@ export class Hl7Service {
           referenceRange: fields[7] || '',
           abnormalFlag: fields[8] || '',
         };
+        const result = this.normalizeMchcAnalyzerResult(rawResult);
         if (!parsed.results) parsed.results = [];
         parsed.results.push(result);
       }
@@ -123,12 +203,13 @@ export class Hl7Service {
         parsed.orderId = fields[2] || '';
       } else if (recordType === 'R') {
         // Result Record
-        const result = {
+        const rawResult = {
           testCode: fields[2]?.split('^')[3] || '',
           value: fields[3] || '',
           unit: fields[4] || '',
           referenceRange: fields[5] || '',
         };
+        const result = this.normalizeMchcAnalyzerResult(rawResult);
         if (!parsed.results) parsed.results = [];
         parsed.results.push(result);
       }
@@ -337,14 +418,16 @@ export class Hl7Service {
     const storedResults: Result[] = [];
 
     for (const result of results) {
+      const normalizedResult = this.normalizeMchcAnalyzerResult(result);
+
       const newResult = new this.resultModel({
         orderId,
-        testCode: result.testCode,
-        testName: result.testName || result.testCode,
-        value: result.value,
-        unit: result.unit,
-        referenceRange: result.referenceRange,
-        flag: this.mapAbnormalFlag(result.abnormalFlag),
+        testCode: normalizedResult.testCode,
+        testName: normalizedResult.testName || normalizedResult.testCode,
+        value: normalizedResult.value,
+        unit: normalizedResult.unit,
+        referenceRange: normalizedResult.referenceRange,
+        flag: this.mapAbnormalFlag(normalizedResult.abnormalFlag),
         status: 'preliminary',
         source: 'automated',
         machineId: new Types.ObjectId(machineId),

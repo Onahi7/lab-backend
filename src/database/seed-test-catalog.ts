@@ -134,11 +134,11 @@ async function seedTestCatalog() {
       sampleType: 'blood',
       turnaroundTime: 60,
       isActive: false,
-      unit: 'g/L',
+      unit: 'g/dL',
       referenceRanges: [
-        { ageGroup: 'Neonatal (0-7 days)',  ageMin: 0,    ageMax: 0.02, gender: 'all', range: '300-340', unit: 'g/L' },
-        { ageGroup: 'Pediatric (7d-13yr)', ageMin: 0.02, ageMax: 13,   gender: 'all', range: '310-370', unit: 'g/L' },
-        { ageGroup: 'Adult',               ageMin: 13,                  gender: 'all', range: '316-354', unit: 'g/L' },
+        { ageGroup: 'Neonatal (0-7 days)',  ageMin: 0,    ageMax: 0.02, gender: 'all', range: '30-34', unit: 'g/dL' },
+        { ageGroup: 'Pediatric (7d-13yr)', ageMin: 0.02, ageMax: 13,   gender: 'all', range: '31-37', unit: 'g/dL' },
+        { ageGroup: 'Adult',               ageMin: 13,                  gender: 'all', range: '31.6-35.4', unit: 'g/dL' },
       ],
     },
     {
@@ -895,10 +895,7 @@ async function seedTestCatalog() {
       isActive: true,
       unit: 'mg/L',
       referenceRanges: [
-        { ageGroup: 'Normal', ageMin: 0, gender: 'all', range: '<5.0', unit: 'mg/L' },
-        { ageGroup: 'Mild Inflammation', ageMin: 0, gender: 'all', range: '5.0-10.0', unit: 'mg/L' },
-        { ageGroup: 'Moderate Inflammation', ageMin: 0, gender: 'all', range: '10.0-50.0', unit: 'mg/L' },
-        { ageGroup: 'Severe Inflammation', ageMin: 0, gender: 'all', range: '>50.0', unit: 'mg/L' },
+        { ageGroup: 'Normal', ageMin: 0, gender: 'all', range: '0-10.0', unit: 'mg/L' },
       ],
     },
     {
@@ -911,9 +908,7 @@ async function seedTestCatalog() {
       isActive: true,
       unit: 'mg/L',
       referenceRanges: [
-        { ageGroup: 'Low CV Risk', ageMin: 18, gender: 'all', range: '<1.0', unit: 'mg/L' },
-        { ageGroup: 'Average CV Risk', ageMin: 18, gender: 'all', range: '1.0-3.0', unit: 'mg/L' },
-        { ageGroup: 'High CV Risk', ageMin: 18, gender: 'all', range: '>3.0', unit: 'mg/L' },
+        { ageGroup: 'Normal', ageMin: 0, gender: 'all', range: '0-1.0', unit: 'mg/L' },
       ],
     },
     {
@@ -1371,6 +1366,7 @@ async function seedTestCatalog() {
       code: 'UPROTEIN',
       name: 'Urine Protein',
       category: 'urinalysis',
+      subcategory: 'Dipstick/Chemical',
       price: 100,
       sampleType: 'urine',
       turnaroundTime: 60,
@@ -1428,7 +1424,7 @@ async function seedTestCatalog() {
       isActive: false,
       unit: 'SG',
       referenceRanges: [
-        { ageGroup: 'Normal', ageMin: 0, gender: 'all', range: '1.005-1.030', unit: 'SG' },
+        { ageGroup: 'Normal', ageMin: 0, gender: 'all', range: '1.000-1.030', unit: 'SG' },
       ],
     },
     {
@@ -1448,6 +1444,7 @@ async function seedTestCatalog() {
       code: 'URINE-PROTEIN',
       name: 'Urine Protein (Dipstick)',
       category: 'urinalysis',
+      subcategory: 'Dipstick/Chemical',
       price: 0,
       sampleType: 'urine',
       turnaroundTime: 60,

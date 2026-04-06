@@ -23,6 +23,8 @@ import { LaboratoryInfoDto } from './dto/laboratory-info.dto';
 
 @Injectable()
 export class ReportsService {
+  private static readonly MCHC_TEST_CODE = 'MCHC';
+
   private static readonly TEST_CODE_ALIASES: Record<string, string[]> = {
     HSCRP: ['HSCR'],
     HSCR: ['HSCRP'],
@@ -52,6 +54,69 @@ export class ReportsService {
     private panelInterpretationModel: Model<PanelInterpretation>,
     private configService: ConfigService,
   ) {}
+
+  private isMchcTest(testCode?: string): boolean {
+    return this.normalizeLookupToken(testCode) === ReportsService.MCHC_TEST_CODE;
+  }
+
+  private formatScaledNumericValue(numericValue: number): string {
+    if (!Number.isFinite(numericValue)) {
+      return '';
+    }
+
+    return parseFloat(numericValue.toFixed(1)).toString();
+  }
+
+  private normalizeMchcValue(rawValue?: string): string | undefined {
+    if (rawValue === undefined || rawValue === null) {
+      return rawValue;
+    }
+
+    const value = String(rawValue).trim();
+    if (!value) {
+      return value;
+    }
+
+    const numericValue = parseFloat(value);
+    if (Number.isNaN(numericValue)) {
+      return value;
+    }
+
+    const normalizedValue = numericValue > 100 ? numericValue / 10 : numericValue;
+    return this.formatScaledNumericValue(normalizedValue);
+  }
+
+  private normalizeMchcRange(rawRange?: string): string | undefined {
+    if (rawRange === undefined || rawRange === null) {
+      return rawRange;
+    }
+
+    const range = String(rawRange).trim();
+    if (!range) {
+      return range;
+    }
+
+    const sanitizedRange = range.replace(/\bg\s*\/\s*(?:d)?l\b/gi, '').trim();
+
+    const rangeMatch = sanitizedRange.match(/^(-?\d*\.?\d+)\s*(?:-|–)\s*(-?\d*\.?\d+)$/);
+    if (rangeMatch) {
+      const low = parseFloat(rangeMatch[1]);
+      const high = parseFloat(rangeMatch[2]);
+      const normalizedLow = low > 100 ? low / 10 : low;
+      const normalizedHigh = high > 100 ? high / 10 : high;
+      return `${this.formatScaledNumericValue(normalizedLow)}-${this.formatScaledNumericValue(normalizedHigh)}`;
+    }
+
+    return sanitizedRange.replace(/-?\d*\.?\d+/g, (token) => {
+      const numericValue = parseFloat(token);
+      if (Number.isNaN(numericValue)) {
+        return token;
+      }
+
+      const normalizedValue = numericValue > 100 ? numericValue / 10 : numericValue;
+      return this.formatScaledNumericValue(normalizedValue);
+    });
+  }
 
   /**
    * Generate lab result report for an order
@@ -308,6 +373,22 @@ export class ReportsService {
         (result.testName && result.testName.trim()) ||
         orderTest?.testName ||
         testCode;
+      const isMchc = this.isMchcTest(testCode);
+      const selectedReferenceRange = this.selectReferenceRange(
+        testCode,
+        patient.gender,
+        patientAge,
+        result.referenceRange,
+        testInfo?.referenceRanges,
+        testInfo?.referenceRange,
+      );
+      const normalizedValue = isMchc
+        ? this.normalizeMchcValue(result.value) || result.value
+        : result.value;
+      const normalizedUnit = isMchc ? 'g/dL' : (result.unit || testInfo?.unit);
+      const normalizedReferenceRange = isMchc
+        ? this.normalizeMchcRange(selectedReferenceRange)
+        : selectedReferenceRange;
       
       const resultedByProfile = result.resultedBy as any;
       const verifiedByProfile = result.verifiedBy as any;
@@ -320,12 +401,15 @@ export class ReportsService {
         const cat =
           testInfo?.category ||
           this.resolveResultCategory(result.category);
+        const resolvedSubcategory = this.resolveUrinalysisSubcategory(
+          testCode,
+          orderTest?.panelCode,
+          result.subcategory || testInfo?.subcategory,
+        );
 
         if (!cat || cat === TestCategoryEnum.OTHER) {
           const normalizedCode = this.normalizeLookupToken(testCode);
-          const normalizedSubcategory = this.normalizeLookupToken(
-            result.subcategory || testInfo?.subcategory,
-          );
+          const normalizedSubcategory = this.normalizeLookupToken(resolvedSubcategory);
           const nameLower = testName.toLowerCase();
 
           const isUrineByName = nameLower.startsWith('urine ') || nameLower === 'urine';
@@ -350,23 +434,20 @@ export class ReportsService {
         testName,
         panelCode: orderTest?.panelCode,
         panelName: orderTest?.panelName,
-        value: result.value,
-        unit: result.unit || testInfo?.unit,
-        referenceRange: this.selectReferenceRange(
-          testCode,
-          patient.gender,
-          patientAge,
-          result.referenceRange,
-          testInfo?.referenceRanges,
-          testInfo?.referenceRange,
-        ),
+        value: normalizedValue,
+        unit: normalizedUnit,
+        referenceRange: normalizedReferenceRange,
         flag: result.flag,
         resultedAt: result.resultedAt,
         comments: result.comments,
         isAmended,
         amendmentReason: result.amendmentReason,
         displayOrder,
-        subcategory: result.subcategory || testInfo?.subcategory,
+        subcategory: this.resolveUrinalysisSubcategory(
+          testCode,
+          orderTest?.panelCode,
+          result.subcategory || testInfo?.subcategory,
+        ),
         category: resolvedCategory,
       } as any);
     }
@@ -466,6 +547,90 @@ export class ReportsService {
     };
 
     return categoryMap[normalized];
+  }
+
+  private normalizeUrinalysisSubcategory(subcategory?: string): string | undefined {
+    const normalizedSubcategory = this.normalizeLookupToken(subcategory);
+
+    if (!normalizedSubcategory) {
+      return undefined;
+    }
+
+    if (normalizedSubcategory === 'DIPSTICKCHEMICAL' || normalizedSubcategory === 'CHEMICAL') {
+      return 'Dipstick/Chemical';
+    }
+
+    if (normalizedSubcategory === 'PHYSICALEXAMINATION' || normalizedSubcategory === 'PHYSICAL') {
+      return 'Physical Examination';
+    }
+
+    if (normalizedSubcategory === 'MICROSCOPIC') {
+      return 'Microscopic';
+    }
+
+    return subcategory;
+  }
+
+  private inferUrinalysisSubcategory(testCode: string, panelCode?: string): string | undefined {
+    const normalizedCode = this.normalizeLookupToken(testCode);
+    const normalizedPanelCode = this.normalizeLookupToken(panelCode);
+
+    const urineLikeTest =
+      normalizedCode.startsWith('URINE') || normalizedCode === 'UPROTEIN' || normalizedCode === 'UPRO';
+
+    if (!urineLikeTest && normalizedPanelCode !== 'URINE') {
+      return undefined;
+    }
+
+    const physicalCodes = new Set(['URINECOLOR', 'URINECLARITY']);
+    const dipstickCodes = new Set([
+      'URINEPH',
+      'URINESG',
+      'URINEPROTEIN',
+      'UPROTEIN',
+      'UPRO',
+      'URINEGLUCOSE',
+      'URINEKETONES',
+      'URINEBLOOD',
+      'URINEBILI',
+      'URINEURO',
+      'URINENITRITE',
+      'URINELE',
+    ]);
+    const microscopicCodes = new Set([
+      'URINERBC',
+      'URINEWBC',
+      'URINEEPI',
+      'URINECASTS',
+      'URINECRYSTALS',
+      'URINEBACTERIA',
+    ]);
+
+    if (physicalCodes.has(normalizedCode)) {
+      return 'Physical Examination';
+    }
+
+    if (dipstickCodes.has(normalizedCode)) {
+      return 'Dipstick/Chemical';
+    }
+
+    if (microscopicCodes.has(normalizedCode)) {
+      return 'Microscopic';
+    }
+
+    if (normalizedPanelCode === 'URINE') {
+      return 'Dipstick/Chemical';
+    }
+
+    return undefined;
+  }
+
+  private resolveUrinalysisSubcategory(
+    testCode: string,
+    panelCode?: string,
+    subcategory?: string,
+  ): string | undefined {
+    return this.normalizeUrinalysisSubcategory(subcategory) || this.inferUrinalysisSubcategory(testCode, panelCode);
   }
 
   /**
