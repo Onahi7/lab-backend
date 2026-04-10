@@ -31,6 +31,42 @@ function genderMatches(range: ReferenceRangeItem, gender: 'M' | 'F' | 'all'): bo
   return range.gender === gender;
 }
 
+function rankRangeSpecificity(
+  range: ReferenceRangeItem,
+  age: number | undefined,
+  gender: 'M' | 'F' | 'all',
+): number {
+  const rangeGender = range.gender || 'all';
+  const genderScore =
+    rangeGender !== 'all' && gender !== 'all' && rangeGender === gender ? 20 : rangeGender === 'all' ? 10 : 0;
+
+  const hasMin = range.ageMin !== undefined;
+  const hasMax = range.ageMax !== undefined;
+  const boundsScore = hasMin && hasMax ? 6 : hasMin || hasMax ? 3 : 0;
+
+  let spanScore = 0;
+  if (age !== undefined && hasMin && hasMax && range.ageMax! >= range.ageMin!) {
+    const span = range.ageMax! - range.ageMin!;
+    spanScore = Math.max(0, 5 - span / 10);
+  }
+
+  const minAgeScore = hasMin ? range.ageMin! / 1000 : 0;
+
+  return genderScore + boundsScore + spanScore + minAgeScore;
+}
+
+function pickMostSpecificRange(
+  candidates: ReferenceRangeItem[],
+  age: number | undefined,
+  gender: 'M' | 'F' | 'all',
+): ReferenceRangeItem | undefined {
+  if (!candidates.length) return undefined;
+
+  return candidates
+    .slice()
+    .sort((a, b) => rankRangeSpecificity(b, age, gender) - rankRangeSpecificity(a, age, gender))[0];
+}
+
 function pickBestMatchingRange(
   ranges: ReferenceRangeItem[],
   age: number | undefined,
@@ -47,24 +83,27 @@ function pickBestMatchingRange(
 
   if (condition) {
     const normalizedCondition = condition.trim().toLowerCase();
-    const conditionMatch = ranges.find(
+    const conditionCandidates = ranges.filter(
       (range) =>
         !!range.condition &&
         range.condition.trim().toLowerCase() === normalizedCondition &&
         ageMatches(range, age) &&
         genderMatches(range, gender),
     );
+    const conditionMatch = pickMostSpecificRange(conditionCandidates, age, gender);
     if (conditionMatch) return conditionMatch;
   }
 
-  const demographicMatch = ranges.find(
+  const demographicCandidates = ranges.filter(
     (range) => !range.pregnancy && ageMatches(range, age) && genderMatches(range, gender),
   );
+  const demographicMatch = pickMostSpecificRange(demographicCandidates, age, gender);
   if (demographicMatch) return demographicMatch;
 
-  const allGenderMatch = ranges.find(
+  const allGenderCandidates = ranges.filter(
     (range) => !range.pregnancy && ageMatches(range, age) && (!range.gender || range.gender === 'all'),
   );
+  const allGenderMatch = pickMostSpecificRange(allGenderCandidates, age, gender);
   if (allGenderMatch) return allGenderMatch;
 
   return ranges.find((range) => !range.pregnancy) || ranges[0];

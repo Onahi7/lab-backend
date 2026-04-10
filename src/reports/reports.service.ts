@@ -429,6 +429,15 @@ export class ReportsService {
         return cat || TestCategoryEnum.OTHER;
       })();
 
+      // Auto-generate Positive/Negative interpretation for BHCG based on numeric value
+      let resolvedComments = result.comments;
+      if (this.normalizeLookupToken(testCode) === 'BHCG' && normalizedValue) {
+        const numericValue = parseFloat(normalizedValue);
+        if (!isNaN(numericValue)) {
+          resolvedComments = numericValue > 5 ? 'Positive' : 'Negative';
+        }
+      }
+
       resultItems.push({
         testCode,
         testName,
@@ -439,7 +448,7 @@ export class ReportsService {
         referenceRange: normalizedReferenceRange,
         flag: result.flag,
         resultedAt: result.resultedAt,
-        comments: result.comments,
+        comments: resolvedComments,
         isAmended,
         amendmentReason: result.amendmentReason,
         displayOrder,

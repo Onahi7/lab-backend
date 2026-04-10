@@ -81,6 +81,12 @@ export class TestCatalogService {
     const activeTestCodes = new Set(tests.map(t => t.code));
     const missingCodes = panelTestCodes.filter(c => c && !activeTestCodes.has(c));
 
+    // Panel codes - tests whose code matches a panel code should be excluded
+    // from standalone tests to avoid duplicates (e.g. LIPID exists as both a
+    // test_catalog entry AND a test_panels panel)
+    const panelCodes = new Set(panels.map(p => p.code));
+    const filteredTests = tests.filter(t => !panelCodes.has(t.code));
+
     let panelComponentTests: TestCatalog[] = [];
     if (missingCodes.length > 0) {
       panelComponentTests = await this.testCatalogModel
@@ -105,7 +111,7 @@ export class TestCatalogService {
       tests: panel.tests,
     }));
 
-    return [...tests, ...panelComponentTests, ...transformedPanels];
+    return [...filteredTests, ...panelComponentTests, ...transformedPanels];
   }
 
   async findTestById(id: string): Promise<TestCatalog> {
