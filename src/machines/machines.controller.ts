@@ -84,7 +84,7 @@ export class MachinesController {
   ) {
     const script = this.machinesService.generateBridgeScript(id);
     const machine = await this.machinesService.findOne(id);
-    const filename = `harbour-bridge-${(machine.name || 'machine').replace(/\s+/g, '-').toLowerCase()}.ps1`;
+    const filename = `harbour-bridge-${(machine.name || 'machine').replace(/\s+/g, '-').toLowerCase()}.bat`;
 
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
