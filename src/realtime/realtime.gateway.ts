@@ -160,7 +160,7 @@ export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect
     this.emitToAll('machine:updated', machine);
   }
 
-  notifyMachineResultReceived(data: { machineId: string; machineName: string; resultCount: number; protocol: string }) {
+  notifyMachineResultReceived(data: { machineId: string; machineName: string; resultCount: number; protocol: string; autoMatched?: boolean; orderId?: string; orderNumber?: string }) {
     this.logger.log(`Broadcasting machine result received from ${data.machineName}: ${data.resultCount} results`);
     this.emitToAll('machine:result_received', data);
   }

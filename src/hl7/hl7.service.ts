@@ -36,10 +36,46 @@ interface ParsedASTMMessage {
   }>;
 }
 
+/**
+ * Mapping from analyzer test codes (sent by Zybio Z52 via HL7) to LIS catalog codes.
+ * Keys = code the analyzer sends, Values = code used in the LIS test catalog / order_tests.
+ * Only codes that differ need to be listed here.
+ */
+const ANALYZER_TO_LIS_CODE: Record<string, string> = {
+  'HGB':    'HB',       // Hemoglobin
+  'RDW-CV': 'RDWCV',    // Red Cell Distribution Width - CV
+  'RDW-SD': 'RDWSD',    // Red Cell Distribution Width - SD
+  'RDW':    'RDWCV',    // Some analyzers send plain RDW for CV
+  'PCT':    'PLTCT',    // Plateletcrit (avoid clash with Procalcitonin)
+  'P-LCR':  'PLCR',    // Platelet Large Cell Ratio
+  'P-LCC':  'PLCC',    // Platelet Large Cell Count
+  'LYMPH%': 'LYMPH',   // Lymphocytes %
+  'MONO%':  'MONO',    // Monocytes %
+  'NEUT%':  'NEUT',    // Neutrophils %
+  'EOS%':   'EOS',     // Eosinophils %
+  'BASO%':  'BASO',    // Basophils %
+  'LYMPH#': 'LYMPHA',  // Lymphocytes absolute
+  'MONO#':  'MONOA',   // Monocytes absolute
+  'NEUT#':  'NEUTA',   // Neutrophils absolute
+  'EOS#':   'EOSA',    // Eosinophils absolute
+  'BASO#':  'BASOA',   // Basophils absolute
+  'Hb':     'HB',      // Case variant
+  'Hgb':    'HB',      // Case variant
+};
+
 @Injectable()
 export class Hl7Service {
   private readonly logger = new Logger(Hl7Service.name);
   private static readonly MCHC_TEST_CODE = 'MCHC';
+
+  /**
+   * Map an analyzer test code to the LIS catalog code.
+   * Falls back to the original code (uppercased) if no mapping exists.
+   */
+  private mapAnalyzerCode(analyzerCode: string): string {
+    const trimmed = analyzerCode.trim();
+    return ANALYZER_TO_LIS_CODE[trimmed] || ANALYZER_TO_LIS_CODE[trimmed.toUpperCase()] || trimmed.toUpperCase();
+  }
 
   constructor(
     @InjectModel(CommunicationLog.name)
@@ -417,13 +453,24 @@ export class Hl7Service {
   ): Promise<Result[]> {
     const storedResults: Result[] = [];
 
+    // Pre-fetch order tests for this order so we can link results
+    const orderTests = await this.orderTestModel.find({ orderId }).exec();
+    const orderTestByCode = new Map<string, any>();
+    for (const ot of orderTests) {
+      orderTestByCode.set((ot as any).testCode?.toUpperCase(), ot);
+    }
+
     for (const result of results) {
       const normalizedResult = this.normalizeMchcAnalyzerResult(result);
 
+      // Map analyzer code (e.g. HGB) to LIS catalog code (e.g. HB)
+      const lisCode = this.mapAnalyzerCode(normalizedResult.testCode || '');
+      const matchedOrderTest = orderTestByCode.get(lisCode);
+
       const newResult = new this.resultModel({
         orderId,
-        testCode: normalizedResult.testCode,
-        testName: normalizedResult.testName || normalizedResult.testCode,
+        testCode: lisCode,
+        testName: matchedOrderTest?.testName || normalizedResult.testName || lisCode,
         value: normalizedResult.value,
         unit: normalizedResult.unit,
         referenceRange: normalizedResult.referenceRange,
@@ -432,10 +479,13 @@ export class Hl7Service {
         source: 'automated',
         machineId: new Types.ObjectId(machineId),
         resultedAt: new Date(),
+        ...(matchedOrderTest ? { orderTestId: matchedOrderTest._id, panelCode: matchedOrderTest.panelCode, panelName: matchedOrderTest.panelName } : {}),
       });
 
       const saved = await newResult.save();
       storedResults.push(saved);
+
+      this.logger.debug(`Stored result: ${normalizedResult.testCode} -> ${lisCode} = ${normalizedResult.value} (matched OT: ${!!matchedOrderTest})`);
     }
 
     // Update order status to processing if not already

@@ -1,10 +1,16 @@
 import { Injectable, Logger, OnModuleInit, OnModuleDestroy, Inject, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import * as net from 'net';
 import { Hl7Service } from './hl7.service';
 import { Machine } from '../database/schemas/machine.schema';
+import { Order } from '../database/schemas/order.schema';
+import { OrderTest } from '../database/schemas/order-test.schema';
 import { RealtimeGateway } from '../realtime/realtime.gateway';
+
+// MLLP framing characters
+const MLLP_START = '\x0B'; // VT (vertical tab)
+const MLLP_END = '\x1C\r';  // FS + CR
 
 export interface UnmatchedResult {
   machineId: string;
@@ -26,6 +32,8 @@ export class TcpListenerService implements OnModuleInit, OnModuleDestroy {
   constructor(
     private readonly hl7Service: Hl7Service,
     @InjectModel(Machine.name) private machineModel: Model<Machine>,
+    @InjectModel(Order.name) private orderModel: Model<Order>,
+    @InjectModel(OrderTest.name) private orderTestModel: Model<OrderTest>,
     @Inject(forwardRef(() => RealtimeGateway))
     private readonly realtimeGateway: RealtimeGateway,
   ) {}
@@ -85,17 +93,33 @@ export class TcpListenerService implements OnModuleInit, OnModuleDestroy {
       socket.on('data', async (data) => {
         buffer += data.toString();
 
-        // Check for message end markers
-        const hasHL7End = buffer.includes('\x1C\r'); // HL7 end marker
-        const hasASTMEnd = buffer.includes('\r\n'); // ASTM end marker
+        // Check for MLLP end marker (\x1C\r) — used by HL7 over TCP
+        const hasMLLPEnd = buffer.includes('\x1C\r');
+        // Check for ASTM end marker
+        const hasASTMEnd = !hasMLLPEnd && buffer.includes('\r\n');
 
-        if (hasHL7End || hasASTMEnd) {
+        if (hasMLLPEnd || hasASTMEnd) {
           try {
-            await this.handleMessage(machineId, machineName, protocol, buffer, socket);
+            // Strip MLLP framing: remove \x0B prefix and \x1C\r suffix
+            let cleanMessage = buffer;
+            if (hasMLLPEnd) {
+              cleanMessage = cleanMessage.replace(/^\x0B/, '');      // strip start
+              cleanMessage = cleanMessage.replace(/\x1C\r$/, '');    // strip end
+              cleanMessage = cleanMessage.trim();
+            }
+
+            await this.handleMessage(machineId, machineName, protocol, cleanMessage, socket);
             buffer = ''; // Clear buffer after processing
           } catch (error: any) {
             this.logger.error(`Error processing message: ${error.message}`);
-            socket.write('NAK\r\n'); // Send negative acknowledgment
+            // Send NAK wrapped in MLLP for HL7, plain for ASTM
+            if (protocol === 'HL7') {
+              const nak = this.hl7Service.generateHL7Ack('0', 'AE');
+              socket.write(MLLP_START + nak + MLLP_END);
+            } else {
+              socket.write('\x15'); // NAK byte
+            }
+            buffer = '';
           }
         }
       });
@@ -146,26 +170,45 @@ export class TcpListenerService implements OnModuleInit, OnModuleDestroy {
       throw new Error(`Unsupported protocol: ${protocol}`);
     }
 
-    // Store as unmatched result (waiting for manual matching)
-    const unmatchedResult: UnmatchedResult = {
-      machineId,
-      machineName,
-      protocol,
-      rawMessage: message,
-      parsedResults: parsed.results || [],
-      receivedAt: new Date(),
-      position: this.extractPosition(message),
-      status: 'pending',
-    };
+    // Try auto-matching by orderId or patientId from the parsed message
+    let autoMatched = false;
+    let unmatchedResult: UnmatchedResult | null = null;
+    const sampleId = parsed.orderId || parsed.patientId;
 
-    this.unmatchedResults.push(unmatchedResult);
+    if (sampleId && parsed.results && parsed.results.length > 0) {
+      autoMatched = await this.tryAutoMatch(machineId, sampleId, parsed.results);
+    }
 
-    this.logger.log(
-      `Stored unmatched result from ${machineName} - ${parsed.results?.length || 0} tests`,
-    );
+    if (!autoMatched) {
+      // Store as unmatched result (waiting for manual matching)
+      unmatchedResult = {
+        machineId,
+        machineName,
+        protocol,
+        rawMessage: message,
+        parsedResults: parsed.results || [],
+        receivedAt: new Date(),
+        position: this.extractPosition(message),
+        status: 'pending',
+      };
 
-    // Send acknowledgment
-    socket.write(ack);
+      this.unmatchedResults.push(unmatchedResult);
+
+      this.logger.log(
+        `Stored unmatched result from ${machineName} - ${parsed.results?.length || 0} tests (no auto-match for "${sampleId || 'unknown'}")`,
+      );
+    } else {
+      this.logger.log(
+        `Auto-matched result from ${machineName} for sample "${sampleId}" - ${parsed.results?.length || 0} tests`,
+      );
+    }
+
+    // Send acknowledgment wrapped in MLLP for HL7
+    if (protocol === 'HL7') {
+      socket.write(MLLP_START + ack + MLLP_END);
+    } else {
+      socket.write(ack);
+    }
 
     // Update machine status
     const updatedMachine = await this.machineModel.findByIdAndUpdate(machineId, {
@@ -182,8 +225,77 @@ export class TcpListenerService implements OnModuleInit, OnModuleDestroy {
       machineName,
       resultCount: parsed.results?.length || 0,
       protocol,
+      autoMatched,
     });
-    this.realtimeGateway.notifyUnmatchedResult(unmatchedResult);
+    if (unmatchedResult) {
+      this.realtimeGateway.notifyUnmatchedResult(unmatchedResult);
+    }
+  }
+
+  /**
+   * Try to auto-match results to a pending order by sample/order ID
+   */
+  private async tryAutoMatch(
+    machineId: string,
+    sampleId: string,
+    results: any[],
+  ): Promise<boolean> {
+    try {
+      // Strategy 1: Match by order number
+      let order = await this.orderModel.findOne({
+        orderNumber: sampleId,
+        status: { $in: ['collected', 'processing', 'pending'] },
+      });
+
+      // Strategy 2: Match by patient ID in recent pending orders
+      if (!order) {
+        order = await this.orderModel
+          .findOne({
+            patientId: sampleId,
+            status: { $in: ['collected', 'processing', 'pending'] },
+          })
+          .sort({ createdAt: -1 });
+      }
+
+      // Strategy 3: Match by accession number / sample ID stored in order tests
+      if (!order) {
+        const orderTest = await this.orderTestModel.findOne({
+          accessionNumber: sampleId,
+        });
+        if (orderTest) {
+          order = await this.orderModel.findById(orderTest.get('orderId'));
+        }
+      }
+
+      if (!order) {
+        return false;
+      }
+
+      // Store results linked to the order
+      await this.hl7Service['storeResults'](
+        order._id as Types.ObjectId,
+        results,
+        machineId,
+      );
+
+      this.logger.log(`Auto-matched ${results.length} results to order ${order.orderNumber}`);
+
+      // Emit real-time notification for auto-match
+      this.realtimeGateway.notifyMachineResultReceived({
+        machineId,
+        machineName: 'Auto-matched',
+        resultCount: results.length,
+        protocol: 'HL7',
+        orderId: order._id?.toString(),
+        orderNumber: order.orderNumber,
+        autoMatched: true,
+      });
+
+      return true;
+    } catch (error: any) {
+      this.logger.error(`Auto-match failed for sample ${sampleId}: ${error.message}`);
+      return false;
+    }
   }
 
   /**

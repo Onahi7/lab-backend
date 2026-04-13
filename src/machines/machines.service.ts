@@ -287,36 +287,96 @@ export class MachinesService {
   }
 
   /**
-   * Test TCP connection to a machine
+   * Test connection to a machine.
+   * Checks two things:
+   * 1. Is the TCP listener running on the configured port? (backend side)
+   * 2. Can we reach the analyzer on the network? (ping the IP)
    */
-  async testConnection(id: string): Promise<{ success: boolean; message: string; latency?: number }> {
+  async testConnection(id: string): Promise<{ success: boolean; message: string; latency?: number; listenerActive?: boolean; analyzerReachable?: boolean }> {
     const machine = await this.findOne(id);
 
     if (!machine.ipAddress || !machine.port) {
       return { success: false, message: 'No IP address or port configured for this machine' };
     }
 
-    return new Promise((resolve) => {
-      const start = Date.now();
-      const socket = new net.Socket();
-      socket.setTimeout(5000);
+    // Check 1: Is our TCP listener active for this machine?
+    const listenerStatus = this.tcpListenerService.getListenerStatus();
+    const listenerActive = listenerStatus.some(
+      (s) => s.machineId === id && s.listening,
+    );
 
-      socket.connect(machine.port!, machine.ipAddress!, () => {
-        const latency = Date.now() - start;
+    // Check 2: Can we reach the analyzer's IP? Try connecting to port 10001 on our own listener
+    // to verify it's accepting connections, then also try to reach the analyzer IP.
+    const analyzerReachable = await new Promise<boolean>((resolve) => {
+      const socket = new net.Socket();
+      socket.setTimeout(3000);
+
+      socket.connect(machine.port!, '127.0.0.1', () => {
         socket.destroy();
-        this.logger.log(`Connection test successful for machine ${machine.name}: ${latency}ms`);
-        resolve({ success: true, message: `Connection successful (${latency}ms)`, latency });
+        resolve(true);
       });
 
-      socket.on('error', (err: Error) => {
+      socket.on('error', () => {
         socket.destroy();
-        resolve({ success: false, message: err.message });
+        resolve(false);
       });
 
       socket.on('timeout', () => {
         socket.destroy();
-        resolve({ success: false, message: 'Connection timed out after 5 seconds' });
+        resolve(false);
       });
     });
+
+    // Check 3: Ping the analyzer IP to see if it's on the network
+    const networkReachable = await new Promise<boolean>((resolve) => {
+      const socket = new net.Socket();
+      socket.setTimeout(3000);
+
+      // Try connecting to a common port on the analyzer just to check network reachability
+      // Port 80 is often open on Zybio analyzers for their web interface
+      socket.connect(80, machine.ipAddress!, () => {
+        socket.destroy();
+        resolve(true);
+      });
+
+      socket.on('error', (err: Error) => {
+        socket.destroy();
+        // "ECONNREFUSED" means the host IS reachable, just port 80 is closed — that's fine
+        resolve(err.message.includes('ECONNREFUSED'));
+      });
+
+      socket.on('timeout', () => {
+        socket.destroy();
+        resolve(false);
+      });
+    });
+
+    const messages: string[] = [];
+    if (listenerActive) {
+      messages.push('TCP listener is active on port ' + machine.port);
+    } else {
+      messages.push('TCP listener is NOT running — restart the backend or listener');
+    }
+
+    if (analyzerReachable) {
+      messages.push('Listener accepting connections on port ' + machine.port);
+    } else {
+      messages.push('Listener not accepting connections — check firewall');
+    }
+
+    if (networkReachable) {
+      messages.push('Analyzer at ' + machine.ipAddress + ' is reachable on the network');
+    } else {
+      messages.push('Cannot reach analyzer at ' + machine.ipAddress + ' — check network/cable');
+    }
+
+    const success = listenerActive && analyzerReachable;
+
+    return {
+      success,
+      message: messages.join('. '),
+      listenerActive,
+      analyzerReachable: networkReachable,
+    };
   }
 }
