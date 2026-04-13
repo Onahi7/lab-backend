@@ -7,9 +7,11 @@ import {
   Param,
   Delete,
   Query,
+  Res,
   UseGuards,
   Request,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { MachinesService } from './machines.service';
 import { CreateMachineDto } from './dto/create-machine.dto';
 import { UpdateMachineDto } from './dto/update-machine.dto';
@@ -71,6 +73,22 @@ export class MachinesController {
   @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH)
   async testConnection(@Param('id') id: string) {
     return this.machinesService.testConnection(id);
+  }
+
+  @Get(':id/bridge-script')
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH)
+  async downloadBridgeScript(
+    @Param('id') id: string,
+    @Query('token') token: string,
+    @Res() res: Response,
+  ) {
+    const script = this.machinesService.generateBridgeScript(id);
+    const machine = await this.machinesService.findOne(id);
+    const filename = `harbour-bridge-${(machine.name || 'machine').replace(/\s+/g, '-').toLowerCase()}.ps1`;
+
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(script);
   }
 
   @Get(':id/maintenance')
