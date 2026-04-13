@@ -4,6 +4,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { Request } from 'express';
 import { Profile } from '../../database/schemas/profile.schema';
 import { UserRole } from '../../database/schemas/user-role.schema';
 import { JwtPayload } from '../auth.service';
@@ -21,7 +22,13 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     }
     
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
+        (request: Request) => {
+          // Fallback: read token from query parameter (for file downloads)
+          return request?.query?.token as string || null;
+        },
+      ]),
       ignoreExpiration: false,
       secretOrKey: jwtSecret,
     });
