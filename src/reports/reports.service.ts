@@ -674,29 +674,54 @@ export class ReportsService {
    * @param results - Array of result items
    * @returns Results grouped by category with display names
    */
+  private static readonly INDIVIDUAL_PAGE_TESTS: Record<string, string> = {
+    'UREA': 'UREA',
+    'BUN': 'BLOOD UREA NITROGEN',
+    'CREAT': 'CREATININE',
+    'CREATININE': 'CREATININE',
+    'UA': 'URIC ACID',
+    'URICACID': 'URIC ACID',
+  };
+
   groupResultsByCategory(results: ResultItemDto[]): ResultCategoryDto[] {
-    // Group results by category
-    const grouped = new Map<TestCategoryEnum, ResultItemDto[]>();
-    const categoryOrder: TestCategoryEnum[] = [];
-    
+    const grouped = new Map<string, ResultItemDto[]>();
+    const categoryOrder: string[] = [];
+
     for (const result of results) {
-      const category = (result as any).category || TestCategoryEnum.OTHER;
-      if (!grouped.has(category)) {
-        grouped.set(category, []);
-        categoryOrder.push(category);
+      const baseCategory = (result as any).category || TestCategoryEnum.OTHER;
+      const testCode = this.normalizeLookupToken(result.testCode);
+      const panelCode = result.panelCode;
+
+      let categoryKey: string = baseCategory;
+      if (!panelCode && ReportsService.INDIVIDUAL_PAGE_TESTS[testCode]) {
+        categoryKey = `individual_${testCode}`;
       }
-      grouped.get(category)!.push(result);
+
+      if (!grouped.has(categoryKey)) {
+        grouped.set(categoryKey, []);
+        categoryOrder.push(categoryKey);
+      }
+      grouped.get(categoryKey)!.push(result);
     }
 
-    // Convert to array and sort by category order
     const resultsByCategory: ResultCategoryDto[] = [];
-    
-    for (const category of categoryOrder) {
-      if (grouped.has(category)) {
+
+    for (const categoryKey of categoryOrder) {
+      if (!grouped.has(categoryKey)) continue;
+
+      if (categoryKey.startsWith('individual_')) {
+        const testCode = categoryKey.replace('individual_', '');
+        resultsByCategory.push({
+          category: `individual_${testCode}` as any,
+          categoryDisplayName: ReportsService.INDIVIDUAL_PAGE_TESTS[testCode] || testCode,
+          results: grouped.get(categoryKey)!,
+        });
+      } else {
+        const category = categoryKey as TestCategoryEnum;
         resultsByCategory.push({
           category,
           categoryDisplayName: this.formatCategoryDisplayName(category),
-          results: grouped.get(category)!,
+          results: grouped.get(categoryKey)!,
         });
       }
     }
