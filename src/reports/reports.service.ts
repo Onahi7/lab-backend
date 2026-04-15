@@ -674,14 +674,9 @@ export class ReportsService {
    * @param results - Array of result items
    * @returns Results grouped by category with display names
    */
-  private static readonly INDIVIDUAL_PAGE_TESTS: Record<string, string> = {
-    'UREA': 'UREA',
-    'BUN': 'BLOOD UREA NITROGEN',
-    'CREAT': 'CREATININE',
-    'CREATININE': 'CREATININE',
-    'UA': 'URIC ACID',
-    'URICACID': 'URIC ACID',
-  };
+  private static readonly INDIVIDUAL_PAGE_TESTS = new Set([
+    'UREA', 'BUN', 'CREAT', 'CREATININE', 'UA', 'URICACID',
+  ]);
 
   groupResultsByCategory(results: ResultItemDto[]): ResultCategoryDto[] {
     const grouped = new Map<string, ResultItemDto[]>();
@@ -692,9 +687,11 @@ export class ReportsService {
       const testCode = this.normalizeLookupToken(result.testCode);
       const panelCode = result.panelCode;
 
+      // Individually-ordered chemistry tests get their own group (separate page)
+      // but still use the CLINICAL CHEMISTRY heading
       let categoryKey: string = baseCategory;
-      if (!panelCode && ReportsService.INDIVIDUAL_PAGE_TESTS[testCode]) {
-        categoryKey = `individual_${testCode}`;
+      if (baseCategory === TestCategoryEnum.CHEMISTRY && !panelCode && ReportsService.INDIVIDUAL_PAGE_TESTS.has(testCode)) {
+        categoryKey = 'individual_chemistry';
       }
 
       if (!grouped.has(categoryKey)) {
@@ -709,11 +706,10 @@ export class ReportsService {
     for (const categoryKey of categoryOrder) {
       if (!grouped.has(categoryKey)) continue;
 
-      if (categoryKey.startsWith('individual_')) {
-        const testCode = categoryKey.replace('individual_', '');
+      if (categoryKey === 'individual_chemistry') {
         resultsByCategory.push({
-          category: `individual_${testCode}` as any,
-          categoryDisplayName: ReportsService.INDIVIDUAL_PAGE_TESTS[testCode] || testCode,
+          category: 'individual_chemistry' as any,
+          categoryDisplayName: this.formatCategoryDisplayName(TestCategoryEnum.CHEMISTRY),
           results: grouped.get(categoryKey)!,
         });
       } else {
