@@ -155,6 +155,30 @@ async function seedTestPanels() {
     tests: lipidTestItems,
   });
 
+  // ==================== COAGULATION PROFILE ====================
+  const coagTests = ['PT', 'APTT', 'INR'];
+  const coagTestItems = [];
+
+  for (const code of coagTests) {
+    const test = await getTestByCode(code);
+    if (test) {
+      coagTestItems.push({
+        testId: test._id,
+        testCode: test.code,
+        testName: test.name,
+      });
+    }
+  }
+
+  panels.push({
+    code: 'COAG',
+    name: 'Coagulation Profile',
+    description: 'Coagulation screen - Prothrombin Time, APTT, INR',
+    price: 525, // PT(175) + APTT(175) + INR(175)
+    isActive: true,
+    tests: coagTestItems,
+  });
+
   // ==================== URINALYSIS ====================
   const urineTests = ['URINE-COLOR', 'URINE-CLARITY', 'URINE-PH', 'URINE-SG', 'URINE-PROTEIN', 
                       'URINE-GLUCOSE', 'URINE-KETONES', 'URINE-BLOOD', 'URINE-BILI', 
@@ -199,6 +223,7 @@ async function seedTestPanels() {
   console.log(`   LFT: ${lftTestItems.length} parameters`);
   console.log(`   RFT: ${rftTestItems.length} parameters`);
   console.log(`   LIPID: ${lipidTestItems.length} parameters`);
+  console.log(`   COAG: ${coagTestItems.length} parameters`);
   console.log(`   URINE: ${urineTestItems.length} parameters`);
 
   await app.close();

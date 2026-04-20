@@ -694,6 +694,12 @@ export class ReportsService {
         categoryKey = 'individual_chemistry';
       }
 
+      // COAG panel always gets its own page under HEMATOLOGY
+      const normalizedPanel = this.normalizeLookupToken(panelCode);
+      if (normalizedPanel === 'COAG') {
+        categoryKey = 'coag_panel';
+      }
+
       if (!grouped.has(categoryKey)) {
         grouped.set(categoryKey, []);
         categoryOrder.push(categoryKey);
@@ -710,6 +716,12 @@ export class ReportsService {
         resultsByCategory.push({
           category: 'individual_chemistry' as any,
           categoryDisplayName: this.formatCategoryDisplayName(TestCategoryEnum.CHEMISTRY),
+          results: grouped.get(categoryKey)!,
+        });
+      } else if (categoryKey === 'coag_panel') {
+        resultsByCategory.push({
+          category: 'coag_panel' as any,
+          categoryDisplayName: 'COAGULATION PROFILE',
           results: grouped.get(categoryKey)!,
         });
       } else {

@@ -1987,6 +1987,21 @@ async function seedTestCatalog() {
       ],
     },
     {
+      code: 'INR',
+      name: 'International Normalised Ratio',
+      category: 'hematology',
+      price: 175,
+      sampleType: 'blood',
+      turnaroundTime: 30,
+      isActive: true,
+      unit: 'ratio',
+      description: 'Standardised ratio derived from Prothrombin Time',
+      referenceRanges: [
+        { ageGroup: 'Normal (non-anticoagulated)', ageMin: 0, gender: 'all', range: '0.8-1.2', unit: 'ratio' },
+        { ageGroup: 'Therapeutic (warfarin)', ageMin: 0, gender: 'all', range: '2.0-3.0', unit: 'ratio' },
+      ],
+    },
+    {
       code: 'ACT',
       name: 'Activated Clotting Time',
       category: 'hematology',
