@@ -29,6 +29,7 @@ async function run() {
 
   const db = mongoose.connection.db;
   const catalog = db.collection('test_catalog');
+  const orderTests = db.collection('order_tests');
   const panels = db.collection('test_panels');
 
   // 1. Upsert PT, APTT, INR into test_catalog
@@ -46,9 +47,28 @@ async function run() {
       code: 'INR',
       name: 'International Normalised Ratio',
       unit: 'ratio',
-      description: 'Standardised ratio derived from Prothrombin Time',
+      price: 0,
+      description: 'Standardised ratio derived from Prothrombin Time (no separate charge)',
       referenceRanges: [
         { ageGroup: 'Normal', ageMin: 0, gender: 'all', range: '0.7-1.3', unit: 'ratio' },
+      ],
+    },
+    {
+      code: 'APTT',
+      name: 'Activated Partial Thromboplastin Time',
+      unit: 'seconds',
+      description: 'Measures the intrinsic coagulation pathway',
+      referenceRanges: [
+        { ageGroup: 'Normal', ageMin: 0, gender: 'all', range: '22.2-37.9', unit: 'seconds' },
+      ],
+    },
+    {
+      code: 'FIB',
+      name: 'Fibrinogen',
+      unit: 'g/L',
+      description: 'Clotting factor I — key substrate in clot formation',
+      referenceRanges: [
+        { ageGroup: 'Normal', ageMin: 0, gender: 'all', range: '2.0-4.0', unit: 'g/L' },
       ],
     },
     {
@@ -58,15 +78,6 @@ async function run() {
       description: 'Measures overall coagulation via whole blood clotting',
       referenceRanges: [
         { ageGroup: 'Normal', ageMin: 0, gender: 'all', range: '80-140', unit: 'seconds' },
-      ],
-    },
-    {
-      code: 'FIB',
-      name: 'Fibrinogen',
-      unit: 'g/dL',
-      description: 'Clotting factor I — key substrate in clot formation',
-      referenceRanges: [
-        { ageGroup: 'Normal', ageMin: 0, gender: 'all', range: '2.0-4.0', unit: 'g/dL' },
       ],
     },
   ];
@@ -79,13 +90,13 @@ async function run() {
           unit: def.unit,
           description: def.description,
           referenceRanges: def.referenceRanges,
+          ...(def.price !== undefined ? { price: def.price } : {}),
           updatedAt: new Date(),
         },
         $setOnInsert: {
           code: def.code,
           name: def.name,
           category: 'hematology',
-          price: 175,
           sampleType: 'blood',
           turnaroundTime: 30,
           isActive: true,
@@ -97,8 +108,8 @@ async function run() {
     console.log(r.upsertedCount ? `✅ ${def.code} created` : `✅ ${def.code} updated`);
   }
 
-  // 2. Fetch panel test entries: PT, INR, ACT, FIB
-  const coagCodes = ['PT', 'INR', 'ACT', 'FIB'];
+  // 2. Fetch panel test entries: PT, INR, APTT, FIB
+  const coagCodes = ['PT', 'INR', 'APTT', 'FIB', 'ACT'];
   const tests = await catalog.find({ code: { $in: coagCodes } }).toArray();
 
   const missing = coagCodes.filter(c => !tests.find(t => t.code === c));
@@ -120,7 +131,7 @@ async function run() {
       $set: {
         code: 'COAG',
         name: 'Coagulation Profile',
-        description: 'Coagulation screen - PT, INR, ACT, Fibrinogen',
+        description: 'Coagulation screen - PT/INR, APTT, Fibrinogen, ACT',
         price: 700,
         isActive: true,
         tests: testItems,

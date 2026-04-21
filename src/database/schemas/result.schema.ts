@@ -50,6 +50,12 @@ export class Result extends Document {
   @Prop()
   referenceRange?: string;
 
+  @Prop()
+  menstrualPhase?: string; // For hormone tests: 'follicular', 'ovulation', 'luteal', 'menopause', 'pregnancy'
+
+  @Prop()
+  allReferenceRanges?: string; // JSON string containing all applicable ranges for display
+
   @Prop({
     required: true,
     enum: Object.values(ResultFlagEnum),

@@ -39,6 +39,14 @@ export class CreateResultDto {
   referenceRange?: string;
 
   @IsOptional()
+  @IsString()
+  menstrualPhase?: string;
+
+  @IsOptional()
+  @IsString()
+  allReferenceRanges?: string;
+
+  @IsOptional()
   @IsEnum(ResultFlagEnum)
   flag?: ResultFlagEnum;
 
