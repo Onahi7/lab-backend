@@ -47,4 +47,12 @@ export class ResultItemDto {
   @IsOptional()
   @IsString()
   subcategory?: string;
+
+  @IsOptional()
+  @IsString()
+  menstrualPhase?: string;
+
+  @IsOptional()
+  @IsString()
+  allReferenceRanges?: string;
 }

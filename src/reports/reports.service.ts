@@ -458,6 +458,8 @@ export class ReportsService {
           result.subcategory || testInfo?.subcategory,
         ),
         category: resolvedCategory,
+        menstrualPhase: result.menstrualPhase,
+        allReferenceRanges: result.allReferenceRanges,
       } as any);
     }
 
