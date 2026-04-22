@@ -407,10 +407,21 @@ export class ReportsService {
           result.subcategory || testInfo?.subcategory,
         );
 
+        // Always force stool microscopy to microbiology regardless of stored category
+        const normalizedCode = this.normalizeLookupToken(testCode);
+        const nameLower = (testName || '').toLowerCase();
+        const isStoolMicro =
+          normalizedCode === 'STOOLMICRO' ||
+          normalizedCode === 'STOOLFULL' ||
+          nameLower.includes('stool') ||
+          nameLower.includes('faec') ||
+          nameLower.includes('fec');
+        if (isStoolMicro) {
+          return TestCategoryEnum.MICROBIOLOGY;
+        }
+
         if (!cat || cat === TestCategoryEnum.OTHER) {
-          const normalizedCode = this.normalizeLookupToken(testCode);
           const normalizedSubcategory = this.normalizeLookupToken(resolvedSubcategory);
-          const nameLower = (testName || '').toLowerCase();
 
           const isUrineByName = nameLower.startsWith('urine ') || nameLower === 'urine';
           const isUrineByCode =
