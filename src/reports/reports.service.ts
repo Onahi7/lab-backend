@@ -410,7 +410,7 @@ export class ReportsService {
         if (!cat || cat === TestCategoryEnum.OTHER) {
           const normalizedCode = this.normalizeLookupToken(testCode);
           const normalizedSubcategory = this.normalizeLookupToken(resolvedSubcategory);
-          const nameLower = testName.toLowerCase();
+          const nameLower = (testName || '').toLowerCase();
 
           const isUrineByName = nameLower.startsWith('urine ') || nameLower === 'urine';
           const isUrineByCode =
