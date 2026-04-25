@@ -40,7 +40,7 @@ export class PatientsController {
     @Query('search') search?: string,
   ) {
     const pageNum = page ? parseInt(page, 10) : 1;
-    const limitNum = limit ? parseInt(limit, 10) : 10;
+    const limitNum = limit ? parseInt(limit, 10) : 1000;
     return this.patientsService.findAll(pageNum, limitNum, search);
   }
 

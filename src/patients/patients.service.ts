@@ -90,7 +90,7 @@ export class PatientsService {
    */
   async findAll(
     page: number = 1,
-    limit: number = 10,
+    limit: number = 1000,
     search?: string,
   ): Promise<{ data: Patient[]; total: number; page: number; limit: number }> {
     const skip = (page - 1) * limit;
@@ -173,7 +173,7 @@ export class PatientsService {
         ],
       })
       .populate('registeredBy', 'fullName email')
-      .limit(20)
+      .limit(1000)
       .exec();
 
     return patients;
