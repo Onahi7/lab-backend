@@ -242,8 +242,86 @@ async function updateHormoneReferenceRanges() {
       console.log('   ⚠️ AMH test not found in catalog');
     }
 
+    // ==================== BHCG (Beta-HCG) ====================
+    console.log('\n5️⃣ Updating BHCG (Beta-HCG)...');
+    const bhcg = await testCatalogModel.findOne({ 
+      $or: [
+        { code: { $regex: /BHCG/i } },
+        { name: { $regex: /Beta.*HCG|Beta.*hCG/i } }
+      ]
+    });
+    
+    if (bhcg) {
+      bhcg.referenceRanges = [
+        {
+          ageGroup: 'Male',
+          ageMin: 18,
+          gender: 'M',
+          range: '0-5',
+          unit: 'mIU/mL'
+        },
+        {
+          ageGroup: 'Female - Non-pregnant',
+          ageMin: 18,
+          gender: 'F',
+          range: '0-5',
+          unit: 'mIU/mL'
+        },
+        {
+          ageGroup: 'Female - Pregnancy (3 weeks)',
+          ageMin: 18,
+          gender: 'F',
+          pregnancy: true,
+          condition: '3 weeks',
+          range: '5-50',
+          unit: 'mIU/mL'
+        },
+        {
+          ageGroup: 'Female - Pregnancy (4 weeks)',
+          ageMin: 18,
+          gender: 'F',
+          pregnancy: true,
+          condition: '4 weeks',
+          range: '5-426',
+          unit: 'mIU/mL'
+        },
+        {
+          ageGroup: 'Female - Pregnancy (5 weeks)',
+          ageMin: 18,
+          gender: 'F',
+          pregnancy: true,
+          condition: '5 weeks',
+          range: '18-7340',
+          unit: 'mIU/mL'
+        },
+        {
+          ageGroup: 'Female - Pregnancy (6 weeks)',
+          ageMin: 18,
+          gender: 'F',
+          pregnancy: true,
+          condition: '6 weeks',
+          range: '1080-56500',
+          unit: 'mIU/mL'
+        },
+        {
+          ageGroup: 'Female - Pregnancy (7-8 weeks)',
+          ageMin: 18,
+          gender: 'F',
+          pregnancy: true,
+          condition: '7-8 weeks',
+          range: '7650-229000',
+          unit: 'mIU/mL'
+        }
+      ];
+      bhcg.unit = 'mIU/mL';
+      await bhcg.save();
+      console.log('   ✅ BHCG updated successfully');
+    } else {
+      console.log('   ⚠️ BHCG test not found in catalog');
+    }
+
     // ==================== PRL (Prolactin) ====================
-    console.log('\n5️⃣ Updating PRL (Prolactin)...');
+    console.log('\n6️⃣ Updating PRL (Prolactin)...');
     const prl = await testCatalogModel.findOne({ 
       $or: [
         { code: { $regex: /PRL/i } },
@@ -282,8 +360,8 @@ async function updateHormoneReferenceRanges() {
 
     const hormoneTests = await testCatalogModel.find({
       $or: [
-        { code: { $regex: /FSH|^LH$|PROG|AMH|PRL/i } },
-        { name: { $regex: /FSH|^LH$|Luteinizing|Progesterone|AMH|Mullerian|Prolactin/i } }
+        { code: { $regex: /FSH|^LH$|PROG|AMH|BHCG|PRL/i } },
+        { name: { $regex: /FSH|^LH$|Luteinizing|Progesterone|AMH|Mullerian|Beta.*HCG|Prolactin/i } }
       ]
     }).sort({ code: 1 });
 

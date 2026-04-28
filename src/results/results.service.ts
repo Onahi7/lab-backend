@@ -111,6 +111,7 @@ export class ResultsService {
     orderId: Types.ObjectId,
     testCode: string,
     explicitReferenceRange?: string,
+    menstrualPhase?: string,
   ): Promise<string | undefined> {
     if (explicitReferenceRange) {
       return this.normalizeMchcRange(testCode, explicitReferenceRange);
@@ -134,11 +135,16 @@ export class ResultsService {
       return undefined;
     }
 
+    const isPregnancy = menstrualPhase === 'pregnancy';
+    const condition = isPregnancy ? undefined : menstrualPhase;
+
     const resolvedReferenceRange = resolveReferenceRange({
       age: patient.age,
       gender: patient.gender as any,
       referenceRanges: testCatalog.referenceRanges,
       simpleReferenceRange: testCatalog.referenceRange,
+      pregnancy: isPregnancy || undefined,
+      condition,
     });
 
     return this.normalizeMchcRange(testCode, resolvedReferenceRange);
@@ -275,6 +281,7 @@ export class ResultsService {
       orderObjectId,
       createResultDto.testCode,
       isReceptionistEntry ? undefined : createResultDto.referenceRange,
+      createResultDto.menstrualPhase,
     );
 
     // Fetch subcategory from test catalog
@@ -368,6 +375,7 @@ export class ResultsService {
           orderObjectId,
           dto.testCode,
           isReceptionistEntry ? undefined : dto.referenceRange,
+          dto.menstrualPhase,
         );
 
         const normalizedValue =
@@ -545,7 +553,7 @@ export class ResultsService {
       const resolvedReferenceRange =
         updateResultDto.referenceRange ||
         result.referenceRange ||
-        (await this.resolveReferenceRangeForResult(result.orderId, result.testCode));
+        (await this.resolveReferenceRangeForResult(result.orderId, result.testCode, undefined, result.menstrualPhase));
       const referenceRange = this.normalizeMchcRange(result.testCode, resolvedReferenceRange);
 
       if (!updateResultDto.referenceRange && referenceRange && !result.referenceRange) {

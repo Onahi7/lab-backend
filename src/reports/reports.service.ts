@@ -374,6 +374,11 @@ export class ReportsService {
         orderTest?.testName ||
         testCode;
       const isMchc = this.isMchcTest(testCode);
+      // Derive pregnancy/condition from menstrualPhase for hormone reference range resolution
+      const menstrualPhase = (result as any).menstrualPhase as string | undefined;
+      const isPregnancy = menstrualPhase === 'pregnancy';
+      const condition = isPregnancy ? undefined : menstrualPhase;
+
       const selectedReferenceRange = this.selectReferenceRange(
         testCode,
         patient.gender,
@@ -381,6 +386,8 @@ export class ReportsService {
         result.referenceRange,
         testInfo?.referenceRanges,
         testInfo?.referenceRange,
+        isPregnancy,
+        condition,
       );
       const normalizedValue = isMchc
         ? this.normalizeMchcValue(result.value) || result.value
@@ -672,6 +679,8 @@ export class ReportsService {
     explicitReferenceRange?: string,
     referenceRanges?: TestCatalog['referenceRanges'],
     referenceRange?: string,
+    pregnancy?: boolean,
+    condition?: string,
   ): string | undefined {
     return resolveReferenceRange({
       age: patientAge,
@@ -679,6 +688,8 @@ export class ReportsService {
       explicitReferenceRange,
       referenceRanges,
       simpleReferenceRange: referenceRange,
+      pregnancy,
+      condition,
     });
   }
 
