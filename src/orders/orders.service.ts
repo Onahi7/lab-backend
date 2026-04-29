@@ -553,7 +553,11 @@ export class OrdersService {
     if (startDate || endDate) {
       const dateFilter: any = {};
       if (startDate) dateFilter.$gte = new Date(startDate);
-      if (endDate) dateFilter.$lte = new Date(endDate);
+      if (endDate) {
+        const endOfDay = new Date(endDate);
+        endOfDay.setHours(23, 59, 59, 999);
+        dateFilter.$lte = endOfDay;
+      }
       orderQuery.createdAt = dateFilter;
       paymentQuery.createdAt = dateFilter;
     }
@@ -609,7 +613,11 @@ export class OrdersService {
     if (startDate || endDate) {
       matchQuery.createdAt = {};
       if (startDate) matchQuery.createdAt.$gte = new Date(startDate);
-      if (endDate) matchQuery.createdAt.$lte = new Date(endDate);
+      if (endDate) {
+        const endOfDay = new Date(endDate);
+        endOfDay.setHours(23, 59, 59, 999);
+        matchQuery.createdAt.$lte = endOfDay;
+      }
     }
 
     const dailyIncome = await this.paymentModel.aggregate([
