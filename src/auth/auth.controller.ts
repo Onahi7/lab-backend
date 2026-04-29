@@ -9,11 +9,20 @@ import {
   HttpStatus,
   Logger,
 } from '@nestjs/common';
+import type { Request as ExpressRequest } from 'express';
 import { AuthService, AuthResponse } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { Public } from './decorators/public.decorator';
+
+interface AuthenticatedRequest extends ExpressRequest {
+  user: {
+    userId: string;
+    email: string;
+    roles: string[];
+  };
+}
 
 @Controller('auth')
 export class AuthController {
@@ -21,16 +30,12 @@ export class AuthController {
 
   constructor(private readonly authService: AuthService) {}
 
-  /**
-   * POST /auth/login
-   * User login endpoint
-   */
   @Public()
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() loginDto: LoginDto): Promise<AuthResponse> {
     this.logger.log(`Login attempt for email: ${loginDto.email}`);
-    
+
     try {
       const result = await this.authService.login(loginDto.email, loginDto.password);
       this.logger.log(`Login successful for email: ${loginDto.email}`);
@@ -42,32 +47,24 @@ export class AuthController {
     }
   }
 
-  /**
-   * POST /auth/logout
-   * User logout endpoint
-   */
   @Post('logout')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  async logout(@Request() req: any): Promise<{ message: string }> {
+  async logout(@Request() req: AuthenticatedRequest): Promise<{ message: string }> {
     const userId = req.user.userId;
     this.logger.log(`Logout request for user: ${userId}`);
-    
+
     await this.authService.logout(userId);
-    
+
     return { message: 'Logged out successfully' };
   }
 
-  /**
-   * POST /auth/refresh
-   * Refresh access token using refresh token
-   */
   @Public()
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   async refresh(@Body() refreshTokenDto: RefreshTokenDto): Promise<{ accessToken: string }> {
     this.logger.log('Token refresh request received');
-    
+
     try {
       const result = await this.authService.refreshAccessToken(refreshTokenDto.refreshToken);
       this.logger.log('Token refresh successful');
@@ -79,16 +76,12 @@ export class AuthController {
     }
   }
 
-  /**
-   * GET /auth/profile
-   * Get current user profile
-   */
   @Get('profile')
   @UseGuards(JwtAuthGuard)
-  async getProfile(@Request() req: any): Promise<any> {
+  async getProfile(@Request() req: AuthenticatedRequest): Promise<{ id: string; email: string; fullName: string; department?: string; avatarUrl?: string; roles: string[]; createdAt: Date }> {
     const userId = req.user.userId;
     this.logger.log(`Profile request for user: ${userId}`);
-    
+
     return this.authService.getProfile(userId);
   }
 }

@@ -79,8 +79,9 @@ async function seedAdmin() {
     console.log('   Password: Admin@2026');
     console.log('\n✨ Seeding completed successfully!');
 
-  } catch (error: any) {
-    console.error('❌ Error seeding admin:', error.message);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('❌ Error seeding admin:', errorMessage);
     process.exit(1);
   } finally {
     await disconnect();

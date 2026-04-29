@@ -65,14 +65,14 @@ async function seedSerology() {
       description: 'Rapid malaria antigen test',
     },
     {
-      code: 'HIV',
-      name: 'HIV Rapid Test',
+      code: 'RVS',
+      name: 'RVS Rapid Test',
       category: 'serology',
       price: 100,
       sampleType: 'blood',
       turnaroundTime: 30,
       isActive: true,
-      description: 'HIV antibody rapid test — Reactive / Non-Reactive',
+      description: 'RVS antibody rapid test — Reactive / Non-Reactive',
     },
     {
       code: 'GONORRHEA',
@@ -115,14 +115,14 @@ async function seedSerology() {
       description: 'Typhoid rapid strip test — reports S. typhi IgM and IgG separately',
     },
     {
-      code: 'HIVP24',
-      name: 'HIV P24 Antigen',
+      code: 'RVSP24',
+      name: 'RVS P24 Antigen',
       category: 'serology',
       price: 150,
       sampleType: 'blood',
       turnaroundTime: 30,
       isActive: true,
-      description: 'HIV P24 antigen early-detection test — Reactive / Non-Reactive',
+      description: 'RVS P24 antigen early-detection test — Reactive / Non-Reactive',
     },
 
     // ==================== MICROSCOPY ====================

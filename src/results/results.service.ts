@@ -16,6 +16,32 @@ import { AmendResultDto } from './dto/amend-result.dto';
 import { RealtimeGateway } from '../realtime/realtime.gateway';
 import { resolveReferenceRange } from '../common/utils/reference-range-resolver';
 
+/**
+ * Qualitative result values that should be flagged as abnormal (high).
+ */
+const ABNORMAL_QUALITATIVE_VALUES = new Set([
+  // Serology: Reactive means positive
+  'Reactive',
+  'Weakly Reactive',
+  'Reactive (HSV-1)',
+  'Reactive (HSV-2)',
+  'Reactive (HSV-1 & 2)',
+  'Reactive (1:1)',
+  'Reactive (1:2)',
+  'Reactive (1:4)',
+  'Reactive (1:8)',
+  'Reactive (1:16)',
+  'Reactive (1:32)',
+  // STI: Positive means detected
+  'Positive',
+  'Positive (P. falciparum)',
+  'Positive (P. vivax)',
+  'Positive (Mixed)',
+  // WIDAL: IgM reactive = acute
+  'IgM: Reactive      |  IgG: Non-Reactive',
+  'IgM: Reactive      |  IgG: Reactive',
+]);
+
 @Injectable()
 export class ResultsService {
   private static readonly MCHC_TEST_CODE = 'MCHC';
@@ -151,9 +177,10 @@ export class ResultsService {
   }
 
   /**
-   * Calculate result flag based on value and reference range
+   * Calculate result flag based on value and reference range.
+   * Handles both numeric ranges and qualitative values.
    * @param value - The test result value
-   * @param referenceRange - The reference range (e.g., "12-16" or "< 5.0")
+   * @param referenceRange - The reference range (e.g., "12-16", "< 5.0", or qualitative)
    * @returns The calculated flag
    */
   calculateFlag(value: string, referenceRange?: string): ResultFlagEnum {
@@ -162,15 +189,20 @@ export class ResultsService {
     }
 
     const trimmedValue = String(value || '').trim();
+
+    // ── Qualitative flag check (serology / rapid tests) ────────────────
+    // If value is non-numeric, check against known abnormal qualitative values
+    const numericCheck = parseFloat(trimmedValue);
+    if (isNaN(numericCheck)) {
+      return this.calculateQualitativeFlag(trimmedValue);
+    }
+
+    // ── Numeric flag calculation ───────────────────────────────────────
     const comparisonValueMatch = trimmedValue.match(/^([<>]=?|≤|≥)\s*(-?\d*\.?\d+)$/);
     const numericValue = comparisonValueMatch
       ? parseFloat(comparisonValueMatch[2])
       : parseFloat(trimmedValue);
     const comparisonOperator = comparisonValueMatch ? comparisonValueMatch[1] : null;
-
-    if (isNaN(numericValue)) {
-      return ResultFlagEnum.NORMAL;
-    }
 
     // Parse reference range
     // Formats: "12-16", "< 5.0", "> 100", "12.5 - 16.5"
@@ -232,6 +264,21 @@ export class ResultsService {
       }
 
       return numericValue <= threshold ? ResultFlagEnum.LOW : ResultFlagEnum.NORMAL;
+    }
+
+    return ResultFlagEnum.NORMAL;
+  }
+
+  /**
+   * Calculate flag for qualitative (non-numeric) results.
+   * Reactive, Positive, Detected → HIGH
+   * Non-Reactive, Negative, Not Detected → NORMAL
+   */
+  private calculateQualitativeFlag(value: string): ResultFlagEnum {
+    if (!value) return ResultFlagEnum.NORMAL;
+
+    if (ABNORMAL_QUALITATIVE_VALUES.has(value)) {
+      return ResultFlagEnum.HIGH;
     }
 
     return ResultFlagEnum.NORMAL;

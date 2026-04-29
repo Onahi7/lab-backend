@@ -8,6 +8,7 @@ import { Order } from '../database/schemas/order.schema';
 import { OrderTest } from '../database/schemas/order-test.schema';
 import { Machine } from '../database/schemas/machine.schema';
 import { Patient } from '../database/schemas/patient.schema';
+import { RealtimeGateway } from '../realtime/realtime.gateway';
 
 interface ParsedHL7Message {
   messageType: string;
@@ -90,6 +91,7 @@ export class Hl7Service {
     private machineModel: Model<Machine>,
     @InjectModel(Patient.name)
     private patientModel: Model<Patient>,
+    private realtimeGateway: RealtimeGateway,
   ) {}
 
   private isMchcTest(testCode?: string): boolean {
@@ -345,9 +347,10 @@ export class Hl7Service {
       );
 
       return { ack, results };
-    } catch (error: any) {
-      this.logger.error(`Error processing HL7 message: ${error.message}`);
-      await this.updateCommunicationLog(logEntry._id, 'failed', error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(`Error processing HL7 message: ${errorMessage}`);
+      await this.updateCommunicationLog(logEntry._id, 'failed', errorMessage);
       throw error;
     }
   }
@@ -402,9 +405,10 @@ export class Hl7Service {
       );
 
       return { ack, results };
-    } catch (error: any) {
-      this.logger.error(`Error processing ASTM message: ${error.message}`);
-      await this.updateCommunicationLog(logEntry._id, 'failed', error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(`Error processing ASTM message: ${errorMessage}`);
+      await this.updateCommunicationLog(logEntry._id, 'failed', errorMessage);
       throw error;
     }
   }
@@ -429,14 +433,30 @@ export class Hl7Service {
     patientId?: string,
   ): Promise<Order | null> {
     if (orderId) {
-      return this.orderModel.findOne({ orderNumber: orderId });
+      // Try orderNumber first, then try as MongoDB ObjectId
+      const byNumber = await this.orderModel.findOne({ orderNumber: orderId });
+      if (byNumber) return byNumber;
+
+      if (Types.ObjectId.isValid(orderId)) {
+        const byId = await this.orderModel.findById(orderId);
+        if (byId) return byId;
+      }
     }
     if (patientId) {
-      // Find most recent pending order for patient
+      // Find most recent non-completed, non-cancelled order for patient
+      let patientObjectId: Types.ObjectId;
+      if (Types.ObjectId.isValid(patientId)) {
+        patientObjectId = new Types.ObjectId(patientId);
+      } else {
+        // Try to find patient by patientId string
+        const patient = await this.patientModel.findOne({ patientId });
+        if (!patient) return null;
+        patientObjectId = patient._id;
+      }
       return this.orderModel
         .findOne({
-          patientId: new Types.ObjectId(patientId),
-          status: { $in: ['collected', 'processing'] },
+          patientId: patientObjectId,
+          status: { $in: ['pending_collection', 'collected', 'processing'] },
         })
         .sort({ createdAt: -1 });
     }
@@ -459,6 +479,13 @@ export class Hl7Service {
     for (const ot of orderTests) {
       orderTestByCode.set((ot as any).testCode?.toUpperCase(), ot);
     }
+
+    // Get machine info for notifications
+    const machine = await this.machineModel.findById(machineId).exec();
+    const machineName = machine?.name || 'Unknown Analyzer';
+
+    // Get order info for notifications
+    const order = await this.orderModel.findById(orderId).exec();
 
     for (const result of results) {
       const normalizedResult = this.normalizeMchcAnalyzerResult(result);
@@ -485,12 +512,55 @@ export class Hl7Service {
       const saved = await newResult.save();
       storedResults.push(saved);
 
+      // Emit WebSocket event for this result
+      this.realtimeGateway.notifyResultCreated({
+        _id: saved._id,
+        testCode: lisCode,
+        testName: saved.testName,
+        value: saved.value,
+        flag: saved.flag,
+        orderId: orderId.toString(),
+        orderNumber: order?.orderNumber,
+        source: 'automated',
+        machineName,
+      });
+
+      // If result doesn't match any order test, emit unmatched event
+      if (!matchedOrderTest) {
+        this.realtimeGateway.notifyUnmatchedResult({
+          testCode: lisCode,
+          testName: normalizedResult.testName || lisCode,
+          value: normalizedResult.value,
+          unit: normalizedResult.unit,
+          machineName,
+          machineId,
+          orderId: orderId.toString(),
+          orderNumber: order?.orderNumber,
+        });
+      }
+
       this.logger.debug(`Stored result: ${normalizedResult.testCode} -> ${lisCode} = ${normalizedResult.value} (matched OT: ${!!matchedOrderTest})`);
     }
 
     // Update order status to processing if not already
     await this.orderModel.findByIdAndUpdate(orderId, {
       $set: { status: 'processing' },
+    });
+
+    // Notify that order status changed
+    if (order) {
+      this.realtimeGateway.notifyOrderStatusChanged(orderId.toString(), 'processing', order.orderNumber);
+    }
+
+    // Notify that machine received results
+    this.realtimeGateway.notifyMachineResultReceived({
+      machineId,
+      machineName,
+      resultCount: storedResults.length,
+      protocol: 'HL7/ASTM',
+      autoMatched: true,
+      orderId: orderId.toString(),
+      orderNumber: order?.orderNumber,
     });
 
     return storedResults;
@@ -518,12 +588,22 @@ export class Hl7Service {
     machineId: string,
     status: string,
   ): Promise<void> {
-    await this.machineModel.findByIdAndUpdate(machineId, {
+    const machine = await this.machineModel.findByIdAndUpdate(machineId, {
       $set: {
         status,
         lastCommunication: new Date(),
       },
-    });
+    }, { new: true }).exec();
+
+    // Emit WebSocket event for machine status change
+    if (machine) {
+      this.realtimeGateway.notifyMachineStatusChanged({
+        _id: machine._id,
+        name: machine.name,
+        status: machine.status,
+        lastCommunication: machine.lastCommunication,
+      });
+    }
   }
 
   /**
@@ -787,11 +867,11 @@ export class Hl7Service {
 
       socket.on('timeout', () => {
         socket.destroy();
-        // Timeout might still be OK if message was sent
-        this.updateCommunicationLog(logEntry._id, 'success', 'No ACK received (timeout)');
+        // Timeout means we didn't get ACK - mark as partial success
+        this.updateCommunicationLog(logEntry._id, 'timeout', 'No ACK received within timeout');
         resolve({
-          success: true,
-          message: `Order sent to ${machine.name} (no ACK received within timeout)`,
+          success: false,
+          message: `Order sent to ${machine.name} but no ACK received - verify manually`,
         });
       });
     });

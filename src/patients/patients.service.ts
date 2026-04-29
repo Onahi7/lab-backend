@@ -71,13 +71,13 @@ export class PatientsService {
       this.realtimeGateway.notifyPatientCreated(savedPatient);
 
       return savedPatient;
-    } catch (error: any) {
-      if (error.code === 11000) {
-        // Duplicate key error
-        if (error.keyPattern?.email) {
+    } catch (error: unknown) {
+      if (typeof error === 'object' && error !== null && 'code' in error && (error as { code: number }).code === 11000) {
+        const keyPattern = (error as { keyPattern?: Record<string, unknown> }).keyPattern;
+        if (keyPattern?.email) {
           throw new ConflictException('Patient with this email already exists');
         }
-        if (error.keyPattern?.mrn) {
+        if (keyPattern?.mrn) {
           throw new ConflictException('Patient with this MRN already exists');
         }
       }
@@ -199,12 +199,13 @@ export class PatientsService {
 
       this.logger.log(`Patient updated: ${patient.patientId}`);
       return patient;
-    } catch (error: any) {
-      if (error.code === 11000) {
-        if (error.keyPattern?.email) {
+    } catch (error: unknown) {
+      if (typeof error === 'object' && error !== null && 'code' in error && (error as { code: number }).code === 11000) {
+        const keyPattern = (error as { keyPattern?: Record<string, unknown> }).keyPattern;
+        if (keyPattern?.email) {
           throw new ConflictException('Patient with this email already exists');
         }
-        if (error.keyPattern?.mrn) {
+        if (keyPattern?.mrn) {
           throw new ConflictException('Patient with this MRN already exists');
         }
       }

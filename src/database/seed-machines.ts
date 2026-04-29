@@ -107,8 +107,9 @@ async function seedMachines() {
         }
         console.log(`   Tests: ${machineData.testsSupported.length} supported\n`);
       }
-    } catch (error: any) {
-      console.error(`❌ Error seeding ${machineData.name}:`, error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error(`❌ Error seeding ${machineData.name}:`, errorMessage);
     }
   }
 

@@ -110,8 +110,9 @@ export class TcpListenerService implements OnModuleInit, OnModuleDestroy {
 
             await this.handleMessage(machineId, machineName, protocol, cleanMessage, socket);
             buffer = ''; // Clear buffer after processing
-          } catch (error: any) {
-            this.logger.error(`Error processing message: ${error.message}`);
+          } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            this.logger.error(`Error processing message: ${errorMessage}`);
             // Send NAK wrapped in MLLP for HL7, plain for ASTM
             if (protocol === 'HL7') {
               const nak = this.hl7Service.generateHL7Ack('0', 'AE');
@@ -292,8 +293,9 @@ export class TcpListenerService implements OnModuleInit, OnModuleDestroy {
       });
 
       return true;
-    } catch (error: any) {
-      this.logger.error(`Auto-match failed for sample ${sampleId}: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(`Auto-match failed for sample ${sampleId}: ${errorMessage}`);
       return false;
     }
   }
@@ -360,9 +362,10 @@ export class TcpListenerService implements OnModuleInit, OnModuleDestroy {
         success: true,
         message: `Successfully matched ${stored.length} test results`,
       };
-    } catch (error: any) {
-      this.logger.error(`Error matching result: ${error.message}`);
-      return { success: false, message: error.message };
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(`Error matching result: ${errorMessage}`);
+      return { success: false, message: errorMessage };
     }
   }
 

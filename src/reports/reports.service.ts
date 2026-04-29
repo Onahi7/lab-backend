@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { ConfigService } from '@nestjs/config';
 import { Model, Types } from 'mongoose';
 import { Order } from '../database/schemas/order.schema';
-import { Result, ResultStatusEnum } from '../database/schemas/result.schema';
+import { Result, ResultStatusEnum, ResultFlagEnum } from '../database/schemas/result.schema';
 import { Machine } from '../database/schemas/machine.schema';
 import { Sample } from '../database/schemas/sample.schema';
 import { Patient, GenderEnum } from '../database/schemas/patient.schema';
@@ -33,6 +33,83 @@ export class ReportsService {
     UPRO: ['UPROTEIN', 'URINEPROTEIN'],
   };
 
+  /**
+   * Interpretation map for qualitative/semi-quantitative tests.
+   * Maps test code → (result value → interpretation text).
+   * Used to auto-generate the "Interpretation" column on reports.
+   */
+  private static readonly INTERPRETATION_MAP: Record<string, Record<string, string>> = {
+    // ── Serology: Reactive/Non-Reactive ────────────────────────────────
+    RVS:       { 'Reactive': 'Positive', 'Non-Reactive': 'Negative' },
+    HBSAG:     { 'Reactive': 'Positive', 'Non-Reactive': 'Negative' },
+    HCV:       { 'Reactive': 'Positive', 'Non-Reactive': 'Negative' },
+    RVSP24:    { 'Reactive': 'Positive', 'Non-Reactive': 'Negative' },
+    HPYLORI:   { 'Reactive': 'Positive', 'Non-Reactive': 'Negative' },
+    HPYLORI_IA:{ 'Reactive': 'Positive', 'Non-Reactive': 'Negative' },
+
+    // ── Serology: HSV (type-specific) ──────────────────────────────────
+    HSV: {
+      'Non-Reactive': 'Negative',
+      'Reactive (HSV-1)': 'Positive – HSV-1',
+      'Reactive (HSV-2)': 'Positive – HSV-2',
+      'Reactive (HSV-1 & 2)': 'Positive – HSV-1 & HSV-2',
+    },
+
+    // ── Serology: VDRL (titered) ───────────────────────────────────────
+    VDRL: {
+      'Non-Reactive': 'Negative',
+      'Weakly Reactive': 'Weakly Positive',
+      'Reactive (1:1)': 'Positive (1:1)',
+      'Reactive (1:2)': 'Positive (1:2)',
+      'Reactive (1:4)': 'Positive (1:4)',
+      'Reactive (1:8)': 'Positive (1:8)',
+      'Reactive (1:16)': 'Positive (1:16)',
+      'Reactive (1:32)': 'Positive (1:32)',
+    },
+
+    // ── Serology: WIDAL (IgM/IgG) ──────────────────────────────────────
+    WIDAL: {
+      'IgM: Non-Reactive  |  IgG: Non-Reactive': 'Negative',
+      'IgM: Reactive      |  IgG: Non-Reactive': 'Acute Infection (IgM+)',
+      'IgM: Non-Reactive  |  IgG: Reactive': 'Past Infection / Immunity (IgG+)',
+      'IgM: Reactive      |  IgG: Reactive': 'Active / Recent Infection (IgM+ IgG+)',
+    },
+
+    // ── Serology: Malaria ──────────────────────────────────────────────
+    MALARIA: {
+      'Negative': 'No Malaria Parasite Detected',
+      'Positive (P. falciparum)': 'P. falciparum Antigen Detected',
+      'Positive (P. vivax)': 'P. vivax Antigen Detected',
+      'Positive (Mixed)': 'Mixed Plasmodium Species Detected',
+    },
+
+    // ── Serology: STI ──────────────────────────────────────────────────
+    GONORRHEA: { 'Positive': 'Detected', 'Negative': 'Not Detected' },
+    CHLAMYDIA: { 'Positive': 'Detected', 'Negative': 'Not Detected' },
+
+    // ── Microbiology ───────────────────────────────────────────────────
+    HPAG: { 'Positive': 'H. pylori Antigen Detected', 'Negative': 'Not Detected' },
+
+    // ── Immunoassay: numeric with auto-interpretation ──────────────────
+    BHCG: {}, // Handled dynamically: >5 = Positive, ≤5 = Negative
+    PSA: {},  // Handled dynamically: age-dependent thresholds
+    TROP: {}, // Handled dynamically by value
+    PCT: {},  // Handled dynamically by value
+    BNP: {},  // Handled dynamically by value
+    NTPRO: {},// Handled dynamically by value
+    VITD: {}, // Handled dynamically: <20 Deficient, 20-30 Insufficient, ≥30 Sufficient
+    DDIMER: {},// Handled dynamically: <0.5 Normal, ≥0.5 Elevated
+    DDIMER_OS: {},
+    MAU: {},  // Handled dynamically: <20 Normal, 20-200 Microalbuminuria, >200 Macroalbuminuria
+    CRP: {},  // Handled dynamically: <10 Normal, ≥10 Elevated
+    HSCRP: {},// Handled dynamically: <1 Normal, ≥1 Elevated
+
+    // ── Hematology qualitative ─────────────────────────────────────────
+    BLOODGROUP: {},
+    SICKLE: {},
+    HBGENO: {},
+  };
+
   constructor(
     @InjectModel(Order.name)
     private orderModel: Model<Order>,
@@ -54,6 +131,89 @@ export class ReportsService {
     private panelInterpretationModel: Model<PanelInterpretation>,
     private configService: ConfigService,
   ) {}
+
+  /**
+   * Resolve interpretation for a test result.
+   * Handles both static lookups (serology qualitative) and dynamic numeric rules.
+   */
+  private resolveInterpretation(
+    normalizedCode: string,
+    value: string,
+    referenceRange?: string,
+  ): string | undefined {
+    if (!value) return undefined;
+
+    const trimmedValue = value.trim();
+    const interpMap = ReportsService.INTERPRETATION_MAP[normalizedCode];
+
+    // ── Static lookup (qualitative tests) ──────────────────────────────
+    if (interpMap && Object.keys(interpMap).length > 0) {
+      return interpMap[trimmedValue];
+    }
+
+    // ── Dynamic numeric interpretations ────────────────────────────────
+    const num = parseFloat(trimmedValue);
+    if (isNaN(num)) return undefined;
+
+    switch (normalizedCode) {
+      case 'BHCG':
+        return num > 5 ? 'Positive' : 'Negative';
+
+      case 'TROP': {
+        if (num < 0.04) return 'Normal';
+        if (num <= 0.4) return 'Elevated – Suggestive of Myocardial Injury';
+        return 'Highly Elevated – Consistent with MI';
+      }
+
+      case 'PCT': {
+        if (num < 0.5) return 'Normal';
+        if (num <= 2.0) return 'Elevated – Possible Bacterial Infection';
+        return 'Highly Elevated – Sepsis Likely';
+      }
+
+      case 'BNP': {
+        if (num < 100) return 'Normal';
+        if (num <= 400) return 'Elevated – Heart Failure Possible';
+        return 'Highly Elevated – Heart Failure Likely';
+      }
+
+      case 'NTPRO': {
+        if (num < 125) return 'Normal';
+        return 'Elevated – Heart Failure Possible';
+      }
+
+      case 'VITD': {
+        if (num < 20) return 'Deficient';
+        if (num < 30) return 'Insufficient';
+        return 'Sufficient';
+      }
+
+      case 'DDIMER':
+      case 'DDIMER_OS':
+        return num < 0.5 ? 'Normal' : 'Elevated';
+
+      case 'MAU': {
+        if (num < 20) return 'Normal';
+        if (num <= 200) return 'Microalbuminuria';
+        return 'Macroalbuminuria';
+      }
+
+      case 'CRP':
+        return num > 10 ? 'Elevated' : 'Normal';
+
+      case 'HSCRP':
+        return num > 1 ? 'Elevated – High Cardiovascular Risk' : 'Normal';
+
+      case 'AFP':
+        return num >= 10 ? 'Elevated' : 'Normal';
+
+      case 'CEA':
+        return num >= 5 ? 'Elevated' : 'Normal';
+
+      default:
+        return undefined;
+    }
+  }
 
   private isMchcTest(testCode?: string): boolean {
     return this.normalizeLookupToken(testCode) === ReportsService.MCHC_TEST_CODE;
@@ -447,12 +607,65 @@ export class ReportsService {
         return cat || TestCategoryEnum.OTHER;
       })();
 
-      // Auto-generate Positive/Negative interpretation for BHCG based on numeric value
-      let resolvedComments = result.comments;
-      if (this.normalizeLookupToken(testCode) === 'BHCG' && normalizedValue) {
-        const numericValue = parseFloat(normalizedValue);
-        if (!isNaN(numericValue)) {
-          resolvedComments = numericValue > 5 ? 'Positive' : 'Negative';
+      // Auto-generate interpretation for all supported tests
+      const normalizedTestCode = this.normalizeLookupToken(testCode);
+      const autoInterpretation = this.resolveInterpretation(
+        normalizedTestCode,
+        normalizedValue,
+        normalizedReferenceRange,
+      );
+      // Use auto-generated interpretation, fall back to stored comments
+      const resolvedComments = autoInterpretation || result.comments;
+
+      // Auto-calculate flag for qualitative serology results if not already set
+      let resolvedFlag = result.flag;
+      if ((!resolvedFlag || resolvedFlag === 'normal') && autoInterpretation) {
+        const abnormalInterpretations = new Set([
+          'Positive', 'Detected', 'Elevated', 'Highly Elevated',
+          'Deficient', 'Insufficient', 'Acute Infection', 'Active / Recent Infection',
+          'Past Infection / Immunity', 'Weakly Positive',
+          'Positive – HSV-1', 'Positive – HSV-2', 'Positive – HSV-1 & HSV-2',
+          'P. falciparum Antigen Detected', 'P. vivax Antigen Detected',
+          'Mixed Plasmodium Species Detected', 'H. pylori Antigen Detected',
+          'Elevated – Suggestive of Myocardial Injury', 'Elevated – Heart Failure Possible',
+          'Highly Elevated – Consistent with MI', 'Highly Elevated – Sepsis Likely',
+          'Highly Elevated – Heart Failure Likely', 'Elevated – High Cardiovascular Risk',
+          'Microalbuminuria', 'Macroalbuminuria',
+          'Negative', // Keep as normal
+          'Normal', 'Sufficient', 'No Malaria Parasite Detected', 'Not Detected',
+        ]);
+
+        // Only flag as abnormal if interpretation indicates something abnormal
+        const abnormalFlags = new Set([
+          'Positive', 'Detected', 'Elevated', 'Highly Elevated',
+          'Deficient', 'Insufficient', 'Acute Infection', 'Active / Recent Infection',
+          'Weakly Positive', 'Microalbuminuria', 'Macroalbuminuria',
+        ]);
+
+        if (abnormalFlags.has(autoInterpretation)) {
+          resolvedFlag = autoInterpretation.includes('Critical') || autoInterpretation.includes('Highly')
+            ? ResultFlagEnum.HIGH
+            : ResultFlagEnum.HIGH;
+        }
+      }
+
+      // Populate allReferenceRanges for conditional/threshold tests if not already set
+      let allRanges = result.allReferenceRanges;
+      if (!allRanges && testInfo?.referenceRanges && testInfo.referenceRanges.length > 1) {
+        // For tests with multiple conditional ranges (PCT, TROP, BNP, VITD, etc.)
+        // serialize them so the frontend can show all ranges
+        const conditionalCodes = new Set([
+          'PCT', 'TROP', 'BNP', 'NTPRO', 'VITD', 'DDIMER', 'DDIMER_OS',
+          'MAU', 'CRP', 'HSCRP', 'CEA', 'AFP', 'PSA',
+        ]);
+        if (conditionalCodes.has(normalizedTestCode)) {
+          allRanges = JSON.stringify(
+            testInfo.referenceRanges.map(r => ({
+              ageGroup: r.ageGroup,
+              range: r.range,
+              unit: r.unit || testInfo.unit,
+            }))
+          );
         }
       }
 
@@ -464,7 +677,7 @@ export class ReportsService {
         value: normalizedValue,
         unit: normalizedUnit,
         referenceRange: normalizedReferenceRange,
-        flag: result.flag,
+        flag: resolvedFlag,
         resultedAt: result.resultedAt,
         comments: resolvedComments,
         isAmended,
@@ -477,7 +690,7 @@ export class ReportsService {
         ),
         category: resolvedCategory,
         menstrualPhase: result.menstrualPhase,
-        allReferenceRanges: result.allReferenceRanges,
+        allReferenceRanges: allRanges,
       } as any);
     }
 
@@ -499,14 +712,14 @@ export class ReportsService {
 
     // Build laboratory info from configuration
     const laboratoryInfo: LaboratoryInfoDto = {
-      name: process.env.LAB_NAME || 'Clinical Laboratory',
-      logo: process.env.LAB_LOGO_URL,
-      address: process.env.LAB_ADDRESS || '123 Medical Center Drive, City, Country',
-      phone: process.env.LAB_PHONE || '+232-XX-XXXXXX',
-      email: process.env.LAB_EMAIL || 'lab@example.com',
-      website: process.env.LAB_WEBSITE,
-      licenseNumber: process.env.LAB_LICENSE_NUMBER,
-      accreditation: process.env.LAB_ACCREDITATION,
+      name: this.configService.get<string>('LAB_NAME', 'Clinical Laboratory'),
+      logo: this.configService.get<string>('LAB_LOGO_URL'),
+      address: this.configService.get<string>('LAB_ADDRESS', '123 Medical Center Drive, City, Country'),
+      phone: this.configService.get<string>('LAB_PHONE', '+232-XX-XXXXXX'),
+      email: this.configService.get<string>('LAB_EMAIL', 'lab@example.com'),
+      website: this.configService.get<string>('LAB_WEBSITE'),
+      licenseNumber: this.configService.get<string>('LAB_LICENSE_NUMBER'),
+      accreditation: this.configService.get<string>('LAB_ACCREDITATION'),
     };
 
     // Build report metadata

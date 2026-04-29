@@ -55,7 +55,7 @@ export class AuthService {
   /**
    * Validate user credentials
    */
-  async validateUser(email: string, password: string): Promise<any> {
+  async validateUser(email: string, password: string): Promise<{ id: string; email: string; fullName: string; roles: string[] } | null> {
     try {
       const user = await this.profileModel.findOne({ email, isActive: true }).exec();
       
@@ -64,13 +64,7 @@ export class AuthService {
         return null;
       }
 
-      this.logger.debug(`Validating password for user: ${email}`);
-      this.logger.debug(`Password hash from DB: ${user.passwordHash?.substring(0, 20)}...`);
-      this.logger.debug(`Plain password length: ${password.length}`);
-      
       const isPasswordValid = await this.comparePasswords(password, user.passwordHash);
-      
-      this.logger.debug(`Password validation result: ${isPasswordValid}`);
       
       if (!isPasswordValid) {
         this.logger.warn(`Login attempt failed: Invalid password - ${email}`);
@@ -100,7 +94,7 @@ export class AuthService {
   /**
    * Generate JWT access token
    */
-  async generateAccessToken(user: any): Promise<string> {
+  async generateAccessToken(user: { id: string; email: string; roles: string[] }): Promise<string> {
     const payload: JwtPayload = {
       sub: user.id,
       email: user.email,
@@ -113,7 +107,7 @@ export class AuthService {
   /**
    * Generate JWT refresh token
    */
-  async generateRefreshToken(user: any): Promise<string> {
+  async generateRefreshToken(user: { id: string; email: string; roles: string[] }): Promise<string> {
     const payload: JwtPayload = {
       sub: user.id,
       email: user.email,
@@ -123,7 +117,7 @@ export class AuthService {
     const refreshTokenExpiry = this.configService.get<string>('jwt.refreshTokenExpiry', '7d');
 
     return this.jwtService.sign(payload, {
-      expiresIn: refreshTokenExpiry as any,
+      expiresIn: refreshTokenExpiry as `${number}${'s' | 'm' | 'h' | 'd' | 'w' | 'y'}`,
     });
   }
 
@@ -190,7 +184,7 @@ export class AuthService {
   /**
    * Get user profile by ID
    */
-  async getProfile(userId: string): Promise<any> {
+  async getProfile(userId: string): Promise<{ id: string; email: string; fullName: string; department?: string; avatarUrl?: string; roles: string[]; createdAt: Date }> {
     const user = await this.profileModel.findById(userId).exec();
     
     if (!user) {

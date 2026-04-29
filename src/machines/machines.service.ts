@@ -7,6 +7,7 @@ import {
   forwardRef,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { ConfigService } from '@nestjs/config';
 import { Model, Types } from 'mongoose';
 import * as net from 'net';
 import { Machine, MachineStatusEnum } from '../database/schemas/machine.schema';
@@ -29,6 +30,7 @@ export class MachinesService {
     private readonly tcpListenerService: TcpListenerService,
     @Inject(forwardRef(() => RealtimeGateway))
     private readonly realtimeGateway: RealtimeGateway,
+    private readonly configService: ConfigService,
   ) {}
 
   /**
@@ -292,7 +294,7 @@ export class MachinesService {
    * to the cloud backend without needing Node.js installed.
    */
   generateBridgeScript(machineId: string): string {
-    const backendBaseUrl = process.env.BACKEND_URL || 'https://carefam-lab-1e0cbe42a3ac.herokuapp.com';
+    const backendBaseUrl = this.configService.get<string>('BACKEND_URL', 'http://localhost:3000');
     const endpointUrl = `${backendBaseUrl}/hl7/machine-receive`;
 
     // .bat wrapper that launches PowerShell with -ExecutionPolicy Bypass

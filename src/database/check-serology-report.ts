@@ -15,7 +15,7 @@ const INTENDED: Record<string, {
   interpretationMap: Record<string, string>;  // result → interpretation on report
   reportedAs: string;               // note for the comparison output
 }> = {
-  HIV: {
+  RVS: {
     resultOptions: ['Non-Reactive', 'Reactive'],
     interpretationMap: { 'Non-Reactive': 'Negative', 'Reactive': 'Positive' },
     reportedAs: 'Result: Reactive/Non-Reactive | Interpretation: Positive/Negative',
@@ -30,7 +30,7 @@ const INTENDED: Record<string, {
     interpretationMap: { 'Non-Reactive': 'Negative', 'Reactive': 'Positive' },
     reportedAs: 'Result: Reactive/Non-Reactive | Interpretation: Positive/Negative',
   },
-  HIVP24: {
+  RVSP24: {
     resultOptions: ['Non-Reactive', 'Reactive'],
     interpretationMap: { 'Non-Reactive': 'Negative', 'Reactive': 'Positive' },
     reportedAs: 'Result: Reactive/Non-Reactive | Interpretation: Positive/Negative',
@@ -113,10 +113,10 @@ const INTENDED: Record<string, {
 
 // ── Frontend QUALITATIVE_OPTIONS (current state) ─────────────────────────────
 const FRONTEND_OPTIONS: Record<string, string[]> = {
-  HIV:       ['Non-Reactive', 'Reactive'],
+  RVS:       ['Non-Reactive', 'Reactive'],
   HBSAG:     ['Non-Reactive', 'Reactive'],
   HCV:       ['Non-Reactive', 'Reactive'],
-  HIVP24:    ['Non-Reactive', 'Reactive'],
+  RVSP24:    ['Non-Reactive', 'Reactive'],
   HPYLORI:   ['Non-Reactive', 'Reactive'],
   HPYLORI_IA:['Non-Reactive', 'Reactive'],
   HSV:       ['Non-Reactive', 'Reactive (HSV-1)', 'Reactive (HSV-2)', 'Reactive (HSV-1 & 2)'],
