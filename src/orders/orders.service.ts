@@ -168,6 +168,18 @@ export class OrdersService {
     // Generate order number
     const orderNumber = await this.generateOrderNumber();
 
+    let doctorObjectId: Types.ObjectId | undefined;
+    let referredByDoctor = createOrderDto.referredByDoctor?.trim();
+    if (createOrderDto.doctorId) {
+      if (!Types.ObjectId.isValid(createOrderDto.doctorId)) {
+        throw new BadRequestException('Invalid doctor ID');
+      }
+      const doctor = await this.doctorModel.findById(createOrderDto.doctorId).lean();
+      if (!doctor) throw new BadRequestException('Doctor not found');
+      doctorObjectId = new Types.ObjectId(createOrderDto.doctorId);
+      referredByDoctor = doctor.fullName;
+    }
+
     // Determine initial payment amounts (split payments take precedence)
     let amountPaid = 0;
     if (createOrderDto.initialPayments && createOrderDto.initialPayments.length > 0) {
@@ -835,14 +847,3 @@ export class OrdersService {
     return populatedOrder;
   }
 }
-    let doctorObjectId: Types.ObjectId | undefined;
-    let referredByDoctor = createOrderDto.referredByDoctor?.trim();
-    if (createOrderDto.doctorId) {
-      if (!Types.ObjectId.isValid(createOrderDto.doctorId)) {
-        throw new BadRequestException('Invalid doctor ID');
-      }
-      const doctor = await this.doctorModel.findById(createOrderDto.doctorId).lean();
-      if (!doctor) throw new BadRequestException('Doctor not found');
-      doctorObjectId = new Types.ObjectId(createOrderDto.doctorId);
-      referredByDoctor = doctor.fullName;
-    }

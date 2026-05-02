@@ -436,10 +436,10 @@ export class ReconciliationService {
           .filter((id): id is string => !!id),
       ),
     ];
-    const doctors = doctorIds.length > 0
+    const doctorDocs = doctorIds.length > 0
       ? await this.doctorModel.find({ _id: { $in: doctorIds.map((id) => new Types.ObjectId(id)) } }).lean()
       : [];
-    const doctorMap = new Map(doctors.map((d) => [d._id.toString(), d]));
+    const doctorLookup = new Map(doctorDocs.map((d) => [d._id.toString(), d]));
 
     // Build rows
     const rows = orders.map(order => {
@@ -468,7 +468,7 @@ export class ReconciliationService {
         date: order.createdAt,
         patientName,
         doctor: order.doctorId
-          ? (doctorMap.get(order.doctorId.toString())?.fullName || order.referredByDoctor || '')
+          ? (doctorLookup.get(order.doctorId.toString())?.fullName || order.referredByDoctor || '')
           : (order.referredByDoctor || ''),
         tests: testLabels.join(', '),
         subtotal: order.subtotal || 0,
@@ -480,18 +480,18 @@ export class ReconciliationService {
     });
 
     // Summary per doctor
-    const doctorMap = new Map<string, { orders: number; billed: number; discount: number; paid: number }>();
+    const doctorSummaryMap = new Map<string, { orders: number; billed: number; discount: number; paid: number }>();
     for (const row of rows) {
       const key = row.doctor;
-      if (!doctorMap.has(key)) doctorMap.set(key, { orders: 0, billed: 0, discount: 0, paid: 0 });
-      const d = doctorMap.get(key)!;
+      if (!doctorSummaryMap.has(key)) doctorSummaryMap.set(key, { orders: 0, billed: 0, discount: 0, paid: 0 });
+      const d = doctorSummaryMap.get(key)!;
       d.orders += 1;
       d.billed += row.total;
       d.discount += row.discount;
       d.paid += row.amountPaid;
     }
 
-    const doctors = Array.from(doctorMap.entries())
+    const doctors = Array.from(doctorSummaryMap.entries())
       .map(([name, stats]) => ({ name, ...stats }))
       .sort((a, b) => b.orders - a.orders);
 
