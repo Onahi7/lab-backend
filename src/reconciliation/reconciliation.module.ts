@@ -11,6 +11,7 @@ import { Expenditure, ExpenditureSchema } from '../database/schemas/expenditure.
 import { Payment, PaymentSchema } from '../database/schemas/payment.schema';
 import { OrderTest, OrderTestSchema } from '../database/schemas/order-test.schema';
 import { Patient, PatientSchema } from '../database/schemas/patient.schema';
+import { Doctor, DoctorSchema } from '../database/schemas/doctor.schema';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { Patient, PatientSchema } from '../database/schemas/patient.schema';
       { name: Payment.name, schema: PaymentSchema },
       { name: OrderTest.name, schema: OrderTestSchema },
       { name: Patient.name, schema: PatientSchema },
+      { name: Doctor.name, schema: DoctorSchema },
     ]),
   ],
   controllers: [ReconciliationController],

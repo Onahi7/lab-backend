@@ -21,4 +21,12 @@ export class UpdateOrderDto {
   @IsOptional()
   @IsString()
   notes?: string;
+
+  @IsOptional()
+  @IsString()
+  referredByDoctor?: string;
+
+  @IsOptional()
+  @IsString()
+  doctorId?: string;
 }

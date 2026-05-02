@@ -15,6 +15,7 @@ import { Payment } from '../database/schemas/payment.schema';
 import { OrderTest } from '../database/schemas/order-test.schema';
 import { Expenditure } from '../database/schemas/expenditure.schema';
 import { Patient } from '../database/schemas/patient.schema';
+import { Doctor } from '../database/schemas/doctor.schema';
 import { CreateReconciliationDto } from './dto/create-reconciliation.dto';
 import { ReviewReconciliationDto } from './dto/review-reconciliation.dto';
 
@@ -35,6 +36,8 @@ export class ReconciliationService {
     private expenditureModel: Model<Expenditure>,
     @InjectModel(Patient.name)
     private patientModel: Model<Patient>,
+    @InjectModel(Doctor.name)
+    private doctorModel: Model<Doctor>,
   ) {}
 
   async getExpectedAmounts(date: Date) {
@@ -371,8 +374,13 @@ export class ReconciliationService {
     };
   }
 
-  async getDoctorReferralReport(params: { startDate?: Date; endDate?: Date; doctor?: string }) {
-    const filter: any = { referredByDoctor: { $exists: true, $nin: [null, ''] } };
+  async getDoctorReferralReport(params: { startDate?: Date; endDate?: Date; doctor?: string; doctorId?: string }) {
+    const filter: any = {
+      $or: [
+        { referredByDoctor: { $exists: true, $nin: [null, ''] } },
+        { doctorId: { $exists: true, $ne: null } },
+      ],
+    };
 
     if (params.startDate || params.endDate) {
       filter.createdAt = {};
@@ -388,7 +396,9 @@ export class ReconciliationService {
       }
     }
 
-    if (params.doctor) {
+    if (params.doctorId && Types.ObjectId.isValid(params.doctorId)) {
+      filter.doctorId = new Types.ObjectId(params.doctorId);
+    } else if (params.doctor) {
       filter.referredByDoctor = { $regex: params.doctor, $options: 'i' };
     }
 
@@ -419,6 +429,18 @@ export class ReconciliationService {
       .lean();
     const patientMap = new Map(patients.map(p => [p._id.toString(), p]));
 
+    const doctorIds = [
+      ...new Set(
+        orders
+          .map((o) => o.doctorId?.toString())
+          .filter((id): id is string => !!id),
+      ),
+    ];
+    const doctors = doctorIds.length > 0
+      ? await this.doctorModel.find({ _id: { $in: doctorIds.map((id) => new Types.ObjectId(id)) } }).lean()
+      : [];
+    const doctorMap = new Map(doctors.map((d) => [d._id.toString(), d]));
+
     // Build rows
     const rows = orders.map(order => {
       const patient = patientMap.get(order.patientId.toString());
@@ -445,7 +467,9 @@ export class ReconciliationService {
         orderNumber: order.orderNumber,
         date: order.createdAt,
         patientName,
-        doctor: order.referredByDoctor || '',
+        doctor: order.doctorId
+          ? (doctorMap.get(order.doctorId.toString())?.fullName || order.referredByDoctor || '')
+          : (order.referredByDoctor || ''),
         tests: testLabels.join(', '),
         subtotal: order.subtotal || 0,
         discount: order.discount || 0,

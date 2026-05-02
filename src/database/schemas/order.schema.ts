@@ -85,6 +85,9 @@ export class Order extends Document {
   @Prop()
   referredByDoctor?: string;
 
+  @Prop({ type: Types.ObjectId, ref: 'Doctor' })
+  doctorId?: Types.ObjectId;
+
   @Prop({ type: Types.ObjectId, ref: 'Profile' })
   orderedBy?: Types.ObjectId;
 
@@ -117,3 +120,4 @@ OrderSchema.index({ orderNumber: 1 }, { unique: true });
 OrderSchema.index({ patientId: 1 });
 OrderSchema.index({ status: 1 });
 OrderSchema.index({ createdAt: -1 });
+OrderSchema.index({ doctorId: 1 });

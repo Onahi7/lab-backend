@@ -17,6 +17,7 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { CancelOrderDto } from './dto/cancel-order.dto';
 import { AddPaymentDto } from './dto/add-payment.dto';
+import { AssignDoctorDto } from './dto/assign-doctor.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -135,6 +136,15 @@ export class OrdersController {
   @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH, UserRoleEnum.RECEPTIONIST)
   async getPaymentHistory(@Param('id') id: string) {
     return this.ordersService.getPaymentHistory(id);
+  }
+
+  @Post(':id/assign-doctor')
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.RECEPTIONIST)
+  async assignDoctor(
+    @Param('id') id: string,
+    @Body() assignDoctorDto: AssignDoctorDto,
+  ) {
+    return this.ordersService.assignDoctor(id, assignDoctorDto);
   }
 
   @Delete(':id')

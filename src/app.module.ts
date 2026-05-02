@@ -23,6 +23,7 @@ import { ReconciliationModule } from './reconciliation/reconciliation.module';
 import { ReportTemplatesModule } from './report-templates/report-templates.module';
 import { SettingsModule } from './settings/settings.module';
 import { ExpendituresModule } from './expenditures/expenditures.module';
+import { DoctorsModule } from './doctors/doctors.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
@@ -60,6 +61,7 @@ import { AuditLoggingInterceptor } from './common/interceptors/audit-logging.int
     ReportTemplatesModule,
     SettingsModule,
     ExpendituresModule,
+    DoctorsModule,
   ],
   controllers: [AppController],
   providers: [

@@ -11,10 +11,12 @@ import { OrderTest } from '../database/schemas/order-test.schema';
 import { IdSequence } from '../database/schemas/id-sequence.schema';
 import { Payment } from '../database/schemas/payment.schema';
 import { TestCatalog } from '../database/schemas/test-catalog.schema';
+import { Doctor } from '../database/schemas/doctor.schema';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { CancelOrderDto } from './dto/cancel-order.dto';
 import { AddPaymentDto } from './dto/add-payment.dto';
+import { AssignDoctorDto } from './dto/assign-doctor.dto';
 import { RealtimeGateway } from '../realtime/realtime.gateway';
 
 @Injectable()
@@ -38,6 +40,7 @@ export class OrdersService {
     @InjectModel(IdSequence.name) private idSequenceModel: Model<IdSequence>,
     @InjectModel(Payment.name) private paymentModel: Model<Payment>,
     @InjectModel(TestCatalog.name) private testCatalogModel: Model<TestCatalog>,
+    @InjectModel(Doctor.name) private doctorModel: Model<Doctor>,
     private realtimeGateway: RealtimeGateway,
   ) {}
 
@@ -194,7 +197,8 @@ export class OrdersService {
       amountPaid,
       balance,
       notes: createOrderDto.notes,
-      referredByDoctor: createOrderDto.referredByDoctor,
+      referredByDoctor,
+      doctorId: doctorObjectId,
       orderedBy: userId ? new Types.ObjectId(userId) : undefined,
     });
 
@@ -282,6 +286,7 @@ export class OrdersService {
       this.orderModel
         .find(query)
         .populate('patientId', 'patientId firstName lastName age gender')
+        .populate('doctorId', 'fullName phone facility')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
@@ -305,6 +310,7 @@ export class OrdersService {
       .findById(id)
       .populate('patientId', 'patientId firstName lastName age gender')
       .populate('orderedBy', 'fullName email')
+      .populate('doctorId', 'fullName phone facility')
       .populate('collectedBy', 'fullName email')
       .populate('cancelledBy', 'fullName email')
       .lean()
@@ -331,6 +337,7 @@ export class OrdersService {
       .findOne({ orderNumber })
       .populate('patientId', 'patientId firstName lastName age gender')
       .populate('orderedBy', 'fullName email')
+      .populate('doctorId', 'fullName phone facility')
       .populate('collectedBy', 'fullName email')
       .populate('cancelledBy', 'fullName email')
       .exec();
@@ -372,6 +379,7 @@ export class OrdersService {
       .findByIdAndUpdate(id, updateOrderDto, { new: true })
       .populate('patientId', 'patientId firstName lastName age gender')
       .populate('orderedBy', 'fullName email')
+      .populate('doctorId', 'fullName phone facility')
       .populate('collectedBy', 'fullName email')
       .populate('cancelledBy', 'fullName email')
       .exec();
@@ -489,6 +497,7 @@ export class OrdersService {
       .find({ status: OrderStatusEnum.PENDING_COLLECTION })
       .populate('patientId', 'patientId firstName lastName age gender')
       .populate('orderedBy', 'fullName email')
+      .populate('doctorId', 'fullName phone facility')
       .sort({ createdAt: 1 })
       .exec();
 
@@ -522,6 +531,7 @@ export class OrdersService {
       })
       .populate('patientId', 'patientId firstName lastName age gender')
       .populate('orderedBy', 'fullName email')
+      .populate('doctorId', 'fullName phone facility')
       .sort({ createdAt: 1 })
       .exec();
 
@@ -787,4 +797,52 @@ export class OrdersService {
     await this.orderModel.findByIdAndDelete(id).exec();
     this.logger.log(`Order ${id} and its associated tests/payments deleted`);
   }
+
+  async assignDoctor(
+    id: string,
+    assignDoctorDto: AssignDoctorDto,
+  ): Promise<Order> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new NotFoundException(`Order with ID ${id} not found`);
+    }
+
+    const order = await this.orderModel.findById(id).exec();
+    if (!order) {
+      throw new NotFoundException(`Order with ID ${id} not found`);
+    }
+
+    const doctorName = assignDoctorDto.referredByDoctor?.trim();
+
+    if (assignDoctorDto.doctorId) {
+      if (!Types.ObjectId.isValid(assignDoctorDto.doctorId)) {
+        throw new BadRequestException('Invalid doctor ID');
+      }
+      const doctor = await this.doctorModel.findById(assignDoctorDto.doctorId).lean();
+      if (!doctor) throw new BadRequestException('Doctor not found');
+      order.doctorId = new Types.ObjectId(assignDoctorDto.doctorId);
+      order.referredByDoctor = doctor.fullName;
+    } else if (doctorName) {
+      order.referredByDoctor = doctorName;
+      order.doctorId = undefined;
+    } else {
+      order.referredByDoctor = undefined;
+      order.doctorId = undefined;
+    }
+
+    await order.save();
+    const populatedOrder = await this.findOne(id);
+    this.realtimeGateway.notifyOrderUpdated(populatedOrder);
+    return populatedOrder;
+  }
 }
+    let doctorObjectId: Types.ObjectId | undefined;
+    let referredByDoctor = createOrderDto.referredByDoctor?.trim();
+    if (createOrderDto.doctorId) {
+      if (!Types.ObjectId.isValid(createOrderDto.doctorId)) {
+        throw new BadRequestException('Invalid doctor ID');
+      }
+      const doctor = await this.doctorModel.findById(createOrderDto.doctorId).lean();
+      if (!doctor) throw new BadRequestException('Doctor not found');
+      doctorObjectId = new Types.ObjectId(createOrderDto.doctorId);
+      referredByDoctor = doctor.fullName;
+    }

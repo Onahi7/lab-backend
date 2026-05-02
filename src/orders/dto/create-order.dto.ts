@@ -55,6 +55,10 @@ export class CreateOrderDto {
   @IsString()
   referredByDoctor?: string;
 
+  @IsOptional()
+  @IsString()
+  doctorId?: string;
+
   @IsArray()
   @ArrayMinSize(1)
   @ValidateNested({ each: true })

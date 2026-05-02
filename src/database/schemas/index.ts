@@ -20,3 +20,4 @@ export * from './id-sequence.schema';
 export * from './cash-reconciliation.schema';
 export * from './report-template.schema';
 export * from './payment.schema';
+export * from './doctor.schema';

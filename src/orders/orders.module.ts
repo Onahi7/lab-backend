@@ -7,6 +7,7 @@ import { OrderTest, OrderTestSchema } from '../database/schemas/order-test.schem
 import { IdSequence, IdSequenceSchema } from '../database/schemas/id-sequence.schema';
 import { Payment, PaymentSchema } from '../database/schemas/payment.schema';
 import { TestCatalog, TestCatalogSchema } from '../database/schemas/test-catalog.schema';
+import { Doctor, DoctorSchema } from '../database/schemas/doctor.schema';
 import { RealtimeModule } from '../realtime/realtime.module';
 
 @Module({
@@ -17,6 +18,7 @@ import { RealtimeModule } from '../realtime/realtime.module';
       { name: IdSequence.name, schema: IdSequenceSchema },
       { name: Payment.name, schema: PaymentSchema },
       { name: TestCatalog.name, schema: TestCatalogSchema },
+      { name: Doctor.name, schema: DoctorSchema },
     ]),
     RealtimeModule,
   ],

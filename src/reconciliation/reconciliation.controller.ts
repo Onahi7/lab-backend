@@ -39,11 +39,13 @@ export class ReconciliationController {
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
     @Query('doctor') doctor?: string,
+    @Query('doctorId') doctorId?: string,
   ) {
     return this.reconciliationService.getDoctorReferralReport({
       startDate: startDate ? new Date(startDate) : undefined,
       endDate: endDate ? new Date(endDate) : undefined,
       doctor,
+      doctorId,
     });
   }
 
