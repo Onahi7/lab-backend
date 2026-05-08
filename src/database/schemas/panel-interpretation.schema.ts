@@ -31,6 +31,15 @@ export class PanelInterpretation extends Document {
   @Prop()
   generalMessage?: string; // General panel interpretation (for non-FBC panels)
 
+  @Prop()
+  interpretation?: string; // AI-generated interpretation text
+
+  @Prop()
+  aiProvider?: string; // Provider used: 'groq', 'openai', etc.
+
+  @Prop()
+  aiGeneratedAt?: Date; // When AI interpretation was generated
+
   @Prop({ type: Types.ObjectId, ref: 'Profile' })
   enteredBy?: Types.ObjectId;
 

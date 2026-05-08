@@ -25,4 +25,16 @@ export class CreatePanelInterpretationDto {
   @IsOptional()
   @IsString()
   generalMessage?: string;
+
+  @IsOptional()
+  @IsString()
+  interpretation?: string;
+
+  @IsOptional()
+  @IsString()
+  aiProvider?: string;
+
+  @IsOptional()
+  @IsString()
+  aiGeneratedAt?: string;
 }

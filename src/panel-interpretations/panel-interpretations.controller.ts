@@ -17,6 +17,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { UserRoleEnum } from '../database/schemas/user-role.schema';
+import { AiInterpretationService, PanelResults } from '../ai-interpretation/ai-interpretation.service';
 
 type AuthenticatedRequest = ExpressRequest & {
   user: {
@@ -29,7 +30,71 @@ type AuthenticatedRequest = ExpressRequest & {
 export class PanelInterpretationsController {
   constructor(
     private readonly panelInterpretationsService: PanelInterpretationsService,
+    private readonly aiInterpretationService: AiInterpretationService,
   ) {}
+
+  /**
+   * Check AI configuration status
+   * GET /panel-interpretations/ai-status
+   */
+  @Get('ai-status')
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH)
+  async getAiStatus() {
+    return {
+      configured: this.aiInterpretationService.isConfigured(),
+      provider: this.aiInterpretationService.getProviderName(),
+    };
+  }
+
+  /**
+   * Generate AI interpretation for a panel
+   * POST /panel-interpretations/ai-generate
+   */
+  @Post('ai-generate')
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH)
+  async generateAiInterpretation(
+    @Body() body: { orderId: string; panel: PanelResults },
+  ) {
+    const interpretation = await this.aiInterpretationService.generateInterpretation(
+      body.orderId,
+      body.panel,
+    );
+    return { interpretation };
+  }
+
+  /**
+   * Generate AI interpretations for all panels in an order
+   * POST /panel-interpretations/ai-generate-all
+   */
+  @Post('ai-generate-all')
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH)
+  async generateAllAiInterpretations(
+    @Body() body: { orderId: string; panels: PanelResults[] },
+  ) {
+    const results = [];
+    for (const panel of body.panels) {
+      try {
+        const interpretation = await this.aiInterpretationService.generateInterpretation(
+          body.orderId,
+          panel,
+        );
+        results.push({
+          panelCode: panel.panelCode,
+          panelName: panel.panelName,
+          interpretation,
+          success: true,
+        });
+      } catch (error) {
+        results.push({
+          panelCode: panel.panelCode,
+          panelName: panel.panelName,
+          error: error.message,
+          success: false,
+        });
+      }
+    }
+    return results;
+  }
 
   /**
    * Create or update panel interpretation

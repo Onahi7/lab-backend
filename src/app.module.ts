@@ -24,6 +24,8 @@ import { ReportTemplatesModule } from './report-templates/report-templates.modul
 import { SettingsModule } from './settings/settings.module';
 import { ExpendituresModule } from './expenditures/expenditures.module';
 import { DoctorsModule } from './doctors/doctors.module';
+import { PanelInterpretationsModule } from './panel-interpretations/panel-interpretations.module';
+import { AiInterpretationModule } from './ai-interpretation/ai-interpretation.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
@@ -62,6 +64,7 @@ import { AuditLoggingInterceptor } from './common/interceptors/audit-logging.int
     SettingsModule,
     ExpendituresModule,
     DoctorsModule,
+    PanelInterpretationsModule,
   ],
   controllers: [AppController],
   providers: [

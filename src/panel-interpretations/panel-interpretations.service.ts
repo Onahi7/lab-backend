@@ -20,16 +20,23 @@ export class PanelInterpretationsService {
     createDto: CreatePanelInterpretationDto,
     userId?: string,
   ): Promise<PanelInterpretation> {
+    // Handle aiGeneratedAt conversion from string to Date
+    const updateData: any = {
+      ...createDto,
+      enteredBy: userId,
+      enteredAt: new Date(),
+    };
+    
+    if (createDto.aiGeneratedAt) {
+      updateData.aiGeneratedAt = new Date(createDto.aiGeneratedAt);
+    }
+
     const interpretation = await this.panelInterpretationModel.findOneAndUpdate(
       {
         orderId: createDto.orderId,
         panelCode: createDto.panelCode,
       },
-      {
-        ...createDto,
-        enteredBy: userId,
-        enteredAt: new Date(),
-      },
+      updateData,
       {
         upsert: true,
         new: true,
