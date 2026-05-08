@@ -307,7 +307,19 @@ export class OrdersService {
       this.orderModel.countDocuments(query).exec(),
     ]);
 
-    return { data: data as unknown as Order[], total, page, limit };
+    // Fetch order tests for each order
+    const ordersWithTests = await Promise.all(
+      data.map(async (order) => {
+        const tests = await this.orderTestModel
+          .find({ orderId: order._id })
+          .select('testCode testName panelCode panelName category')
+          .lean()
+          .exec();
+        return { ...order, tests };
+      }),
+    );
+
+    return { data: ordersWithTests as unknown as Order[], total, page, limit };
   }
 
   /**
