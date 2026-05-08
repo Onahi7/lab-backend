@@ -732,6 +732,7 @@ export class ReportsService {
     // Fetch panel interpretations for this order
     const panelInterpretations = await this.panelInterpretationModel
       .find({ orderId: new Types.ObjectId(orderId) })
+      .lean()
       .exec();
 
     // Return complete report DTO
