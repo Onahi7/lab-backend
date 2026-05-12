@@ -656,7 +656,7 @@ export class ReportsService {
         // serialize them so the frontend can show all ranges
         const conditionalCodes = new Set([
           'PCT', 'TROP', 'BNP', 'NTPRO', 'VITD', 'DDIMER', 'DDIMER_OS',
-          'MAU', 'CRP', 'HSCRP', 'CEA', 'AFP', 'PSA',
+          'MAU', 'CRP', 'HSCRP', 'CEA', 'AFP', 'PSA', 'BHCG',
         ]);
         if (conditionalCodes.has(normalizedTestCode)) {
           allRanges = JSON.stringify(
