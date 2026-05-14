@@ -492,8 +492,16 @@ export class Hl7Service {
     // Pre-fetch order tests for this order so we can link results
     const orderTests = await this.orderTestModel.find({ orderId }).exec();
     const orderTestByCode = new Map<string, any>();
+    const duplicateOrderTestCodes = new Set<string>();
     for (const ot of orderTests) {
-      orderTestByCode.set((ot as any).testCode?.toUpperCase(), ot);
+      const code = (ot as any).testCode?.toUpperCase();
+      if (!code) {
+        continue;
+      }
+      if (orderTestByCode.has(code)) {
+        duplicateOrderTestCodes.add(code);
+      }
+      orderTestByCode.set(code, ot);
     }
 
     // Get machine info for notifications
@@ -510,10 +518,30 @@ export class Hl7Service {
       const lisCode = this.mapAnalyzerCode(normalizedResult.testCode || '');
       const matchedOrderTest = orderTestByCode.get(lisCode);
 
+      // Never persist unmatched/ambiguous analyzer results to an order.
+      // This prevents phantom results from appearing on newly created orders.
+      if (!matchedOrderTest || duplicateOrderTestCodes.has(lisCode)) {
+        this.realtimeGateway.notifyUnmatchedResult({
+          testCode: lisCode,
+          testName: normalizedResult.testName || lisCode,
+          value: normalizedResult.value,
+          unit: normalizedResult.unit,
+          machineName,
+          machineId,
+          orderId: orderId.toString(),
+          orderNumber: order?.orderNumber,
+        });
+
+        this.logger.warn(
+          `Skipped analyzer result ${normalizedResult.testCode} -> ${lisCode} for order ${order?.orderNumber || orderId.toString()} (matched: ${!!matchedOrderTest}, ambiguousCode: ${duplicateOrderTestCodes.has(lisCode)})`,
+        );
+        continue;
+      }
+
       const newResult = new this.resultModel({
         orderId,
         testCode: lisCode,
-        testName: matchedOrderTest?.testName || normalizedResult.testName || lisCode,
+        testName: matchedOrderTest.testName || normalizedResult.testName || lisCode,
         value: normalizedResult.value,
         unit: normalizedResult.unit,
         referenceRange: normalizedResult.referenceRange,
@@ -522,7 +550,9 @@ export class Hl7Service {
         source: 'automated',
         machineId: new Types.ObjectId(machineId),
         resultedAt: new Date(),
-        ...(matchedOrderTest ? { orderTestId: matchedOrderTest._id, panelCode: matchedOrderTest.panelCode, panelName: matchedOrderTest.panelName } : {}),
+        orderTestId: matchedOrderTest._id,
+        panelCode: matchedOrderTest.panelCode,
+        panelName: matchedOrderTest.panelName,
       });
 
       const saved = await newResult.save();
@@ -540,20 +570,6 @@ export class Hl7Service {
         source: 'automated',
         machineName,
       });
-
-      // If result doesn't match any order test, emit unmatched event
-      if (!matchedOrderTest) {
-        this.realtimeGateway.notifyUnmatchedResult({
-          testCode: lisCode,
-          testName: normalizedResult.testName || lisCode,
-          value: normalizedResult.value,
-          unit: normalizedResult.unit,
-          machineName,
-          machineId,
-          orderId: orderId.toString(),
-          orderNumber: order?.orderNumber,
-        });
-      }
 
       this.logger.debug(`Stored result: ${normalizedResult.testCode} -> ${lisCode} = ${normalizedResult.value} (matched OT: ${!!matchedOrderTest})`);
     }
