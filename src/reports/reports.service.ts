@@ -539,11 +539,11 @@ export class ReportsService {
       const isPregnancy = menstrualPhase === 'pregnancy';
       const condition = isPregnancy ? undefined : menstrualPhase;
 
-      const selectedReferenceRange = this.selectReferenceRange(
+      const selectedReferenceRange = result.referenceRange || this.selectReferenceRange(
         testCode,
         patient.gender,
         patientAge,
-        result.referenceRange,
+        undefined,
         testInfo?.referenceRanges,
         testInfo?.referenceRange,
         isPregnancy,
@@ -614,40 +614,9 @@ export class ReportsService {
         normalizedValue,
         normalizedReferenceRange,
       );
-      // Use auto-generated interpretation, fall back to stored comments
-      const resolvedComments = autoInterpretation || result.comments;
-
-      // Auto-calculate flag for qualitative serology results if not already set
-      let resolvedFlag = result.flag;
-      if ((!resolvedFlag || resolvedFlag === 'normal') && autoInterpretation) {
-        const abnormalInterpretations = new Set([
-          'Positive', 'Detected', 'Elevated', 'Highly Elevated',
-          'Deficient', 'Insufficient', 'Acute Infection', 'Active / Recent Infection',
-          'Past Infection / Immunity', 'Weakly Positive',
-          'Positive – HSV-1', 'Positive – HSV-2', 'Positive – HSV-1 & HSV-2',
-          'P. falciparum Antigen Detected', 'P. vivax Antigen Detected',
-          'Mixed Plasmodium Species Detected', 'H. pylori Antigen Detected',
-          'Elevated – Suggestive of Myocardial Injury', 'Elevated – Heart Failure Possible',
-          'Highly Elevated – Consistent with MI', 'Highly Elevated – Sepsis Likely',
-          'Highly Elevated – Heart Failure Likely', 'Elevated – High Cardiovascular Risk',
-          'Microalbuminuria', 'Macroalbuminuria',
-          'Negative', // Keep as normal
-          'Normal', 'Sufficient', 'No Malaria Parasite Detected', 'Not Detected',
-        ]);
-
-        // Only flag as abnormal if interpretation indicates something abnormal
-        const abnormalFlags = new Set([
-          'Positive', 'Detected', 'Elevated', 'Highly Elevated',
-          'Deficient', 'Insufficient', 'Acute Infection', 'Active / Recent Infection',
-          'Weakly Positive', 'Microalbuminuria', 'Macroalbuminuria',
-        ]);
-
-        if (abnormalFlags.has(autoInterpretation)) {
-          resolvedFlag = autoInterpretation.includes('Critical') || autoInterpretation.includes('Highly')
-            ? ResultFlagEnum.HIGH
-            : ResultFlagEnum.HIGH;
-        }
-      }
+      // Keep reports stable over time: prefer saved comments/flag from result entry.
+      const resolvedComments = result.comments || autoInterpretation;
+      const resolvedFlag = result.flag || ResultFlagEnum.NORMAL;
 
       // Populate allReferenceRanges for conditional/threshold tests if not already set
       let allRanges = result.allReferenceRanges;
@@ -1274,3 +1243,4 @@ export class ReportsService {
     return distribution;
   }
 }
+
