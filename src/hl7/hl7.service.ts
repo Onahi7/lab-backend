@@ -443,7 +443,8 @@ export class Hl7Service {
       }
     }
     if (patientId) {
-      // Find most recent non-completed, non-cancelled order for patient
+      // Safety-first fallback: only use patient-based matching when it is unambiguous.
+      // This avoids attaching analyzer results to the wrong active order.
       let patientObjectId: Types.ObjectId;
       if (Types.ObjectId.isValid(patientId)) {
         patientObjectId = new Types.ObjectId(patientId);
@@ -453,12 +454,27 @@ export class Hl7Service {
         if (!patient) return null;
         patientObjectId = patient._id;
       }
-      return this.orderModel
-        .findOne({
+
+      const activeOrders = await this.orderModel
+        .find({
           patientId: patientObjectId,
           status: { $in: ['pending_collection', 'collected', 'processing'] },
         })
-        .sort({ createdAt: -1 });
+        .sort({ createdAt: -1 })
+        .limit(2)
+        .exec();
+
+      if (activeOrders.length === 1) {
+        return activeOrders[0];
+      }
+
+      if (activeOrders.length > 1) {
+        this.logger.warn(
+          `Ambiguous patient-only analyzer match for patient ${patientId}: ${activeOrders.length} active orders found`,
+        );
+      }
+
+      return null;
     }
     return null;
   }

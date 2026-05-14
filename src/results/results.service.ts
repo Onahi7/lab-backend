@@ -457,7 +457,13 @@ export class ResultsService {
         // Use updateOne with upsert to handle existing results
         return {
           updateOne: {
-            filter: { orderId: orderObjectId, testCode: dto.testCode },
+            filter:
+              dto.orderTestId && Types.ObjectId.isValid(dto.orderTestId)
+                ? {
+                    orderId: orderObjectId,
+                    orderTestId: new Types.ObjectId(dto.orderTestId),
+                  }
+                : { orderId: orderObjectId, testCode: dto.testCode },
             update: { $set: resultData },
             upsert: true,
           },
