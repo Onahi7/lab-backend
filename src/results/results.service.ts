@@ -324,6 +324,47 @@ export class ResultsService {
   ): Promise<Result> {
     const isReceptionistEntry = userRoles.includes(UserRoleEnum.RECEPTIONIST);
     const orderObjectId = new Types.ObjectId(createResultDto.orderId);
+    const order = await this.orderModel.findById(orderObjectId).select('_id status').lean();
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    const orderTests = await (this.orderModel.db.model('OrderTest') as Model<any>)
+      .find({ orderId: orderObjectId })
+      .select('_id testCode testName panelCode panelName')
+      .lean();
+    if (!orderTests.length) {
+      throw new BadRequestException('Order has no tests to result');
+    }
+
+    let matchedOrderTest: any | undefined;
+    if (createResultDto.orderTestId) {
+      if (!Types.ObjectId.isValid(createResultDto.orderTestId)) {
+        throw new BadRequestException('Invalid order test ID');
+      }
+      matchedOrderTest = orderTests.find(
+        (ot) => ot._id.toString() === createResultDto.orderTestId,
+      );
+      if (!matchedOrderTest) {
+        throw new BadRequestException('orderTestId does not belong to this order');
+      }
+    } else {
+      const candidates = orderTests.filter(
+        (ot) => (ot.testCode || '').toUpperCase() === (createResultDto.testCode || '').toUpperCase(),
+      );
+      if (candidates.length === 1) {
+        matchedOrderTest = candidates[0];
+      } else if (candidates.length === 0) {
+        throw new BadRequestException(
+          `Test ${createResultDto.testCode} is not part of this order`,
+        );
+      } else {
+        throw new BadRequestException(
+          `Ambiguous test ${createResultDto.testCode} on this order; specify orderTestId`,
+        );
+      }
+    }
+
     const resolvedReferenceRange = await this.resolveReferenceRangeForResult(
       orderObjectId,
       createResultDto.testCode,
@@ -358,12 +399,14 @@ export class ResultsService {
 
     const result = new this.resultModel({
       ...createResultDto,
+      testCode: matchedOrderTest.testCode || createResultDto.testCode,
+      testName: matchedOrderTest.testName || createResultDto.testName,
+      panelCode: matchedOrderTest.panelCode,
+      panelName: matchedOrderTest.panelName,
       value: normalizedValue,
       unit: normalizedUnit,
       orderId: orderObjectId,
-      orderTestId: createResultDto.orderTestId
-        ? new Types.ObjectId(createResultDto.orderTestId)
-        : undefined,
+      orderTestId: new Types.ObjectId(matchedOrderTest._id),
       referenceRange: normalizedReferenceRange,
       subcategory: testCatalog?.subcategory,
       flag,
@@ -414,25 +457,72 @@ export class ResultsService {
       testCatalogs.map(tc => [tc.code, tc.unit])
     );
 
+    const uniqueOrderIds = [...new Set(createResultDtos.map((dto) => dto.orderId))];
+    const orderTestModel = this.orderModel.db.model('OrderTest') as Model<any>;
+    const orderTestDocs = await orderTestModel
+      .find({ orderId: { $in: uniqueOrderIds.map((id) => new Types.ObjectId(id)) } })
+      .select('_id orderId testCode testName panelCode panelName')
+      .lean();
+    const orderTestsByOrder = new Map<string, any[]>();
+    for (const ot of orderTestDocs) {
+      const key = ot.orderId.toString();
+      const current = orderTestsByOrder.get(key) || [];
+      current.push(ot);
+      orderTestsByOrder.set(key, current);
+    }
+
     // Prepare all results for bulk operation
     const bulkOps = await Promise.all(
       createResultDtos.map(async (dto) => {
         const orderObjectId = new Types.ObjectId(dto.orderId);
+        const orderTests = orderTestsByOrder.get(dto.orderId) || [];
+        if (!orderTests.length) {
+          throw new BadRequestException(`Order ${dto.orderId} has no tests to result`);
+        }
+
+        let matchedOrderTest: any | undefined;
+        if (dto.orderTestId) {
+          if (!Types.ObjectId.isValid(dto.orderTestId)) {
+            throw new BadRequestException(`Invalid orderTestId for order ${dto.orderId}`);
+          }
+          matchedOrderTest = orderTests.find((ot) => ot._id.toString() === dto.orderTestId);
+          if (!matchedOrderTest) {
+            throw new BadRequestException(
+              `orderTestId ${dto.orderTestId} does not belong to order ${dto.orderId}`,
+            );
+          }
+        } else {
+          const candidates = orderTests.filter(
+            (ot) => (ot.testCode || '').toUpperCase() === (dto.testCode || '').toUpperCase(),
+          );
+          if (candidates.length === 1) {
+            matchedOrderTest = candidates[0];
+          } else if (candidates.length === 0) {
+            throw new BadRequestException(
+              `Test ${dto.testCode} is not part of order ${dto.orderId}`,
+            );
+          } else {
+            throw new BadRequestException(
+              `Ambiguous test ${dto.testCode} on order ${dto.orderId}; specify orderTestId`,
+            );
+          }
+        }
+
         const resolvedReferenceRange = await this.resolveReferenceRangeForResult(
           orderObjectId,
-          dto.testCode,
+          matchedOrderTest.testCode || dto.testCode,
           isReceptionistEntry ? undefined : dto.referenceRange,
           dto.menstrualPhase,
         );
 
         const normalizedValue =
-          this.normalizeMchcValue(dto.testCode, dto.value) || dto.value;
+          this.normalizeMchcValue(matchedOrderTest.testCode || dto.testCode, dto.value) || dto.value;
         const normalizedReferenceRange = this.normalizeMchcRange(
-          dto.testCode,
+          matchedOrderTest.testCode || dto.testCode,
           resolvedReferenceRange,
         );
         const normalizedUnit = this.normalizeMchcUnit(
-          dto.testCode,
+          matchedOrderTest.testCode || dto.testCode,
           dto.unit || unitMap.get(dto.testCode),
         );
 
@@ -440,10 +530,14 @@ export class ResultsService {
 
         const resultData = {
           ...dto,
+          testCode: matchedOrderTest.testCode || dto.testCode,
+          testName: matchedOrderTest.testName || dto.testName,
+          panelCode: matchedOrderTest.panelCode,
+          panelName: matchedOrderTest.panelName,
           value: normalizedValue,
           unit: normalizedUnit,
           orderId: orderObjectId,
-          orderTestId: dto.orderTestId ? new Types.ObjectId(dto.orderTestId) : undefined,
+          orderTestId: new Types.ObjectId(matchedOrderTest._id),
           referenceRange: normalizedReferenceRange,
           subcategory: subcategoryMap.get(dto.testCode),
           flag,
