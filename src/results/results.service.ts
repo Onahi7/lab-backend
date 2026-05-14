@@ -45,6 +45,8 @@ const ABNORMAL_QUALITATIVE_VALUES = new Set([
 @Injectable()
 export class ResultsService {
   private static readonly MCHC_TEST_CODE = 'MCHC';
+  private static readonly CRP_TEST_CODE = 'CRP';
+  private static readonly HSCRP_TEST_CODE = 'HSCRP';
 
   constructor(
     @InjectModel(Result.name) private resultModel: Model<Result>,
@@ -56,6 +58,84 @@ export class ResultsService {
 
   private isMchcTest(testCode?: string): boolean {
     return (testCode || '').trim().toUpperCase() === ResultsService.MCHC_TEST_CODE;
+  }
+
+  private normalizeTestCode(testCode?: string): string {
+    return (testCode || '').trim().toUpperCase();
+  }
+
+  private async canAutoAddLinkedTest(orderTests: any[], targetTestCode?: string): Promise<boolean> {
+    const normalizedTarget = this.normalizeTestCode(targetTestCode);
+    if (!normalizedTarget || orderTests.length === 0) {
+      return false;
+    }
+
+    const orderTestCodes = new Set(
+      orderTests.map((ot) => this.normalizeTestCode(ot.testCode)).filter(Boolean),
+    );
+
+    // Safety fallback: CRP implies HSCRP.
+    if (
+      normalizedTarget === ResultsService.HSCRP_TEST_CODE &&
+      orderTestCodes.has(ResultsService.CRP_TEST_CODE)
+    ) {
+      return true;
+    }
+
+    const catalogTests = await this.testCatalogModel
+      .find({ code: { $in: Array.from(orderTestCodes) } })
+      .select('code linkedTests')
+      .lean();
+
+    for (const catalogTest of catalogTests) {
+      const linked = new Set(
+        (catalogTest.linkedTests || [])
+          .map((code: string) => this.normalizeTestCode(code))
+          .filter(Boolean),
+      );
+
+      if (this.normalizeTestCode(catalogTest.code) === ResultsService.CRP_TEST_CODE) {
+        linked.add(ResultsService.HSCRP_TEST_CODE);
+      }
+
+      if (linked.has(normalizedTarget)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private async createLinkedOrderTest(
+    orderObjectId: Types.ObjectId,
+    testCode: string,
+  ): Promise<any> {
+    const normalizedCode = this.normalizeTestCode(testCode);
+    const testCatalog = await this.testCatalogModel
+      .findOne({ code: normalizedCode })
+      .select('code name panelCode panelName category _id')
+      .lean();
+
+    if (!testCatalog) {
+      throw new BadRequestException(
+        `Linked test ${testCode} not found in test catalog`,
+      );
+    }
+
+    const orderTestModel = this.orderModel.db.model('OrderTest') as Model<any>;
+    const created = await orderTestModel.create({
+      orderId: orderObjectId,
+      testId: testCatalog._id,
+      testCode: testCatalog.code,
+      testName: testCatalog.name,
+      panelCode: testCatalog.panelCode,
+      panelName: testCatalog.panelName,
+      category: testCatalog.category,
+      price: 0,
+      status: 'pending',
+    });
+
+    return created;
   }
 
   private formatScaledNumericValue(numericValue: number): string {
@@ -350,14 +430,25 @@ export class ResultsService {
       }
     } else {
       const candidates = orderTests.filter(
-        (ot) => (ot.testCode || '').toUpperCase() === (createResultDto.testCode || '').toUpperCase(),
+        (ot) => this.normalizeTestCode(ot.testCode) === this.normalizeTestCode(createResultDto.testCode),
       );
       if (candidates.length === 1) {
         matchedOrderTest = candidates[0];
       } else if (candidates.length === 0) {
-        throw new BadRequestException(
-          `Test ${createResultDto.testCode} is not part of this order`,
+        const canAutoAdd = await this.canAutoAddLinkedTest(
+          orderTests,
+          createResultDto.testCode,
         );
+        if (canAutoAdd) {
+          matchedOrderTest = await this.createLinkedOrderTest(
+            orderObjectId,
+            createResultDto.testCode,
+          );
+        } else {
+          throw new BadRequestException(
+            `Test ${createResultDto.testCode} is not part of this order`,
+          );
+        }
       } else {
         throw new BadRequestException(
           `Ambiguous test ${createResultDto.testCode} on this order; specify orderTestId`,
@@ -493,14 +584,20 @@ export class ResultsService {
           }
         } else {
           const candidates = orderTests.filter(
-            (ot) => (ot.testCode || '').toUpperCase() === (dto.testCode || '').toUpperCase(),
+            (ot) => this.normalizeTestCode(ot.testCode) === this.normalizeTestCode(dto.testCode),
           );
           if (candidates.length === 1) {
             matchedOrderTest = candidates[0];
           } else if (candidates.length === 0) {
-            throw new BadRequestException(
-              `Test ${dto.testCode} is not part of order ${dto.orderId}`,
-            );
+            const canAutoAdd = await this.canAutoAddLinkedTest(orderTests, dto.testCode);
+            if (canAutoAdd) {
+              matchedOrderTest = await this.createLinkedOrderTest(orderObjectId, dto.testCode);
+              orderTests.push(matchedOrderTest);
+            } else {
+              throw new BadRequestException(
+                `Test ${dto.testCode} is not part of order ${dto.orderId}`,
+              );
+            }
           } else {
             throw new BadRequestException(
               `Ambiguous test ${dto.testCode} on order ${dto.orderId}; specify orderTestId`,
