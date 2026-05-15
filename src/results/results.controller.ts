@@ -161,10 +161,10 @@ export class ResultsController {
   /**
    * Delete a result
    * DELETE /results/:id
-   * Requires: admin role only
+   * Requires: lab_tech, receptionist, or admin role
    */
   @Delete(':id')
-  @Roles(UserRoleEnum.ADMIN)
+  @Roles(UserRoleEnum.LAB_TECH, UserRoleEnum.RECEPTIONIST, UserRoleEnum.ADMIN)
   remove(@Param('id') id: string) {
     return this.resultsService.remove(id);
   }
