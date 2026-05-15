@@ -574,7 +574,7 @@ export class ReportsService {
           result.subcategory || testInfo?.subcategory,
         );
 
-        // Always force stool microscopy to microbiology regardless of stored category
+        // Stool microscopy gets its own category with display name "MICROSCOPY"
         const normalizedCode = this.normalizeLookupToken(testCode);
         const nameLower = (testName || '').toLowerCase();
         const isStoolMicro =
@@ -584,7 +584,7 @@ export class ReportsService {
           nameLower.includes('faec') ||
           nameLower.includes('fec');
         if (isStoolMicro) {
-          return TestCategoryEnum.MICROBIOLOGY;
+          return 'stool_microscopy' as any;
         }
 
         if (!cat || cat === TestCategoryEnum.OTHER) {
@@ -656,7 +656,7 @@ export class ReportsService {
           testCode,
           orderTest?.panelCode,
           result.subcategory || testInfo?.subcategory,
-        ),
+        ) || this.resolveStoolMicroSubcategory(testCode, testName),
         category: resolvedCategory,
         menstrualPhase: result.menstrualPhase,
         allReferenceRanges: allRanges,
@@ -849,6 +849,29 @@ export class ReportsService {
   }
 
   /**
+   * Resolve subcategory for stool microscopy results
+   * Groups: Physical (Color, Appearance), Chemical (Blood, Mucus), Microscopic (Microscopy)
+   */
+  private resolveStoolMicroSubcategory(testCode: string, testName?: string): string | undefined {
+    const normalizedCode = this.normalizeLookupToken(testCode);
+    const nameLower = (testName || '').toLowerCase();
+
+    // Check if this is a stool microscopy test
+    const isStoolMicro =
+      normalizedCode === 'STOOLMICRO' ||
+      normalizedCode === 'STOOLFULL' ||
+      nameLower.includes('stool') ||
+      nameLower.includes('faec') ||
+      nameLower.includes('fec');
+
+    if (!isStoolMicro) return undefined;
+
+    // For combined STOOLMICRO results, the value contains sub-fields
+    // We'll use 'Combined' as subcategory since it's a single result with multiple fields
+    return 'Combined';
+  }
+
+  /**
    * Select appropriate reference range based on patient demographics
    * Note: Current schema has simple referenceRange string. This function
    * is designed for future enhancement when demographic-specific ranges are added.
@@ -932,6 +955,12 @@ export class ReportsService {
         resultsByCategory.push({
           category: 'coag_panel' as any,
           categoryDisplayName: 'COAGULATION PROFILE',
+          results: grouped.get(categoryKey)!,
+        });
+      } else if (categoryKey === 'stool_microscopy') {
+        resultsByCategory.push({
+          category: 'stool_microscopy' as any,
+          categoryDisplayName: 'MICROSCOPY',
           results: grouped.get(categoryKey)!,
         });
       } else {
