@@ -29,6 +29,7 @@
     "update:glucose-ranges": "ts-node -r tsconfig-paths/register src/database/update-glucose-ranges.ts",
     "update:urine-sg-range": "ts-node -r tsconfig-paths/register src/database/update-urine-sg-range.ts",
     "update:urine-protein-subcategory": "ts-node -r tsconfig-paths/register src/database/update-urine-protein-subcategory.ts",
+    "update:thyroid-ranges": "ts-node -r tsconfig-paths/register src/database/update-thyroid-ranges.ts",
     "update:t4-range": "ts-node -r tsconfig-paths/register src/database/update-t4-range.ts",
     "update:ft4-range": "ts-node -r tsconfig-paths/register src/database/update-ft4-range.ts",
     "update:psa-range": "ts-node -r tsconfig-paths/register src/database/update-psa-range.ts",

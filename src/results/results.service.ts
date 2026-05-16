@@ -529,12 +529,26 @@ export class ResultsService {
       return [];
     }
 
+    // Filter out any DTOs with undefined or empty test codes
+    const validDtos = createResultDtos.filter(dto => {
+      if (!dto.testCode || dto.testCode.trim() === '') {
+        this.logger.warn(`Skipping result with undefined or empty testCode for order ${dto.orderId}`);
+        return false;
+      }
+      return true;
+    });
+
+    if (validDtos.length === 0) {
+      this.logger.warn('No valid results to create after filtering');
+      return [];
+    }
+
     const isReceptionistEntry = userRoles.includes(UserRoleEnum.RECEPTIONIST);
     const userObjectId = userId ? new Types.ObjectId(userId) : undefined;
     const now = new Date();
 
     // Fetch all subcategories in one query for efficiency
-    const testCodes = [...new Set(createResultDtos.map(dto => dto.testCode))];
+    const testCodes = [...new Set(validDtos.map(dto => dto.testCode))];
     const testCatalogs = await this.testCatalogModel
       .find({ code: { $in: testCodes } })
       .select('code subcategory unit')
@@ -548,7 +562,7 @@ export class ResultsService {
       testCatalogs.map(tc => [tc.code, tc.unit])
     );
 
-    const uniqueOrderIds = [...new Set(createResultDtos.map((dto) => dto.orderId))];
+    const uniqueOrderIds = [...new Set(validDtos.map((dto) => dto.orderId))];
     const orderTestModel = this.orderModel.db.model('OrderTest') as Model<any>;
     const orderTestDocs = await orderTestModel
       .find({ orderId: { $in: uniqueOrderIds.map((id) => new Types.ObjectId(id)) } })
@@ -564,7 +578,7 @@ export class ResultsService {
 
     // Prepare all results for bulk operation
     const bulkOps = await Promise.all(
-      createResultDtos.map(async (dto) => {
+      validDtos.map(async (dto) => {
         const orderObjectId = new Types.ObjectId(dto.orderId);
         const orderTests = orderTestsByOrder.get(dto.orderId) || [];
         if (!orderTests.length) {

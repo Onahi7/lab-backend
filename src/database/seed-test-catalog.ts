@@ -25,7 +25,7 @@ async function seedTestCatalog() {
       isActive: false,
       description: 'Hemoglobin concentration measurement',
       unit: 'g/dL',
-      referenceRanges: [
+        { ageGroup: 'Adult', ageMin: 18, gender: 'M', range: '0-4.0', unit: 'ng/mL' },
         { ageGroup: 'Neonatal (0-7 days)',  ageMin: 0,    ageMax: 0.02, gender: 'all', range: '17.0-20.0', unit: 'g/dL', criticalLow: '7.0', criticalHigh: '24.0' },
         { ageGroup: 'Pediatric (7d-13yr)', ageMin: 0.02, ageMax: 13,   gender: 'all', range: '12.0-16.0', unit: 'g/dL', criticalLow: '7.0', criticalHigh: '20.0' },
         { ageGroup: 'Adult Female',         ageMin: 13,                  gender: 'F',   range: '11.5-15.0', unit: 'g/dL', criticalLow: '7.0', criticalHigh: '20.0' },
@@ -959,10 +959,9 @@ async function seedTestCatalog() {
       sampleType: 'blood',
       turnaroundTime: 60,
       isActive: true,
-      unit: 'ng/dL',
+      unit: 'pmol/L',
       referenceRanges: [
-        { ageGroup: 'Adult', ageMin: 18, gender: 'all', range: '0.8-1.8', unit: 'ng/dL' },
-        { ageGroup: 'Pregnancy', ageMin: 18, ageMax: 45, gender: 'F', pregnancy: true, range: '0.8-1.5', unit: 'ng/dL' },
+        { ageGroup: 'Adult', ageMin: 18, gender: 'all', range: '12-22', unit: 'pmol/L' },
       ],
     },
     {
@@ -1002,10 +1001,7 @@ async function seedTestCatalog() {
       isActive: true,
       unit: 'ng/mL',
       referenceRanges: [
-        { ageGroup: '40-49 years', ageMin: 40, ageMax: 49, gender: 'M', range: '<2.5', unit: 'ng/mL' },
-        { ageGroup: '50-59 years', ageMin: 50, ageMax: 59, gender: 'M', range: '<3.5', unit: 'ng/mL' },
-        { ageGroup: '60-69 years', ageMin: 60, ageMax: 69, gender: 'M', range: '<4.5', unit: 'ng/mL' },
-        { ageGroup: '70-79 years', ageMin: 70, ageMax: 79, gender: 'M', range: '<6.5', unit: 'ng/mL' },
+        { ageGroup: 'Adult', ageMin: 18, gender: 'M', range: '0-4.0', unit: 'ng/mL' },
       ],
     },
     {
@@ -1697,9 +1693,9 @@ async function seedTestCatalog() {
       sampleType: 'blood',
       turnaroundTime: 30,
       isActive: true,
-      unit: 'µg/dL',
+      unit: 'pmol/L',
       referenceRanges: [
-        { ageGroup: 'Adult', ageMin: 18, gender: 'all', range: '5.0-12.0', unit: 'µg/dL' },
+        { ageGroup: 'Adult', ageMin: 18, gender: 'all', range: '12-22', unit: 'pmol/L' },
       ],
     },
     {
@@ -1823,7 +1819,7 @@ async function seedTestCatalog() {
       isActive: true,
       unit: 'ng/mL',
       referenceRanges: [
-        { ageGroup: 'Free/Total PSA Ratio', ageMin: 18, gender: 'M', range: '>0.25', unit: 'ratio' },
+        { ageGroup: 'Adult', ageMin: 18, gender: 'M', range: '0-4.0', unit: 'ng/mL' },
       ],
     },
     {

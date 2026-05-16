@@ -68,11 +68,11 @@ export class AiInterpretationService implements OnModuleInit {
     try {
       let interpretation: string;
 
-      // Try providers in order of preference
-      if (this.openRouterApiKey) {
-        interpretation = await this.callOpenRouter(prompt);
-      } else if (this.groqApiKey) {
+      // Try providers in order of preference: Groq (fastest) > OpenRouter > OpenAI
+      if (this.groqApiKey) {
         interpretation = await this.callGroq(prompt);
+      } else if (this.openRouterApiKey) {
+        interpretation = await this.callOpenRouter(prompt);
       } else if (this.openAiApiKey) {
         interpretation = await this.callOpenAI(prompt);
       } else {
