@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
@@ -47,6 +48,7 @@ export class ResultsService {
   private static readonly MCHC_TEST_CODE = 'MCHC';
   private static readonly CRP_TEST_CODE = 'CRP';
   private static readonly HSCRP_TEST_CODE = 'HSCRP';
+  private readonly logger = new Logger(ResultsService.name);
 
   constructor(
     @InjectModel(Result.name) private resultModel: Model<Result>,
