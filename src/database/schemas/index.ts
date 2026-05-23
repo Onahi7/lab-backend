@@ -21,3 +21,4 @@ export * from './cash-reconciliation.schema';
 export * from './report-template.schema';
 export * from './payment.schema';
 export * from './doctor.schema';
+export * from './external-api-client.schema';

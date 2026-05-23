@@ -67,7 +67,7 @@ async function bootstrap() {
     },
     credentials: configService.get('cors.credentials'),
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-API-Key'],
     exposedHeaders: ['X-Total-Count', 'X-Page', 'X-Per-Page'],
     maxAge: 3600,
   });

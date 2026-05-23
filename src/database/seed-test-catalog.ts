@@ -25,7 +25,7 @@ async function seedTestCatalog() {
       isActive: false,
       description: 'Hemoglobin concentration measurement',
       unit: 'g/dL',
-        { ageGroup: 'Adult', ageMin: 18, gender: 'M', range: '0-4.0', unit: 'ng/mL' },
+      referenceRanges: [
         { ageGroup: 'Neonatal (0-7 days)',  ageMin: 0,    ageMax: 0.02, gender: 'all', range: '17.0-20.0', unit: 'g/dL', criticalLow: '7.0', criticalHigh: '24.0' },
         { ageGroup: 'Pediatric (7d-13yr)', ageMin: 0.02, ageMax: 13,   gender: 'all', range: '12.0-16.0', unit: 'g/dL', criticalLow: '7.0', criticalHigh: '20.0' },
         { ageGroup: 'Adult Female',         ageMin: 13,                  gender: 'F',   range: '11.5-15.0', unit: 'g/dL', criticalLow: '7.0', criticalHigh: '20.0' },

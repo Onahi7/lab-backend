@@ -83,6 +83,15 @@ export class Order extends Document {
   notes?: string;
 
   @Prop()
+  externalFacilityId?: string;
+
+  @Prop()
+  externalFacilityName?: string;
+
+  @Prop()
+  externalRequestId?: string;
+
+  @Prop()
   referredByDoctor?: string;
 
   @Prop({ type: Types.ObjectId, ref: 'Doctor' })
@@ -121,3 +130,14 @@ OrderSchema.index({ patientId: 1 });
 OrderSchema.index({ status: 1 });
 OrderSchema.index({ createdAt: -1 });
 OrderSchema.index({ doctorId: 1 });
+OrderSchema.index(
+  { externalFacilityId: 1, externalRequestId: 1 },
+  {
+    unique: true,
+    sparse: true,
+    partialFilterExpression: {
+      externalFacilityId: { $exists: true },
+      externalRequestId: { $exists: true },
+    },
+  },
+);
