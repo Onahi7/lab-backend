@@ -80,7 +80,10 @@ export class ExternalApiService {
         .lean(),
     ]);
 
-    return { tests, panels };
+    const panelCodes = new Set(panels.map((panel) => panel.code));
+    const standaloneTests = tests.filter((test) => !panelCodes.has(test.code));
+
+    return { tests: standaloneTests, panels };
   }
 
   async createTestRequest(
@@ -187,40 +190,41 @@ export class ExternalApiService {
     const orderTests: any[] = [];
     for (const rawCode of testCodes) {
       const code = rawCode.trim().toUpperCase();
-      const test = await this.testCatalogModel.findOne({ code, isActive: true }).lean();
-
-      if (test) {
-        orderTests.push({
-          testId: test._id.toString(),
-          testCode: test.code,
-          testName: test.name,
-          panelCode: test.panelCode,
-          panelName: test.panelName,
-          category: test.category,
-          price: test.price,
-        });
-        continue;
-      }
 
       const panel = await this.testPanelModel
         .findOne({ code, isActive: true })
         .lean();
 
-      if (!panel) {
+      if (panel) {
+        for (let index = 0; index < panel.tests.length; index += 1) {
+          const panelTest = panel.tests[index] as any;
+          orderTests.push({
+            testId: panelTest.testId.toString(),
+            testCode: panelTest.testCode,
+            testName: panelTest.testName,
+            panelCode: panel.code,
+            panelName: panel.name,
+            price: index === 0 ? panel.price : 0,
+          });
+        }
+        continue;
+      }
+
+      const test = await this.testCatalogModel.findOne({ code, isActive: true }).lean();
+
+      if (!test) {
         throw new BadRequestException(`Unknown test or panel code: ${code}`);
       }
 
-      for (let index = 0; index < panel.tests.length; index += 1) {
-        const panelTest = panel.tests[index] as any;
-        orderTests.push({
-          testId: panelTest.testId.toString(),
-          testCode: panelTest.testCode,
-          testName: panelTest.testName,
-          panelCode: panel.code,
-          panelName: panel.name,
-          price: index === 0 ? panel.price : 0,
-        });
-      }
+      orderTests.push({
+        testId: test._id.toString(),
+        testCode: test.code,
+        testName: test.name,
+        panelCode: test.panelCode,
+        panelName: test.panelName,
+        category: test.category,
+        price: test.price,
+      });
     }
 
     const deduped = new Map<string, any>();
