@@ -80,6 +80,18 @@ export class CreateFacilityTestRequestDto {
   @IsNotEmpty()
   externalRequestId: string;
 
+  @IsOptional()
+  @IsString()
+  sourceSystem?: string;
+
+  @IsOptional()
+  @IsString()
+  sourceFacilityName?: string;
+
+  @IsOptional()
+  @IsString()
+  sourceFacilityLocation?: string;
+
   @ValidateNested()
   @Type(() => FacilityPatientDto)
   patient: FacilityPatientDto;

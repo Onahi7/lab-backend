@@ -115,6 +115,9 @@ export class ExternalApiService {
       notes: dto.notes,
       externalFacilityId: facility._id.toString(),
       externalFacilityName: facility.facilityName,
+      sourceSystem: dto.sourceSystem || facility.facilityName,
+      sourceFacilityName: dto.sourceFacilityName || facility.facilityName,
+      sourceFacilityLocation: dto.sourceFacilityLocation,
       externalRequestId: dto.externalRequestId,
     } as any);
 
@@ -269,6 +272,9 @@ export class ExternalApiService {
     return {
       externalRequestId: order.externalRequestId,
       externalFacilityName: order.externalFacilityName,
+      sourceSystem: order.sourceSystem,
+      sourceFacilityName: order.sourceFacilityName,
+      sourceFacilityLocation: order.sourceFacilityLocation,
       orderId: order._id,
       orderNumber: order.orderNumber,
       status: order.status,

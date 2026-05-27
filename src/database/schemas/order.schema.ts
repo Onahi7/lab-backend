@@ -89,6 +89,15 @@ export class Order extends Document {
   externalFacilityName?: string;
 
   @Prop()
+  sourceSystem?: string;
+
+  @Prop()
+  sourceFacilityName?: string;
+
+  @Prop()
+  sourceFacilityLocation?: string;
+
+  @Prop()
   externalRequestId?: string;
 
   @Prop()
