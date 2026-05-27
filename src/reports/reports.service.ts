@@ -25,6 +25,17 @@ import { LaboratoryInfoDto } from './dto/laboratory-info.dto';
 export class ReportsService {
   private static readonly MCHC_TEST_CODE = 'MCHC';
 
+  private static readonly FBC_RESULT_ORDER = [
+    'WBC', 'NEUTA', 'LYMPHA', 'MONOA', 'EOSA', 'BASOA',
+    'NEUT', 'LYMPH', 'MONO', 'EOS', 'BASO',
+    'RBC', 'HB', 'HCT', 'MCV', 'MCH', 'MCHC', 'RDWCV', 'RDWSD',
+    'PLT', 'MPV', 'PDW', 'PLTCT', 'PLCR', 'PLCC',
+  ];
+
+  private static readonly FBC_RESULT_ORDER_INDEX = new Map(
+    ReportsService.FBC_RESULT_ORDER.map((code, index) => [code, index]),
+  );
+
   private static readonly TEST_CODE_ALIASES: Record<string, string[]> = {
     HSCRP: ['HSCR'],
     HSCR: ['HSCRP'],
@@ -276,6 +287,14 @@ export class ReportsService {
       const normalizedValue = numericValue > 100 ? numericValue / 10 : numericValue;
       return this.formatScaledNumericValue(normalizedValue);
     });
+  }
+
+  private getPanelResultOrder(panelCode?: string, testCode?: string): number | undefined {
+    if (this.normalizeLookupToken(panelCode) !== 'FBC') {
+      return undefined;
+    }
+
+    return ReportsService.FBC_RESULT_ORDER_INDEX.get(this.normalizeLookupToken(testCode));
   }
 
   /**
@@ -663,7 +682,16 @@ export class ReportsService {
       } as any);
     }
 
-    resultItems.sort((a, b) => a.displayOrder - b.displayOrder);
+    resultItems.sort((a, b) => {
+      const aPanelOrder = this.getPanelResultOrder(a.panelCode, a.testCode);
+      const bPanelOrder = this.getPanelResultOrder(b.panelCode, b.testCode);
+
+      if (aPanelOrder !== undefined && bPanelOrder !== undefined) {
+        return (aPanelOrder ?? Number.MAX_SAFE_INTEGER) - (bPanelOrder ?? Number.MAX_SAFE_INTEGER);
+      }
+
+      return a.displayOrder - b.displayOrder;
+    });
 
     // Group results by category
     const resultsByCategory = this.groupResultsByCategory(resultItems);
