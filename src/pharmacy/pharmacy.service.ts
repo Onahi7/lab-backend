@@ -210,7 +210,7 @@ export class PharmacyService {
   }
 
   async checkout(params: {
-    items: Array<{ productId: string; quantity: number; unitPrice: number }>;
+    items: Array<{ productId: string; quantity: number; unitPrice: number; packSize?: { code?: string; name: string; unit: string; quantityPerPack: number } }>;
     paymentMethod: string;
     customerName?: string;
     customerPhone?: string;
@@ -229,6 +229,7 @@ export class PharmacyService {
         productId: item.productId,
         quantity: item.quantity,
         unitPrice: item.unitPrice,
+        ...(item.packSize ? { packSize: item.packSize } : {}),
       }));
 
       const { data } = await firstValueFrom(

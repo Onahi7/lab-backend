@@ -1,6 +1,24 @@
 import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 
+export class PackSizeDto {
+  @IsOptional()
+  @IsString()
+  code?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  unit: string;
+
+  @IsNumber()
+  @Min(1)
+  quantityPerPack: number;
+}
+
 export class CheckoutItemDto {
   @IsString()
   @IsNotEmpty()
@@ -13,6 +31,11 @@ export class CheckoutItemDto {
   @IsNumber()
   @Min(0)
   unitPrice: number;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => PackSizeDto)
+  packSize?: PackSizeDto;
 }
 
 export class CheckoutDto {
