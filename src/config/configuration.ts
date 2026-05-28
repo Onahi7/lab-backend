@@ -70,4 +70,12 @@ export default () => ({
     authToken: process.env.SMS_AUTH_TOKEN,
     fromNumber: process.env.SMS_FROM_NUMBER,
   },
+
+  // CAF Pharmacy integration
+  caf: {
+    baseUrl: process.env.CAF_API_BASE_URL,
+    username: process.env.CAF_API_USERNAME,
+    password: process.env.CAF_API_PASSWORD,
+    branchId: process.env.CAF_BRANCH_ID,
+  },
 });

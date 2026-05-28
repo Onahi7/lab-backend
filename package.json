@@ -31,6 +31,7 @@
     "update:urine-protein-subcategory": "ts-node -r tsconfig-paths/register src/database/update-urine-protein-subcategory.ts",
     "update:thyroid-ranges": "ts-node -r tsconfig-paths/register src/database/update-thyroid-ranges.ts",
     "update:ggt-cortisol-ranges": "ts-node -r tsconfig-paths/register src/database/update-ggt-cortisol-ranges.ts",
+    "update:existing-ggt-cortisol-results": "ts-node -r tsconfig-paths/register src/database/update-existing-ggt-cortisol-results.ts",
     "update:t4-range": "ts-node -r tsconfig-paths/register src/database/update-t4-range.ts",
     "update:ft4-range": "ts-node -r tsconfig-paths/register src/database/update-ft4-range.ts",
     "update:psa-range": "ts-node -r tsconfig-paths/register src/database/update-psa-range.ts",

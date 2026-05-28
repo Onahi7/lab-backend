@@ -51,14 +51,27 @@ export class ReconciliationService {
       .find({ createdAt: { $gte: startOfDay, $lte: endOfDay } })
       .exec();
 
-    // Gross collected by payment method
-    const incomeCash = payments
+    // Lab income by payment method
+    const labPayments = payments.filter((p) => p.source !== 'pharmacy');
+    const incomeCash = labPayments
       .filter((p) => p.paymentMethod === 'cash')
       .reduce((sum, p) => sum + p.amount, 0);
-    const incomeOrangeMoney = payments
+    const incomeOrangeMoney = labPayments
       .filter((p) => p.paymentMethod === 'orange_money')
       .reduce((sum, p) => sum + p.amount, 0);
-    const incomeAfrimoney = payments
+    const incomeAfrimoney = labPayments
+      .filter((p) => p.paymentMethod === 'afrimoney')
+      .reduce((sum, p) => sum + p.amount, 0);
+
+    // Pharmacy income by payment method
+    const pharmacyPayments = payments.filter((p) => p.source === 'pharmacy');
+    const pharmacyCash = pharmacyPayments
+      .filter((p) => p.paymentMethod === 'cash')
+      .reduce((sum, p) => sum + p.amount, 0);
+    const pharmacyOrangeMoney = pharmacyPayments
+      .filter((p) => p.paymentMethod === 'orange_money')
+      .reduce((sum, p) => sum + p.amount, 0);
+    const pharmacyAfrimoney = pharmacyPayments
       .filter((p) => p.paymentMethod === 'afrimoney')
       .reduce((sum, p) => sum + p.amount, 0);
 
@@ -81,10 +94,14 @@ export class ReconciliationService {
       .reduce((sum, e) => sum + e.amount, 0);
     const totalExpenditures = expenditures.reduce((sum, exp) => sum + exp.amount, 0);
 
-    // Expected = gross collected per method minus expenditures per method
-    const expectedCash = incomeCash - cashExpenditures;
-    const expectedOrangeMoney = incomeOrangeMoney - orangeExpenditures;
-    const expectedAfrimoney = incomeAfrimoney - afriExpenditures;
+    // Expected = gross collected per method minus expenditures per method (lab + pharmacy combined)
+    const totalCash = incomeCash + pharmacyCash;
+    const totalOrange = incomeOrangeMoney + pharmacyOrangeMoney;
+    const totalAfrimoney = incomeAfrimoney + pharmacyAfrimoney;
+
+    const expectedCash = totalCash - cashExpenditures;
+    const expectedOrangeMoney = totalOrange - orangeExpenditures;
+    const expectedAfrimoney = totalAfrimoney - afriExpenditures;
 
     // Get order counts
     const allOrders = await this.orderModel
@@ -103,9 +120,22 @@ export class ReconciliationService {
       paidOrders: paidOrders.length,
       pendingOrders: allOrders.length - paidOrders.length,
       totalExpenditures,
-      incomeCash,
-      incomeOrangeMoney,
-      incomeAfrimoney,
+      incomeCash: totalCash,
+      incomeOrangeMoney: totalOrange,
+      incomeAfrimoney: totalAfrimoney,
+      // Breakdown by source
+      labIncome: {
+        cash: incomeCash,
+        orangeMoney: incomeOrangeMoney,
+        afrimoney: incomeAfrimoney,
+        total: incomeCash + incomeOrangeMoney + incomeAfrimoney,
+      },
+      pharmacyIncome: {
+        cash: pharmacyCash,
+        orangeMoney: pharmacyOrangeMoney,
+        afrimoney: pharmacyAfrimoney,
+        total: pharmacyCash + pharmacyOrangeMoney + pharmacyAfrimoney,
+      },
     };
   }
 
@@ -275,16 +305,33 @@ export class ReconciliationService {
       .find({ createdAt: { $gte: startOfDay, $lte: endOfDay } })
       .lean();
 
-    const cashCollected = payments
+    // Lab payments
+    const labPayments = payments.filter(p => p.source !== 'pharmacy');
+    const cashCollected = labPayments
       .filter(p => p.paymentMethod === 'cash')
       .reduce((s, p) => s + p.amount, 0);
-    const orangeCollected = payments
+    const orangeCollected = labPayments
       .filter(p => p.paymentMethod === 'orange_money')
       .reduce((s, p) => s + p.amount, 0);
-    const afriCollected = payments
+    const afriCollected = labPayments
       .filter(p => p.paymentMethod === 'afrimoney')
       .reduce((s, p) => s + p.amount, 0);
-    const totalCollected = cashCollected + orangeCollected + afriCollected;
+    const totalLabCollected = cashCollected + orangeCollected + afriCollected;
+
+    // Pharmacy payments
+    const pharmacyPayments = payments.filter(p => p.source === 'pharmacy');
+    const pharmacyCash = pharmacyPayments
+      .filter(p => p.paymentMethod === 'cash')
+      .reduce((s, p) => s + p.amount, 0);
+    const pharmacyOrange = pharmacyPayments
+      .filter(p => p.paymentMethod === 'orange_money')
+      .reduce((s, p) => s + p.amount, 0);
+    const pharmacyAfri = pharmacyPayments
+      .filter(p => p.paymentMethod === 'afrimoney')
+      .reduce((s, p) => s + p.amount, 0);
+    const totalPharmacyCollected = pharmacyCash + pharmacyOrange + pharmacyAfri;
+
+    const totalCollected = totalLabCollected + totalPharmacyCollected;
 
     // 4. Expenditures
     const expenditures = await this.expenditureModel
@@ -302,10 +349,14 @@ export class ReconciliationService {
       .reduce((s, e) => s + e.amount, 0);
     const totalExpenditure = expenditures.reduce((s, e) => s + e.amount, 0);
 
-    // 5. Net expected per method
-    const netExpectedCash = cashCollected - cashExpenditure;
-    const netExpectedOrange = orangeCollected - orangeExpenditure;
-    const netExpectedAfri = afriCollected - afriExpenditure;
+    // 5. Net expected per method (combined lab + pharmacy income minus expenditures)
+    const totalCash = cashCollected + pharmacyCash;
+    const totalOrange = orangeCollected + pharmacyOrange;
+    const totalAfri = afriCollected + pharmacyAfri;
+
+    const netExpectedCash = totalCash - cashExpenditure;
+    const netExpectedOrange = totalOrange - orangeExpenditure;
+    const netExpectedAfri = totalAfri - afriExpenditure;
     const netExpectedTotal = totalCollected - totalExpenditure;
 
     // 6. Reconciliation (if submitted)
@@ -347,10 +398,22 @@ export class ReconciliationService {
         breakdown: testBreakdown,
       },
       income: {
-        cash: cashCollected,
-        orangeMoney: orangeCollected,
-        afrimoney: afriCollected,
+        cash: totalCash,
+        orangeMoney: totalOrange,
+        afrimoney: totalAfri,
         total: totalCollected,
+        lab: {
+          cash: cashCollected,
+          orangeMoney: orangeCollected,
+          afrimoney: afriCollected,
+          total: totalLabCollected,
+        },
+        pharmacy: {
+          cash: pharmacyCash,
+          orangeMoney: pharmacyOrange,
+          afrimoney: pharmacyAfri,
+          total: totalPharmacyCollected,
+        },
       },
       expenditures: {
         cash: cashExpenditure,
