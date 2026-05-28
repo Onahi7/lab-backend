@@ -222,63 +222,69 @@ export class PharmacyService {
       throw new BadRequestException('CAF integration not configured');
     }
 
-    const shiftId = await this.ensureOpenShift();
-
-    const checkoutItems = params.items.map((item) => ({
-      productId: item.productId,
-      quantity: item.quantity,
-      unitPrice: item.unitPrice,
-    }));
-
-    const { data } = await firstValueFrom(
-      this.httpService.post(
-        `${this.baseUrl}/sales/checkout`,
-        {
-          branchId: this.branchId,
-          shiftId,
-          terminalId: 'lab-dispensary',
-          items: checkoutItems,
-          paymentMethod: params.paymentMethod,
-          customerName: params.customerName || 'Lab Customer',
-          customerPhone: params.customerPhone,
-          notes: params.notes || 'Lab dispensary sale',
-          discount: params.discount || 0,
-        },
-        {
-          headers: {
-            ...this.headers,
-            'X-Idempotency-Key': params.idempotencyKey || this.idempotencyKey('lab-checkout'),
-          },
-        },
-      ),
-    );
-
-    const saleId = data.data.saleId;
-    const receiptNumber = data.data.receiptNumber;
-    const total = data.data.total;
-
-    // Record a local Payment so reconciliation picks it up
     try {
-      const totalAmount = params.items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
-      const finalAmount = params.discount ? totalAmount - params.discount : totalAmount;
+      const shiftId = await this.ensureOpenShift();
 
-      await this.paymentModel.create({
-        amount: finalAmount,
-        paymentMethod: params.paymentMethod,
-        notes: `Pharmacy sale ${receiptNumber}${params.customerName ? ` - ${params.customerName}` : ''}`,
-        source: 'pharmacy',
-        cafSaleId: saleId,
-        cafReceiptNumber: receiptNumber,
-      });
-    } catch (err: any) {
-      this.logger.error(`Failed to record local payment for pharmacy sale: ${err.message}`);
+      const checkoutItems = params.items.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+      }));
+
+      const { data } = await firstValueFrom(
+        this.httpService.post(
+          `${this.baseUrl}/sales/checkout`,
+          {
+            branchId: this.branchId,
+            shiftId,
+            terminalId: 'lab-dispensary',
+            items: checkoutItems,
+            paymentMethod: params.paymentMethod,
+            customerName: params.customerName || 'Lab Customer',
+            customerPhone: params.customerPhone,
+            notes: params.notes || 'Lab dispensary sale',
+            discount: params.discount || 0,
+          },
+          {
+            headers: {
+              ...this.headers,
+              'X-Idempotency-Key': params.idempotencyKey || this.idempotencyKey('lab-checkout'),
+            },
+          },
+        ),
+      );
+
+      const saleId = data.data.saleId;
+      const receiptNumber = data.data.receiptNumber;
+      const total = data.data.total;
+
+      // Record a local Payment so reconciliation picks it up
+      try {
+        const totalAmount = params.items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+        const finalAmount = params.discount ? totalAmount - params.discount : totalAmount;
+
+        await this.paymentModel.create({
+          amount: finalAmount,
+          paymentMethod: params.paymentMethod,
+          notes: `Pharmacy sale ${receiptNumber}${params.customerName ? ` - ${params.customerName}` : ''}`,
+          source: 'pharmacy',
+          cafSaleId: saleId,
+          cafReceiptNumber: receiptNumber,
+        });
+      } catch (err: any) {
+        this.logger.error(`Failed to record local payment for pharmacy sale: ${err.message}`);
+      }
+
+      return {
+        saleId,
+        receiptNumber,
+        total,
+      };
+    } catch (error: any) {
+      const message = error?.response?.data?.message || error?.message || 'Pharmacy checkout failed';
+      this.logger.error(`Pharmacy checkout error: ${message}`);
+      throw new BadRequestException(`Checkout failed: ${message}`);
     }
-
-    return {
-      saleId,
-      receiptNumber,
-      total,
-    };
   }
 
   async getSales(branchId?: string, startDate?: string, endDate?: string): Promise<any[]> {
