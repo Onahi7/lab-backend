@@ -721,8 +721,8 @@ async function seedTestCatalog() {
       isActive: true,
       unit: '%',
       referenceRanges: [
-        { ageGroup: 'Normal', ageMin: 18, gender: 'all', range: '<5.7', unit: '%' },
-        { ageGroup: 'Prediabetes', ageMin: 18, gender: 'all', range: '5.7-6.4', unit: '%' },
+        { ageGroup: 'Normal', ageMin: 18, gender: 'all', range: '<6.0', unit: '%' },
+        { ageGroup: 'Prediabetes', ageMin: 18, gender: 'all', range: '6.0-6.4', unit: '%' },
         { ageGroup: 'Diabetes', ageMin: 18, gender: 'all', range: '≥6.5', unit: '%' },
       ],
     },
