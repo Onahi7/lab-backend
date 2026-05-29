@@ -299,26 +299,35 @@ export class PharmacyService {
   }
 
   async getSales(branchId?: string, startDate?: string, endDate?: string): Promise<any[]> {
-    if (!this.isConfigured()) return [];
-    await this.ensureAuthenticated();
-
-    const params: any = {
-      branchId: branchId || this.branchId,
-      limit: 50,
-    };
-    if (startDate) params.startDate = startDate;
-    if (endDate) params.endDate = endDate;
-
     try {
-      const { data } = await firstValueFrom(
-        this.httpService.get(`${this.baseUrl}/sales`, {
-          headers: this.headers,
-          params,
-        }),
-      );
-      return data.data || [];
+      const filter: any = { source: 'pharmacy' };
+      if (startDate || endDate) {
+        filter.createdAt = {};
+        if (startDate) filter.createdAt.$gte = new Date(startDate);
+        if (endDate) filter.createdAt.$lte = new Date(endDate);
+      }
+
+      const payments = await this.paymentModel
+        .find(filter)
+        .sort({ createdAt: -1 })
+        .limit(50)
+        .lean()
+        .exec();
+
+      return payments.map((p: any) => ({
+        _id: p._id,
+        receiptNumber: p.cafReceiptNumber || p._id.toString().slice(-8).toUpperCase(),
+        total: p.amount,
+        paymentMethod: p.paymentMethod || 'cash',
+        customerName: p.notes?.includes('-')
+          ? p.notes.split('-').pop()?.trim()
+          : 'Walk-in',
+        items: [],
+        createdAt: p.createdAt,
+        status: 'completed',
+      }));
     } catch (error: any) {
-      this.logger.error(`Failed to fetch sales: ${error.message}`);
+      this.logger.error(`Failed to fetch local pharmacy sales: ${error.message}`);
       return [];
     }
   }
