@@ -105,19 +105,24 @@ export class PharmacyService {
 
   async getProducts(search?: string, category?: string): Promise<CafProduct[]> {
     if (!this.isConfigured()) return [];
-    await this.ensureAuthenticated();
+    try {
+      await this.ensureAuthenticated();
 
-    const params: any = { branchId: this.branchId };
-    if (search) params.query = search;
-    if (category) params.category = category;
+      const params: any = { branchId: this.branchId };
+      if (search) params.query = search;
+      if (category) params.category = category;
 
-    const { data } = await firstValueFrom(
-      this.httpService.get(`${this.baseUrl}/products/search`, {
-        headers: this.headers,
-        params,
-      }),
-    );
-    return data.data || data;
+      const { data } = await firstValueFrom(
+        this.httpService.get(`${this.baseUrl}/products/search`, {
+          headers: this.headers,
+          params,
+        }),
+      );
+      return data.data || data;
+    } catch (error: any) {
+      this.logger.error(`CAF products fetch failed: ${error.message}`);
+      return [];
+    }
   }
 
   async getProductByBarcode(barcode: string): Promise<CafProduct | null> {
@@ -138,15 +143,20 @@ export class PharmacyService {
 
   async getLowStockAlerts(): Promise<any[]> {
     if (!this.isConfigured()) return [];
-    await this.ensureAuthenticated();
+    try {
+      await this.ensureAuthenticated();
 
-    const { data } = await firstValueFrom(
-      this.httpService.get(`${this.baseUrl}/inventory/low-stock-alerts`, {
-        headers: this.headers,
-        params: { branchId: this.branchId },
-      }),
-    );
-    return data.data || [];
+      const { data } = await firstValueFrom(
+        this.httpService.get(`${this.baseUrl}/inventory/low-stock-alerts`, {
+          headers: this.headers,
+          params: { branchId: this.branchId },
+        }),
+      );
+      return data.data || [];
+    } catch (error: any) {
+      this.logger.error(`CAF low stock fetch failed: ${error.message}`);
+      return [];
+    }
   }
 
   async getProductStock(productId: string): Promise<number> {
