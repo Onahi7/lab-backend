@@ -66,7 +66,7 @@ export class ExpendituresController {
   }
 
   @Delete(':id')
-  @Roles(UserRoleEnum.ADMIN)
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.RECEPTIONIST)
   async delete(@Param('id') id: string) {
     return this.expendituresService.delete(id);
   }
