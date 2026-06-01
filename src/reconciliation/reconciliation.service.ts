@@ -300,6 +300,9 @@ export class ReconciliationService {
     });
     testBreakdown.sort((a, b) => b.count - a.count);
 
+    // Correct total: panels count as 1 per order, standalone tests count individually
+    const deduplicatedTestCount = testBreakdown.reduce((sum, item) => sum + item.count, 0);
+
     // 3. Payments (actual money received)
     const payments = await this.paymentModel
       .find({ createdAt: { $gte: startOfDay, $lte: endOfDay } })
@@ -392,7 +395,7 @@ export class ReconciliationService {
         billed: totalBilled,
       },
       tests: {
-        total: totalTestsDone,
+        total: deduplicatedTestCount,
         completed: completedTests,
         pending: pendingTests,
         breakdown: testBreakdown,
