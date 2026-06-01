@@ -78,7 +78,7 @@ async function seedTestPanels() {
     code: 'ELEC',
     name: 'Electrolyte Panel',
     description: 'Complete electrolyte panel - K, Na, Cl, iCa, nCa, TCa, TCO2, Blood pH',
-    price: 190,
+    price: 200,
     isActive: true,
     tests: electTestItems,
   });
@@ -102,7 +102,7 @@ async function seedTestPanels() {
     code: 'LFT',
     name: 'Liver Function Test',
     description: 'Comprehensive liver function panel - ALT, AST, ALP, Albumin, Bilirubin, GGT, Total Protein',
-    price: 320,
+    price: 360,
     isActive: true,
     tests: lftTestItems,
   });
