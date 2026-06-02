@@ -10,6 +10,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  Req,
 } from '@nestjs/common';
 import { TestCatalogService } from './test-catalog.service';
 import { CreateTestDto } from './dto/create-test.dto';
@@ -20,6 +21,14 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { UserRoleEnum } from '../database/schemas/user-role.schema';
+
+function buildCtx(req: any) {
+  const user = req?.user || {};
+  return {
+    userId: user._id || user.userId || user.id || user.sub,
+    userName: user.fullName || user.full_name || user.name || user.email || 'Unknown',
+  };
+}
 
 @Controller('test-catalog')
 @UseGuards(JwtAuthGuard)
@@ -42,6 +51,21 @@ export class TestCatalogController {
   @Get('active-with-panels')
   async findActiveTestsAndPanels() {
     return this.testCatalogService.findActiveTestsAndPanels();
+  }
+
+  @Get('price-history')
+  async getPriceHistory(
+    @Query('testId') testId?: string,
+    @Query('panelId') panelId?: string,
+    @Query('code') code?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.testCatalogService.getPriceHistory({
+      testId,
+      panelId,
+      code,
+      limit: limit ? parseInt(limit) : undefined,
+    });
   }
 
   @Get('category/:category')
@@ -72,8 +96,9 @@ export class TestCatalogController {
   async updateTest(
     @Param('id') id: string,
     @Body() updateTestDto: UpdateTestDto,
+    @Req() req: any,
   ) {
-    return this.testCatalogService.updateTest(id, updateTestDto);
+    return this.testCatalogService.updateTest(id, updateTestDto, buildCtx(req));
   }
 
   @Patch(':id/activate')
@@ -133,8 +158,9 @@ export class TestPanelsController {
   async updateTestPanel(
     @Param('id') id: string,
     @Body() updateTestPanelDto: UpdateTestPanelDto,
+    @Req() req: any,
   ) {
-    return this.testCatalogService.updateTestPanel(id, updateTestPanelDto);
+    return this.testCatalogService.updateTestPanel(id, updateTestPanelDto, buildCtx(req));
   }
 
   @Patch(':id/activate')
@@ -157,5 +183,33 @@ export class TestPanelsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteTestPanel(@Param('id') id: string) {
     await this.testCatalogService.deleteTestPanel(id);
+  }
+}
+
+@Controller('price-history')
+@UseGuards(JwtAuthGuard)
+export class PriceHistoryController {
+  constructor(private readonly testCatalogService: TestCatalogService) {}
+
+  @Get()
+  async getPriceHistory(
+    @Query('testId') testId?: string,
+    @Query('panelId') panelId?: string,
+    @Query('code') code?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.testCatalogService.getPriceHistory({
+      testId,
+      panelId,
+      code,
+      limit: limit ? parseInt(limit) : undefined,
+    });
+  }
+
+  @Post(':id/revert')
+  @UseGuards(RolesGuard)
+  @Roles(UserRoleEnum.ADMIN)
+  async revertPrice(@Param('id') id: string, @Req() req: any) {
+    return this.testCatalogService.revertPrice(id, buildCtx(req));
   }
 }

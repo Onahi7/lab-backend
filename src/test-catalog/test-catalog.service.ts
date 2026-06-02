@@ -8,10 +8,17 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { TestCatalog } from '../database/schemas/test-catalog.schema';
 import { TestPanel } from '../database/schemas/test-panel.schema';
+import { PriceHistory, PriceHistoryDocument } from '../database/schemas/price-history.schema';
 import { CreateTestDto } from './dto/create-test.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 import { CreateTestPanelDto } from './dto/create-test-panel.dto';
 import { UpdateTestPanelDto } from './dto/update-test-panel.dto';
+
+interface PriceChangeContext {
+  userId: string;
+  userName: string;
+  reason?: string;
+}
 
 @Injectable()
 export class TestCatalogService {
@@ -20,7 +27,33 @@ export class TestCatalogService {
     private testCatalogModel: Model<TestCatalog>,
     @InjectModel(TestPanel.name)
     private testPanelModel: Model<TestPanel>,
+    @InjectModel(PriceHistory.name)
+    private priceHistoryModel: Model<PriceHistoryDocument>,
   ) {}
+
+  // ─── Price history logging ─────────────────────────────────────
+  private async logPriceChange(
+    entityType: 'test' | 'panel',
+    entityId: Types.ObjectId,
+    code: string,
+    name: string,
+    oldPrice: number,
+    newPrice: number,
+    ctx: PriceChangeContext,
+  ) {
+    await this.priceHistoryModel.create({
+      entityType,
+      testId: entityType === 'test' ? entityId : undefined,
+      panelId: entityType === 'panel' ? entityId : undefined,
+      code,
+      name,
+      oldPrice,
+      newPrice,
+      changedBy: new Types.ObjectId(ctx.userId),
+      changedByName: ctx.userName,
+      reason: ctx.reason,
+    });
+  }
 
   // Test Catalog Methods
 
@@ -147,6 +180,7 @@ export class TestCatalogService {
   async updateTest(
     id: string,
     updateTestDto: UpdateTestDto,
+    ctx?: PriceChangeContext,
   ): Promise<TestCatalog> {
     if (!Types.ObjectId.isValid(id)) {
       throw new BadRequestException('Invalid test ID format');
@@ -191,6 +225,23 @@ export class TestCatalogService {
 
     if (!updatedTest) {
       throw new NotFoundException(`Test with ID ${id} not found`);
+    }
+
+    // Log price change
+    if (
+      ctx &&
+      updateTestDto.price !== undefined &&
+      Number(existingTest.price) !== Number(updatedTest.price)
+    ) {
+      await this.logPriceChange(
+        'test',
+        updatedTest._id as Types.ObjectId,
+        updatedTest.code,
+        updatedTest.name,
+        Number(existingTest.price),
+        Number(updatedTest.price),
+        ctx,
+      );
     }
 
     return updatedTest;
@@ -331,6 +382,7 @@ export class TestCatalogService {
   async updateTestPanel(
     id: string,
     updateTestPanelDto: UpdateTestPanelDto,
+    ctx?: PriceChangeContext,
   ): Promise<TestPanel> {
     if (!Types.ObjectId.isValid(id)) {
       throw new BadRequestException('Invalid test panel ID format');
@@ -399,7 +451,93 @@ export class TestCatalogService {
       throw new NotFoundException(`Test panel with ID ${id} not found`);
     }
 
+    // Log price change
+    if (
+      ctx &&
+      updateTestPanelDto.price !== undefined &&
+      Number(existingPanel.price) !== Number(updatedPanel.price)
+    ) {
+      await this.logPriceChange(
+        'panel',
+        updatedPanel._id as Types.ObjectId,
+        updatedPanel.code,
+        updatedPanel.name,
+        Number(existingPanel.price),
+        Number(updatedPanel.price),
+        ctx,
+      );
+    }
+
     return updatedPanel;
+  }
+
+  // ─── Price history queries ─────────────────────────────────────
+
+  async getPriceHistory(
+    filters: { testId?: string; panelId?: string; code?: string; limit?: number } = {},
+  ) {
+    const query: any = {};
+    if (filters.testId) query.testId = new Types.ObjectId(filters.testId);
+    if (filters.panelId) query.panelId = new Types.ObjectId(filters.panelId);
+    if (filters.code) query.code = filters.code;
+    return this.priceHistoryModel
+      .find(query)
+      .sort({ createdAt: -1 })
+      .limit(filters.limit || 100)
+      .lean();
+  }
+
+  async revertPrice(
+    historyId: string,
+    ctx: PriceChangeContext,
+  ): Promise<TestCatalog | TestPanel> {
+    if (!Types.ObjectId.isValid(historyId)) {
+      throw new BadRequestException('Invalid history ID format');
+    }
+    const entry = await this.priceHistoryModel.findById(historyId).lean();
+    if (!entry) throw new NotFoundException('Price history entry not found');
+
+    if (entry.entityType === 'test' && entry.testId) {
+      const test = await this.testCatalogModel.findById(entry.testId);
+      if (!test) throw new NotFoundException('Test not found');
+      const oldPrice = Number(test.price);
+      const revertTo = Number(entry.oldPrice);
+      await this.testCatalogModel.updateOne(
+        { _id: entry.testId },
+        { $set: { price: revertTo } },
+      );
+      await this.logPriceChange(
+        'test',
+        entry.testId as Types.ObjectId,
+        test.code,
+        test.name,
+        oldPrice,
+        revertTo,
+        { ...ctx, reason: `Reverted to Le ${revertTo} (from history ${historyId})` },
+      );
+      return { ...test.toObject(), price: revertTo } as any;
+    }
+    if (entry.entityType === 'panel' && entry.panelId) {
+      const panel = await this.testPanelModel.findById(entry.panelId);
+      if (!panel) throw new NotFoundException('Panel not found');
+      const oldPrice = Number(panel.price);
+      const revertTo = Number(entry.oldPrice);
+      await this.testPanelModel.updateOne(
+        { _id: entry.panelId },
+        { $set: { price: revertTo } },
+      );
+      await this.logPriceChange(
+        'panel',
+        entry.panelId as Types.ObjectId,
+        panel.code,
+        panel.name,
+        oldPrice,
+        revertTo,
+        { ...ctx, reason: `Reverted to Le ${revertTo} (from history ${historyId})` },
+      );
+      return { ...panel.toObject(), price: revertTo } as any;
+    }
+    throw new BadRequestException('Invalid history entry type');
   }
 
   async deleteTestPanel(id: string): Promise<void> {
