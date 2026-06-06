@@ -28,6 +28,7 @@ import { PanelInterpretationsModule } from './panel-interpretations/panel-interp
 import { AiInterpretationModule } from './ai-interpretation/ai-interpretation.module';
 import { ExternalApiModule } from './external-api/external-api.module';
 import { PharmacyModule } from './pharmacy/pharmacy.module';
+import { BackupModule } from './backup/backup.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
@@ -69,6 +70,7 @@ import { AuditLoggingInterceptor } from './common/interceptors/audit-logging.int
     PanelInterpretationsModule,
     ExternalApiModule,
     PharmacyModule,
+    BackupModule,
   ],
   controllers: [AppController],
   providers: [
