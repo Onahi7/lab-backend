@@ -771,15 +771,22 @@ export class OrdersService {
       notes: addPaymentDto.notes,
     });
 
-    // Update order totals
-    order.amountPaid = Math.round((order.amountPaid + addPaymentDto.amount) * 100) / 100;
-    order.balance = Math.round((order.total - order.amountPaid) * 100) / 100;
-
-    if (order.amountPaid >= order.total) {
-      order.paymentStatus = PaymentStatusEnum.PAID;
+    // Zero-amount external payments are workflow signals from an upstream EMR:
+    // mark the order payable for collection without making LIS a financial ledger.
+    if (addPaymentDto.amount === 0) {
+      order.amountPaid = 0;
       order.balance = 0;
+      order.paymentStatus = PaymentStatusEnum.PAID;
     } else {
-      order.paymentStatus = PaymentStatusEnum.PARTIAL;
+      order.amountPaid = Math.round((order.amountPaid + addPaymentDto.amount) * 100) / 100;
+      order.balance = Math.round((order.total - order.amountPaid) * 100) / 100;
+
+      if (order.amountPaid >= order.total) {
+        order.paymentStatus = PaymentStatusEnum.PAID;
+        order.balance = 0;
+      } else {
+        order.paymentStatus = PaymentStatusEnum.PARTIAL;
+      }
     }
 
     // Move to pending_collection once any payment is made

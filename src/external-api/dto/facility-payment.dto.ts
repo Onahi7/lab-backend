@@ -3,7 +3,7 @@ import { PaymentMethodEnum } from '../../database/schemas/order.schema';
 
 export class FacilityPaymentDto {
   @IsNumber()
-  @Min(0.01)
+  @Min(0)
   amount: number;
 
   @IsEnum(PaymentMethodEnum)
