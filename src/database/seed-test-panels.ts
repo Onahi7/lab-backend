@@ -179,6 +179,30 @@ async function seedTestPanels() {
     tests: coagTestItems,
   });
 
+  // ==================== HEPATITIS B PANEL ====================
+  const hepBCodes = ['HBSAG', 'HBSAB', 'HBEAG', 'HBEAB', 'HBCAB'];
+  const hepBTestItems = [];
+
+  for (const code of hepBCodes) {
+    const test = await getTestByCode(code);
+    if (test) {
+      hepBTestItems.push({
+        testId: test._id,
+        testCode: test.code,
+        testName: test.name,
+      });
+    }
+  }
+
+  panels.push({
+    code: 'HEPB',
+    name: 'Hepatitis B Panel',
+    description: '5-in-1 combo cassette — HBsAg, HBsAb, HBeAg, HBeAb, HBcAb (Reactive / Non-Reactive)',
+    price: 170,
+    isActive: true,
+    tests: hepBTestItems,
+  });
+
   // ==================== URINALYSIS ====================
   const urineTests = ['URINE-COLOR', 'URINE-CLARITY', 'URINE-PH', 'URINE-SG', 'URINE-PROTEIN', 
                       'URINE-GLUCOSE', 'URINE-KETONES', 'URINE-BLOOD', 'URINE-BILI', 
@@ -224,6 +248,7 @@ async function seedTestPanels() {
   console.log(`   RFT: ${rftTestItems.length} parameters`);
   console.log(`   LIPID: ${lipidTestItems.length} parameters`);
   console.log(`   COAG: ${coagTestItems.length} parameters`);
+  console.log(`   HEPB: ${hepBTestItems.length} parameters`);
   console.log(`   URINE: ${urineTestItems.length} parameters`);
 
   await app.close();

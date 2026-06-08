@@ -53,6 +53,10 @@ export class ReportsService {
     // ── Serology: Reactive/Non-Reactive ────────────────────────────────
     RVS:       { 'Reactive': 'Positive', 'Non-Reactive': 'Negative' },
     HBSAG:     { 'Reactive': 'Positive', 'Non-Reactive': 'Negative' },
+    HBSAB:     { 'Reactive': 'Positive', 'Non-Reactive': 'Negative' },
+    HBEAG:     { 'Reactive': 'Positive', 'Non-Reactive': 'Negative' },
+    HBEAB:     { 'Reactive': 'Positive', 'Non-Reactive': 'Negative' },
+    HBCAB:     { 'Reactive': 'Positive', 'Non-Reactive': 'Negative' },
     HCV:       { 'Reactive': 'Positive', 'Non-Reactive': 'Negative' },
     RVSP24:    { 'Reactive': 'Positive', 'Non-Reactive': 'Negative' },
     HPYLORI:   { 'Reactive': 'Positive', 'Non-Reactive': 'Negative' },

@@ -21,6 +21,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "seed:admin": "ts-node -r tsconfig-paths/register src/database/seed-admin.ts",
     "seed:serology": "ts-node -r tsconfig-paths/register src/database/seed-serology.ts",
+    "seed:hepb": "ts-node -r tsconfig-paths/register src/database/add-hepatitis-b-panel.ts",
     "migrate:glucose": "ts-node -r tsconfig-paths/register src/database/migrate-glucose-to-mmol.ts",
     "update:prices": "ts-node -r tsconfig-paths/register src/database/update-test-prices.ts",
     "update:rft-ranges": "ts-node -r tsconfig-paths/register src/database/update-rft-ranges.ts",
