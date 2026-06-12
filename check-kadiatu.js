@@ -3,25 +3,35 @@ const uri = 'mongodb+srv://mmmnigeriaschool12_db_user:Iamhardy_7*@cluster0.abdi7
 
 mongoose.connect(uri, { serverSelectionTimeoutMS: 10000 }).then(async () => {
   const catCol = mongoose.connection.collection('test_catalog');
-  const panelCol = mongoose.connection.collection('test_panels');
 
-  // Check all HB tests in catalog
-  console.log('=== test_catalog: HB tests ===');
-  const hbTests = await catCol.find({ code: { $in: ['HBSAG', 'HBSAB', 'HBEAG', 'HBEAB', 'HBCAB'] } }).toArray();
-  for (const t of hbTests) {
-    console.log(`  ${t.code}: ${t.name} | price=${t.price} | active=${t.isActive} | category=${t.category}`);
-  }
+  await catCol.findOneAndUpdate(
+    { code: 'IGE' },
+    {
+      $set: {
+        code: 'IGE',
+        name: 'Total IgE',
+        category: 'immunoassay',
+        sampleType: 'blood',
+        price: 250,
+        unit: 'IU/mL',
+        turnaroundTime: 30,
+        isActive: true,
+        description: 'Total Immunoglobulin E — allergy screening',
+        referenceRanges: [
+          { ageGroup: '<1 year', ageMin: 0, ageMax: 1, gender: 'all', range: '0-15', unit: 'IU/mL' },
+          { ageGroup: '1-5 years', ageMin: 1, ageMax: 5, gender: 'all', range: '0-60', unit: 'IU/mL' },
+          { ageGroup: '6-9 years', ageMin: 6, ageMax: 9, gender: 'all', range: '0-90', unit: 'IU/mL' },
+          { ageGroup: '10-15 years', ageMin: 10, ageMax: 15, gender: 'all', range: '0-200', unit: 'IU/mL' },
+          { ageGroup: 'Adult', ageMin: 16, gender: 'all', range: '0-100', unit: 'IU/mL' },
+        ],
+      },
+    },
+    { upsert: true, new: true },
+  );
 
-  // Check HEPB panel
-  console.log('\n=== test_panels: HEPB ===');
-  const panel = await panelCol.findOne({ code: 'HEPB' });
-  if (panel) {
-    console.log(`  ${panel.code}: ${panel.name} | price=${panel.price} | active=${panel.isActive}`);
-    console.log(`  Tests (${panel.tests.length}):`);
-    panel.tests.forEach(t => console.log(`    ${t.testCode}: ${t.testName}`));
-  } else {
-    console.log('  HEPB panel NOT FOUND');
-  }
+  const t = await catCol.findOne({ code: 'IGE' });
+  console.log('IGE:', t.code, '| Price:', t.price, '| Ranges:', t.referenceRanges.length);
+  t.referenceRanges.forEach(r => console.log('  ' + r.ageGroup + ': ' + r.range + ' ' + r.unit));
 
   await mongoose.disconnect();
   process.exit(0);
