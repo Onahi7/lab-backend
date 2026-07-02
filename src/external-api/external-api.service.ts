@@ -19,6 +19,7 @@ import { Result } from '../database/schemas/result.schema';
 import { TestCatalog } from '../database/schemas/test-catalog.schema';
 import { TestPanel } from '../database/schemas/test-panel.schema';
 import { CreateApiClientDto } from './dto/create-api-client.dto';
+import { UpdateApiClientDto } from './dto/update-api-client.dto';
 import { CreateFacilityTestRequestDto } from './dto/create-facility-test-request.dto';
 import { FacilityPaymentDto } from './dto/facility-payment.dto';
 
@@ -54,6 +55,7 @@ export class ExternalApiService {
       keyPrefix: client.keyPrefix,
       apiKey,
       isActive: client.isActive,
+      priceMarkupPercentage: client.priceMarkupPercentage,
       createdAt: client.createdAt,
     };
   }
@@ -66,7 +68,25 @@ export class ExternalApiService {
       .lean();
   }
 
-  async getCatalog() {
+  async updateApiClient(id: string, dto: UpdateApiClientDto) {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new NotFoundException(`API client ${id} not found`);
+    }
+
+    const client = await this.externalApiClientModel
+      .findByIdAndUpdate(id, dto, { new: true })
+      .select('-apiKeyHash')
+      .lean();
+
+    if (!client) {
+      throw new NotFoundException(`API client ${id} not found`);
+    }
+
+    return client;
+  }
+
+  async getCatalog(facility: ExternalApiClient) {
+    const markupPercentage = this.getPriceMarkupPercentage(facility);
     const [tests, panels] = await Promise.all([
       this.testCatalogModel
         .find({ isActive: true })
@@ -83,7 +103,15 @@ export class ExternalApiService {
     const panelCodes = new Set(panels.map((panel) => panel.code));
     const standaloneTests = tests.filter((test) => !panelCodes.has(test.code));
 
-    return { tests: standaloneTests, panels };
+    return {
+      priceMarkupPercentage: markupPercentage,
+      tests: standaloneTests.map((test) =>
+        this.applyMarkupToPricedEntity(test, markupPercentage),
+      ),
+      panels: panels.map((panel) =>
+        this.applyMarkupToPricedEntity(panel, markupPercentage),
+      ),
+    };
   }
 
   async createTestRequest(
@@ -100,7 +128,10 @@ export class ExternalApiService {
       return this.buildRequestResponse(existing);
     }
 
-    const orderTests = await this.resolveRequestedTests(dto.tests.map((t) => t.code));
+    const orderTests = await this.resolveRequestedTests(
+      dto.tests.map((t) => t.code),
+      facility,
+    );
     const patient = await this.patientsService.create(dto.patient);
 
     const order = await this.ordersService.create({
@@ -185,11 +216,15 @@ export class ExternalApiService {
     };
   }
 
-  private async resolveRequestedTests(testCodes: string[]) {
+  private async resolveRequestedTests(
+    testCodes: string[],
+    facility: ExternalApiClient,
+  ) {
     if (!testCodes.length) {
       throw new BadRequestException('At least one test code is required');
     }
 
+    const markupPercentage = this.getPriceMarkupPercentage(facility);
     const orderTests: any[] = [];
     for (const rawCode of testCodes) {
       const code = rawCode.trim().toUpperCase();
@@ -207,7 +242,10 @@ export class ExternalApiService {
             testName: panelTest.testName,
             panelCode: panel.code,
             panelName: panel.name,
-            price: index === 0 ? panel.price : 0,
+            price:
+              index === 0
+                ? this.applyPriceMarkup(panel.price, markupPercentage)
+                : 0,
           });
         }
         continue;
@@ -226,7 +264,7 @@ export class ExternalApiService {
         panelCode: test.panelCode,
         panelName: test.panelName,
         category: test.category,
-        price: test.price,
+        price: this.applyPriceMarkup(test.price, markupPercentage),
       });
     }
 
@@ -239,6 +277,32 @@ export class ExternalApiService {
     }
 
     return Array.from(deduped.values());
+  }
+
+  private getPriceMarkupPercentage(facility?: ExternalApiClient | null) {
+    const value = Number(facility?.priceMarkupPercentage ?? 0);
+    return Number.isFinite(value) && value > 0 ? value : 0;
+  }
+
+  private applyPriceMarkup(price: number, markupPercentage: number) {
+    const numericPrice = Number(price || 0);
+    if (!markupPercentage) {
+      return Math.ceil(numericPrice / 5) * 5;
+    }
+
+    const markedUpPrice = numericPrice * (1 + markupPercentage / 100);
+    return Math.ceil(markedUpPrice / 5) * 5;
+  }
+
+  private applyMarkupToPricedEntity<T extends { price?: number }>(
+    entity: T,
+    markupPercentage: number,
+  ) {
+    return {
+      ...entity,
+      basePrice: Number(entity.price || 0),
+      price: this.applyPriceMarkup(Number(entity.price || 0), markupPercentage),
+    };
   }
 
   private async findFacilityOrder(

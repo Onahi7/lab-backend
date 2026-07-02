@@ -12,8 +12,8 @@ export class ExternalApiController {
   constructor(private readonly externalApiService: ExternalApiService) {}
 
   @Get('catalog')
-  getCatalog() {
-    return this.externalApiService.getCatalog();
+  getCatalog(@Request() req: any) {
+    return this.externalApiService.getCatalog(req.facility);
   }
 
   @Post('test-requests')

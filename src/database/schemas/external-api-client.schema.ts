@@ -15,6 +15,9 @@ export class ExternalApiClient extends Document {
   @Prop({ default: true, index: true })
   isActive: boolean;
 
+  @Prop({ default: 0, min: 0 })
+  priceMarkupPercentage: number;
+
   @Prop()
   contactName?: string;
 
