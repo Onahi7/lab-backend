@@ -1920,6 +1920,16 @@ async function seedTestCatalog() {
       ],
     },
     {
+      code: 'G6PD',
+      name: 'Glucose-6-Phosphate Dehydrogenase',
+      category: 'hematology',
+      price: 250,
+      sampleType: 'blood',
+      turnaroundTime: 30,
+      isActive: true,
+      description: 'G6PD deficiency screening',
+    },
+    {
       code: 'ASO',
       name: 'Anti-Streptolysin O',
       category: 'immunoassay',
