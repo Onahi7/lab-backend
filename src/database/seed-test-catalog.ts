@@ -1921,13 +1921,14 @@ async function seedTestCatalog() {
     },
     {
       code: 'G6PD',
-      name: 'Glucose-6-Phosphate Dehydrogenase',
+      name: 'G6PD Rapid Test',
       category: 'hematology',
       price: 250,
       sampleType: 'blood',
       turnaroundTime: 30,
       isActive: true,
-      description: 'G6PD deficiency screening',
+      description:
+        'Qualitative rapid screening test. Report as Normal, Deficient, or Invalid. Deficient or clinically suspicious results should be confirmed with quantitative G6PD enzyme assay where indicated.',
     },
     {
       code: 'ASO',
