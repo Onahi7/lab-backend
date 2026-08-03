@@ -9,6 +9,7 @@ export enum TestCategoryEnum {
   SEROLOGY = 'serology',
   URINALYSIS = 'urinalysis',
   MICROBIOLOGY = 'microbiology',
+  CLINICAL_PATHOLOGY = 'clinical_pathology',
   OTHER = 'other',
 }
 

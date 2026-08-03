@@ -789,6 +789,7 @@ export class ReportsService {
       serology: TestCategoryEnum.SEROLOGY,
       urinalysis: TestCategoryEnum.URINALYSIS,
       microbiology: TestCategoryEnum.MICROBIOLOGY,
+      clinical_pathology: TestCategoryEnum.CLINICAL_PATHOLOGY,
       other: TestCategoryEnum.OTHER,
       other_tests: TestCategoryEnum.OTHER,
     };
@@ -1021,6 +1022,7 @@ export class ReportsService {
       [TestCategoryEnum.SEROLOGY]: 'SEROLOGY',
       [TestCategoryEnum.URINALYSIS]: 'URINALYSIS',
       [TestCategoryEnum.MICROBIOLOGY]: 'MICROBIOLOGY',
+      [TestCategoryEnum.CLINICAL_PATHOLOGY]: 'CLINICAL PATHOLOGY',
       [TestCategoryEnum.OTHER]: 'OTHER TESTS',
     };
 

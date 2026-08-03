@@ -196,6 +196,16 @@ async function seedSerology() {
       isActive: true,
       description: 'Helicobacter pylori stool antigen detection — Positive / Negative',
     },
+    {
+      code: 'SFA',
+      name: 'Semen Fluid Analysis',
+      category: 'clinical_pathology',
+      price: 250,
+      sampleType: 'other',
+      turnaroundTime: 120,
+      isActive: true,
+      description: 'Semen fluid analysis — lab scientist types observation findings',
+    },
   ];
 
   let upserted = 0;
