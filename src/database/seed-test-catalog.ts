@@ -712,6 +712,22 @@ async function seedTestCatalog() {
       ],
     },
     {
+      code: 'OGTT',
+      name: 'Oral Glucose Tolerance Test',
+      category: 'chemistry',
+      price: 250,
+      sampleType: 'blood',
+      turnaroundTime: 180,
+      isActive: true,
+      unit: 'mmol/L',
+      description: '75g oral glucose tolerance test with fasting, 1-hour and 2-hour readings',
+      referenceRanges: [
+        { ageGroup: 'Fasting', ageMin: 18, gender: 'all', range: '3.5-5.9', unit: 'mmol/L', criticalLow: '2.8', criticalHigh: '27.8' },
+        { ageGroup: '1 hour', ageMin: 18, gender: 'all', range: '<10', unit: 'mmol/L' },
+        { ageGroup: '2 hours', ageMin: 18, gender: 'all', range: '<8.6', unit: 'mmol/L' },
+      ],
+    },
+    {
       code: 'HBA1C',
       name: 'Glycated Hemoglobin',
       category: 'immunoassay',
