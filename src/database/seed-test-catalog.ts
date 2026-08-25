@@ -715,7 +715,7 @@ async function seedTestCatalog() {
       code: 'OGTT',
       name: 'Oral Glucose Tolerance Test',
       category: 'chemistry',
-      price: 250,
+      price: 300,
       sampleType: 'blood',
       turnaroundTime: 180,
       isActive: true,

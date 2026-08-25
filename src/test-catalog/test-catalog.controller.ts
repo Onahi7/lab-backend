@@ -17,6 +17,7 @@ import { CreateTestDto } from './dto/create-test.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 import { CreateTestPanelDto } from './dto/create-test-panel.dto';
 import { UpdateTestPanelDto } from './dto/update-test-panel.dto';
+import { UpdatePriceDto } from './dto/update-price.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -101,6 +102,21 @@ export class TestCatalogController {
     return this.testCatalogService.updateTest(id, updateTestDto, buildCtx(req));
   }
 
+  @Patch(':id/price')
+  @UseGuards(RolesGuard)
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH)
+  async updateTestPrice(
+    @Param('id') id: string,
+    @Body() updatePriceDto: UpdatePriceDto,
+    @Req() req: any,
+  ) {
+    return this.testCatalogService.updateTest(
+      id,
+      { price: updatePriceDto.price },
+      buildCtx(req),
+    );
+  }
+
   @Patch(':id/activate')
   @UseGuards(RolesGuard)
   @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH)
@@ -161,6 +177,21 @@ export class TestPanelsController {
     @Req() req: any,
   ) {
     return this.testCatalogService.updateTestPanel(id, updateTestPanelDto, buildCtx(req));
+  }
+
+  @Patch(':id/price')
+  @UseGuards(RolesGuard)
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.LAB_TECH)
+  async updateTestPanelPrice(
+    @Param('id') id: string,
+    @Body() updatePriceDto: UpdatePriceDto,
+    @Req() req: any,
+  ) {
+    return this.testCatalogService.updateTestPanel(
+      id,
+      { price: updatePriceDto.price },
+      buildCtx(req),
+    );
   }
 
   @Patch(':id/activate')
